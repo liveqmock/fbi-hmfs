@@ -32,7 +32,7 @@
 
 
     <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
-    <context:component-scan base-package="fip"/>
+    <context:component-scan base-package="hmfs,skyline"/>
 
     <!-- enable autowire -->
     <context:annotation-config/>
@@ -45,13 +45,18 @@
     <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="mapperLocations" value="classpath:skyline/repository/mapper/**/*.xml"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:fis/repository/mapper/**/*.xml</value>
+                <value>classpath:skyline/repository/mapper/**/*.xml</value>
+            </list>
+        </property>
     </bean>
 
     <!-- scan for mappers and let them be autowired -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage"
-                  value="skyline.repository.dao,fip.repository.dao"/>
+                  value="skyline.repository.dao,hmfs.repository.dao"/>
     </bean>
 
 

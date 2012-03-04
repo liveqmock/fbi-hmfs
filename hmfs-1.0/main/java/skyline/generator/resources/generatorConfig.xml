@@ -10,36 +10,53 @@
     <context id="AllInfo" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
                         connectionURL="jdbc:oracle:thin:@localhost:1521:orcl"
-                        userId="skyline"
-                        password="skyline">
+                        userId="hmfs"
+                        password="hmfs">
         </jdbcConnection>
 
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="biz.repository.model" targetProject="main/java">
+        <javaModelGenerator targetPackage="hmfs.repository.model" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="biz.repository.mapper" targetProject="main/java">
+        <sqlMapGenerator targetPackage="hmfs.repository.mapper" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
-        <javaClientGenerator type="XMLMAPPER" targetPackage="biz.repository.dao" targetProject="main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="hmfs.repository.dao" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
 
         <!--业务类例子 -->
         <!--
-        <table schema="" tableName="">
+        <table schema="hmfs" tableName="">
             <property name="ignoreQualifiersAtRuntime" value="true" />
             <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
             <columnOverride column="" jdbcType="TIMESTAMP"/>
         </table>
         -->
+
+        <table schema="hmfs" tableName="hm_actinfo_cbs">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+        </table>
+        <table schema="hmfs" tableName="hm_actinfo_fund">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+        </table>
+        <table schema="hmfs" tableName="txn_cbs_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+        </table>
+        <table schema="hmfs" tableName="txn_fund_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+        </table>
 
 
     </context>
