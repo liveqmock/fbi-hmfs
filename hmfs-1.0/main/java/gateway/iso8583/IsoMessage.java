@@ -263,17 +263,16 @@ public class IsoMessage {
      * length header, one for the message, and the last one with for the ETX.
      *
      * @param outs        The stream to write the message to.
-     * @param lengthBytes The size of the message length header. Valid ranges are 0 to 4.
      * @throws IllegalArgumentException if the specified length header is more than 4 bytes.
      * @throws java.io.IOException      if there is a problem writing to the stream.
      */
-    public void write(OutputStream outs, int lengthBytes) throws IOException {
-        if (lengthBytes > 4) {
+    public void write(OutputStream outs) throws IOException {
+       /* if (lengthBytes > 4) {
             throw new IllegalArgumentException("The length header can have at most 4 bytes");
-        }
+        }*/
         byte[] data = writeData();
 
-        if (lengthBytes > 0) {
+       /* if (lengthBytes > 0) {
             int l = data.length;
             if (etx > -1) {
                 l++;
@@ -294,7 +293,7 @@ public class IsoMessage {
             }
             buf[pos] = (byte) (l & 0xff);
             outs.write(buf);
-        }
+        }*/
         outs.write(data);
         //ETX
         if (etx > -1) {
@@ -359,7 +358,7 @@ public class IsoMessage {
             }
         }
         //Message Type
-        if (binary) {
+       /* if (binary) {
             bout.write((type & 0xff00) >> 8);
             bout.write(type & 0xff);
         } else {
@@ -368,7 +367,7 @@ public class IsoMessage {
             } catch (IOException ex) {
                 //should never happen, writing to a ByteArrayOutputStream
             }
-        }
+        }*/
 
         //Bitmap
         BitSet bs = new BitSet(forceb2 ? 128 : 64);
@@ -385,6 +384,10 @@ public class IsoMessage {
             b2.or(bs);
             bs = b2;
             bs.set(0);
+        }
+        // =======================================
+        if(isHasNext) {
+            bs.set(127, true);
         }
         //Write bitmap to stream
         if (binary) {

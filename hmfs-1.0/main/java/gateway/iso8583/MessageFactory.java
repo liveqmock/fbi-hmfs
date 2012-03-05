@@ -217,8 +217,9 @@ public class MessageFactory {
         IsoMessage m = new IsoMessage(isoHeaders.get(type));
         m.setType(type);
         m.setEtx(etx);
-        m.setBinary(useBinary);
-        m.setForceSecondaryBitmap(forceb2);
+        //m.setBinary(useBinary);
+        // m.setForceSecondaryBitmap(forceb2);
+        m.setForceSecondaryBitmap(true);
         m.setCharacterEncoding(encoding);
 
         //Copy the values from the template
@@ -232,12 +233,12 @@ public class MessageFactory {
                 }
             }
         }
-        if (traceGen != null) {
+        /*if (traceGen != null) {
             m.setValue(11, traceGen.nextTrace(), IsoType.NUMERIC, 6);
         }
         if (setDate) {
             m.setValue(7, new Date(), IsoType.DATE10, 10);
-        }
+        }*/
         return m;
     }
 
@@ -275,7 +276,7 @@ public class MessageFactory {
         return resp;
     }
 
-    public Map<String, List<IsoMessage>> parseTxnMessage(byte[] buf)
+    public Map<String, List<IsoMessage>> parseTxnMessageMap(byte[] buf)
             throws ParseException, UnsupportedEncodingException {
         Map<String, List<IsoMessage>> txnMessageMap = new HashMap<String, List<IsoMessage>>();
         // 获取交易码
