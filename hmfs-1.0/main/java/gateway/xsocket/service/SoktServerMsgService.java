@@ -24,10 +24,16 @@ public class SoktServerMsgService implements IMessageService {
     private static final Logger logger = LoggerFactory.getLogger(SoktServerMsgService.class);
 
     @Override
-    public byte[] handleMessage(byte[] bytes) throws IOException, ParseException {
+    public byte[] handleMessage(byte[] bytes) {
         // TODO
-        MessageFactory messageFactory = ConfigParser.createFromClasspathConfig("/j8583-config.xml");
-        Map<String, List<IsoMessage>> txnMessageMap = messageFactory.parseTxnMessage(bytes);
+        try {
+            MessageFactory messageFactory = ConfigParser.createFromClasspathConfig("/j8583-config.xml");
+            Map<String, List<IsoMessage>> txnMessageMap = messageFactory.parseTxnMessage(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
         return null;
     }
