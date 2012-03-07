@@ -32,7 +32,7 @@
 
 
     <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
-    <context:component-scan base-package="hmfs,skyline"/>
+    <context:component-scan base-package="hmfs,skyline,gateway"/>
 
     <!-- enable autowire -->
     <context:annotation-config/>
@@ -42,12 +42,21 @@
     <!-- enable transaction demarcation with annotations -->
     <tx:annotation-driven/>
 
+    <bean id="hmSocketServer" class="gateway.xsocket.server.XSocketServer">
+        <property name="port" value="${socket_server_monitor_port_hmfs}"/>
+        <property name="serverHandler" ref="hmServerHandler"/>
+    </bean>
+
+    <bean id="cbsSocketServer" class="gateway.xsocket.server.XSocketServer">
+        <property name="port" value="${socket_server_monitor_port_cbs}"/>
+        <property name="serverHandler" ref="cbsServerHandler"/>
+    </bean>
+
     <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations">
             <list>
-                <value>classpath:fis/repository/mapper/**/*.xml</value>
                 <value>classpath:skyline/repository/mapper/**/*.xml</value>
             </list>
         </property>
@@ -56,8 +65,7 @@
     <!-- scan for mappers and let them be autowired -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage"
-                  value="skyline.repository.dao,hmfs.repository.dao"/>
+                  value="skyline.repository.dao"/>
     </bean>
-
 
 </beans>

@@ -3,8 +3,10 @@ package gateway.xsocket.service;
 import gateway.iso8583.IsoMessage;
 import gateway.iso8583.IsoType;
 import gateway.iso8583.MessageFactory;
+import gateway.iso8583.parse.ConfigParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,13 +23,19 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 
-public class SoktServerMsgService implements IMessageService {
+@Service
+public class HmMsgHandleService implements IMessageHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SoktServerMsgService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CbsMsgHandleService.class);
+
     private MessageFactory messageFactory;
 
-    public SoktServerMsgService(MessageFactory messageFactory) {
-        this.messageFactory = messageFactory;
+    public HmMsgHandleService() {
+        try {
+            messageFactory = ConfigParser.createFromClasspathConfig("/j8583-config.xml");
+        } catch (IOException e) {
+            logger.info("【本地服务端】J8583初始化配置异常!");
+        }
     }
 
     @Override

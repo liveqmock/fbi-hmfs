@@ -1,6 +1,7 @@
 package gateway.xsocket.client.impl;
 
 import gateway.xsocket.client.ConnectClient;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xsocket.MaxReadSizeExceededException;
@@ -42,11 +43,12 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         logger.info("【本地客户端】发送报文：" + dataContent);
         String datagram = null;
         if (sendData(dataContent)) {
-            int garamLength = Integer.parseInt(blockingConnection.readStringByLength(headLength));
-            logger.info("【本地客户端】接收报文内容长度：" + garamLength);
+            int garamLength = Integer.parseInt(blockingConnection.readStringByLength(headLength).trim());
+            logger.info("【本地客户端】需接收报文长度：" + garamLength);
             datagram = blockingConnection.readStringByLength(garamLength);
         }
-        logger.info("【本地客户端】接收报文内容：" + datagram);
+        logger.info("【本地客户端】实际接收报文内容：" + datagram);
+        logger.info("【本地客户端】实际接收报文长度：" + datagram.length());
         return datagram;
     }
 
@@ -86,4 +88,15 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         this.blockingConnection = blockingConnection;
     }
 
+    public static void main(String[] args) {
+        try {
+            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000);
+            String datagram = "1234567890      000080001   1123456789123456789890000.00       ";
+            socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.length() + 6 +"", 6, " ") + datagram, 6);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
 }

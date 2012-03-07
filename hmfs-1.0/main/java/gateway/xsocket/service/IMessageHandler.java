@@ -10,6 +10,6 @@ import java.text.ParseException;
  * Time: ионГ2:47
  * To change this template use File | Settings | File Templates.
  */
-public interface IMessageService {
+public interface IMessageHandler {
     byte[] handleMessage(byte[] bytes) throws IOException, ParseException;
 }

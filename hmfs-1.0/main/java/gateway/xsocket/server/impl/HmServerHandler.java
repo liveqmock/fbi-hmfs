@@ -1,14 +1,16 @@
 package gateway.xsocket.server.impl;
 
+import gateway.xsocket.server.ContentHandler;
 import gateway.xsocket.server.IServerHandler;
-import gateway.xsocket.service.SoktServerMsgService;
+import gateway.xsocket.service.HmMsgHandleService;
+import gateway.xsocket.service.IMessageHandler;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xsocket.connection.IDataHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.xsocket.connection.INonBlockingConnection;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 
@@ -17,11 +19,13 @@ import java.nio.BufferUnderflowException;
  * 7位报文长度 + 4位交易码 + 报文正文
  * @author zxb
  */
-public class ServerHandler implements IServerHandler {
+@Component
+public class HmServerHandler implements IServerHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HmServerHandler.class);
     private static final int DATA_LENGTH = 7;
-    private SoktServerMsgService soktServerMsgService;
+    @Autowired
+    private HmMsgHandleService hmMsgHandleService;
     // = ConfigParser.createFromClasspathConfig("/j8583-config.xml")
     /**
      * 连接的成功时的操作
@@ -53,7 +57,7 @@ public class ServerHandler implements IServerHandler {
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH)) + 4;
         logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
 
-        connection.setHandler(new ContentHandler(this, soktServerMsgService, dataLength));
+        connection.setHandler(new HmContentHandler(this, hmMsgHandleService, dataLength));
 
         return true;
     }
@@ -80,36 +84,18 @@ public class ServerHandler implements IServerHandler {
     public boolean onConnectException(INonBlockingConnection iNonBlockingConnection, IOException e) throws IOException {
         logger.error("【本地客户端】与远程主机连接发生异常。");
         return true;
-    }
-
-    public SoktServerMsgService getSoktServerMsgService() {
-        return soktServerMsgService;
-    }
-
-    public void setSoktServerMsgService(SoktServerMsgService soktServerMsgService) {
-        this.soktServerMsgService = soktServerMsgService;
-    }
+    }    
 }
 
+class HmContentHandler extends ContentHandler {
 
-class ContentHandler implements IDataHandler {
+    private static Logger logger = LoggerFactory.getLogger(HmContentHandler.class);
 
-    private static Logger logger = LoggerFactory.getLogger(ContentHandler.class);
+    private HmMsgHandleService hmMsgHandleService;
 
-    //private StringBuilder strBuilder = new StringBuilder();
-    private ByteArrayOutputStream byteArrayOutStream;
-    private byte[] bytesDatagram;
-    private SoktServerMsgService soktServerMsgService;
-    private int remaining = 0;
-    private ServerHandler hdl = null;
-    private int destPos = 0;
-
-    public ContentHandler(ServerHandler hdl, SoktServerMsgService soktServerMsgService, int dataLength) {
-        this.hdl = hdl;
-        remaining = dataLength;
-        this.soktServerMsgService = soktServerMsgService;
-        byteArrayOutStream = new ByteArrayOutputStream();
-        // bytesDatagram = new byte[dataLength];
+    HmContentHandler(IServerHandler hdl, IMessageHandler msgHandleService, int dataLength) {
+        super(hdl, msgHandleService, dataLength);
+        this.hmMsgHandleService = (HmMsgHandleService) msgHandleService;
     }
 
     public boolean onData(INonBlockingConnection nbc) throws IOException {
@@ -120,8 +106,6 @@ class ContentHandler implements IDataHandler {
             lengthToRead = available;
         }
 
-        //String buffers = nbc.readStringByLength(lengthToRead);
-        //strBuilder.append(buffers);
         byteArrayOutStream.write(nbc.readBytesByLength(lengthToRead));
         remaining -= lengthToRead;
 
@@ -134,7 +118,7 @@ class ContentHandler implements IDataHandler {
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 
             // 处理接收到的报文，并生成响应报文
-            byte[] resBytesMsg = soktServerMsgService.handleMessage(bytesDatagram);
+            byte[] resBytesMsg = hmMsgHandleService.handleMessage(bytesDatagram);
             String dataLength = StringUtils.leftPad(String.valueOf(resBytesMsg.length - 4), 7, '0');
 
             logger.info("【本地服务端】发送报文长度:" + dataLength);
@@ -146,3 +130,4 @@ class ContentHandler implements IDataHandler {
         return true;
     }
 }
+
