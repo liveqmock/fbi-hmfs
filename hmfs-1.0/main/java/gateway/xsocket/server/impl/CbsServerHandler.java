@@ -120,17 +120,16 @@ class CbsContentHandler extends ContentHandler {
 
             byteArrayOutStream.flush();
             nbc.setAttachment(hdl);
-           // String datagram = null; //  strBuilder.toString();
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = cbsMsgHandleService.handleMessage(bytesDatagram);
-
-            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
-            logger.info("【本地服务端】发送报文长度:" + new String(resBytesMsg).length());
             nbc.write(resBytesMsg);
             nbc.flush();
+
+            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
+            logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
         }
         return true;
     }

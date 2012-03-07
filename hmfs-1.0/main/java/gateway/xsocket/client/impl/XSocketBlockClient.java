@@ -33,8 +33,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     @Override
     public boolean onConnect(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, MaxReadSizeExceededException {
-        String remoteName = nbc.getRemoteAddress().getHostName();
-        logger.info("【本地客户端】与远程主机:" + remoteName + "建立连接。");
+        logger.info("【本地客户端】与远程主机:" + serverIP + "建立连接。");
         return true;
     }
 
@@ -43,12 +42,12 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         logger.info("【本地客户端】发送报文：" + dataContent);
         String datagram = null;
         if (sendData(dataContent)) {
-            int garamLength = Integer.parseInt(blockingConnection.readStringByLength(headLength).trim());
-            logger.info("【本地客户端】需接收报文长度：" + garamLength);
-            datagram = blockingConnection.readStringByLength(garamLength);
+            int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(headLength).trim());
+            logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
+            datagram = new String(blockingConnection.readBytesByLength(garamTotalLength - headLength));
         }
         logger.info("【本地客户端】实际接收报文内容：" + datagram);
-        logger.info("【本地客户端】实际接收报文长度：" + datagram.length());
+        logger.info("【本地客户端】实际接收报文内容长度：" + datagram.getBytes().length);
         return datagram;
     }
 

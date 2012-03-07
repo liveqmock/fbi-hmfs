@@ -63,17 +63,17 @@ public class CbsMsgHandleService implements IMessageHandler {
         payDetail.setHouseType("0");
         payDetail.setPhoneNo("89901100");
         payDetail.setProjAmt("1001234567.89");
-        payDetail.setPayPart("80%");
+        payDetail.setPayPart("30%");
 
         PayDetail detail = new PayDetail();
         detail.setAccountName("李四");
         detail.setTxAmt("1234.56");
-        detail.setAddress("青岛崂山区");
+        detail.setAddress("青岛崂山崂山崂山");
         detail.setHouseArea("89.6");
         detail.setHouseType("1");
         detail.setPhoneNo("89931100");
-        detail.setProjAmt("1234567.89");
-        detail.setPayPart("70%");
+        detail.setProjAmt("1234588.88");
+        detail.setPayPart("99%");
 
         // 生成返回报文头
         DataHead rtnDataHead = new DataHead();
@@ -92,7 +92,10 @@ public class CbsMsgHandleService implements IMessageHandler {
         rtnStrBuilder.append(rtnDataHead.toStringByFieldLength());
         rtnStrBuilder.append(datagram.substring(0, 18) + "2   ");
         rtnStrBuilder.append(toDatagramString(payDetailList));
-        return (StringUtils.rightPad(String.valueOf(rtnStrBuilder.length() + 6), 6, " ") + rtnStrBuilder.toString()).getBytes();
+        
+        String rtnDatagram = rtnStrBuilder.toString();
+        int totalLength = rtnDatagram.getBytes().length + 6;
+        return (StringUtils.rightPad(String.valueOf(totalLength), 6, " ") + rtnDatagram).getBytes();
     }
     
     private String toDatagramString(List<PayDetail> payDetailList) {
