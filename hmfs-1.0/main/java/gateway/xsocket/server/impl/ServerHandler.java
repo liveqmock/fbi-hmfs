@@ -22,7 +22,7 @@ public class ServerHandler implements IServerHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
     private static final int DATA_LENGTH = 7;
     private SoktServerMsgService soktServerMsgService;
-
+    // = ConfigParser.createFromClasspathConfig("/j8583-config.xml")
     /**
      * 连接的成功时的操作
      */

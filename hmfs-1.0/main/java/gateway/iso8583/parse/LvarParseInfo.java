@@ -33,7 +33,7 @@ import java.text.ParseException;
 public class LvarParseInfo extends FieldParseInfo {
 
     public LvarParseInfo() {
-        super(IsoType.LLVAR, 0);
+        super(IsoType.LVAR, 0);
     }
 
     public IsoValue<?> parse(byte[] buf, int pos, CustomField<?> custom)
@@ -43,7 +43,7 @@ public class LvarParseInfo extends FieldParseInfo {
         }
         length = buf[pos] - 48;
         if (length < 0) {
-            throw new ParseException(String.format("Invalid LLVAR length %d pos %d", length, pos), pos);
+            throw new ParseException(String.format("Invalid LVAR length %d pos %d", length, pos), pos);
         }
 
         String _v = length == 0 ? "" : new String(buf, pos + 1, length, getCharacterEncoding());
