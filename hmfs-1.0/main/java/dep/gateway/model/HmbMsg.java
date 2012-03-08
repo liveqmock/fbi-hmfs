@@ -8,5 +8,6 @@ package dep.gateway.model;
  * To change this template use File | Settings | File Templates.
  */
 public class HmbMsg {
+    //F1：2位报文种类（00-汇总;01-子报文）+ 3位报文序号
     public String msgType;
 }

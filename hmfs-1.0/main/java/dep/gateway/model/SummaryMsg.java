@@ -8,9 +8,6 @@ package dep.gateway.model;
  * To change this template use File | Settings | File Templates.
  */
 public class SummaryMsg extends HmbMsg{
-    //F1：2位报文种类（00-汇总;01-子报文）+ 3位报文序号
-    public String msgType;
-
     //F2：本笔报文的编号，唯一标识一笔报文，在整个报文的生命周期中，不会改变，规则如下：2位年（年的后两位）+2位月+2位日+6位序号+4位交易类型+2位发起地
     public String msgSn;
 
