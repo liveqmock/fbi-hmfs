@@ -7,7 +7,7 @@ package dep.gateway.model;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class SummaryToaMsg extends SummaryMsg{
+public class SummaryResponseMsg extends SummaryMsg{
     //F9：和新交易相关的原始交易的报文编号，如抹账、冲正类交易被抹账、冲正交易的报文编号
     public String origMsgSn;
 

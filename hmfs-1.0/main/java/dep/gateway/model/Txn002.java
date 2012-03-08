@@ -7,5 +7,5 @@ package dep.gateway.model;
  * Time: обнГ7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn002 extends SummaryToaMsg {
+public class Txn002 extends SummaryResponseMsg {
 }
