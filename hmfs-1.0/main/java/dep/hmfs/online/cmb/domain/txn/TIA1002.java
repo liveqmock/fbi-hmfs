@@ -7,23 +7,22 @@ import dep.hmfs.online.cmb.domain.base.TIAHeader;
 import java.io.Serializable;
 
 public class TIA1002 extends TIA implements Serializable {
-    
-    private static final int[] FIELD_LENGTHS = {18, 16};
-    public  Header header = new Header();
-    public  Body body = new Body();
+
+    public Header header = new Header();
+    public Body body = new Body();
 
     @Override
     public TIAHeader getHeader() {
-        return  header;
+        return header;
     }
 
     @Override
     public TIABody getBody() {
-        return  body;
+        return body;
     }
 
     //====================================================================
-    public  static class Header extends TIAHeader {
+    public static class Header extends TIAHeader {
     }
 
     public static class Body extends TIABody {

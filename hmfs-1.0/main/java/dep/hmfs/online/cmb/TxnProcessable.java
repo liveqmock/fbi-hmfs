@@ -1,7 +1,6 @@
-package dep.hmfs.online;
+package dep.hmfs.online.cmb;
 
-import java.util.List;
-import java.util.Map;
+import dep.hmfs.online.cmb.domain.base.TOA;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,5 +10,5 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public interface TxnProcessable {
-    List<Map<String, String>> process(String bizCode, String postCode, List<String> paramList) throws Exception;
+    TOA process(byte[] bytes) throws Exception;
 }
