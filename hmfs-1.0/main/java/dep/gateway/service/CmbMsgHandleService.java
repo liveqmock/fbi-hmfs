@@ -2,6 +2,7 @@ package dep.gateway.service;
 
 import dep.hmfs.online.cmb.domain.DataHead;
 import dep.hmfs.online.cmb.domain.PayDetail;
+import dep.hmfs.online.cmb.domain.base.TIAHeader;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,24 +38,20 @@ public class CmbMsgHandleService implements IMessageHandler {
     @Override
     public byte[] handleMessage(byte[] bytes) {
         // TODO  测试缴款通知书缴费
-        DataHead dataHead = new DataHead();
-        dataHead.transBytesToFields(bytes);
 
-        // TODO start from 29
-        String datagram = new String(bytes, 29, bytes.length - 29);
+        TIAHeader tiaHeader = new TIAHeader();
+        tiaHeader.initFields(bytes);
+
+        byte[] datagramBytes = new byte[bytes.length - 24];
+        System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
+
+        String datagram = new String(datagramBytes);
         logger.info(" ==== 报文正文：" + datagram);
 
-        // TODO
         // 缴款通知书编号	18	维修资金缴款通知书编号
         // 缴费金额	16
         logger.info("缴款通知书编号：" + datagram.substring(0, 18) + "    缴费金额：" + datagram.substring(18, 34));
-        /*for(String detail : datagram.split("\n")) {
-            logger.info("=== 报文项目内容： " + detail);
-            for(String field : detail.split("|")) {
-                logger.info("=== 报文字段内容： " + field);
-            }
-        }
-*/
+
         PayDetail payDetail = new PayDetail();
         payDetail.setAccountName("张三");
         payDetail.setTxAmt("123456.78");
@@ -64,6 +61,7 @@ public class CmbMsgHandleService implements IMessageHandler {
         payDetail.setPhoneNo("89901100");
         payDetail.setProjAmt("1001234567.89");
         payDetail.setPayPart("30%");
+        payDetail.setAccountNo("32001001");
 
         PayDetail detail = new PayDetail();
         detail.setAccountName("李四");
@@ -74,14 +72,14 @@ public class CmbMsgHandleService implements IMessageHandler {
         detail.setPhoneNo("89931100");
         detail.setProjAmt("1234588.88");
         detail.setPayPart("99%");
+        detail.setAccountNo("32001002");
+
 
         // 生成返回报文头
         DataHead rtnDataHead = new DataHead();
-        rtnDataHead.setSerialNo(dataHead.getSerialNo());
+        rtnDataHead.setSerialNo(tiaHeader.serialNo);
         rtnDataHead.setErrorCode("0000");
-        rtnDataHead.setLast(true);
-        rtnDataHead.setPkgNo("1");
-        rtnDataHead.setTxnCode(dataHead.getTxnCode());
+        rtnDataHead.setTxnCode(tiaHeader.txnCode);
 
         // 报文内容
         List<PayDetail> payDetailList = new ArrayList<PayDetail>();
@@ -92,15 +90,15 @@ public class CmbMsgHandleService implements IMessageHandler {
         rtnStrBuilder.append(rtnDataHead.toStringByFieldLength());
         rtnStrBuilder.append(datagram.substring(0, 18) + "2   ");
         rtnStrBuilder.append(toDatagramString(payDetailList));
-        
+
         String rtnDatagram = rtnStrBuilder.toString();
         int totalLength = rtnDatagram.getBytes().length + 6;
         return (StringUtils.rightPad(String.valueOf(totalLength), 6, " ") + rtnDatagram).getBytes();
     }
-    
+
     private String toDatagramString(List<PayDetail> payDetailList) {
         StringBuilder strDatagramBuilder = new StringBuilder();
-        for(PayDetail payDetail : payDetailList) {
+        for (PayDetail payDetail : payDetailList) {
             strDatagramBuilder.append(payDetail.toStringByDelimiter("|")).append("\n");
         }
         strDatagramBuilder.deleteCharAt(strDatagramBuilder.length() - 1);

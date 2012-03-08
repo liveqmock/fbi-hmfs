@@ -5,7 +5,7 @@ package dep.hmfs.online.cmb.domain;
  * User: zhangxiaobo
  * Date: 12-3-7
  * Time: 下午7:27
- * 业主姓名|交易金额|住宅地址|住宅建筑面积|电话|住宅类型|住宅建筑面积|工程造价|缴存比例|
+ * 业主姓名|交易金额|住宅地址|住宅建筑面积|电话|住宅类型|工程造价|缴存比例|业主资金账号
  */
 public class PayDetail {
 
@@ -17,6 +17,7 @@ public class PayDetail {
     private String houseType;
     private String projAmt;
     private String payPart;
+    private String accountNo;
 
     public String toStringByDelimiter(String delimiter) {
         if (delimiter == null) {
@@ -31,6 +32,7 @@ public class PayDetail {
         stringBuilder.append(houseType).append("|");
         stringBuilder.append(projAmt).append("|");
         stringBuilder.append(payPart).append("|");
+        stringBuilder.append(accountNo);
         return stringBuilder.toString();
     }
 
@@ -98,4 +100,11 @@ public class PayDetail {
         this.txAmt = txAmt;
     }
 
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
 }

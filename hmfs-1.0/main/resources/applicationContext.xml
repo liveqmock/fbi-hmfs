@@ -48,7 +48,7 @@
     </bean>
 
     <bean id="cmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
-        <property name="port" value="${socket_server_monitor_port_cbs}"/>
+        <property name="port" value="${socket_server_monitor_port_cmb}"/>
         <property name="serverHandler" ref="cmbServerHandler"/>
     </bean>
 
