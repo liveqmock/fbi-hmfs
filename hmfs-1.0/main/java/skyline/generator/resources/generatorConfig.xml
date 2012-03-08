@@ -18,16 +18,16 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="hmfs.repository.model" targetProject="main/java">
+        <javaModelGenerator targetPackage="common.repository.hmfs.model" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="hmfs.repository.mapper" targetProject="main/java">
+        <sqlMapGenerator targetPackage="common.repository.hmfs.mapper" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
-        <javaClientGenerator type="XMLMAPPER" targetPackage="hmfs.repository.dao" targetProject="main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="common.repository.hmfs.dao" targetProject="main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
@@ -43,22 +43,31 @@
 
         <table schema="hmfs" tableName="hm_actinfo_cbs">
             <property name="ignoreQualifiersAtRuntime" value="true" />
-            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
         <table schema="hmfs" tableName="hm_actinfo_fund">
             <property name="ignoreQualifiersAtRuntime" value="true" />
-            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
         <table schema="hmfs" tableName="txn_cbs_log">
             <property name="ignoreQualifiersAtRuntime" value="true" />
-            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
         <table schema="hmfs" tableName="txn_fund_log">
             <property name="ignoreQualifiersAtRuntime" value="true" />
-            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
-
-
+        <table schema="hmfs" tableName="txn_vouch_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
+        </table>
+        <table schema="hmfs" tableName="his_fcj_msgin_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
+        </table>
+        <table schema="hmfs" tableName="his_fcj_msgout_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
+        </table>
     </context>
-
 </generatorConfiguration>
