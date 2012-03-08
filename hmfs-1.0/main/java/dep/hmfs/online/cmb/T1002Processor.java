@@ -34,6 +34,19 @@ public class T1002Processor extends AbstractTProcessor {
 
         TOA1002 toa1002 = new TOA1002();
         toa1002.body.recordList.add(record);
+
+        record = new TOA1002.Body.Record();
+        record.accountName = "李四";
+        record.txAmt = "123456.78";
+        record.address = "青岛市北区";
+        record.houseArea = "98.5";
+        record.houseType = "0";
+        record.phoneNo = "89901100";
+        record.projAmt = "1001234567.89";
+        record.payPart = "30%";
+        record.accountNo = "320010888";
+        toa1002.body.recordList.add(record);
+
         return toa1002;
     }
 }
