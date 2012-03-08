@@ -61,11 +61,15 @@
             <property name="ignoreQualifiersAtRuntime" value="true" />
             <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
-        <table schema="hmfs" tableName="his_fcj_msgin_log">
+        <table schema="hmfs" tableName="his_msgin_log">
             <property name="ignoreQualifiersAtRuntime" value="true" />
             <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>
-        <table schema="hmfs" tableName="his_fcj_msgout_log">
+        <table schema="hmfs" tableName="his_msgout_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+            <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
+        </table>
+        <table schema="hmfs" tableName="hm_joblog">
             <property name="ignoreQualifiersAtRuntime" value="true" />
             <!--<generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>-->
         </table>

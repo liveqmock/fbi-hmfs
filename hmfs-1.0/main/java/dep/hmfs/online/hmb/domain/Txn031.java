@@ -1,4 +1,4 @@
-package dep.gateway.model;
+package dep.hmfs.online.hmb.domain;
 
 /**
  * Created by IntelliJ IDEA.
@@ -7,15 +7,12 @@ package dep.gateway.model;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-public class Txn032 extends SubMsg{
+public class Txn031 extends SubMsg{
+    //F8：动作代码
+    public String actionCode;
+
     //F38：会计帐号
     public String cbsActno;
-
-    //F32：结算户账号1
-    public String settleActno1;
-
-    //F33：结算户账号1类型
-    public String settleActtype1;
 
     //F39：会计帐号类型
     public String cbsActtype;

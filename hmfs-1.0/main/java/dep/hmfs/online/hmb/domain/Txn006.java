@@ -1,4 +1,4 @@
-package dep.gateway.model;
+package dep.hmfs.online.hmb.domain;
 
 import java.math.BigDecimal;
 
@@ -9,18 +9,12 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn010 extends SummaryResponseMsg {
+public class Txn006 extends SummaryResponseMsg {
     //F16：信息ID1
     public String infoId1;
 
     //F17：信息ID1类型
     public String infoIdType1;
-
-    //F18：信息ID2
-    public String infoId2;
-
-    //F19：信息ID2类型
-    public String infoIdType2;
 
     //F25：归属区县ID
     public String districtId;
@@ -31,11 +25,11 @@ public class Txn010 extends SummaryResponseMsg {
     //F29：核算户账号1类型
     public String fundActtype1;
 
-    //F95：划入资金帐号
-    public String payinCbsActno;
+    //F32：结算户账号1
+    public String settleActno1;
 
-    //F96：划入资金帐号类型
-    public String payinCbsActtype;
+    //F33：结算户账号1类型
+    public String settleActtype1;
 
     //F45：交易金额1
     public BigDecimal txnAmt1;

@@ -1,4 +1,4 @@
-package dep.gateway.model;
+package dep.hmfs.online.hmb.domain;
 
 /**
  * Created by IntelliJ IDEA.
@@ -7,7 +7,7 @@ package dep.gateway.model;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn001 extends SummaryMsg{
+public class Txn003 extends SummaryMsg{
     //F12:交易方式  1－批量；2－单笔
     public String txnType;
 
@@ -16,4 +16,13 @@ public class Txn001 extends SummaryMsg{
 
     //F14:交易类型 发起方的交易类型码
     public String txnCode;
+
+    //F16：信息ID1
+    public String infoId1;
+
+    //F17：信息ID1类型
+    public String infoIdType1;
+
+    //F25：归属区县ID
+    public String districtId;
 }

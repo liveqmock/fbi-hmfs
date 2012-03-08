@@ -1,4 +1,4 @@
-package dep.gateway.model;
+package dep.hmfs.online.hmb.domain;
 
 import java.math.BigDecimal;
 
