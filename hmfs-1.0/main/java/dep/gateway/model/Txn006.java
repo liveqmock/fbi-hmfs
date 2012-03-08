@@ -9,16 +9,7 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class TIA007 extends SummaryMsg {
-    //F12:交易方式  1－批量；2－单笔
-    public String txnType;
-
-    //F13:业务种类  1－单位；2－业主；3－其他；4－抹账
-    public String bizType;
-
-    //F14:交易类型 发起方的交易类型码
-    public String txnCode;
-
+public class Txn006 extends SummaryToaMsg {
     //F16：信息ID1
     public String infoId1;
 
@@ -42,16 +33,4 @@ public class TIA007 extends SummaryMsg {
 
     //F45：交易金额1
     public BigDecimal txnAmt1;
-
-    //F84：资金付方会计账号
-    public String payoutActno;
-
-    //F85：付款方名称
-    public String payoutActName;
-
-    //F86：资金收方会计账号
-    public String payinActno;
-
-    //F87：收款方名称
-    public String payinActName;
 }

@@ -7,15 +7,15 @@ package dep.gateway.model;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-public class TIA031 extends SubMsg{
-    //F1：2位报文种类（00-汇总;01-子报文）+ 3位报文序号
-    public String msgType;
-
-    //F8：动作代码
-    public String actionCode;
-
+public class Txn032 extends SubMsg{
     //F38：会计帐号
     public String cbsActno;
+
+    //F32：结算户账号1
+    public String settleActno1;
+
+    //F33：结算户账号1类型
+    public String settleActtype1;
 
     //F39：会计帐号类型
     public String cbsActtype;

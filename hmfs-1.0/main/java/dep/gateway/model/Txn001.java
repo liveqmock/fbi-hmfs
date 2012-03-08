@@ -7,7 +7,7 @@ package dep.gateway.model;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class TIA001 extends SummaryMsg{
+public class Txn001 extends SummaryMsg{
     //F12:交易方式  1－批量；2－单笔
     public String txnType;
 
