@@ -90,7 +90,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
     public static void main(String[] args) {
         try {
             XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000);
-            String datagram = "1234567890      00002001123456789123456789";
+            String datagram = "1234567890      00005001123456789123456789            10000.00        201203090000001|300|C\n21122000012|9090900|C\n000000455|300|D";
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 +"", 6, " ") + datagram, 6);
         } catch (IOException e) {
             e.printStackTrace();

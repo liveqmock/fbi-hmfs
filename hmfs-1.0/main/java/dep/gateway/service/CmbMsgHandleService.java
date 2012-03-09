@@ -60,7 +60,9 @@ public class CmbMsgHandleService implements IMessageHandler {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 18, " "));
         strBuilder.append(toaHeader.errorCode).append(toaHeader.txnCode);
-        strBuilder.append(toa.toString());
+        if (toa != null) {
+            strBuilder.append(toa.toString());
+        }
         String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, "");
 
         return (totalLength + strBuilder.toString()).getBytes();

@@ -59,10 +59,10 @@ public class TOA1002 extends TOA implements Serializable {
             }
         }
     }
-    
+
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for(Body.Record record : body.recordList) {
+        for (Body.Record record : body.recordList) {
             stringBuilder.append(record.toStringByDelimiter("|"));
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             stringBuilder.append("\n");
