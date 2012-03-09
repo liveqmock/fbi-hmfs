@@ -58,6 +58,7 @@
         <property name="mapperLocations">
             <list>
                 <value>classpath:skyline/repository/mapper/**/*.xml</value>
+                <value>classpath:common/repository/hmfs/mapper/**/*.xml</value>
             </list>
         </property>
     </bean>
@@ -65,7 +66,7 @@
     <!-- scan for mappers and let them be autowired -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage"
-                  value="skyline.repository.dao"/>
+                  value="skyline.repository.dao,common.repository.hmfs.dao"/>
     </bean>
 
 </beans>

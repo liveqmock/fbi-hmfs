@@ -27,7 +27,9 @@ public class HisMsginLogService {
     public HisMsginLog qryTotalPayInfoByMsgSn(String msgSn) {
         HisMsginLogExample example = new HisMsginLogExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
-        return hisMsginLogMapper.selectByExample(example).get(0);
+        List<HisMsginLog> hisMsginLogList = hisMsginLogMapper.selectByExample(example);
+
+        return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
     }
 
     // 根据申请单号查询所有交款明细
