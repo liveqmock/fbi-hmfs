@@ -60,7 +60,7 @@ public class IsoValue<T> implements Cloneable {
 		encoder = custom;
 		type = t;
 		this.value = value;
-		if (type == IsoType.LLVAR || type == IsoType.LLLVAR) {
+		if (type == IsoType.LVAR ||type == IsoType.LLVAR || type == IsoType.LLLVAR) {
 			if (custom == null) {
 				length = value.toString().length();
 			} else {
@@ -70,7 +70,9 @@ public class IsoValue<T> implements Cloneable {
 				}
 				length = enc.length();
 			}
-			if (t == IsoType.LLVAR && length > 99) {
+			if (t == IsoType.LVAR && length > 9) {
+				throw new IllegalArgumentException("LVAR can only hold values up to 9 chars");
+			} else if (t == IsoType.LLVAR && length > 99) {
 				throw new IllegalArgumentException("LLVAR can only hold values up to 99 chars");
 			} else if (t == IsoType.LLLVAR && length > 999) {
 				throw new IllegalArgumentException("LLLVAR can only hold values up to 999 chars");
@@ -118,11 +120,13 @@ public class IsoValue<T> implements Cloneable {
 		encoder = custom;
 		if (length == 0 && t.needsLength()) {
 			throw new IllegalArgumentException(String.format("Length must be greater than zero for type %s (value '%s')", t, val));
-		} else if (t == IsoType.LLVAR || t == IsoType.LLLVAR) {
+		} else if (t == IsoType.LVAR || t == IsoType.LLVAR || t == IsoType.LLLVAR) {
 			if (len == 0) {
 				length = custom == null ? val.toString().length() : custom.encodeField(value).length();
 			}
-			if (t == IsoType.LLVAR && length > 99) {
+			if (t == IsoType.LVAR && length > 9) {
+				throw new IllegalArgumentException("LVAR can only hold values up to 99 chars");
+			} else if (t == IsoType.LLVAR && length > 99) {
 				throw new IllegalArgumentException("LLVAR can only hold values up to 99 chars");
 			} else if (t == IsoType.LLLVAR && length > 999) {
 				throw new IllegalArgumentException("LLLVAR can only hold values up to 999 chars");
@@ -184,7 +188,7 @@ public class IsoValue<T> implements Cloneable {
 			}
 		} else if (type == IsoType.ALPHA) {
 			return type.format(encoder == null ? value.toString() : encoder.encodeField(value), length);
-		} else if (type == IsoType.LLLVAR || type == IsoType.LLLVAR) {
+		} else if (type == IsoType.LVAR ||type == IsoType.LLVAR || type == IsoType.LLLVAR) {
 			return encoder == null ? value.toString() : encoder.encodeField(value);
 		} else if (value instanceof Date) {
 			return type.format((Date)value);
@@ -238,7 +242,7 @@ public class IsoValue<T> implements Cloneable {
 	/** Writes the formatted value to a stream, with the length header
 	 * if it's a variable length type. */
 	public void write(OutputStream outs, boolean binary) throws IOException {
-		if (type == IsoType.LLLVAR || type == IsoType.LLVAR) {
+		if (type == IsoType.LLLVAR || type == IsoType.LLVAR || type == IsoType.LVAR) {
 			if (binary) {
 				if (type == IsoType.LLLVAR) {
 					outs.write(length / 100); //00 to 09 automatically in BCD

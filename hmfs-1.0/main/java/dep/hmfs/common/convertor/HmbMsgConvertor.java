@@ -29,7 +29,7 @@ public class HmbMsgConvertor {
         paramMap.put("MSG_TYPE", "5110");
         Txn001 txn = new Txn001();
         txn.msgType="00001";
-        txn.msgSn = "1212121212";
+        txn.msgSn = "msgsn";
         txn.bizType = "9";
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(txn);
@@ -37,7 +37,7 @@ public class HmbMsgConvertor {
         convertor.marshal(paramMap);
     }
 
-    public Map marshal(Map paramMap){
+    public byte[] marshal(Map paramMap){
         String msgType = (String) paramMap.get("MSG_TYPE");
         if (msgType == null) {
             throw new IllegalArgumentException("交易码未定义！");
@@ -50,7 +50,15 @@ public class HmbMsgConvertor {
         IsoMessage message;
         List<IsoMessage>  messageList = new ArrayList<IsoMessage>();
         try {
+            int  msgTotalNum = hmbMsgList.size();
+            int  step = 0;
             for (HmbMsg hmbMsg : hmbMsgList) {
+                step++;
+                if (step == msgTotalNum) {
+                    hmbMsg.msgNextFlag = "0";
+                }else{
+                    hmbMsg.msgNextFlag = "1";
+                }
                 String newSubTxnCode = hmbMsg.msgType.substring(2);
                 if (!newSubTxnCode.equals(subTxnCode)) {
                     dataFormat = new HmbMessageFactory(hmbMsg);

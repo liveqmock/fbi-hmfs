@@ -262,17 +262,17 @@ public class IsoMessage {
      * after the write. There are at most three write operations to the stream: one for the
      * length header, one for the message, and the last one with for the ETX.
      *
-     * @param outs        The stream to write the message to.
+     * @param outs The stream to write the message to.
      * @throws IllegalArgumentException if the specified length header is more than 4 bytes.
      * @throws java.io.IOException      if there is a problem writing to the stream.
      */
     public void write(OutputStream outs) throws IOException {
-       /* if (lengthBytes > 4) {
+        /* if (lengthBytes > 4) {
             throw new IllegalArgumentException("The length header can have at most 4 bytes");
         }*/
         byte[] data = writeData();
 
-       /* if (lengthBytes > 0) {
+        /* if (lengthBytes > 0) {
             int l = data.length;
             if (etx > -1) {
                 l++;
@@ -358,7 +358,7 @@ public class IsoMessage {
             }
         }
         //Message Type
-       /* if (binary) {
+        /* if (binary) {
             bout.write((type & 0xff00) >> 8);
             bout.write(type & 0xff);
         } else {
@@ -370,61 +370,28 @@ public class IsoMessage {
         }*/
 
         //Bitmap
-        BitSet bs = new BitSet(forceb2 ? 128 : 64);
-        for (int i = 2; i < 129; i++) {
+        BitSet bs = new BitSet(128);
+        for (int i = 1; i < 128; i++) {
             if (fields[i] != null) {
                 bs.set(i - 1);
             }
         }
-        if (forceb2) {
-            bs.set(0);
-        } else if (bs.length() > 64) {
-            //Extend to 128 if needed
-            BitSet b2 = new BitSet(128);
-            b2.or(bs);
-            bs = b2;
-            bs.set(0);
-        }
-        // =======================================
-        if(isHasNext) {
-            bs.set(127, true);
-        }
         //Write bitmap to stream
-        //if (binary) {
-            int pos = 128;
-            int b = 0;
-            for (int i = 0; i < bs.size(); i++) {
-                if (bs.get(i)) {
-                    b |= pos;
-                }
-                pos >>= 1;
-                if (pos == 0) {
-                    bout.write(b);
-                    pos = 128;
-                    b = 0;
-                }
+        int pos = 128;
+        int b = 0;
+        for (int i = 0; i < bs.size(); i++) {
+            if (bs.get(i)) {
+                b |= pos;
             }
-/*
-        } else {
-            int pos = 0;
-            int lim = bs.size() / 4;
-            for (int i = 0; i < lim; i++) {
-                int nibble = 0;
-                if (bs.get(pos++))
-                    nibble |= 8;
-                if (bs.get(pos++))
-                    nibble |= 4;
-                if (bs.get(pos++))
-                    nibble |= 2;
-                if (bs.get(pos++))
-                    nibble |= 1;
-                bout.write(HEX[nibble]);
+            pos >>= 1;
+            if (pos == 0) {
+                bout.write(b);
+                pos = 128;
+                b = 0;
             }
         }
-*/
-
         //Fields
-        for (int i = 2; i < 129; i++) {
+        for (int i = 1; i < 128; i++) {
             IsoValue<?> v = fields[i];
             if (v != null) {
                 try {
