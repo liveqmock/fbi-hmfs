@@ -1,7 +1,7 @@
 package dep.gateway.service;
 
 import dep.ContainerManager;
-import dep.hmfs.online.cmb.AbstractTProcessor;
+import dep.hmfs.online.cmb.AbstractTxnProcessor;
 import dep.hmfs.online.cmb.domain.base.TIAHeader;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.base.TOAHeader;
@@ -39,24 +39,20 @@ public class CmbMsgHandleService implements IMessageHandler {
 
         TOAHeader toaHeader = null;
         TOA toa = null;
+        TIAHeader tiaHeader = new TIAHeader();
+        tiaHeader.initFields(bytes);
+
+        byte[] datagramBytes = new byte[bytes.length - 24];
+        System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
+
         try {
-            TIAHeader tiaHeader = new TIAHeader();
-            tiaHeader.initFields(bytes);
-
-            byte[] datagramBytes = new byte[bytes.length - 24];
-            System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
-
-            //AbstractTProcessor tProcessor = (AbstractTProcessor)Class.forName("dep.hmfs.online.cmb.T" + tiaHeader.txnCode + "Processor").newInstance();
-            AbstractTProcessor tProcessor = (AbstractTProcessor) ContainerManager.getBean("t" + tiaHeader.txnCode + "Processor");
-            toa = tProcessor.process(datagramBytes);
-
-
+            AbstractTxnProcessor txnProcessor = (AbstractTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
+            toa = txnProcessor.process(datagramBytes);
             // 生成返回报文头
             toaHeader = new TOAHeader();
             toaHeader.serialNo = tiaHeader.serialNo;
             toaHeader.errorCode = "0000";
             toaHeader.txnCode = tiaHeader.txnCode;
-
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             toaHeader.errorCode = "1111";
@@ -66,6 +62,7 @@ public class CmbMsgHandleService implements IMessageHandler {
         strBuilder.append(toaHeader.errorCode).append(toaHeader.txnCode);
         strBuilder.append(toa.toString());
         String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, "");
+
         return (totalLength + strBuilder.toString()).getBytes();
     }
 }
