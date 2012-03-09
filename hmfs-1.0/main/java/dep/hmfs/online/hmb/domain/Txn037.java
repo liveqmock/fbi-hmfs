@@ -37,10 +37,40 @@ public class Txn037 extends SubMsg{
     //F45：交易金额1
     public BigDecimal txnAmt1;
 
-    private String orgId;
-    private String orgType;
+    //F59：单位ID
+    public String orgId;
 
-    private String orgName;
+    //F60：单位类型  10：市局；11：区局；12：开发商；13：业委会；14：物业公司；15：审价单位；16：监理单位
+    public String orgType;
 
+    //F61：单位名称
+    public String orgName;
+
+    //F77：收据编号
+    public String receiptNo;
+
+    //F78：交存标准1
+    public String depStandard1;
+
+    //F79：缴款类型 00:首次交款 01:维修资金追缴 02:维修资金续交 03:结息交款 04:欠款补交 05:其他交款 06:收益资金交款
+    public String depType;
+
+    //F80：缴存人
+    public String depPerson;
+
+    //F81：户卡号
+    public String houseCardNo;
+
+    //F82：购房合同号
+    public String houseContNo;
+
+    //F86：资金收方会计账号
+    public String payinActno;
+
+    //F90：凭证类型   00-商品住宅;
+    public String voucherType;
+
+    //F91：关联报文编号
+    public String linkMsgSn;
 }
 

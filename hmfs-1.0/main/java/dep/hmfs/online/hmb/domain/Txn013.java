@@ -20,7 +20,7 @@ public class Txn013 extends SummaryMsg {
     public String bizType;
 
     //F14:交易类型 发起方的交易类型码
-    public String txnCode;
+    public String origTxnCode;
 
     //F16：信息ID1
     public String infoId1;

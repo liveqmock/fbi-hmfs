@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.Hmb8583Field;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -9,5 +11,6 @@ package dep.hmfs.online.hmb.domain;
  */
 public class HmbMsg {
     //F1：2位报文种类（00-汇总;01-子报文）+ 3位报文序号
+    @Hmb8583Field(1)
     public String msgType;
 }
