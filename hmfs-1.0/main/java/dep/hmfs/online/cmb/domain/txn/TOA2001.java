@@ -26,24 +26,24 @@ public class TOA2001 extends TOA implements Serializable {
     }
 
     /*
-    缴款通知书编号	18	维修资金缴款通知书编号
-    缴费标志	1	0：未交费 1：已缴费
-    缴款书金额	16	缴款通知书对应的缴费金额
+    支取通知书编号	18	支取通知书编号
+    支取标志	1	0：未支取1：已经支取
+    支取金额	16	支取金额
     (单位：元，左对齐，长度不足右补空格)
      */
     public static class Body extends TOABody {
 
-        public String payApplyNo = "";
-        public String payFlag = "";
-        public String payAmt = "";
+        public String drawApplyNo = "";
+        public String drawFlag = "";
+        public String drawAmt = "";
     }
 
     public String toString() {
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(StringUtils.rightPad(body.payApplyNo, 18, " "));
-        stringBuilder.append(body.payFlag);
-        stringBuilder.append(StringUtils.rightPad(body.payAmt, 16, " "));
+        stringBuilder.append(StringUtils.rightPad(body.drawApplyNo, 18, " "));
+        stringBuilder.append(body.drawFlag);
+        stringBuilder.append(StringUtils.rightPad(body.drawAmt, 16, " "));
         return stringBuilder.toString();
     }
 }

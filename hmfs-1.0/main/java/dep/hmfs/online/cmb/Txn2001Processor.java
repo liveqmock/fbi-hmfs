@@ -17,13 +17,13 @@ public class Txn2001Processor extends AbstractTxnProcessor {
     @Override
     public TOA process(byte[] bytes) throws Exception {
         TIA2001 tia2001 = new TIA2001();
-        tia2001.body.payApplyNo = new String(bytes, 0, 18).trim();
+        tia2001.body.drawApplyNo = new String(bytes, 0, 18).trim();
 
         // TODO 从数据库查询缴款汇总信息
         TOA2001 toa2001 = new TOA2001();
-        toa2001.body.payApplyNo = tia2001.body.payApplyNo;
-        toa2001.body.payAmt = "123456.88";
-        toa2001.body.payFlag = "0";
+        toa2001.body.drawApplyNo = tia2001.body.drawApplyNo;
+        toa2001.body.drawAmt = "123456.88";
+        toa2001.body.drawFlag = "0";
 
         return toa2001;
     }

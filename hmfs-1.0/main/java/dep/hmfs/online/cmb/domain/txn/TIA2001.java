@@ -26,7 +26,7 @@ public class TIA2001 extends TIA implements Serializable {
     }
 
     public static class Body extends TIABody {
-        public String payApplyNo;                  // 缴款申请单号
+        public String drawApplyNo;                  // 支取通知书编号
     }
 
 }
