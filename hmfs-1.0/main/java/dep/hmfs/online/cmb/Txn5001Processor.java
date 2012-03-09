@@ -18,7 +18,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(Txn5001Processor.class);
 
     @Override
-    public TOA process(byte[] bytes) throws Exception {
+    public TOA process(byte[] bytes) {
         /*
         开户账号	30	维修资金监管部门账号
         账户金额	16	账号当日余额

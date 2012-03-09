@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Txn4001Processor extends AbstractTxnProcessor {
     @Override
-    public TOA process(byte[] bytes) throws Exception {
+    public TOA process(byte[] bytes) {
         TIA4001 tia4001 = new TIA4001();
         tia4001.body.billStatus = new String(bytes, 0, 1).trim();
         tia4001.body.billStartNo = new String(bytes, 1, 12).trim();

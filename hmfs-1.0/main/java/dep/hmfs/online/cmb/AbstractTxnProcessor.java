@@ -10,5 +10,5 @@ import dep.hmfs.online.cmb.domain.base.TOA;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractTxnProcessor {
-    public abstract TOA process(byte[] bytes) throws Exception;
+    public abstract TOA process(byte[] bytes);
 }

@@ -32,7 +32,7 @@
 
 
     <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
-    <context:component-scan base-package="hmfs,skyline,dep"/>
+    <context:component-scan base-package="hmfs,skyline,dep,common"/>
 
     <!-- enable autowire -->
     <context:annotation-config/>

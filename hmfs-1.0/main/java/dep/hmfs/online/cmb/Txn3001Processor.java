@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Txn3001Processor extends AbstractTxnProcessor {
     @Override
-    public TOA process(byte[] bytes) throws Exception {
+    public TOA process(byte[] bytes) {
         TIA3001 tia3001 = new TIA3001();
         tia3001.body.refundApplyNo = new String(bytes, 0, 18).trim();
 
