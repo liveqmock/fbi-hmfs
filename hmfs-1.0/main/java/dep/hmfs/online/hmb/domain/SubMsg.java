@@ -9,5 +9,5 @@ package dep.hmfs.online.hmb.domain;
  */
 public class SubMsg extends HmbMsg{
     //F8£º¶¯×÷´úÂë
-    public String actionCode;
+    public String actionCode = "#";
 }

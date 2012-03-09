@@ -182,7 +182,7 @@ public class IsoMessage {
      * @return The receiver (useful for setting several fields in sequence).
      */
     public IsoMessage setField(int index, IsoValue<?> field) {
-        if (index < 2 || index > 128) {
+        if (index < 1 || index > 128) {
             throw new IndexOutOfBoundsException("Field index must be between 2 and 128");
         }
         if (field != null) {
@@ -228,8 +228,8 @@ public class IsoMessage {
      * @return The receiver (useful for setting several values in sequence).
      */
     public <T> IsoMessage setValue(int index, T value, CustomField<T> encoder, IsoType t, int length) {
-        if (index < 2 || index > 128) {
-            throw new IndexOutOfBoundsException("Field index must be between 2 and 128");
+        if (index < 1 || index > 128) {
+            throw new IndexOutOfBoundsException("Field index must be between 1 and 128");
         }
         if (value == null) {
             fields[index] = null;
@@ -390,7 +390,7 @@ public class IsoMessage {
             bs.set(127, true);
         }
         //Write bitmap to stream
-        if (binary) {
+        //if (binary) {
             int pos = 128;
             int b = 0;
             for (int i = 0; i < bs.size(); i++) {
@@ -404,6 +404,7 @@ public class IsoMessage {
                     b = 0;
                 }
             }
+/*
         } else {
             int pos = 0;
             int lim = bs.size() / 4;
@@ -420,6 +421,7 @@ public class IsoMessage {
                 bout.write(HEX[nibble]);
             }
         }
+*/
 
         //Fields
         for (int i = 2; i < 129; i++) {

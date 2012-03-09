@@ -305,13 +305,7 @@ public class MessageFactory {
     }
 
     /**
-     * Creates a new message instance from the buffer, which must contain a valid ISO8583
-     * message. If the factory is set to use binary messages then it will try to parse
-     * a binary message.
-     *
-     * @param buf             The byte buffer containing the message. Must not include the length header.
-     * @param isoHeaderLength The expected length of the ISO header, after which the message type
-     *                        and the rest of the message must come.
+     * 根据BEAN注解创建新8583报文
      */
     public IsoMessage parseMessage(byte[] buf, int isoHeaderLength, int pos)
             throws ParseException, UnsupportedEncodingException {
@@ -385,52 +379,106 @@ public class MessageFactory {
     }
 
     /**
-     * Sets whether the factory should set the current date on newly created messages,
-     * in field 7. Default is false.
+     * 根据XML中的定义生成新报文
+     * @param buf
+     * @param isoHeaderLength
+     * @param pos
+     * @return
+     * @throws ParseException
+     * @throws UnsupportedEncodingException
      */
+    public IsoMessage parseMessageByXmlDef(byte[] buf, int isoHeaderLength, int pos)
+            throws ParseException, UnsupportedEncodingException {
+        //IsoMessage m = new IsoMessage(isoHeaderLength > 0 ? new String(buf, 0, isoHeaderLength) : null);
+        IsoMessage m = new IsoMessage(null);
+        m.setCharacterEncoding(encoding);
+
+        int type = 0;
+        type = ((buf[isoHeaderLength] - 48) << 8)
+                | ((buf[isoHeaderLength + 1] - 48) << 4)
+                | (buf[isoHeaderLength + 2] - 48);
+        m.setType(type);
+        //Parse the bitmap (primary first)
+        BitSet bs = new BitSet(128);
+        int bitIndex = 0;
+        for (int i = 0; i < 16; i++) {
+            int bit = 128;
+            for (int b = 0; b < 8; b++) {
+                bs.set(bitIndex++, (buf[i] & bit) != 0);
+                bit >>= 1;
+            }
+        }
+
+        //开始转换域信息
+        Map<Integer, FieldParseInfo> parseGuide = parseMap.get(type);
+        List<Integer> index = parseOrder.get(type);
+        if (index == null) {
+            log.error(String.format("ISO8583 MessageFactory 配置文件中未找到报文编号 %04x [%s]",
+                    type, new String(buf)));
+            return null;
+        }
+
+        // 检查转换模板中是否设置所需的域信息
+        boolean abandon = false;
+        for (int i = 0; i < bs.length(); i++) {
+            if (bs.get(i) && !index.contains(i + 1)) {
+                log.warn("ISO8583 MessageFactory 无法保存域 {}: 没有配置信息", i + 1);
+                abandon = true;
+            }
+        }
+        if (abandon) {
+            return m;
+        }
+
+        //转换获取数据域值
+        for (Integer i : index) {
+            FieldParseInfo fpi = parseGuide.get(i);
+            if (bs.get(i - 1)) {
+                /* if (ignoreLast && pos >= buf.length && i == index.get(index.size() - 1)) {
+                  log.warn("Field {} is not really in the message even though it's in the bitmap", i);
+                  bs.clear(i - 1);
+              } else {*/
+                IsoValue<?> val = fpi.parse(buf, pos, getCustomField(i));
+                m.setField(i, val);
+                //To get the correct next position, we need to get the number of bytes, not chars
+                pos += val.toString().getBytes(fpi.getCharacterEncoding()).length;
+                if (val.getType() == IsoType.LLVAR || val.getType() == IsoType.LLBIN) {
+                    pos += 2;
+                } else if (val.getType() == IsoType.LLLVAR || val.getType() == IsoType.LLLBIN) {
+                    pos += 3;
+                } else if(val.getType() == IsoType.LVAR) {
+                    pos++;
+                }
+                //}
+            }
+        }
+        m.setLength(pos);
+        m.setHasNext(bs.get(127));
+        m.setBinary(useBinary);
+        return m;
+    }
+
     public void setAssignDate(boolean flag) {
         setDate = flag;
     }
 
-    /**
-     * Returns true if the factory is assigning the current date to newly created messages
-     * (field 7). Default is false.
-     */
     public boolean getAssignDate() {
         return setDate;
     }
 
-    /**
-     * Sets the generator that this factory will get new trace numbers from. There is no
-     * default generator.
-     */
     public void setTraceNumberGenerator(TraceNumberGenerator value) {
         traceGen = value;
     }
 
-    /**
-     * Returns the generator used to assign trace numbers to new messages.
-     */
     public TraceNumberGenerator getTraceNumberGenerator() {
         return traceGen;
     }
 
-    /**
-     * Sets the ISO header to be used in each message type.
-     *
-     * @param value A map where the keys are the message types and the values are the ISO headers.
-     */
     public void setIsoHeaders(Map<Integer, String> value) {
         isoHeaders.clear();
         isoHeaders.putAll(value);
     }
 
-    /**
-     * Sets the ISO header for a specific message type.
-     *
-     * @param type  The message type, for example 0x200.
-     * @param value The ISO header, or NULL to remove any headers for this message type.
-     */
     public void setIsoHeader(int type, String value) {
         if (value == null) {
             isoHeaders.remove(type);
@@ -439,34 +487,20 @@ public class MessageFactory {
         }
     }
 
-    /**
-     * Returns the ISO header used for the specified type.
-     */
     public String getIsoHeader(int type) {
         return isoHeaders.get(type);
     }
 
-    /**
-     * Adds a message template to the factory. If there was a template for the same
-     * message type as the new one, it is overwritten.
-     */
     public void addMessageTemplate(IsoMessage templ) {
         if (templ != null) {
             typeTemplates.put(templ.getType(), templ);
         }
     }
 
-    /**
-     * Removes the message template for the specified type.
-     */
     public void removeMessageTemplate(int type) {
         typeTemplates.remove(type);
     }
 
-    /**
-     * Returns the template for the specified message type. This allows templates to be modified
-     * programatically.
-     */
     public IsoMessage getMessageTemplate(int type) {
         return typeTemplates.get(type);
     }
