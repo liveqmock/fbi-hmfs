@@ -14,7 +14,7 @@ public class IsoValue<T> implements Cloneable {
     private T value;
     private CustomField<T> encoder;
     private int length;
-    private String encoding;
+    private String encoding = "GBK";
 
     public IsoValue(IsoType t, T value) {
         this(t, value, null);

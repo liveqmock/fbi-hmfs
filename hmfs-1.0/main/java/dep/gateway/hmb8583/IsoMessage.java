@@ -13,9 +13,7 @@ public class IsoMessage {
     private String msgCode;
     private IsoValue[] fields = new IsoValue[129];
     private String encoding = "GBK";
-
-
-    // ===========新增字段 ==================================
+    
     // 包长度
     private int length;
     // 是否有后续子报文

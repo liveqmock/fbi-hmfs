@@ -196,7 +196,7 @@ public class HmbMessageFactory {
         IsoMessage isoMessage = null;
         int pos = 0;
         do {
-            isoMessage = parseMessage(buf, 16 + 1 + 2 + pos, 16 + pos);
+            isoMessage = parseMessage(buf, pos);
             isoMessageList.add(isoMessage);
             pos += isoMessage.getLength();
             if(!isoMessage.isHasNext()){
@@ -210,15 +210,17 @@ public class HmbMessageFactory {
     /**
      * 根据BEAN注解创建新8583报文
      */
-    private IsoMessage parseMessage(byte[] buf, int msgCodePos, int dataFieldPos)
+    private IsoMessage parseMessage(byte[] buf, int pos)
             throws ParseException, UnsupportedEncodingException {
         IsoMessage m = new IsoMessage();
-        String msgCode = new String(buf, msgCodePos, 3, encoding);
+        String msgCode = new String(buf, pos + 16 + 1 + 2, 3, encoding);
         m.setMsgCode(msgCode);
+        int dataFieldPos = pos + 16;
+
         //处理Bitmap （128b）
         BitSet bs = new BitSet(128);
         int bitIndex = 0;
-        for (int i = 0; i < 16; i++) {
+        for (int i = pos; i < pos + 16; i++) {
             int bit = 128;
             for (int b = 0; b < 8; b++) {
                 bs.set(bitIndex++, (buf[i] & bit) != 0);
@@ -270,7 +272,7 @@ public class HmbMessageFactory {
             }
         }
         //后续处理
-        m.setLength(dataFieldPos);
+        m.setLength(dataFieldPos - pos);
         String nextflag = (String) m.getField(128).getValue();
         m.setHasNext("1".equals(nextflag));
         return m;
@@ -313,7 +315,7 @@ public class HmbMessageFactory {
                 HmbMessage hmbMessage = (HmbMessage) clazz.getAnnotation(HmbMessage.class);
                 if (hmbMessage != null) {
                     String msgCode = hmbMessage.value();
-                    Map<Integer, Field> annotatedFields = new HashMap<Integer, Field>();
+                    Map<Integer, Field> annotatedFields = new TreeMap<Integer, Field>();
                     initOneClassFileds(clazz, annotatedFields);
                     parseMap.put(msgCode, annotatedFields);
                 }
