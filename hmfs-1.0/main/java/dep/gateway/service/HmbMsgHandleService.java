@@ -1,17 +1,14 @@
 package dep.gateway.service;
 
+import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.hmb8583.IsoMessage;
-import dep.gateway.hmb8583.IsoType;
-import dep.gateway.hmb8583.MessageFactory;
-import dep.gateway.hmb8583.parse.ConfigParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,28 +25,23 @@ public class HmbMsgHandleService implements IMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CmbMsgHandleService.class);
 
-    private MessageFactory messageFactory;
+    @Autowired
+    private HmbMessageFactory hmbMessageFactory;
 
-    public HmbMsgHandleService() {
-        try {
-            messageFactory = ConfigParser.createFromClasspathConfig("/j8583-config.xml");
-        } catch (IOException e) {
-            logger.info("【本地服务端】J8583初始化配置异常!");
-        }
-    }
 
     @Override
     public byte[] handleMessage(byte[] bytes) {
         // TODO
         try {
-            Map<String, List<IsoMessage>> txnMessageMap = messageFactory.parseTxnMessageMap(bytes);
+            Map<String, List<IsoMessage>> txnMessageMap = hmbMessageFactory.parseTxnMessageMap(bytes);
 
             logger.info("【本地服务端】接收交易编码：" + txnMessageMap.keySet().iterator().next());
             for (IsoMessage isoMessage : txnMessageMap.entrySet().iterator().next().getValue()) {
                 logger.info("【本地服务端】接收报文编号：" + isoMessage.getField(1));
             }
             // TODO
-            IsoMessage m = messageFactory.newMessage(0x200);
+/*
+            IsoMessage m = hmbMessageFactory.newMessage();
 
             m.setValue(4, "sfsfs", IsoType.LVAR, 0);
             m.setValue(12, new Date(), IsoType.TIME, 0);
@@ -62,6 +54,7 @@ public class HmbMsgHandleService implements IMessageHandler {
             m.write(fout);
 
             fout.close();
+*/
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ParseException e) {

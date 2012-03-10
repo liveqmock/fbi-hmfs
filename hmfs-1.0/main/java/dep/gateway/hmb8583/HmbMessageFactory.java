@@ -11,6 +11,7 @@ import dep.hmfs.online.hmb.domain.HmbMsg;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -25,6 +26,7 @@ import java.util.*;
  * Time: обнГ4:36
  * To change this template use File | Settings | File Templates.
  */
+@Component
 public class HmbMessageFactory {
     private static final Logger logger = LoggerFactory.getLogger(HmbMsgConvertor.class);
 
