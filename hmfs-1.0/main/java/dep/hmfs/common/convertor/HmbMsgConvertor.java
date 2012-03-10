@@ -25,28 +25,22 @@ public class HmbMsgConvertor {
     private HmbMessageFactory dataFormat = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
         HmbMsgConvertor convertor = new HmbMsgConvertor();
-        Map paramMap = new HashMap();
-        paramMap.put("MSG_TYPE", "5110");
         Msg001 txn = new Msg001();
         txn.msgType="00001";
         txn.msgSn = "msgsn";
         txn.bizType = "9";
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(txn);
-        paramMap.put("TXN_MSGS", hmbMsgList);
-        convertor.marshal(paramMap);
+        convertor.marshal("5110", hmbMsgList);
     }
 
-    public byte[] marshal(Map paramMap){
-        String msgType = (String) paramMap.get("MSG_TYPE");
-        if (msgType == null) {
+    public byte[] marshal(String txnCode, List<HmbMsg> hmbMsgList){
+        if (txnCode == null) {
             throw new IllegalArgumentException("交易码未定义！");
         }
-        List<HmbMsg> hmbMsgList = (List<HmbMsg>) paramMap.get("TXN_MSGS");
         if (hmbMsgList == null) {
             throw new IllegalArgumentException("交易数据不存在！");
         }
-//        String subTxnCode = "";
         IsoMessage message;
         List<IsoMessage>  messageList = new ArrayList<IsoMessage>();
         try {
@@ -60,7 +54,7 @@ public class HmbMsgConvertor {
                     hmbMsg.msgNextFlag = "1";
                 }
 /*
-                String newSubTxnCode = hmbMsg.msgType.substring(2);
+                String newSubTxnCode = hmbMsg.txnCode.substring(2);
                 if (!newSubTxnCode.equals(subTxnCode)) {
                     dataFormat = new HmbMessageFactory();
                     subTxnCode = newSubTxnCode;
