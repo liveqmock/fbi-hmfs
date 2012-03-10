@@ -7,6 +7,7 @@ import dep.hmfs.online.hmb.domain.Msg002;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +41,12 @@ public class HmbMsgConvertor {
         txn002.msgSn = "msgsn3";
         hmbMsgList.add(txn002);
 
-
-        convertor.dataFormat.marshal("5110", hmbMsgList);
+        String txnCode = "5110";
+        byte[] txnBuf = convertor.dataFormat.marshal(txnCode, hmbMsgList);
+        FileOutputStream fout;
+        fout = new FileOutputStream("d:/tmp/txn" + txnCode + ".bin");
+        fout.write(txnBuf);
+        fout.close();
     }
 
 }

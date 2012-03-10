@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -88,9 +87,7 @@ public class HmbMessageFactory {
                 message = newMessage(hmbMsg);
                 messageList.add(message);
             }
-
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-
             for (IsoMessage isoMessage : messageList) {
                 logger.info(isoMessage.toString());
                 isoMessage.write(byteOut);
@@ -101,16 +98,9 @@ public class HmbMessageFactory {
             txnBuf = new byte[txnBodyBuf.length + 7 + 4];
             System.arraycopy(txnHeaderBuf, 0, txnBuf, 0, txnHeaderBuf.length);
             System.arraycopy(txnBodyBuf, 0, txnBuf, 11, txnBodyBuf.length);
-
-            FileOutputStream fout;
-            fout = new FileOutputStream("d:/tmp/iso.bin");
-            fout.write(txnBuf);
-            fout.close();
-
         } catch (Exception e) {
-            //TODO
-            logger.error("", e);
-            throw new RuntimeException("", e);
+            logger.error("数据打包出现错误!", e);
+            throw new RuntimeException("数据打包出现错误!", e);
         }
         return txnBuf;
     }
@@ -118,7 +108,7 @@ public class HmbMessageFactory {
     /**
      * 创建单个新IsoMessage
      */
-    public IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
+    private IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
         IsoMessage m = new IsoMessage();
         String msgCode = hmbMsg.msgType.substring(2);
         m.setMsgCode(msgCode);
@@ -163,14 +153,18 @@ public class HmbMessageFactory {
      * 解包
      * @param buf  (不含7位长度的报文)
      */
-    public Map<String, List<IsoMessage>> parseTxnMessageMap(byte[] buf)
-            throws ParseException, UnsupportedEncodingException {
+    public Map<String, List<IsoMessage>> unmashal(byte[] buf) {
         Map<String, List<IsoMessage>> txnMessageMap = new HashMap<String, List<IsoMessage>>();
         // 获取交易码
-        String txnCode = new String(buf, 0, 4, encoding);
-        byte[] subBuf = new byte[buf.length - 4];
-        System.arraycopy(buf, 4, subBuf, 0, subBuf.length);
-        txnMessageMap.put(txnCode, parseMessageList(subBuf));
+        try {
+            String txnCode = new String(buf, 0, 4, encoding);
+            byte[] subBuf = new byte[buf.length - 4];
+            System.arraycopy(buf, 4, subBuf, 0, subBuf.length);
+            txnMessageMap.put(txnCode, parseMessageList(subBuf));
+        } catch (Exception e) {
+            logger.error("解包时出现错误！", e);
+            throw new RuntimeException("解包时出现错误！", e);
+        }
         return txnMessageMap;
     }
 

@@ -33,7 +33,7 @@ public class HmbMsgHandleService implements IMessageHandler {
     public byte[] handleMessage(byte[] bytes) {
         // TODO
         try {
-            Map<String, List<IsoMessage>> txnMessageMap = hmbMessageFactory.parseTxnMessageMap(bytes);
+            Map<String, List<IsoMessage>> txnMessageMap = hmbMessageFactory.unmashal(bytes);
 
             logger.info("【本地服务端】接收交易编码：" + txnMessageMap.keySet().iterator().next());
             for (IsoMessage isoMessage : txnMessageMap.entrySet().iterator().next().getValue()) {
