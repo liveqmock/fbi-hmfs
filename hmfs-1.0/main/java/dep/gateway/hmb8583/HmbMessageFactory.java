@@ -131,26 +131,6 @@ public class HmbMessageFactory {
         return rtnMap;
     }
 
-    private void assembleMsgBean(Object msgBean, IsoMessage message) throws IllegalAccessException {
-        Map<Integer, Field> fieldMap = parseMap.get(message.getMsgCode());
-        for (Integer fieldno : fieldMap.keySet()) {
-            Field field = fieldMap.get(fieldno);
-
-            String value = (String) message.getField(fieldno).getValue();
-            Class typeClass = field.getType();
-            if (typeClass == String.class) {
-                field.set(msgBean, value);
-            } else if (typeClass == int.class) {
-                field.set(msgBean, Integer.parseInt(value));
-            } else if (typeClass == BigDecimal.class) {
-                field.set(msgBean, new BigDecimal(value));
-            } else {
-                logger.error("报文BEAN的字段类型不支持!" + typeClass.getName());
-                throw new RuntimeException("报文BEAN的字段类型不支持!");
-            }
-        }
-    }
-
     public Map<String, List<IsoMessage>> parseTxnBuf(byte[] buf) {
         Map<String, List<IsoMessage>> txnMessageMap = new HashMap<String, List<IsoMessage>>();
         // 获取交易码
@@ -227,7 +207,6 @@ public class HmbMessageFactory {
         return isoMessageList;
     }
 
-
     /**
      * 根据BEAN注解创建新8583报文
      */
@@ -295,6 +274,33 @@ public class HmbMessageFactory {
         String nextflag = (String) m.getField(128).getValue();
         m.setHasNext("1".equals(nextflag));
         return m;
+    }
+
+
+    /**
+     * 根据isomessage的内容填写msgBean的内容
+     * @param msgBean
+     * @param message
+     * @throws IllegalAccessException
+     */
+    private void assembleMsgBean(Object msgBean, IsoMessage message) throws IllegalAccessException {
+        Map<Integer, Field> fieldMap = parseMap.get(message.getMsgCode());
+        for (Integer fieldno : fieldMap.keySet()) {
+            Field field = fieldMap.get(fieldno);
+
+            String value = (String) message.getField(fieldno).getValue();
+            Class typeClass = field.getType();
+            if (typeClass == String.class) {
+                field.set(msgBean, value);
+            } else if (typeClass == int.class) {
+                field.set(msgBean, Integer.parseInt(value));
+            } else if (typeClass == BigDecimal.class) {
+                field.set(msgBean, new BigDecimal(value));
+            } else {
+                logger.error("报文BEAN的字段类型不支持!" + typeClass.getName());
+                throw new RuntimeException("报文BEAN的字段类型不支持!");
+            }
+        }
     }
 
     //===============================================================================
