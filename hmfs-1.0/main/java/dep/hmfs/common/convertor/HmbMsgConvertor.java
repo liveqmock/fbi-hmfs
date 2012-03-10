@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 房产局接口报文CODEC处理.
@@ -53,13 +51,6 @@ public class HmbMsgConvertor {
                 }else{
                     hmbMsg.msgNextFlag = "1";
                 }
-/*
-                String newSubTxnCode = hmbMsg.txnCode.substring(2);
-                if (!newSubTxnCode.equals(subTxnCode)) {
-                    dataFormat = new HmbMessageFactory();
-                    subTxnCode = newSubTxnCode;
-                }
-*/
                 message = dataFormat.newMessage(hmbMsg);
                 messageList.add(message);
             }
