@@ -7,7 +7,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: ÏÂÎç6:50
  * To change this template use File | Settings | File Templates.
  */
-public class Txn032 extends SubMsg{
+public class Msg032 extends SubMsg{
     //F38£º»á¼ÆÕÊºÅ
     public String cbsActno;
 

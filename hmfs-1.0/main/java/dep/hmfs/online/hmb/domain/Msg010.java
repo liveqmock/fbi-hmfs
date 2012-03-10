@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * Time: ÏÂÎç7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn010 extends SummaryResponseMsg {
+public class Msg010 extends SummaryResponseMsg {
     //F16£ºÐÅÏ¢ID1
     public String infoId1;
 

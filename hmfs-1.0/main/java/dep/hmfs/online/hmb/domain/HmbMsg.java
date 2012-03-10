@@ -14,10 +14,6 @@ public class HmbMsg {
     @Hmb8583Field(1)
     public String msgType;
 
-    @Hmb8583Field(127)
-    public String flag = "&";
-
-
     //F128：后续报文标志 0－表示没有后续子报文；1－表示还有后续子报文；
     @Hmb8583Field(128)
     public String msgNextFlag = "@";

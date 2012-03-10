@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn009 extends SummaryMsg {
+public class Msg005 extends SummaryMsg {
     //F12:交易方式  1－批量；2－单笔
     public String txnType;
 
@@ -25,12 +25,6 @@ public class Txn009 extends SummaryMsg {
     //F17：信息ID1类型
     public String infoIdType1;
 
-    //F18：信息ID2
-    public String infoId2;
-
-    //F19：信息ID2类型
-    public String infoIdType2;
-
     //F25：归属区县ID
     public String districtId;
 
@@ -40,12 +34,15 @@ public class Txn009 extends SummaryMsg {
     //F29：核算户账号1类型
     public String fundActtype1;
 
-    //F95：划入资金帐号
-    public String payinCbsActno;
+    //F32：结算户账号1
+    public String settleActno1;
 
-    //F96：划入资金帐号类型
-    public String payinCbsActtype;
+    //F33：结算户账号1类型
+    public String settleActtype1;
 
     //F45：交易金额1
     public BigDecimal txnAmt1;
+
+    //F79：缴款类型 00:首次交款 01:维修资金追缴 02:维修资金续交 03:结息交款 04:欠款补交 05:其他交款 06:收益资金交款
+    public String depType;
 }

@@ -7,7 +7,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-public class Txn031 extends SubMsg{
+public class Msg031 extends SubMsg{
     //F8：动作代码
     public String actionCode;
 

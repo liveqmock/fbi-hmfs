@@ -7,7 +7,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn100 extends HmbMsg{
+public class Msg100 extends HmbMsg{
     //F2：本笔报文的编号，唯一标识一笔报文，在整个报文的生命周期中，不会改变，规则如下：2位年（年的后两位）+2位月+2位日+6位序号+4位交易类型+2位发起地
     public String msgSn;
 

@@ -9,19 +9,7 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn013 extends SummaryMsg {
-    //F9：和新交易相关的原始交易的报文编号，如抹账、冲正类交易被抹账、冲正交易的报文编号
-    public String origMsgSn;
-
-    //F12:交易方式  1－批量；2－单笔
-    public String txnType;
-
-    //F13:业务种类  1－单位；2－业主；3－其他；4－抹账
-    public String bizType;
-
-    //F14:交易类型 发起方的交易类型码
-    public String origTxnCode;
-
+public class Msg014 extends SummaryResponseMsg {
     //F16：信息ID1
     public String infoId1;
 
@@ -45,7 +33,4 @@ public class Txn013 extends SummaryMsg {
 
     //F45：交易金额1
     public BigDecimal txnAmt1;
-
-    //F79：缴款类型 00:首次交款 01:维修资金追缴 02:维修资金续交 03:结息交款 04:欠款补交 05:其他交款 06:收益资金交款
-    public String depType;
 }

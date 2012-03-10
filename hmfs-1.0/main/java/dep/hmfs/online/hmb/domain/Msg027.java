@@ -7,7 +7,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-public class Txn034 extends SubMsg{
+public class Msg027 extends SubMsg{
     //F8：动作代码
     public String actionCode;
 
@@ -16,6 +16,12 @@ public class Txn034 extends SubMsg{
 
     //F17：信息ID1类型
     public String infoIdType1;
+
+    //F18：信息ID2
+    public String infoId2;
+
+    //F19：信息ID2类型
+    public String infoIdType2;
 
     //F20：信息编码
     public String infoCode;
@@ -34,12 +40,6 @@ public class Txn034 extends SubMsg{
 
     //F25：归属区县ID
     public String districtId;
-
-    //F28：核算户账号1。
-    public String fundActno1;
-
-    //F29：核算户账号1类型
-    public String fundActtype1;
 
     //F71：开发建设单位名称    核算户为区县时，可以填写#
     public String devOrgName;

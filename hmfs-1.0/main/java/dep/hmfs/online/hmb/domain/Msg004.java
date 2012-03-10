@@ -7,7 +7,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: ÏÂÎç7:05
  * To change this template use File | Settings | File Templates.
  */
-public class Txn004 extends SummaryResponseMsg {
+public class Msg004 extends SummaryResponseMsg {
     //F16£ºĞÅÏ¢ID1
     public String infoId1;
 
