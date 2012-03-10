@@ -29,16 +29,17 @@ public class Txn1001Processor extends AbstractTxnProcessor {
 
         TOA1001 toa1001 = null;
         // 查询交款汇总信息
-        HisMsginLog totalPayInfo = hisMsginLogService.qryTotalPayInfoByMsgSn(tia1001.body.payApplyNo);
+        HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia1001.body.payApplyNo, "00005");
 
         if (totalPayInfo != null) {
             toa1001 = new TOA1001();
             toa1001.body.payApplyNo = tia1001.body.payApplyNo;
-            toa1001.body.payAmt = totalPayInfo.getTxnAmt1().toString();
+            toa1001.body.payAmt = String.format("%.2f", totalPayInfo.getTxnAmt1());
             toa1001.body.payFlag = TxnCtlSts.TXN_SUCCESS.getCode().equals(totalPayInfo.getTxnCtlSts()) ? "1" : "0";
 
             // 更新交款汇总信息和明细信息状态为：处理中 -- 更新完成后交款信息不可撤销
-            hisMsginLogService.updatePayInfosTxnCtlStsByMsgSn(tia1001.body.payApplyNo, TxnCtlSts.TXN_HANDLING);
+            String[] payMsgTypes = {"01035", "01045"};
+            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1001.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_HANDLING);
         }
         return toa1001;
     }

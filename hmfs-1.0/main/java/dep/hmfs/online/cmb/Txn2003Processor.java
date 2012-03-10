@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  * Time: 上午11:47
  * To change this template use File | Settings | File Templates.
  */
+// TODO 支取冲正--待定
 @Component
 public class Txn2003Processor extends AbstractTxnProcessor {
     @Override

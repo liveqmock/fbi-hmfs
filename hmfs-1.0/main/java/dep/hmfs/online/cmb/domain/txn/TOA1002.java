@@ -3,6 +3,7 @@ package dep.hmfs.online.cmb.domain.txn;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.base.TOABody;
 import dep.hmfs.online.cmb.domain.base.TOAHeader;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class TOA1002 extends TOA implements Serializable {
 
     public static class Body extends TOABody {
 
+        public String payApplyNo;
+        public String payDetailNum;
+
         public List<Record> recordList = new ArrayList<Record>();
 
         public static class Record {
@@ -46,15 +50,17 @@ public class TOA1002 extends TOA implements Serializable {
                     delimiter = "|";
                 }
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(accountName).append("|");
-                stringBuilder.append(txAmt).append("|");
-                stringBuilder.append(address).append("|");
-                stringBuilder.append(houseArea).append("|");
-                stringBuilder.append(phoneNo).append("|");
-                stringBuilder.append(houseType).append("|");
-                stringBuilder.append(projAmt).append("|");
-                stringBuilder.append(payPart).append("|");
-                stringBuilder.append(accountNo);
+                stringBuilder.append(emptyToUnderline(accountName)).append("|");
+                stringBuilder.append(emptyToUnderline(txAmt)).append("|");
+                stringBuilder.append(emptyToUnderline(address)).append("|");
+                stringBuilder.append(emptyToUnderline(houseArea)).append("|");
+                stringBuilder.append(emptyToUnderline(phoneNo)).append("|");
+                stringBuilder.append(emptyToUnderline(houseType)).append("|");
+                stringBuilder.append(emptyToUnderline(projAmt)).append("|");
+                stringBuilder.append(emptyToUnderline(payPart)).append("|");
+                stringBuilder.append(emptyToUnderline(accountNo));
+
+                System.out.println(stringBuilder.toString());
                 return stringBuilder.toString();
             }
         }
@@ -62,12 +68,21 @@ public class TOA1002 extends TOA implements Serializable {
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Body.Record record : body.recordList) {
-            stringBuilder.append(record.toStringByDelimiter("|"));
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("\n");
+        stringBuilder.append(StringUtils.rightPad(body.payApplyNo, 18, " "));
+        if (!StringUtils.isEmpty(body.payDetailNum)) {
+            stringBuilder.append(StringUtils.rightPad(body.payDetailNum, 4, " "));
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        if (body.recordList.size() > 0) {
+            for (Body.Record record : body.recordList) {
+                stringBuilder.append(record.toStringByDelimiter("|"));
+                stringBuilder.append("\n");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
         return stringBuilder.toString();
+    }
+
+    private static String emptyToUnderline(String field) {
+        return StringUtils.isEmpty(field) ? "_" : field;
     }
 }

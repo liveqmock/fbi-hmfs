@@ -1,5 +1,6 @@
 package dep.gateway.service;
 
+import common.enums.CbsErrorCode;
 import dep.ContainerManager;
 import dep.hmfs.online.cmb.AbstractTxnProcessor;
 import dep.hmfs.online.cmb.domain.base.TIAHeader;
@@ -56,8 +57,7 @@ public class CmbMsgHandleService implements IMessageHandler {
             toa = txnProcessor.process(datagramBytes);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
-            // TODO toaHeader.errorCode = e.getMessage();
-            toaHeader.errorCode = "1111";
+            toaHeader.errorCode = CbsErrorCode.SYSTEM_ERROR.getCode();
         }
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 18, " "));
