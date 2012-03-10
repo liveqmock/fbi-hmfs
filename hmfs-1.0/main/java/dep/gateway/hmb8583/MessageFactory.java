@@ -18,7 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 package dep.gateway.hmb8583;
 
-import dep.gateway.hmb8583.parse.ConfigParser;
 import dep.gateway.hmb8583.parse.FieldParseInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +42,7 @@ import java.util.*;
  *
  * @author Enrique Zamudio
  */
+@Deprecated
 public class MessageFactory {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -173,7 +173,7 @@ public class MessageFactory {
      * but is really convenient in case the MessageFactory is being configured from within, say, Spring.
      */
     public void setConfigPath(String path) throws IOException {
-        ConfigParser.configureFromClasspathConfig(this, path);
+//        ConfigParser.configureFromClasspathConfig(this, path);
     }
 
     /**
@@ -214,12 +214,13 @@ public class MessageFactory {
      * @param type The message type, for example 0x200, 0x400, etc.
      */
     public IsoMessage newMessage(int type) {
-        IsoMessage m = new IsoMessage(isoHeaders.get(type));
-        m.setType(type);
-        m.setEtx(etx);
+//        IsoMessage m = new IsoMessage(isoHeaders.get(type));
+        IsoMessage m = new IsoMessage();
+        //m.setType(type);
+//        m.setEtx(etx);
         //m.setBinary(useBinary);
         // m.setForceSecondaryBitmap(forceb2);
-        m.setForceSecondaryBitmap(true);
+//        m.setForceSecondaryBitmap(true);
         m.setCharacterEncoding(encoding);
 
         //Copy the values from the template
@@ -242,39 +243,6 @@ public class MessageFactory {
         return m;
     }
 
-    /**
-     * Creates a message to respond to a request. Increments the message type by 16,
-     * sets all fields from the template if there is one, and copies all values from the request,
-     * overwriting fields from the template if they overlap.
-     *
-     * @param request An ISO8583 message with a request type (ending in 00).
-     */
-    public IsoMessage createResponse(IsoMessage request) {
-        IsoMessage resp = new IsoMessage(isoHeaders.get(request.getType() + 16));
-        resp.setCharacterEncoding(request.getCharacterEncoding());
-        resp.setBinary(request.isBinary());
-        resp.setType(request.getType() + 16);
-        resp.setEtx(etx);
-        resp.setForceSecondaryBitmap(forceb2);
-        //Copy the values from the template or the request (request has preference)
-        IsoMessage templ = typeTemplates.get(resp.getType());
-        if (templ == null) {
-            for (int i = 2; i < 128; i++) {
-                if (request.hasField(i)) {
-                    resp.setField(i, request.getField(i).clone());
-                }
-            }
-        } else {
-            for (int i = 2; i < 128; i++) {
-                if (request.hasField(i)) {
-                    resp.setField(i, request.getField(i).clone());
-                } else if (templ.hasField(i)) {
-                    resp.setField(i, templ.getField(i).clone());
-                }
-            }
-        }
-        return resp;
-    }
 
     public Map<String, List<IsoMessage>> parseTxnMessageMap(byte[] buf)
             throws ParseException, UnsupportedEncodingException {
@@ -310,14 +278,15 @@ public class MessageFactory {
     public IsoMessage parseMessage(byte[] buf, int isoHeaderLength, int pos)
             throws ParseException, UnsupportedEncodingException {
         //IsoMessage m = new IsoMessage(isoHeaderLength > 0 ? new String(buf, 0, isoHeaderLength) : null);
-        IsoMessage m = new IsoMessage(null);
+//        IsoMessage m = new IsoMessage(null);
+        IsoMessage m = new IsoMessage();
         m.setCharacterEncoding(encoding);
 
         int type = 0;
         type = ((buf[isoHeaderLength] - 48) << 8)
                 | ((buf[isoHeaderLength + 1] - 48) << 4)
                 | (buf[isoHeaderLength + 2] - 48);
-        m.setType(type);
+//        m.setType(type);
         //Parse the bitmap (primary first)
         BitSet bs = new BitSet(128);
         int bitIndex = 0;
@@ -374,7 +343,7 @@ public class MessageFactory {
         }
         m.setLength(pos);
         m.setHasNext(bs.get(127));
-        m.setBinary(useBinary);
+//        m.setBinary(useBinary);
         return m;
     }
 
@@ -390,14 +359,15 @@ public class MessageFactory {
     public IsoMessage parseMessageByXmlDef(byte[] buf, int isoHeaderLength, int pos)
             throws ParseException, UnsupportedEncodingException {
         //IsoMessage m = new IsoMessage(isoHeaderLength > 0 ? new String(buf, 0, isoHeaderLength) : null);
-        IsoMessage m = new IsoMessage(null);
+//        IsoMessage m = new IsoMessage(null);
+        IsoMessage m = new IsoMessage();
         m.setCharacterEncoding(encoding);
 
         int type = 0;
         type = ((buf[isoHeaderLength] - 48) << 8)
                 | ((buf[isoHeaderLength + 1] - 48) << 4)
                 | (buf[isoHeaderLength + 2] - 48);
-        m.setType(type);
+//        m.setType(type);
         //Parse the bitmap (primary first)
         BitSet bs = new BitSet(128);
         int bitIndex = 0;
@@ -454,7 +424,7 @@ public class MessageFactory {
         }
         m.setLength(pos);
         m.setHasNext(bs.get(127));
-        m.setBinary(useBinary);
+//        m.setBinary(useBinary);
         return m;
     }
 
@@ -493,7 +463,7 @@ public class MessageFactory {
 
     public void addMessageTemplate(IsoMessage templ) {
         if (templ != null) {
-            typeTemplates.put(templ.getType(), templ);
+//            typeTemplates.put(templ.getType(), templ);
         }
     }
 

@@ -3,7 +3,7 @@ package dep.hmfs.common.convertor;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.hmb8583.IsoMessage;
 import dep.hmfs.online.hmb.domain.HmbMsg;
-import dep.hmfs.online.hmb.domain.Txn001;
+import dep.hmfs.online.hmb.domain.Msg001;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +22,12 @@ import java.util.Map;
  */
 public class HmbMsgConvertor {
     private static final Logger logger = LoggerFactory.getLogger(HmbMsgConvertor.class);
-    private HmbMessageFactory dataFormat;
+    private HmbMessageFactory dataFormat = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
         HmbMsgConvertor convertor = new HmbMsgConvertor();
         Map paramMap = new HashMap();
         paramMap.put("MSG_TYPE", "5110");
-        Txn001 txn = new Txn001();
+        Msg001 txn = new Msg001();
         txn.msgType="00001";
         txn.msgSn = "msgsn";
         txn.bizType = "9";
@@ -46,7 +46,7 @@ public class HmbMsgConvertor {
         if (hmbMsgList == null) {
             throw new IllegalArgumentException("交易数据不存在！");
         }
-        String subTxnCode = "";
+//        String subTxnCode = "";
         IsoMessage message;
         List<IsoMessage>  messageList = new ArrayList<IsoMessage>();
         try {
@@ -59,17 +59,19 @@ public class HmbMsgConvertor {
                 }else{
                     hmbMsg.msgNextFlag = "1";
                 }
+/*
                 String newSubTxnCode = hmbMsg.msgType.substring(2);
                 if (!newSubTxnCode.equals(subTxnCode)) {
-                    dataFormat = new HmbMessageFactory(hmbMsg);
+                    dataFormat = new HmbMessageFactory();
                     subTxnCode = newSubTxnCode;
                 }
+*/
                 message = dataFormat.newMessage(hmbMsg);
                 messageList.add(message);
             }
             FileOutputStream fout;
             for (IsoMessage isoMessage : messageList) {
-                print(isoMessage);
+                dataFormat.print(isoMessage);
                 fout = new FileOutputStream("d:/tmp/iso.bin");
                 isoMessage.write(fout);
                 fout.close();
@@ -81,15 +83,5 @@ public class HmbMsgConvertor {
         }
 
         return null;
-    }
-
-    public static void print(IsoMessage m) {
-        System.out.printf("TYPE: %04x\n", m.getType());
-        for (int i = 1; i <= 128; i++) {
-            if (m.hasField(i)) {
-                System.out.printf("F %3d(%s): %s -> '%s'\n", i, m.getField(i).getType(),
-                        m.getObjectValue(i), m.getField(i).toString());
-            }
-        }
     }
 }
