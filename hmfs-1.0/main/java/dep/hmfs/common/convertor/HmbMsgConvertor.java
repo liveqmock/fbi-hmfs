@@ -7,9 +7,12 @@ import dep.hmfs.online.hmb.domain.Msg002;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房产局接口报文CODEC处理.
@@ -23,6 +26,11 @@ public class HmbMsgConvertor {
     private HmbMessageFactory dataFormat = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
         HmbMsgConvertor convertor = new HmbMsgConvertor();
+        testMarshal(convertor);
+        testUnmarshal(convertor);
+    }
+
+    private static void testMarshal(HmbMsgConvertor convertor) throws IOException {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
 
         Msg001 txn = new Msg001();
@@ -48,5 +56,16 @@ public class HmbMsgConvertor {
         fout.write(txnBuf);
         fout.close();
     }
+    private static void testUnmarshal(HmbMsgConvertor convertor) throws IOException {
+        String txnCode = "5110";
+        FileInputStream fi = new FileInputStream("d:/tmp/txn" + txnCode + ".bin");
+        byte[] txnBuf = new byte[fi.available()];
+        fi.read(txnBuf);
+        fi.close();
 
+        byte[] buf = new byte[txnBuf.length - 7];
+        System.arraycopy(txnBuf, 7,  buf, 0,buf.length);
+        Map<String, List<HmbMsg>> rtnMap = convertor.dataFormat.unmarshal(buf);
+        logger.info((String) rtnMap.keySet().toArray()[0]);
+    }
 }

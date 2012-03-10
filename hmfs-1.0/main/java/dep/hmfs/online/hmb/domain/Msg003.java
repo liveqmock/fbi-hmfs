@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -7,6 +9,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("003")
 public class Msg003 extends SummaryMsg{
     //F12:交易方式  1－批量；2－单笔
     public String txnType;

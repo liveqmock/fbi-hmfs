@@ -1,16 +1,10 @@
 package dep.gateway.service;
 
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.gateway.hmb8583.IsoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,13 +26,14 @@ public class HmbMsgHandleService implements IMessageHandler {
     @Override
     public byte[] handleMessage(byte[] bytes) {
         // TODO
-        try {
+/*
             Map<String, List<IsoMessage>> txnMessageMap = hmbMessageFactory.unmashal(bytes);
 
             logger.info("【本地服务端】接收交易编码：" + txnMessageMap.keySet().iterator().next());
             for (IsoMessage isoMessage : txnMessageMap.entrySet().iterator().next().getValue()) {
                 logger.info("【本地服务端】接收报文编号：" + isoMessage.getField(1));
             }
+*/
             // TODO
 /*
             IsoMessage m = hmbMessageFactory.newMessage();
@@ -55,11 +50,6 @@ public class HmbMsgHandleService implements IMessageHandler {
 
             fout.close();
 */
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ParseException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
 
         return null;
     }

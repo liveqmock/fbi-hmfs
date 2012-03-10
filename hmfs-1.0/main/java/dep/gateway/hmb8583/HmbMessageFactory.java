@@ -44,11 +44,10 @@ public class HmbMessageFactory {
     };
     //private String encoding = System.getProperty("file.encoding");
     private String encoding = "GBK";
+    //报文bean所在package
     private String packageName = "dep.hmfs.online.hmb.domain";
-
-    //private Map<String, Map<Integer, Hmb8583Field>> parseMap = new HashMap<String, Map<Integer, Hmb8583Field>>();
+    //报文处理元信息
     private Map<String, Map<Integer, Field>> parseMap = new HashMap<String, Map<Integer, Field>>();
-
 
     public HmbMessageFactory() {
         try {
@@ -106,6 +105,68 @@ public class HmbMessageFactory {
     }
 
     /**
+     * 解包
+     * @param buf  (不含7位长度的报文)
+     */
+    public Map<String, List<HmbMsg>> unmarshal(byte[] buf) {
+        Map<String, List<IsoMessage>> txnMsgMap = parseTxnBuf(buf);
+        String txnCode = (String) txnMsgMap.keySet().toArray()[0];
+
+        List<IsoMessage> isoMessageList = txnMsgMap.get(txnCode);
+        List<HmbMsg> msgBeanList = new ArrayList<HmbMsg>();
+        for (IsoMessage message : isoMessageList) {
+            String msgCode = message.getMsgCode();
+            try {
+                Class<?> clazz = Class.forName(packageName + ".Msg" + msgCode);
+                Object msgBean = clazz.newInstance();
+                assembleMsgBean(msgBean, message);
+                msgBeanList.add((HmbMsg)msgBean);
+            } catch (Exception e) {
+                logger.error("解包时出现错误！", e);
+                throw new RuntimeException("解包时出现错误！", e);
+            }
+        }
+        Map<String, List<HmbMsg>> rtnMap = new HashMap<String, List<HmbMsg>>();
+        rtnMap.put(txnCode, msgBeanList);
+        return rtnMap;
+    }
+
+    private void assembleMsgBean(Object msgBean, IsoMessage message) throws IllegalAccessException {
+        Map<Integer, Field> fieldMap = parseMap.get(message.getMsgCode());
+        for (Integer fieldno : fieldMap.keySet()) {
+            Field field = fieldMap.get(fieldno);
+
+            String value = (String) message.getField(fieldno).getValue();
+            Class typeClass = field.getType();
+            if (typeClass == String.class) {
+                field.set(msgBean, value);
+            } else if (typeClass == int.class) {
+                field.set(msgBean, Integer.parseInt(value));
+            } else if (typeClass == BigDecimal.class) {
+                field.set(msgBean, new BigDecimal(value));
+            } else {
+                logger.error("报文BEAN的字段类型不支持!" + typeClass.getName());
+                throw new RuntimeException("报文BEAN的字段类型不支持!");
+            }
+        }
+    }
+
+    public Map<String, List<IsoMessage>> parseTxnBuf(byte[] buf) {
+        Map<String, List<IsoMessage>> txnMessageMap = new HashMap<String, List<IsoMessage>>();
+        // 获取交易码
+        try {
+            String txnCode = new String(buf, 0, 4, encoding);
+            byte[] subBuf = new byte[buf.length - 4];
+            System.arraycopy(buf, 4, subBuf, 0, subBuf.length);
+            txnMessageMap.put(txnCode, parseMessageList(subBuf));
+        } catch (Exception e) {
+            logger.error("解包时出现错误！", e);
+            throw new RuntimeException("解包时出现错误！", e);
+        }
+        return txnMessageMap;
+    }
+
+    /**
      * 创建单个新IsoMessage
      */
     private IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
@@ -149,32 +210,13 @@ public class HmbMessageFactory {
         return m;
     }
 
-    /**
-     * 解包
-     * @param buf  (不含7位长度的报文)
-     */
-    public Map<String, List<IsoMessage>> unmashal(byte[] buf) {
-        Map<String, List<IsoMessage>> txnMessageMap = new HashMap<String, List<IsoMessage>>();
-        // 获取交易码
-        try {
-            String txnCode = new String(buf, 0, 4, encoding);
-            byte[] subBuf = new byte[buf.length - 4];
-            System.arraycopy(buf, 4, subBuf, 0, subBuf.length);
-            txnMessageMap.put(txnCode, parseMessageList(subBuf));
-        } catch (Exception e) {
-            logger.error("解包时出现错误！", e);
-            throw new RuntimeException("解包时出现错误！", e);
-        }
-        return txnMessageMap;
-    }
-
     private List<IsoMessage> parseMessageList(byte[] buf)
             throws ParseException, UnsupportedEncodingException {
         List<IsoMessage> isoMessageList = new ArrayList<IsoMessage>();
         IsoMessage isoMessage = null;
         int pos = 0;
         do {
-            isoMessage = parseMessage(buf, 16 + 3 + pos, 16 + pos);
+            isoMessage = parseMessage(buf, 16 + 1 + 2 + pos, 16 + pos);
             isoMessageList.add(isoMessage);
             pos += isoMessage.getLength();
             if(!isoMessage.isHasNext()){
@@ -257,22 +299,14 @@ public class HmbMessageFactory {
 
     //===============================================================================
 
-    public static void main(String[] args) {
-        HmbMessageFactory factory = new HmbMessageFactory();
-        factory.initParseMap();
-
-    }
-
     private void initParseMap() {
         for (int i = 1; i <= 999; i++) {
             String sn = StringUtils.leftPad("" + i, 3, "0");
-            //logger.info(sn);
             try {
                 Class clazz = Class.forName(packageName + ".Msg" + sn);
                 HmbMessage hmbMessage = (HmbMessage) clazz.getAnnotation(HmbMessage.class);
                 if (hmbMessage != null) {
                     String msgCode = hmbMessage.value();
-                    //Map<Integer, Hmb8583Field> dataFields = new HashMap<Integer, Hmb8583Field>();
                     Map<Integer, Field> annotatedFields = new HashMap<Integer, Field>();
                     initOneClassFileds(clazz, annotatedFields);
                     parseMap.put(msgCode, annotatedFields);
@@ -290,10 +324,8 @@ public class HmbMessageFactory {
         for (Field field : clazz.getDeclaredFields()) {
             Hmb8583Field msgField = field.getAnnotation(Hmb8583Field.class);
             if (msgField != null) {
-                //dataFields.put(msgField.value(), msgField);
                 annotatedFields.put(msgField.value(), field);
             }
-            //System.out.println(field.getName());
         }
         Class superclazz = clazz.getSuperclass();
         if (superclazz != Object.class) {

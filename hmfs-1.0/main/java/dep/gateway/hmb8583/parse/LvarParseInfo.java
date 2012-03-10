@@ -25,11 +25,6 @@ import dep.gateway.hmb8583.IsoValue;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
-/**
- * This class is used to parse fields of type LLVAR.
- *
- * @author Enrique Zamudio
- */
 public class LvarParseInfo extends FieldParseInfo {
 
     public LvarParseInfo() {
