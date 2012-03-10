@@ -118,27 +118,6 @@ public class IsoMessage {
 
     public byte[] writeData() {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-/*
-        if (isoHeader != null) {
-            try {
-                bout.write(isoHeader.getBytes());
-            } catch (IOException ex) {
-                //should never happen, writing to a ByteArrayOutputStream
-            }
-        }
-*/
-        //Message Type
-        /* if (binary) {
-            bout.write((type & 0xff00) >> 8);
-            bout.write(type & 0xff);
-        } else {
-            try {
-                bout.write(String.format("%04x", type).getBytes());
-            } catch (IOException ex) {
-                //should never happen, writing to a ByteArrayOutputStream
-            }
-        }*/
-
         //Bitmap
         BitSet bs = new BitSet(128);
         for (int i = 1; i < 129; i++) {
@@ -184,6 +163,18 @@ public class IsoMessage {
                 setValue(i, v.getValue(), v.getEncoder(), v.getType(), v.getLength());
             }
         }
+    }
+
+    public  String toString() {
+        System.out.printf("MSGCODE: %s\n", this.getMsgCode());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 1; i <= 128; i++) {
+            if (this.hasField(i)) {
+                sb.append(String.format("F%3d(%s): %s -> '%s'\n", i, this.getField(i).getType(),
+                        this.getObjectValue(i), this.getField(i).toString()));
+            }
+        }
+        return sb.toString();
     }
 
     // ===========ÐÂÔö×Ö¶Î ==================================

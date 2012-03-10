@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -58,7 +60,63 @@ public class HmbMessageFactory {
     }
 
     /**
-     * 创建新报文
+     * 创建交易报文
+     * @param txnCode  4位交易码
+     * @param hmbMsgList  子报文bean List
+     * @return   全部子报文组成的buffer
+     */
+    public byte[] marshal(String txnCode, List<HmbMsg> hmbMsgList){
+        if (txnCode == null) {
+            throw new IllegalArgumentException("交易码未定义！");
+        }
+        if (hmbMsgList == null) {
+            throw new IllegalArgumentException("交易数据不存在！");
+        }
+        IsoMessage message;
+        List<IsoMessage>  messageList = new ArrayList<IsoMessage>();
+        byte[] txnBuf;
+        try {
+            int  msgTotalNum = hmbMsgList.size();
+            int  step = 0;
+            for (HmbMsg hmbMsg : hmbMsgList) {
+                step++;
+                if (step == msgTotalNum) {
+                    hmbMsg.msgNextFlag = "0";
+                }else{
+                    hmbMsg.msgNextFlag = "1";
+                }
+                message = newMessage(hmbMsg);
+                messageList.add(message);
+            }
+
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+
+            for (IsoMessage isoMessage : messageList) {
+                logger.info(isoMessage.toString());
+                isoMessage.write(byteOut);
+            }
+            byte[] txnBodyBuf = byteOut.toByteArray();
+            byte[] txnHeaderBuf = (StringUtils.leftPad(String.valueOf(txnBodyBuf.length), 7, "0") + txnCode).getBytes();
+
+            txnBuf = new byte[txnBodyBuf.length + 7 + 4];
+            System.arraycopy(txnHeaderBuf, 0, txnBuf, 0, txnHeaderBuf.length);
+            System.arraycopy(txnBodyBuf, 0, txnBuf, 11, txnBodyBuf.length);
+
+            FileOutputStream fout;
+            fout = new FileOutputStream("d:/tmp/iso.bin");
+            fout.write(txnBuf);
+            fout.close();
+
+        } catch (Exception e) {
+            //TODO
+            logger.error("", e);
+            throw new RuntimeException("", e);
+        }
+        return txnBuf;
+    }
+
+    /**
+     * 创建单个新IsoMessage
      */
     public IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
         IsoMessage m = new IsoMessage();
@@ -246,16 +304,6 @@ public class HmbMessageFactory {
         Class superclazz = clazz.getSuperclass();
         if (superclazz != Object.class) {
             initOneClassFileds(superclazz, annotatedFields);
-        }
-    }
-
-    public  void print(IsoMessage m) {
-        System.out.printf("MSGCODE: %s\n", m.getMsgCode());
-        for (int i = 1; i <= 128; i++) {
-            if (m.hasField(i)) {
-                System.out.printf("F%3d(%s): %s -> '%s'\n", i, m.getField(i).getType(),
-                        m.getObjectValue(i), m.getField(i).toString());
-            }
         }
     }
 }
