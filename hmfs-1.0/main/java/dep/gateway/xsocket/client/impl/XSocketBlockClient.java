@@ -92,7 +92,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000);
             //String datagram = "1234567890      00005001123456789123456789            10000.00        201203090000001|300|C\n21122000012|9090900|C\n000000455|300|D";
             // 1001 交款查询
-            //String datagram = "123456789012345600001001123456789123456789";
+            String datagram = "123456789012345600001001123456789123456789";
             // 1002 交款
             //String datagram = "1234567890123456000010021234567891234567892000000         ";
             // 2001 支取查询
@@ -105,7 +105,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             打印票据结束编号	12	票据结束编号（单张销号该字段为空）
             缴款通知书编号	18	非必填项，凭证使用时填写
              */
-            String datagram = "1234567890123456000040011123456789123123456789234";
+           // String datagram = "1234567890123456000040011123456789123123456789234";
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
         } catch (IOException e) {
             e.printStackTrace();

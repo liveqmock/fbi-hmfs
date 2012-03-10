@@ -1,9 +1,11 @@
 package dep.hmfs.online.cmb;
 
+import common.service.HisMsginLogService;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA5001;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 public class Txn5001Processor extends AbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(Txn5001Processor.class);
 
+    @Autowired
+    private HisMsginLogService hisMsginLogService;
     @Override
     public TOA process(byte[] bytes) {
         /*

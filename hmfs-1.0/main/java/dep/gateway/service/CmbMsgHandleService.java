@@ -31,10 +31,6 @@ public class CmbMsgHandleService implements IMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CmbMsgHandleService.class);
 
-    public CmbMsgHandleService() {
-
-    }
-
     @Override
     public byte[] handleMessage(byte[] bytes) {
 
