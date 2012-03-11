@@ -4,6 +4,7 @@ import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.hmb.domain.HmbMsg;
 import dep.hmfs.online.hmb.domain.Msg001;
 import dep.hmfs.online.hmb.domain.Msg002;
+import dep.hmfs.online.hmb.domain.Msg031;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +35,19 @@ public class HmbMsgConvertor {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
 
         Msg001 txn = new Msg001();
-        txn.msgType="00001";
+        //txn.msgType="00001";
         txn.msgSn = "msgsn";
         txn.bizType = "9";
         hmbMsgList.add(txn);
-        txn = new Msg001();
-        txn.msgType="00001";
-        txn.msgSn = "msgsn2";
-        txn.bizType = "9";
-        hmbMsgList.add(txn);
-
         Msg002 txn002 = new Msg002();
-        txn002.msgType="01002";
-        txn002.msgSn = "msgsn3";
+        txn002.msgType="00001";
+        txn002.msgSn = "msgsn2";
         hmbMsgList.add(txn002);
+
+        Msg031 txn031 = new Msg031();
+        //txn002.msgType="01002";
+        txn031.actionCode = "100";
+        hmbMsgList.add(txn031);
 
         String txnCode = "5110";
         byte[] txnBuf = convertor.dataFormat.marshal(txnCode, hmbMsgList);

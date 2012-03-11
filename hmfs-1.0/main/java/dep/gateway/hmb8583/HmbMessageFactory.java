@@ -8,6 +8,7 @@ import dep.hmfs.common.annotation.Hmb8583Field;
 import dep.hmfs.common.annotation.HmbMessage;
 import dep.hmfs.common.convertor.HmbMsgConvertor;
 import dep.hmfs.online.hmb.domain.HmbMsg;
+import dep.hmfs.online.hmb.domain.SummaryMsg;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,25 +151,40 @@ public class HmbMessageFactory {
      * 创建单个新IsoMessage
      */
     private IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
+        HmbMessage hmbMessage = (HmbMessage) hmbMsg.getClass().getAnnotation(HmbMessage.class);
+        if (hmbMessage == null) {
+            logger.error("报文BEAN注解定义错误!" );
+            throw new RuntimeException("报文BEAN注解定义错误!");
+        }
+        String msgCode = hmbMessage.value();
+
         IsoMessage m = new IsoMessage();
-        String msgCode = hmbMsg.msgType.substring(2);
         m.setMsgCode(msgCode);
         Map<Integer, Field> annotatedFields = parseMap.get(msgCode);
 
         for (Integer fieldno : annotatedFields.keySet()) {
             Field f = annotatedFields.get(fieldno);
             Class typeClass = f.getType();
-            String fieldValue = "#";
+            String fieldValue;
+            Object objFieldValue = f.get(hmbMsg);
             if (typeClass == String.class) {
-                fieldValue = (String) f.get(hmbMsg);
+                fieldValue = objFieldValue == null ? "#" : (String) objFieldValue;
             } else if (typeClass == int.class) {
-                fieldValue = String.valueOf(f.get(hmbMsg));
+                fieldValue = objFieldValue == null ? "0" : String.valueOf(objFieldValue);
             } else if (typeClass == BigDecimal.class) {
-                fieldValue = f.get(hmbMsg).toString();
+                fieldValue = objFieldValue == null ? "0.00" : objFieldValue.toString();
             } else {
                 logger.error("报文BEAN的字段类型不支持!" + typeClass.getName());
                 throw new RuntimeException("报文BEAN的字段类型不支持!");
             }
+            //特殊处理：报文第一个字段（msgType）处理
+            if (fieldno == 1) {
+                if (hmbMsg instanceof SummaryMsg) {
+                    fieldValue = "00" + msgCode;
+                } else {
+                    fieldValue = "01" + msgCode;
+                }
+            } 
             int isotype = Hmb8583FieldTypes[fieldno - 1];
             IsoType isoType;
             switch (isotype) {
