@@ -1,10 +1,7 @@
 package dep.test.hmbclient;
 
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.online.hmb.domain.HmbMsg;
-import dep.hmfs.online.hmb.domain.Msg001;
-import dep.hmfs.online.hmb.domain.Msg002;
-import dep.hmfs.online.hmb.domain.Msg031;
+import dep.hmfs.online.hmb.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +67,6 @@ public class HmbClient {
     }
 
     private void  processMsg004(){
-
+        Msg004 msg004 = new Msg004();
     }
 }
