@@ -22,7 +22,7 @@ public class IsoValue<T> implements Cloneable {
 
     public IsoValue(IsoType t, T value, CustomField<T> custom) {
         if (t.needsLength()) {
-            throw new IllegalArgumentException("Fixed-value types must use constructor that specifies length");
+            throw new IllegalArgumentException("长度未指定");
         }
         encoder = custom;
         type = t;
@@ -38,11 +38,11 @@ public class IsoValue<T> implements Cloneable {
                 length = enc.length();
             }
             if (t == IsoType.LVAR && length > 9) {
-                throw new IllegalArgumentException("LVAR can only hold values up to 9 chars");
+                throw new IllegalArgumentException("LVAR 长度超过 9 chars");
             } else if (t == IsoType.LLVAR && length > 99) {
-                throw new IllegalArgumentException("LLVAR can only hold values up to 99 chars");
+                throw new IllegalArgumentException("LLVAR 长度超过 99 chars");
             } else if (t == IsoType.LLLVAR && length > 999) {
-                throw new IllegalArgumentException("LLLVAR can only hold values up to 999 chars");
+                throw new IllegalArgumentException("LLLVAR 长度超过 999 chars");
             }
         } else if (type == IsoType.LLBIN || type == IsoType.LLLBIN) {
             if (custom == null) {
@@ -60,9 +60,9 @@ public class IsoValue<T> implements Cloneable {
                 length = enc.length();
             }
             if (t == IsoType.LLBIN && length > 99) {
-                throw new IllegalArgumentException("LLBIN can only hold values up to 99 chars");
+                throw new IllegalArgumentException("LLBIN 长度超过 to 99 chars");
             } else if (t == IsoType.LLLBIN && length > 999) {
-                throw new IllegalArgumentException("LLLBIN can only hold values up to 999 chars");
+                throw new IllegalArgumentException("LLLBIN 长度超过 999 chars");
             }
         } else {
             length = type.getLength();
@@ -79,17 +79,17 @@ public class IsoValue<T> implements Cloneable {
         length = len;
         encoder = custom;
         if (length == 0 && t.needsLength()) {
-            throw new IllegalArgumentException(String.format("Length must be greater than zero for type %s (value '%s')", t, val));
+            throw new IllegalArgumentException(String.format("长度错误  type %s (value '%s')", t, val));
         } else if (t == IsoType.LVAR || t == IsoType.LLVAR || t == IsoType.LLLVAR) {
             if (len == 0) {
                 length = custom == null ? val.toString().length() : custom.encodeField(value).length();
             }
             if (t == IsoType.LVAR && length > 9) {
-                throw new IllegalArgumentException("LVAR can only hold values up to 99 chars");
+                throw new IllegalArgumentException("LVAR 长度超过 99 chars");
             } else if (t == IsoType.LLVAR && length > 99) {
-                throw new IllegalArgumentException("LLVAR can only hold values up to 99 chars");
+                throw new IllegalArgumentException("LLVAR 长度超过 99 chars");
             } else if (t == IsoType.LLLVAR && length > 999) {
-                throw new IllegalArgumentException("LLLVAR can only hold values up to 999 chars");
+                throw new IllegalArgumentException("LLLVAR 长度超过 999 chars");
             }
         } else if (t == IsoType.LLBIN || t == IsoType.LLLBIN) {
             if (len == 0) {
@@ -97,9 +97,9 @@ public class IsoValue<T> implements Cloneable {
                 length = custom == null ? ((byte[]) val).length : custom.encodeField(value).length();
             }
             if (t == IsoType.LLBIN && length > 99) {
-                throw new IllegalArgumentException("LLBIN can only hold values up to 99 chars");
+                throw new IllegalArgumentException("LLBIN 长度超过 99 chars");
             } else if (t == IsoType.LLLBIN && length > 999) {
-                throw new IllegalArgumentException("LLLBIN can only hold values up to 999 chars");
+                throw new IllegalArgumentException("LLLBIN 长度超过 999 chars");
             }
         }
     }
@@ -189,12 +189,6 @@ public class IsoValue<T> implements Cloneable {
         return encoder;
     }
 
-    /**
-     *
-     * @param outs
-     * @param binary
-     * @throws IOException
-     */
     public void write(OutputStream outs, boolean binary) throws IOException {
         if (type == IsoType.LLLVAR || type == IsoType.LLVAR || type == IsoType.LVAR) {
             if (type == IsoType.LLLVAR) {
@@ -211,7 +205,6 @@ public class IsoValue<T> implements Cloneable {
         } else {
             throw new RuntimeException("域类型定义错误！");
         }
-
         outs.write(encoding == null ? toString().getBytes() : toString().getBytes(encoding));
     }
 }

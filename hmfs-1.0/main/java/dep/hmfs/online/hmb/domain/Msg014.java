@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 import java.math.BigDecimal;
 
 /**
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
  * Time: ÏÂÎç7:05
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("014")
 public class Msg014 extends SummaryResponseMsg {
     //F16£ºÐÅÏ¢ID1
     public String infoId1;

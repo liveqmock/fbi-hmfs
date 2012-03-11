@@ -1,21 +1,3 @@
-/*
-j8583 A Java implementation of the ISO8583 protocol
-Copyright (C) 2011 Enrique Zamudio Lopez
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-*/
 package dep.gateway.hmb8583.parse;
 
 import dep.gateway.hmb8583.CustomField;
@@ -26,10 +8,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-/** This class is used to parse fields of type DATE10.
- * 
- * @author Enrique Zamudio
- */
 public class Date10ParseInfo extends FieldParseInfo {
 
 	private static final long FUTURE_TOLERANCE;
@@ -45,15 +23,12 @@ public class Date10ParseInfo extends FieldParseInfo {
 	public IsoValue<Date> parse(byte[] buf, int pos, CustomField<?> custom)
 			throws ParseException {
 		if (pos < 0) {
-			throw new ParseException(String.format("Invalid position %d", pos), pos);
+			throw new ParseException(String.format("位置无效 %d", pos), pos);
 		}
 		if (pos+10 > buf.length) {
-			throw new ParseException(String.format("Insufficient data for DATE10 field, pos %d", pos), pos);
+			throw new ParseException(String.format("数据长度错误 for DATE10 field, pos %d", pos), pos);
 		}
-		//A SimpleDateFormat in the case of dates won't help because of the missing data
-		//we have to use the current date for reference and change what comes in the buffer
 		Calendar cal = Calendar.getInstance();
-		//Set the month in the date
 		cal.set(Calendar.MONTH, ((buf[pos] - 48) * 10) + buf[pos + 1] - 49);
 		cal.set(Calendar.DATE, ((buf[pos + 2] - 48) * 10) + buf[pos + 3] - 48);
 		cal.set(Calendar.HOUR_OF_DAY, ((buf[pos + 4] - 48) * 10) + buf[pos + 5] - 48);
@@ -72,9 +47,6 @@ public class Date10ParseInfo extends FieldParseInfo {
 			tens[start++] = (((buf[i] & 0xf0) >> 4) * 10) + (buf[i] & 0x0f);
 		}
 		Calendar cal = Calendar.getInstance();
-		//A SimpleDateFormat in the case of dates won't help because of the missing data
-		//we have to use the current date for reference and change what comes in the buffer
-		//Set the month in the date
 		cal.set(Calendar.MONTH, tens[0] - 1);
 		cal.set(Calendar.DATE, tens[1]);
 		cal.set(Calendar.HOUR_OF_DAY, tens[2]);
@@ -86,7 +58,6 @@ public class Date10ParseInfo extends FieldParseInfo {
 	}
 
 	public static void adjustWithFutureTolerance(Calendar cal) {
-		//We need to handle a small tolerance into the future (a couple of minutes)
 		long now = System.currentTimeMillis();
 		long then = cal.getTimeInMillis();
 		if (then > now && then-now > FUTURE_TOLERANCE) {

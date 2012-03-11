@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -7,6 +9,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("034")
 public class Msg034 extends SubMsg{
     //F8：动作代码
     public String actionCode;

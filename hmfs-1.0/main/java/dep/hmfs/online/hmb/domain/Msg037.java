@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 import java.math.BigDecimal;
 
 /**
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("037")
 public class Msg037 extends SubMsg{
     //F8：动作代码
     public String actionCode;

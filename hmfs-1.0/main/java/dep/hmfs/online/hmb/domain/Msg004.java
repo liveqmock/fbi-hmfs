@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -7,6 +9,7 @@ package dep.hmfs.online.hmb.domain;
  * Time: ÏÂÎç7:05
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("004")
 public class Msg004 extends SummaryResponseMsg {
     //F16£ºĞÅÏ¢ID1
     public String infoId1;

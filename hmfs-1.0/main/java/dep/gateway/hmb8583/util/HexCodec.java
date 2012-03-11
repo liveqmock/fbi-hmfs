@@ -1,6 +1,5 @@
 package dep.gateway.hmb8583.util;
 
-/** Utility class to perform HEX encoding/decoding of values. */
 public class HexCodec {
 
 	static final char[] HEX = new char[]{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -21,13 +20,11 @@ public class HexCodec {
 	}
 
 	public static byte[] hexDecode(String hex) {
-		//A null string returns an empty array
 		if (hex == null || hex.length() == 0) {
 			return new byte[0];
 		} else if (hex.length() < 3) {
 			return new byte[]{ (byte)(Integer.parseInt(hex, 16) & 0xff) };
 		}
-		//Adjust accordingly for odd-length strings
 		int count = hex.length();
 		int nibble = 0;
 		if (count % 2 != 0) {

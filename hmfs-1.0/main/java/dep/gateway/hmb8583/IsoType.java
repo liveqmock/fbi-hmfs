@@ -1,62 +1,23 @@
-/*
-j8583 A Java implementation of the ISO8583 protocol
-Copyright (C) 2007 Enrique Zamudio Lopez
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-*/
 package dep.gateway.hmb8583;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-/** Defines the possible values types that can be used in the fields.
- * Some types required the length of the value to be specified (NUMERIC
- * and ALPHA). Other types have a fixed length, like dates and times.
- * Other types do not require a length to be specified, like LLVAR
- * and LLLVAR.
- * 
- * @author Enrique Zamudio
- */
 public enum IsoType {
 
-	/** A fixed-length numeric value. It is zero-filled to the left. */
 	NUMERIC(true, 0),
-	/** A fixed-length alphanumeric value. It is filled with spaces to the right. */
 	ALPHA(true, 0),
-    /** A variable length alphanumeric value with a 2-digit header length. */
     // 新增 1字节变长长度
     LVAR(false, 0),
-	/** A variable length alphanumeric value with a 2-digit header length. */
 	LLVAR(false, 0),
-	/** A variable length alphanumeric value with a 3-digit header length. */
 	LLLVAR(false, 0),
-	/** A date in format MMddHHmmss */
 	DATE10(false, 10),
-	/** A date in format MMdd */
 	DATE4(false, 4),
-	/** A date in format yyMM */
 	DATE_EXP(false, 4),
-	/** Time of day in format HHmmss */
 	TIME(false, 6),
-	/** An amount, expressed in cents with a fixed length of 12. */
 	AMOUNT(false, 12),
-	/** Similar to ALPHA but holds byte arrays instead of strings. */
 	BINARY(true, 0),
-	/** Similar to LLVAR but holds byte arrays instead of strings. */
 	LLBIN(false, 0),
-	/** Similar to LLLVAR but holds byte arrays instead of strings. */
 	LLLBIN(false, 0);
 
 	private boolean needsLen;
@@ -67,18 +28,14 @@ public enum IsoType {
 		length = l;
 	}
 
-	/** Returns true if the type needs a specified length. */
 	public boolean needsLength() {
 		return needsLen;
 	}
 
-	/** Returns the length of the type if it's always fixed, or 0 if it's variable. */
 	public int getLength() {
 		return length;
 	}
 
-	/** Formats a Date if the receiver is DATE10, DATE4, DATE_EXP or TIME; throws an exception
-	 * otherwise. */
 	public String format(Date value) {
 		if (this == DATE10) {
 			return String.format("%Tm%<Td%<TH%<TM%<TS", value);
@@ -92,7 +49,6 @@ public enum IsoType {
 		throw new IllegalArgumentException("Cannot format date as " + this);
 	}
 
-	/** Formats the string to the given length (length is only useful if type is ALPHA, NUMERIC or BINARY). */
 	public String format(String value, int length) {
 		if (this == ALPHA) {
 	    	if (value == null) {
@@ -149,12 +105,11 @@ public enum IsoType {
 		throw new IllegalArgumentException("Cannot format String as " + this);
 	}
 
-	/** Formats the integer value as a NUMERIC, an AMOUNT, or a String. */
 	public String format(long value, int length) {
 		if (this == NUMERIC) {
 			String x = String.format(String.format("%%0%dd", length), value);
 	        if (x.length() > length) {
-	        	throw new IllegalArgumentException("Numeric value is larger than intended length: " + value + " LEN " + length);
+	        	throw new IllegalArgumentException("长度错误  length: " + value + " LEN " + length);
 	        }
 	        return x;
 		} else if (this == ALPHA || this == LLVAR || this == LLLVAR) {
@@ -167,7 +122,6 @@ public enum IsoType {
 		throw new IllegalArgumentException("Cannot format number as " + this);
 	}
 
-	/** Formats the BigDecimal as an AMOUNT, NUMERIC, or a String. */
 	public String format(BigDecimal value, int length) {
 		if (this == AMOUNT) {
 			return String.format("%012d", value.movePointRight(2).longValue());

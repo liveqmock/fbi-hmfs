@@ -104,9 +104,6 @@ public class IsoMessage {
     }
 
     public void write(OutputStream outs) throws IOException {
-        /* if (lengthBytes > 4) {
-            throw new IllegalArgumentException("The length header can have at most 4 bytes");
-        }*/
         byte[] data = writeData();
 
         outs.write(data);
@@ -144,7 +141,7 @@ public class IsoMessage {
                 try {
                     v.write(bout, false);
                 } catch (IOException ex) {
-                    //should never happen, writing to a ByteArrayOutputStream
+                    //
                 }
             }
         }

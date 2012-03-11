@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 import java.math.BigDecimal;
 
 /**
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("007")
 public class Msg007 extends SummaryMsg {
     //F12:交易方式  1－批量；2－单笔
     public String txnType;

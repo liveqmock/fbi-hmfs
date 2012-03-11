@@ -1,5 +1,7 @@
 package dep.hmfs.online.hmb.domain;
 
+import dep.hmfs.common.annotation.HmbMessage;
+
 import java.math.BigDecimal;
 
 /**
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
  * Time: 下午7:05
  * To change this template use File | Settings | File Templates.
  */
+@HmbMessage("013")
 public class Msg013 extends SummaryMsg {
     //F9：和新交易相关的原始交易的报文编号，如抹账、冲正类交易被抹账、冲正交易的报文编号
     public String origMsgSn;
