@@ -51,6 +51,30 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         return datagram;
     }
 
+    public byte[] sendDataUntilRcv(byte[] dataBytes, int headLength) throws Exception {
+
+            logger.info("【本地客户端】发送报文：" + new String(dataBytes));
+            byte[] datagramBytes = null;
+            if (sendData(dataBytes)) {
+                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(headLength).trim());
+                logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
+                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength - headLength);
+            }
+            logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
+            logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
+            return datagramBytes;
+        }
+
+    private boolean sendData(byte[] dataBytes) throws IOException {
+            if (blockingConnection == null || !blockingConnection.isOpen()) {
+                throw new RuntimeException("未建立连接！");
+            } else {
+                blockingConnection.write(dataBytes);
+                blockingConnection.flush();
+            }
+            return true;
+        }
+
     private boolean sendData(String dataContent) throws IOException {
         if (blockingConnection == null || !blockingConnection.isOpen()) {
             throw new RuntimeException("未建立连接！");

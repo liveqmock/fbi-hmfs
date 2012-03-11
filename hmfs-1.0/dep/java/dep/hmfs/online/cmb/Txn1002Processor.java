@@ -4,23 +4,26 @@ import common.enums.DCFlagCode;
 import common.enums.SystemService;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.*;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HmActinfoCbs;
-import common.repository.hmfs.model.HmActinfoFund;
-import common.repository.hmfs.model.TxnCbsLog;
+import common.repository.hmfs.model.*;
 import common.service.HisMsginLogService;
 import common.service.HmActinfoCbsService;
 import common.service.HmActinfoFundService;
+import dep.gateway.hmb8583.HmbMessageFactory;
+import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.cmb.domain.txn.TOA1002;
+import dep.hmfs.online.hmb.domain.HmbMsg;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -32,6 +35,8 @@ import java.util.UUID;
  */
 @Component
 public class Txn1002Processor extends AbstractTxnProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(Txn1002Processor.class);
 
     @Autowired
     private HisMsginLogService hisMsginLogService;
@@ -50,6 +55,8 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     @Autowired
     private TxnFundLogMapper txnFundLogMapper;
 
+    private HmbMessageFactory mf = new HmbMessageFactory();
+
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
     public TOA process(byte[] bytes) throws Exception {
@@ -59,9 +66,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         tia1002.body.txnSerialNo = new String(bytes, 34, 16).trim();
 
         String[] payMsgTypes = {"01035", "01045"};
-
-        // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
-        //hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_SUCCESS);
 
         // 查询交易汇总报文记录
         HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
@@ -87,7 +91,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
       交款交易。
     */
     @Transactional
-    private TOA1002 handlePayTxn(HisMsginLog totalMsg, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws ParseException {
+    private TOA1002 handlePayTxn(HisMsginLog totalMsg, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws Exception, IOException {
 
         // CBS 会计账户信息
         HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.qryHmActinfoCbsBySettleActNo(totalMsg.getSettleActno1());
@@ -99,6 +103,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         TxnCbsLog txnCbsLog = new TxnCbsLog();
         txnCbsLog.setPkid(UUID.randomUUID().toString());
         txnCbsLog.setTxnSn(tia1002.body.txnSerialNo);
+        txnCbsLog.setTxnSubSn("00001");
         txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
         txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
         txnCbsLog.setTxnCode("1002");
@@ -106,8 +111,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
         txnCbsLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
         txnCbsLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
-
-        // TODO 新增Fund账户交易明细记录
 
         // 修改CBS账户\结算账户\项目核算账户信息：账户余额,若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD
         String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
@@ -132,8 +135,48 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
         // 新增CBS账户交易明细记录
         txnCbsLogMapper.insertSelective(txnCbsLog);
+        // 更新会计账号信息
         hmActinfoCbsMapper.updateByPrimaryKey(hmActinfoCbs);
+
+        // 新增结算账号交易明细记录
+        TxnFundLog txnSettleLog = new TxnFundLog();
+        txnSettleLog.setPkid(UUID.randomUUID().toString());
+        txnSettleLog.setFundActno(hmActinfoSettle.getFundActno1());
+        txnSettleLog.setFundActtype(hmActinfoSettle.getFundActtype1());
+        txnSettleLog.setTxnSn(totalMsg.getMsgSn());
+        txnSettleLog.setTxnSubSn("00001");
+        txnSettleLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
+        txnSettleLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
+        txnSettleLog.setLastActBal(hmActinfoSettle.getLastActBal());
+        txnSettleLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
+        txnSettleLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+        txnSettleLog.setTxnCode("1002");
+        txnSettleLog.setActionCode("115");
+        txnSettleLog.setActionCode("115");
+
+        txnFundLogMapper.insertSelective(txnSettleLog);
+
+        // 更新结算账号信息
         hmActinfoFundMapper.updateByPrimaryKey(hmActinfoSettle);
+
+        // 新增一级核算账户交易明细记录
+        TxnFundLog txnFundLog = new TxnFundLog();
+        txnFundLog.setPkid(UUID.randomUUID().toString());
+        txnFundLog.setFundActno(hmActinfoFund.getFundActno1());
+        txnFundLog.setFundActtype(hmActinfoFund.getFundActtype1());
+        txnFundLog.setTxnSn(totalMsg.getMsgSn());
+        txnFundLog.setTxnSubSn("00001");
+        txnFundLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
+        txnFundLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
+        txnFundLog.setLastActBal(hmActinfoFund.getLastActBal());
+        txnFundLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
+        txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+        txnFundLog.setTxnCode("1002");
+        txnFundLog.setActionCode("115");
+        txnFundLog.setActionCode("115");
+
+        txnFundLogMapper.insertSelective(txnFundLog);
+        // 更新一级核算账户
         hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
 
         // 业主核算户账户信息更新
@@ -147,12 +190,37 @@ public class Txn1002Processor extends AbstractTxnProcessor {
                 subActinfoFund.setLastTxnDt(strToday);
             }
             hmActinfoFund.setActBal(hmActinfoFund.getActBal().add(subPayMsg.getTxnAmt1()));
+
+            // 新增业主核算户交易明细记录
+            TxnFundLog txnSubFundLog = new TxnFundLog();
+            txnSubFundLog.setPkid(UUID.randomUUID().toString());
+            txnSubFundLog.setFundActno(subPayMsg.getFundActno1());
+            txnSubFundLog.setFundActtype(subPayMsg.getFundActtype1());
+            txnSubFundLog.setTxnSn(totalMsg.getMsgSn());
+            txnSubFundLog.setTxnSubSn("00001");
+            txnSubFundLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
+            txnSubFundLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
+            txnSubFundLog.setLastActBal(subActinfoFund.getLastActBal());
+            txnSubFundLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
+            txnSubFundLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+            txnSubFundLog.setTxnCode("1002");
+            txnSubFundLog.setActionCode("115");
+            txnSubFundLog.setActionCode("115");
+
+            txnFundLogMapper.insertSelective(txnSubFundLog);
+
             hmActinfoFundMapper.updateByPrimaryKey(subActinfoFund);
         }
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_SUCCESS);
+
         // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
-
-
+        // TODO 组装8583 报文
+        byte[] bytes = null;
+        socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
+        byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
+        Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(hmfsDatagram);
+        // TODO 解析8583报文
+        logger.info((String) rtnMap.keySet().toArray()[0]);
         return getPayInfoDatagram(tia1002, payInfoList);
     }
 
