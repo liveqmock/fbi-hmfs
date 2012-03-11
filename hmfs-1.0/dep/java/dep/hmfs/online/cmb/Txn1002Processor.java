@@ -49,8 +49,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     @Autowired
     private HmActinfoFundMapper hmActinfoFundMapper;
     @Autowired
-    private HisMsginLogMapper hisMsginLogMapper;
-    @Autowired
     private TxnCbsLogMapper txnCbsLogMapper;
     @Autowired
     private TxnFundLogMapper txnFundLogMapper;
@@ -76,16 +74,17 @@ public class Txn1002Processor extends AbstractTxnProcessor {
             throw new RuntimeException("该笔交易不存在！");
         } else if (!(totalPayInfo.getTxnAmt1().compareTo(new BigDecimal(tia1002.body.payAmt)) == 0)) {
             throw new RuntimeException("实际交款金额和应交款金额不一致！");
-        } else if (TxnCtlSts.TXN_INIT.getCode().equals(totalPayInfo.getTxnCtlSts())) {
-            throw new RuntimeException("请先发起查询交易！");
         } else if (TxnCtlSts.TXN_CANCEL.getCode().equals(totalPayInfo.getTxnCtlSts())) {
             throw new RuntimeException("该笔交易已撤销！");
-        } else if (TxnCtlSts.TXN_HANDLING.getCode().equals(totalPayInfo.getTxnCtlSts())) {
+        } else if (TxnCtlSts.TXN_INIT.getCode().equals(totalPayInfo.getTxnCtlSts()) ||
+                TxnCtlSts.TXN_HANDLING.getCode().equals(totalPayInfo.getTxnCtlSts())) {
             // 交款交易。
             return handlePayTxn(totalPayInfo, tia1002, payMsgTypes, payInfoList);
-        } else {
+        } else if (TxnCtlSts.TXN_SUCCESS.getCode().equals(totalPayInfo.getTxnCtlSts())) {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return getPayInfoDatagram(tia1002, payInfoList);
+        } else {
+            throw new RuntimeException("该笔交易处理状态不明！");
         }
     }
 
@@ -102,17 +101,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         // 项目核算户账户信息
         HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(totalMsg.getFundActno1());
 
-        TxnCbsLog txnCbsLog = new TxnCbsLog();
-        txnCbsLog.setPkid(UUID.randomUUID().toString());
-        txnCbsLog.setTxnSn(tia1002.body.txnSerialNo);
-        txnCbsLog.setTxnSubSn("00001");
-        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
-        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
-        txnCbsLog.setTxnCode("1002");
-        txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
-        txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
-        txnCbsLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
-        txnCbsLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
 
         // 修改CBS账户\结算账户\项目核算账户信息：账户余额,若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD
         String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
@@ -134,11 +122,28 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
         hmActinfoSettle.setActBal(hmActinfoSettle.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
         hmActinfoFund.setActBal(hmActinfoFund.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
-        txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
-        // 新增CBS账户交易明细记录
-        txnCbsLogMapper.insertSelective(txnCbsLog);
+
         // 更新会计账号信息
         hmActinfoCbsMapper.updateByPrimaryKey(hmActinfoCbs);
+        // 更新结算账号信息
+        hmActinfoFundMapper.updateByPrimaryKey(hmActinfoSettle);
+        // 更新一级核算账户
+        hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+
+        // 新增CBS账户交易明细记录
+        TxnCbsLog txnCbsLog = new TxnCbsLog();
+        txnCbsLog.setPkid(UUID.randomUUID().toString());
+        txnCbsLog.setTxnSn(tia1002.body.txnSerialNo);
+        txnCbsLog.setTxnSubSn("00001");
+        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
+        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+        txnCbsLog.setTxnCode("1002");
+        txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
+        txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
+        txnCbsLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
+        txnCbsLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
+        txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
+        txnCbsLogMapper.insertSelective(txnCbsLog);
 
         // 新增结算账号交易明细记录
         TxnFundLog txnSettleLog = new TxnFundLog();
@@ -155,11 +160,8 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnSettleLog.setTxnCode("1002");
         txnSettleLog.setActionCode("115");
         txnSettleLog.setActionCode("115");
-
         txnFundLogMapper.insertSelective(txnSettleLog);
 
-        // 更新结算账号信息
-        hmActinfoFundMapper.updateByPrimaryKey(hmActinfoSettle);
 
         // 新增一级核算账户交易明细记录
         TxnFundLog txnFundLog = new TxnFundLog();
@@ -176,10 +178,8 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnFundLog.setTxnCode("1002");
         txnFundLog.setActionCode("115");
         txnFundLog.setActionCode("115");
-
         txnFundLogMapper.insertSelective(txnFundLog);
-        // 更新一级核算账户
-        hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+
 
         // 业主核算户账户信息更新
         for (HisMsginLog subPayMsg : payInfoList) {
@@ -192,6 +192,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
                 subActinfoFund.setLastTxnDt(strToday);
             }
             hmActinfoFund.setActBal(hmActinfoFund.getActBal().add(subPayMsg.getTxnAmt1()));
+            hmActinfoFundMapper.updateByPrimaryKey(subActinfoFund);
 
             // 新增业主核算户交易明细记录
             TxnFundLog txnSubFundLog = new TxnFundLog();
@@ -208,10 +209,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
             txnSubFundLog.setTxnCode("1002");
             txnSubFundLog.setActionCode("115");
             txnSubFundLog.setActionCode("115");
-
             txnFundLogMapper.insertSelective(txnSubFundLog);
-
-            hmActinfoFundMapper.updateByPrimaryKey(subActinfoFund);
         }
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_SUCCESS);
 
