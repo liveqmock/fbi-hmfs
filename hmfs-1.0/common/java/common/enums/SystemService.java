@@ -1,5 +1,6 @@
 package common.enums;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -12,10 +13,16 @@ import java.util.Date;
  */
 public class SystemService {
 
-    public static String formatDateByPattern(String pattern) {
+    public static String formatTodayByPattern(String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.format(new Date());
     }
-    
 
+    public static long daysBetween(String strDate1, String strDate2, String pattern) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        Date date1 = sdf.parse(strDate1);
+        Date date2 = sdf.parse(strDate2);
+        long days = (date1.getTime()-date2.getTime())/(24*60*60*1000);
+        return days > 0 ? days : (days * -1);
+    }
 }
