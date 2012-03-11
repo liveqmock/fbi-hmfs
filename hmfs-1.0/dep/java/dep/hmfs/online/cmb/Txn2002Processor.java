@@ -39,7 +39,6 @@ public class Txn2002Processor extends AbstractTxnProcessor {
             // TODO 成功则更新本地报文交易处理状态
             String[] drawSubMsgTypes = {"01041"};
             hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", drawSubMsgTypes, TxnCtlSts.TXN_SUCCESS);
-            
         }
         return null;
     }

@@ -94,13 +94,12 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     @Transactional
     private TOA1002 handlePayTxn(HisMsginLog totalMsg, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws Exception, IOException {
 
-        // CBS 会计账户信息
+        // CBS会计账户信息
         HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.qryHmActinfoCbsBySettleActNo(totalMsg.getSettleActno1());
         // 结算户账户信息
         HmActinfoFund hmActinfoSettle = hmActinfoFundService.qryHmActinfoFundByFundActNo(totalMsg.getSettleActno1());
         // 项目核算户账户信息
         HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(totalMsg.getFundActno1());
-
 
         // 修改CBS账户\结算账户\项目核算账户信息：账户余额,若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD
         String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
