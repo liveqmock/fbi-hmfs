@@ -30,6 +30,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         TIA1002 tia1002 = new TIA1002();
         tia1002.body.payApplyNo = new String(bytes, 0, 18).trim();
         tia1002.body.payAmt = new String(bytes, 18, 16).trim();
+        tia1002.body.txnSerialNo = new String(bytes, 34, 16).trim();
 
         String[] payMsgTypes = {"01035", "01045"};
         // TODO 发送至房管局并解析返回结果

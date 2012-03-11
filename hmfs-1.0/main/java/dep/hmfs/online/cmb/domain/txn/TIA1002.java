@@ -27,7 +27,8 @@ public class TIA1002 extends TIA implements Serializable {
 
     public static class Body extends TIABody {
         public String payApplyNo;                  // 缴款申请单号
-        public String payAmt;                   // 缴款金额
+        public String payAmt;                      // 缴款金额
+        public String txnSerialNo;                 // 交易流水号
     }
 
 }

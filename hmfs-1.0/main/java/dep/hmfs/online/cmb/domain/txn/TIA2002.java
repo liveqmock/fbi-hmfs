@@ -28,6 +28,7 @@ public class TIA2002 extends TIA implements Serializable {
     public static class Body extends TIABody {
         public String drawApplyNo;                  // 支取通知书编号
         public String drawAmt;                      // 支取金额
+        public String txnSerialNo;                  // 交易流水号
     }
 
 }

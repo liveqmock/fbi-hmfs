@@ -28,6 +28,7 @@ public class Txn3002Processor extends AbstractTxnProcessor {
         TIA3002 tia3002 = new TIA3002();
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();
         tia3002.body.refundAmt = new String(bytes, 18, 16).trim();
+        tia3002.body.txnSerialNo = new String(bytes, 34, 16).trim();
 
         // TODO 退款业务 交易成功则返回空报文体
         HisMsginLog totalRefundInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia3002.body.refundApplyNo, "00005");

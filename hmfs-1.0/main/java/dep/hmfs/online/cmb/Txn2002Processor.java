@@ -28,6 +28,7 @@ public class Txn2002Processor extends AbstractTxnProcessor {
         TIA2002 tia2002 = new TIA2002();
         tia2002.body.drawApplyNo = new String(bytes, 0, 18).trim();
         tia2002.body.drawAmt = new String(bytes, 18, 16).trim();
+        tia2002.body.txnSerialNo = new String(bytes, 34, 16).trim();
 
         // TODO 支取业务 交易成功则返回空报文体
         HisMsginLog totalDrawInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia2002.body.drawApplyNo, "00007");
