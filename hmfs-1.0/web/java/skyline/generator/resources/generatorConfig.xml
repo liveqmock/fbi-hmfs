@@ -18,16 +18,16 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="common.repository.hmfs.model" targetProject="main/java">
+        <javaModelGenerator targetPackage="common.repository.hmfs.model" targetProject="common/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="common.repository.hmfs.mapper" targetProject="main/java">
+        <sqlMapGenerator targetPackage="common.repository.hmfs.mapper" targetProject="common/java">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
-        <javaClientGenerator type="XMLMAPPER" targetPackage="common.repository.hmfs.dao" targetProject="main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="common.repository.hmfs.dao" targetProject="common/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
@@ -68,6 +68,5 @@
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 -->
-
     </context>
 </generatorConfiguration>
