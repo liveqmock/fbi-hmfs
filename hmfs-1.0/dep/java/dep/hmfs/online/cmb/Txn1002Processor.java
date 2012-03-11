@@ -101,15 +101,12 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnCbsLog.setTxnSn(tia1002.body.txnSerialNo);
         txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
         txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
-        txnCbsLog.setFundActno(totalMsg.getSettleActno1());
         txnCbsLog.setTxnCode("1002");
-        txnCbsLog.setMesgNo(tia1002.body.txnSerialNo);
         txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
         txnCbsLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
         txnCbsLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
-        // 新增CBS账户交易明细记录
-        txnCbsLogMapper.insertSelective(txnCbsLog);
+
         // TODO 新增Fund账户交易明细记录
 
         // 修改CBS账户\结算账户\项目核算账户信息：账户余额,若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD
@@ -132,6 +129,9 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
         hmActinfoSettle.setActBal(hmActinfoSettle.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
         hmActinfoFund.setActBal(hmActinfoFund.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
+        txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
+        // 新增CBS账户交易明细记录
+        txnCbsLogMapper.insertSelective(txnCbsLog);
         hmActinfoCbsMapper.updateByPrimaryKey(hmActinfoCbs);
         hmActinfoFundMapper.updateByPrimaryKey(hmActinfoSettle);
         hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
