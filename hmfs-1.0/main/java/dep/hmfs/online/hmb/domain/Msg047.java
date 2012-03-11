@@ -12,8 +12,8 @@ import java.math.BigDecimal;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-@HmbMessage("037")
-public class Msg037 extends SubMsg{
+@HmbMessage("047")
+public class Msg047 extends SubMsg{
     //F8：动作代码
     @Hmb8583Field(8)
     public String actionCode;

@@ -3,6 +3,8 @@ package dep.hmfs.online.hmb.domain;
 import dep.hmfs.common.annotation.Hmb8583Field;
 import dep.hmfs.common.annotation.HmbMessage;
 
+import java.math.BigDecimal;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -10,8 +12,8 @@ import dep.hmfs.common.annotation.HmbMessage;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-@HmbMessage("028")
-public class Msg028 extends SubMsg{
+@HmbMessage("052")
+public class Msg052 extends SubMsg{
     //F8：动作代码
     @Hmb8583Field(8)
     public String actionCode;
@@ -23,14 +25,6 @@ public class Msg028 extends SubMsg{
     //F17：信息ID1类型
     @Hmb8583Field(17)
     public String infoIdType1;
-
-    //F18：信息ID2
-    @Hmb8583Field(18)
-    public String infoId2;
-
-    //F19：信息ID2类型
-    @Hmb8583Field(19)
-    public String infoIdType2;
 
     //F20：信息编码
     @Hmb8583Field(20)
@@ -56,7 +50,24 @@ public class Msg028 extends SubMsg{
     @Hmb8583Field(25)
     public String districtId;
 
-    //F71：开发建设单位名称    核算户为区县时，可以填写#
-    @Hmb8583Field(71)
-    public String devOrgName;
+    //F28：核算户账号1。
+    @Hmb8583Field(28)
+    public String fundActno1;
+
+    //F29：核算户账号1类型
+    @Hmb8583Field(29)
+    public String fundActtype1;
+
+    //F30：核算户账号2。
+    @Hmb8583Field(30)
+    public String fundActno2;
+
+    //F31：核算户账号2类型
+    @Hmb8583Field(31)
+    public String fundActtype2;
+
+    //F37：账户余额
+    @Hmb8583Field(37)
+    public BigDecimal actBal;
 }
+

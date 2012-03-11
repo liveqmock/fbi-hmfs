@@ -10,11 +10,27 @@ import dep.hmfs.common.annotation.HmbMessage;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-@HmbMessage("032")
-public class Msg032 extends SubMsg{
-    //F38：会计帐号
-    @Hmb8583Field(38)
-    public String cbsActno;
+@HmbMessage("054")
+public class Msg054 extends SubMsg{
+    //F8：动作代码
+    @Hmb8583Field(8)
+    public String actionCode;
+
+    //F16：信息ID1
+    @Hmb8583Field(16)
+    public String infoId1;
+
+    //F17：信息ID1类型
+    @Hmb8583Field(17)
+    public String infoIdType1;
+
+    //F21：信息名称
+    @Hmb8583Field(21)
+    public String infoName;
+
+    //F25：归属区县ID
+    @Hmb8583Field(25)
+    public String districtId;
 
     //F32：结算户账号1
     @Hmb8583Field(32)
@@ -23,6 +39,10 @@ public class Msg032 extends SubMsg{
     //F33：结算户账号1类型
     @Hmb8583Field(33)
     public String settleActtype1;
+
+    //F38：会计帐号
+    @Hmb8583Field(38)
+    public String cbsActno;
 
     //F39：会计帐号类型
     @Hmb8583Field(39)

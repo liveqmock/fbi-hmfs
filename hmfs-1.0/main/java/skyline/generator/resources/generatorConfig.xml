@@ -68,12 +68,6 @@
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 -->
-        <table schema="hmfs" tableName="his_msgin_log">
-            <property name="ignoreQualifiersAtRuntime" value="true" />
-        </table>
-        <table schema="hmfs" tableName="his_msgout_log">
-            <property name="ignoreQualifiersAtRuntime" value="true" />
-        </table>
 
     </context>
 </generatorConfiguration>

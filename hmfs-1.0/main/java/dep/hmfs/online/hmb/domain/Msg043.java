@@ -12,8 +12,8 @@ import java.math.BigDecimal;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-@HmbMessage("035")
-public class Msg035 extends SubMsg{
+@HmbMessage("043")
+public class Msg043 extends SubMsg{
     //F8：动作代码
     @Hmb8583Field(8)
     public String actionCode;
@@ -37,10 +37,6 @@ public class Msg035 extends SubMsg{
     //F22：信息地址
     @Hmb8583Field(22)
     public String infoAddr;
-
-    //F23：分户数
-    @Hmb8583Field(23)
-    public String cellNum;
 
     //F24：建筑面积
     @Hmb8583Field(24)
@@ -74,16 +70,28 @@ public class Msg035 extends SubMsg{
     @Hmb8583Field(33)
     public String settleActtype1;
 
+    //F37：账户余额
+    @Hmb8583Field(37)
+    public BigDecimal actBal;
+
     //F45：交易金额1
     @Hmb8583Field(45)
     public BigDecimal txnAmt1;
 
-    //F71：开发建设单位名称    核算户为区县时，可以填写#
-    @Hmb8583Field(71)
-    public String devOrgName;
+    //F49：利息金额1
+    @Hmb8583Field(49)
+    public BigDecimal intrAmt1;
 
-    //F87：收款方名称
-    @Hmb8583Field(87)
-    public String payinActName;
+    //F42：开户银行分支机构编号
+    @Hmb8583Field(42)
+    public  String branchId;
 
+    //F94：划入资金帐号名称
+    @Hmb8583Field(94)
+    public String payinCbsActname;
+
+    //F95：划入资金帐号
+    @Hmb8583Field(95)
+    public String payinCbsActno;
 }
+
