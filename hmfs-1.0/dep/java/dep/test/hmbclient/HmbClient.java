@@ -69,4 +69,8 @@ public class HmbClient {
     private void  processMsg004(){
         Msg004 msg004 = new Msg004();
     }
+
+    private void  generateMsgSn(){
+
+    }
 }
