@@ -215,6 +215,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
         // TODO 组装8583 报文
         byte[] bytes = null;
+
         socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
         byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
         Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(hmfsDatagram);

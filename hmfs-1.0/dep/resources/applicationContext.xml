@@ -40,14 +40,19 @@
     <tx:annotation-driven/>
 
     <bean id="hmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
-        <property name="port" value="${socket_server_monitor_port_hmfs}"/>
+        <property name="port" value="61600"/>
         <property name="serverHandler" ref="hmbServerHandler"/>
     </bean>
 
     <bean id="cmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
-        <property name="port" value="${socket_server_monitor_port_cmb}"/>
-        <property name="serverHandler" ref="cmbServerHandler"/>
+        <property name="port" value="61601"/>
+        <property name="serverHandler" ref="webServerHandler"/>
     </bean>
+
+    <bean id="webSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
+            <property name="port" value="61602"/>
+            <property name="serverHandler" ref="webServerHandler"/>
+        </bean>
 
     <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

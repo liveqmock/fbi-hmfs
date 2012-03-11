@@ -1,9 +1,9 @@
 package dep.gateway.xsocket.server.impl;
 
+import dep.gateway.service.IMessageHandler;
+import dep.gateway.service.WebMsgHandleService;
 import dep.gateway.xsocket.server.ContentHandler;
 import dep.gateway.xsocket.server.IServerHandler;
-import dep.gateway.service.CmbMsgHandleService;
-import dep.gateway.service.IMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +14,17 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 
 /**
- * 服务端数据处理类 监听中间业务平台
+ * 服务端数据处理类 监听维修资金监管系统管理界面发起的报文
  * 6位报文长度
  * @author zxb
  */
 @Component
-public class CmbServerHandler implements IServerHandler {
+public class WebServerHandler implements IServerHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(WebServerHandler.class);
     private static final int DATA_LENGTH_FIELD_LENGTH = 6;
     @Autowired
-    private CmbMsgHandleService cmbMsgHandleService;
+    private WebMsgHandleService webMsgHandleService;
     /**
      * 连接的成功时的操作
      */
@@ -55,7 +55,7 @@ public class CmbServerHandler implements IServerHandler {
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
         logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
 
-        connection.setHandler(new CmbContentHandler(this, cmbMsgHandleService, dataLength));
+        connection.setHandler(new WebContentHandler(this, webMsgHandleService, dataLength));
 
         return true;
     }
@@ -84,24 +84,24 @@ public class CmbServerHandler implements IServerHandler {
         return true;
     }
 
-    public CmbMsgHandleService getCmbMsgHandleService() {
-        return cmbMsgHandleService;
+    public WebMsgHandleService getWebMsgHandleService() {
+        return webMsgHandleService;
     }
 
-    public void setCmbMsgHandleService(CmbMsgHandleService cmbMsgHandleService) {
-        this.cmbMsgHandleService = cmbMsgHandleService;
+    public void setWebMsgHandleService(WebMsgHandleService webMsgHandleService) {
+        this.webMsgHandleService = webMsgHandleService;
     }
 }
 
 
-class CmbContentHandler extends ContentHandler {
+class WebContentHandler extends ContentHandler {
 
     private static Logger logger = LoggerFactory.getLogger(CmbContentHandler.class);
-    private CmbMsgHandleService cmbMsgHandleService;
+    private WebMsgHandleService webMsgHandleService;
 
-    CmbContentHandler(IServerHandler hdl, IMessageHandler msgHandleService, int dataLength) {
+    WebContentHandler(IServerHandler hdl, IMessageHandler msgHandleService, int dataLength) {
         super(hdl, msgHandleService, dataLength);
-        cmbMsgHandleService = (CmbMsgHandleService) msgHandleService;
+        webMsgHandleService = (WebMsgHandleService) msgHandleService;
     }
 
     public boolean onData(INonBlockingConnection nbc) throws IOException {
@@ -124,7 +124,7 @@ class CmbContentHandler extends ContentHandler {
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 
             // 处理接收到的报文，并生成响应报文
-            byte[] resBytesMsg = cmbMsgHandleService.handleMessage(bytesDatagram);
+            byte[] resBytesMsg = webMsgHandleService.handleMessage(bytesDatagram);
             nbc.write(resBytesMsg);
             nbc.flush();
 
@@ -134,4 +134,3 @@ class CmbContentHandler extends ContentHandler {
         return true;
     }
 }
-

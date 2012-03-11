@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 
 /**
- * 服务端数据处理类
+ * 服务端数据处理类 监听房管局客户端
  * 7位报文长度 + 4位交易码 + 报文正文
  * @author zxb
  */
