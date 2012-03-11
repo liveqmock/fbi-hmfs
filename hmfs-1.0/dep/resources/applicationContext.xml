@@ -29,7 +29,7 @@
 
 
     <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
-    <context:component-scan base-package="hmfs,dep,common"/>
+    <context:component-scan base-package="dep,common"/>
 
     <!-- enable autowire -->
     <context:annotation-config/>
