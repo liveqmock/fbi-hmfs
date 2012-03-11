@@ -3,8 +3,7 @@ package dep.hmfs.online.cmb;
 import common.enums.DCFlagCode;
 import common.enums.SystemService;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HisMsginLogMapper;
-import common.repository.hmfs.dao.TxnCbsLogMapper;
+import common.repository.hmfs.dao.*;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,12 +37,19 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     @Autowired
     private HmActinfoCbsService hmActinfoCbsService;
     @Autowired
+    private HmActinfoCbsMapper hmActinfoCbsMapper;
+    @Autowired
+    private HmActinfoFundMapper hmActinfoFundMapper;
+    @Autowired
     private HisMsginLogMapper hisMsginLogMapper;
     @Autowired
     private TxnCbsLogMapper txnCbsLogMapper;
-    
+    @Autowired
+    private TxnFundLogMapper txnFundLogMapper;
+
+
     private static Map<String, HmActinfoCbs> settleCbsActinfoMaps;
-    
+
     public Txn1002Processor() {
 
     }
@@ -113,12 +120,13 @@ public class Txn1002Processor extends AbstractTxnProcessor {
       新增 TXN_CBS_LOG 记录 ，更新汇总报文记录和子报文记录的交易处理状态为成功。
     */
     @Transactional
-    private void handlePayTxn(HisMsginLog totalMsg, TIA1002 tia1002, String[] payMsgTypes) {
+    private void handlePayTxn(HisMsginLog totalMsg, TIA1002 tia1002, String[] payMsgTypes) throws ParseException {
+
         TxnCbsLog txnCbsLog = new TxnCbsLog();
         txnCbsLog.setPkid(UUID.randomUUID().toString());
         txnCbsLog.setTxnSn(tia1002.body.txnSerialNo);
-        txnCbsLog.setTxnDate(SystemService.formatDateByPattern("YYYYMMDD"));
-        txnCbsLog.setTxnTime(SystemService.formatDateByPattern("HHMMSSsss"));
+        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
+        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSSsss"));
         txnCbsLog.setFundActno(totalMsg.getSettleActno1());
         txnCbsLog.setTxnCode("1002");
         txnCbsLog.setMesgNo(tia1002.body.txnSerialNo);
@@ -127,7 +135,23 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
         txnCbsLog.setTxnAmt(new BigDecimal(tia1002.body.payAmt));
         txnCbsLog.setDcFlag(DCFlagCode.TXN_IN.getCode());
+        // 新增CBS账户交易明细记录
         txnCbsLogMapper.insertSelective(txnCbsLog);
+        // 修改CBS账户信息：若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD   账户余额
+        String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
+        if (!strToday.equals(hmActinfoCbs.getLastTxnDt())) {
+            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "YYYY-MM-DD");
+            hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
+                    .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
+            hmActinfoCbs.setLastActBal(hmActinfoCbs.getActBal());
+            hmActinfoCbs.setLastTxnDt(strToday);
+        }
+        hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().add(new BigDecimal(tia1002.body.payAmt)));
+        hmActinfoCbsMapper.updateByPrimaryKey(hmActinfoCbs);
+        // 新增Fund账户明细
+
+        // 修改CBS账户信息：若上次记账日不是今日，修改昨日余额为当前账户余额，积数+=上次余额*日期差、上次记帐日 YYYY-MM-DD   账户余额
+
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_SUCCESS);
         // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
     }
