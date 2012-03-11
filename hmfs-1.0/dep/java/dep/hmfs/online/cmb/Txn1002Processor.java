@@ -74,6 +74,8 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (totalPayInfo == null || payInfoList.size() < 1) {
             throw new RuntimeException("该笔交易不存在！");
+        } else if (!(totalPayInfo.getTxnAmt1().compareTo(new BigDecimal(tia1002.body.payAmt)) == 0)) {
+            throw new RuntimeException("实际交款金额和应交款金额不一致！");
         } else if (TxnCtlSts.TXN_INIT.getCode().equals(totalPayInfo.getTxnCtlSts())) {
             throw new RuntimeException("请先发起查询交易！");
         } else if (TxnCtlSts.TXN_CANCEL.getCode().equals(totalPayInfo.getTxnCtlSts())) {
