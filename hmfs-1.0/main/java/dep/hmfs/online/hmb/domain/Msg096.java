@@ -1,6 +1,6 @@
 package dep.hmfs.online.hmb.domain;
 
-import dep.hmfs.common.annotation.Hmb8583Field;
+import dep.hmfs.common.annotation.HmbMessage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,8 +9,7 @@ import dep.hmfs.common.annotation.Hmb8583Field;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-public class SubMsg extends HmbMsg{
-    //F8：动作代码
-    @Hmb8583Field(8)
-    public String actionCode = "#";
+@HmbMessage("096")
+public class Msg096 extends SubMsg{
 }
+

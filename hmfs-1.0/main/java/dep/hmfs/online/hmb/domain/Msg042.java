@@ -14,10 +14,6 @@ import java.math.BigDecimal;
  */
 @HmbMessage("042")
 public class Msg042 extends SubMsg{
-    //F8：动作代码
-    @Hmb8583Field(8)
-    public String actionCode;
-
     //F16：信息ID1
     @Hmb8583Field(16)
     public String infoId1;

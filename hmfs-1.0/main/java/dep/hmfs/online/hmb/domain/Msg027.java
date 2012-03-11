@@ -12,10 +12,6 @@ import dep.hmfs.common.annotation.HmbMessage;
  */
 @HmbMessage("027")
 public class Msg027 extends SubMsg{
-    //F8：动作代码
-    @Hmb8583Field(8)
-    public String actionCode;
-
     //F16：信息ID1
     @Hmb8583Field(16)
     public String infoId1;

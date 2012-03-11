@@ -12,8 +12,8 @@ import java.math.BigDecimal;
  * Time: 下午6:50
  * To change this template use File | Settings | File Templates.
  */
-@HmbMessage("041")
-public class Msg041 extends SubMsg{
+@HmbMessage("081")
+public class Msg081 extends SubMsg{
     //F16：信息ID1
     @Hmb8583Field(16)
     public String infoId1;
@@ -33,6 +33,10 @@ public class Msg041 extends SubMsg{
     //F22：信息地址
     @Hmb8583Field(22)
     public String infoAddr;
+
+    //F23：分户数
+    @Hmb8583Field(23)
+    public String cellNum;
 
     //F24：建筑面积
     @Hmb8583Field(24)
@@ -66,12 +70,12 @@ public class Msg041 extends SubMsg{
     @Hmb8583Field(33)
     public String settleActtype1;
 
-    //F37：账户余额
-    @Hmb8583Field(37)
-    public BigDecimal actBal;
-
     //F45：交易金额1
     @Hmb8583Field(45)
     public BigDecimal txnAmt1;
+
+    //F53：借贷标志
+    @Hmb8583Field(53)
+    public String dcFlag;
 }
 
