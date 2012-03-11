@@ -1,4 +1,4 @@
-package dep.hmfs.common.convertor;
+package dep.test.hmbclient;
 
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.hmb.domain.HmbMsg;
@@ -16,22 +16,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 房产局接口报文CODEC处理.
+ * Created by IntelliJ IDEA.
  * User: zhanrui
- * Date: 12-3-9
- * Time: 下午4:36
+ * Date: 12-3-11
+ * Time: 下午12:55
  * To change this template use File | Settings | File Templates.
  */
-public class HmbMsgConvertor {
-    private static final Logger logger = LoggerFactory.getLogger(HmbMsgConvertor.class);
-    private HmbMessageFactory dataFormat = new HmbMessageFactory();
+public class HmbClient {
+    private static final Logger logger = LoggerFactory.getLogger(HmbClient.class);
+    private HmbMessageFactory mf = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
-        HmbMsgConvertor convertor = new HmbMsgConvertor();
-        testMarshal(convertor);
-        testUnmarshal(convertor);
+        HmbClient client = new HmbClient();
+        client.testMarshal();
+        client.testUnmarshal();
     }
 
-    private static void testMarshal(HmbMsgConvertor convertor) throws IOException {
+    private void testMarshal() throws IOException {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
 
         Msg001 txn = new Msg001();
@@ -50,13 +50,13 @@ public class HmbMsgConvertor {
         hmbMsgList.add(txn031);
 
         String txnCode = "5110";
-        byte[] txnBuf = convertor.dataFormat.marshal(txnCode, hmbMsgList);
+        byte[] txnBuf = mf.marshal(txnCode, hmbMsgList);
         FileOutputStream fout;
         fout = new FileOutputStream("d:/tmp/txn" + txnCode + ".bin");
         fout.write(txnBuf);
         fout.close();
     }
-    private static void testUnmarshal(HmbMsgConvertor convertor) throws IOException {
+    private void testUnmarshal() throws IOException {
         String txnCode = "5110";
         FileInputStream fi = new FileInputStream("d:/tmp/txn" + txnCode + ".bin");
         byte[] txnBuf = new byte[fi.available()];
@@ -65,7 +65,11 @@ public class HmbMsgConvertor {
 
         byte[] buf = new byte[txnBuf.length - 7];
         System.arraycopy(txnBuf, 7,  buf, 0,buf.length);
-        Map<String, List<HmbMsg>> rtnMap = convertor.dataFormat.unmarshal(buf);
+        Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(buf);
         logger.info((String) rtnMap.keySet().toArray()[0]);
+    }
+
+    private void  processMsg004(){
+
     }
 }
