@@ -95,7 +95,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
                 record.accountName = hisMsginLog.getInfoName();
                 record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
                 record.address = hisMsginLog.getInfoAddr();
-                record.houseArea = hisMsginLog.getBuilderArea();
+                record.houseArea = hisMsginLog.getBuilderArea().toString();
                 // TODO  待定字段：房屋类型、电话号码、工程造价、缴款比例
                 record.houseType = "";
                 record.phoneNo = "";
