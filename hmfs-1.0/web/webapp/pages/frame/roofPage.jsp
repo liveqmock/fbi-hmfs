@@ -71,11 +71,6 @@
 
         div#nifty1 {
             margin: 0 1px; /*background: #9BD1FA;*/
-        /*background: #7A8FA8;*/
-        /*background: #0F67A1;*/
-        /*background: #B54936;*/
-        /*background: #FF6600;*/
-        /*background: #999999;*/
             background: #7387A0;
         }
 
@@ -136,8 +131,7 @@
 <table width="100%" cellpadding="0" cellspacing="0">
     <tr width="100%" height="50px" style="margin-bottom: 0px;margin-top:0px;margin:0px;padding:0px">
         <td width="50%" style="height:50" colspan="4">
-            <img  src="../../images/pams.jpg" width="110px" height="50px" style="margin-left:40px; " >
-            <%--<img src="../../images/pamstitle.jpg" height="50px">--%>
+            <img  src="../../images/hmfs.jpg" width="110px" height="50px" style="margin-left:40px; " >
         </td>
         <td width="50%" style="height:50;text-align:right" colspan="1">
             <font color="#5F6A78"> <span>ฤ๚บร,<%=username%>! </span> </font>
@@ -163,7 +157,6 @@
 
                 <div style="height:15px;text-align:right">
                     <font color="#ECEFF2">
-                        <%--<font color="#FFFFFF">--%>
                         <%=" " + deptname + " | " + operid + " | <" + rolesall + ">" %>   &nbsp;&nbsp;&nbsp;
                     </font>
                 </div>

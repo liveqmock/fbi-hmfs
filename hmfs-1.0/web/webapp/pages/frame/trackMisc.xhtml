@@ -2,7 +2,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:p="http://primefaces.org/ui"
                 template="/templates/ui.xhtml">
 
     <ui:define name="head">
@@ -14,9 +14,7 @@
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
-
             <p:tabView style="font-weight:normal;font-style:normal">
-
                 <p:tab title="系统更新历史">
                     <p:panel  header="更新信息（2012年2月）">
                         <p>2012年2月23日系统最新更新：</p>
@@ -27,8 +25,9 @@
                                 <li>3、系统菜单重新划分。</li>
                             </ul>
                         </div>
-
                     </p:panel>
+                </p:tab>
+                <p:tab title="当前系统状态">
                 </p:tab>
             </p:tabView>
         </div>
