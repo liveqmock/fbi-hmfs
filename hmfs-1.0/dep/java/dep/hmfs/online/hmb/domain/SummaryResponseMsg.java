@@ -21,4 +21,28 @@ public class SummaryResponseMsg extends SummaryMsg{
     //F11：用于说明报文处理代码的对应错误信息，如果报文处理代码为“99”,则表示业务处理错误信息的详细描述。
     @Hmb8583Field(11)
     public String rtnInfo = "#";
+
+    public String getOrigMsgSn() {
+        return origMsgSn;
+    }
+
+    public void setOrigMsgSn(String origMsgSn) {
+        this.origMsgSn = origMsgSn;
+    }
+
+    public String getRtnInfoCode() {
+        return rtnInfoCode;
+    }
+
+    public void setRtnInfoCode(String rtnInfoCode) {
+        this.rtnInfoCode = rtnInfoCode;
+    }
+
+    public String getRtnInfo() {
+        return rtnInfo;
+    }
+
+    public void setRtnInfo(String rtnInfo) {
+        this.rtnInfo = rtnInfo;
+    }
 }

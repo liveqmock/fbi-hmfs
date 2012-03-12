@@ -61,4 +61,100 @@ public class Msg005 extends SummaryMsg {
     //F79：缴款类型 00:首次交款 01:维修资金追缴 02:维修资金续交 03:结息交款 04:欠款补交 05:其他交款 06:收益资金交款
     @Hmb8583Field(79)
     public String depType;
+
+    public String getTxnType() {
+        return txnType;
+    }
+
+    public void setTxnType(String txnType) {
+        this.txnType = txnType;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public String getOrigTxnCode() {
+        return origTxnCode;
+    }
+
+    public void setOrigTxnCode(String origTxnCode) {
+        this.origTxnCode = origTxnCode;
+    }
+
+    public String getInfoId1() {
+        return infoId1;
+    }
+
+    public void setInfoId1(String infoId1) {
+        this.infoId1 = infoId1;
+    }
+
+    public String getInfoIdType1() {
+        return infoIdType1;
+    }
+
+    public void setInfoIdType1(String infoIdType1) {
+        this.infoIdType1 = infoIdType1;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getFundActno1() {
+        return fundActno1;
+    }
+
+    public void setFundActno1(String fundActno1) {
+        this.fundActno1 = fundActno1;
+    }
+
+    public String getFundActtype1() {
+        return fundActtype1;
+    }
+
+    public void setFundActtype1(String fundActtype1) {
+        this.fundActtype1 = fundActtype1;
+    }
+
+    public String getSettleActno1() {
+        return settleActno1;
+    }
+
+    public void setSettleActno1(String settleActno1) {
+        this.settleActno1 = settleActno1;
+    }
+
+    public String getSettleActtype1() {
+        return settleActtype1;
+    }
+
+    public void setSettleActtype1(String settleActtype1) {
+        this.settleActtype1 = settleActtype1;
+    }
+
+    public BigDecimal getTxnAmt1() {
+        return txnAmt1;
+    }
+
+    public void setTxnAmt1(BigDecimal txnAmt1) {
+        this.txnAmt1 = txnAmt1;
+    }
+
+    public String getDepType() {
+        return depType;
+    }
+
+    public void setDepType(String depType) {
+        this.depType = depType;
+    }
 }

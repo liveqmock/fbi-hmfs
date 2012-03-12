@@ -45,4 +45,68 @@ public class Msg006 extends SummaryResponseMsg {
     //F45£º½»Ò×½ð¶î1
     @Hmb8583Field(45)
     public BigDecimal txnAmt1;
+
+    public String getInfoId1() {
+        return infoId1;
+    }
+
+    public void setInfoId1(String infoId1) {
+        this.infoId1 = infoId1;
+    }
+
+    public String getInfoIdType1() {
+        return infoIdType1;
+    }
+
+    public void setInfoIdType1(String infoIdType1) {
+        this.infoIdType1 = infoIdType1;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getFundActno1() {
+        return fundActno1;
+    }
+
+    public void setFundActno1(String fundActno1) {
+        this.fundActno1 = fundActno1;
+    }
+
+    public String getFundActtype1() {
+        return fundActtype1;
+    }
+
+    public void setFundActtype1(String fundActtype1) {
+        this.fundActtype1 = fundActtype1;
+    }
+
+    public String getSettleActno1() {
+        return settleActno1;
+    }
+
+    public void setSettleActno1(String settleActno1) {
+        this.settleActno1 = settleActno1;
+    }
+
+    public String getSettleActtype1() {
+        return settleActtype1;
+    }
+
+    public void setSettleActtype1(String settleActtype1) {
+        this.settleActtype1 = settleActtype1;
+    }
+
+    public BigDecimal getTxnAmt1() {
+        return txnAmt1;
+    }
+
+    public void setTxnAmt1(BigDecimal txnAmt1) {
+        this.txnAmt1 = txnAmt1;
+    }
 }

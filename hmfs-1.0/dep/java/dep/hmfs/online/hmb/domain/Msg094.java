@@ -33,4 +33,44 @@ public class Msg094 extends SubMsg{
     //F60：单位类型  10：市局；11：区局；12：开发商；13：业委会；14：物业公司；15：审价单位；16：监理单位
     @Hmb8583Field(60)
     public String orgType;
+
+    public String getSettleActno1() {
+        return settleActno1;
+    }
+
+    public void setSettleActno1(String settleActno1) {
+        this.settleActno1 = settleActno1;
+    }
+
+    public String getSettleActtype1() {
+        return settleActtype1;
+    }
+
+    public void setSettleActtype1(String settleActtype1) {
+        this.settleActtype1 = settleActtype1;
+    }
+
+    public BigDecimal getActBal() {
+        return actBal;
+    }
+
+    public void setActBal(BigDecimal actBal) {
+        this.actBal = actBal;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
 }

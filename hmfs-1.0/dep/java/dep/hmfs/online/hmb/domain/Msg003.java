@@ -35,4 +35,52 @@ public class Msg003 extends SummaryMsg{
     //F25£∫πÈ Ù«¯œÿID
     @Hmb8583Field(25)
     public String districtId;
+
+    public String getTxnType() {
+        return txnType;
+    }
+
+    public void setTxnType(String txnType) {
+        this.txnType = txnType;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public String getOrigTxnCode() {
+        return origTxnCode;
+    }
+
+    public void setOrigTxnCode(String origTxnCode) {
+        this.origTxnCode = origTxnCode;
+    }
+
+    public String getInfoId1() {
+        return infoId1;
+    }
+
+    public void setInfoId1(String infoId1) {
+        this.infoId1 = infoId1;
+    }
+
+    public String getInfoIdType1() {
+        return infoIdType1;
+    }
+
+    public void setInfoIdType1(String infoIdType1) {
+        this.infoIdType1 = infoIdType1;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
 }

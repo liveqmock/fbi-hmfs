@@ -37,4 +37,52 @@ public class Msg092 extends SubMsg{
     //F57£ºÁ÷Ë®±àºÅ
     @Hmb8583Field(55)
     public String streamNo;
+
+    public String getSettleActno1() {
+        return settleActno1;
+    }
+
+    public void setSettleActno1(String settleActno1) {
+        this.settleActno1 = settleActno1;
+    }
+
+    public String getSettleActtype1() {
+        return settleActtype1;
+    }
+
+    public void setSettleActtype1(String settleActtype1) {
+        this.settleActtype1 = settleActtype1;
+    }
+
+    public BigDecimal getTxnAmt1() {
+        return txnAmt1;
+    }
+
+    public void setTxnAmt1(BigDecimal txnAmt1) {
+        this.txnAmt1 = txnAmt1;
+    }
+
+    public String getDcFlag() {
+        return dcFlag;
+    }
+
+    public void setDcFlag(String dcFlag) {
+        this.dcFlag = dcFlag;
+    }
+
+    public String getTxnDt() {
+        return txnDt;
+    }
+
+    public void setTxnDt(String txnDt) {
+        this.txnDt = txnDt;
+    }
+
+    public String getStreamNo() {
+        return streamNo;
+    }
+
+    public void setStreamNo(String streamNo) {
+        this.streamNo = streamNo;
+    }
 }

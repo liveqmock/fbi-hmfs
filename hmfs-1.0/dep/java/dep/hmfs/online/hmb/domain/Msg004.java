@@ -23,4 +23,28 @@ public class Msg004 extends SummaryResponseMsg {
     //F25£∫πÈ Ù«¯œÿID
     @Hmb8583Field(25)
     public String districtId;
+
+    public String getInfoId1() {
+        return infoId1;
+    }
+
+    public void setInfoId1(String infoId1) {
+        this.infoId1 = infoId1;
+    }
+
+    public String getInfoIdType1() {
+        return infoIdType1;
+    }
+
+    public void setInfoIdType1(String infoIdType1) {
+        this.infoIdType1 = infoIdType1;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
 }

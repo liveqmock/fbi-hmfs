@@ -42,10 +42,13 @@ public class HmbMessageFactory {
             1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1
     };
+
     //private String encoding = System.getProperty("file.encoding");
     private String encoding = "GBK";
+
     //报文bean所在package
-    private String packageName = "dep.hmfs.online.hmb.domain";
+    private String packageName;
+
     //报文处理元信息
     private Map<String, Map<Integer, Field>> parseMap = new HashMap<String, Map<Integer, Field>>();
 
@@ -59,11 +62,12 @@ public class HmbMessageFactory {
 
     /**
      * 创建交易报文
-     * @param txnCode  4位交易码
-     * @param hmbMsgList  子报文bean List
-     * @return   全部子报文组成的buffer
+     *
+     * @param txnCode    4位交易码
+     * @param hmbMsgList 子报文bean List
+     * @return 全部子报文组成的buffer
      */
-    public byte[] marshal(String txnCode, List<HmbMsg> hmbMsgList){
+    public byte[] marshal(String txnCode, List<HmbMsg> hmbMsgList) {
         if (txnCode == null) {
             throw new IllegalArgumentException("交易码未定义！");
         }
@@ -71,19 +75,18 @@ public class HmbMessageFactory {
             throw new IllegalArgumentException("交易数据不存在！");
         }
         IsoMessage message;
-        List<IsoMessage>  messageList = new ArrayList<IsoMessage>();
+        List<IsoMessage> messageList = new ArrayList<IsoMessage>();
         byte[] txnBuf;
         try {
-            int  msgTotalNum = hmbMsgList.size();
-            int  step = 0;
+            int msgTotalNum = hmbMsgList.size();
+            int step = 0;
             for (HmbMsg hmbMsg : hmbMsgList) {
                 step++;
                 if (step == msgTotalNum) {
-                    hmbMsg.msgNextFlag = "0";
-                }else{
-                    hmbMsg.msgNextFlag = "1";
+                    message = newMessage(hmbMsg, true);
+                } else {
+                    message = newMessage(hmbMsg, false);
                 }
-                message = newMessage(hmbMsg);
                 messageList.add(message);
             }
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -106,7 +109,8 @@ public class HmbMessageFactory {
 
     /**
      * 解包
-     * @param buf  (不含7位长度的报文)
+     *
+     * @param buf (不含7位长度的报文)
      */
     public Map<String, List<HmbMsg>> unmarshal(byte[] buf) {
         Map<String, List<IsoMessage>> txnMsgMap = parseTxnBuf(buf);
@@ -120,7 +124,7 @@ public class HmbMessageFactory {
                 Class<?> clazz = Class.forName(packageName + ".Msg" + msgCode);
                 Object msgBean = clazz.newInstance();
                 assembleMsgBean(msgBean, message);
-                msgBeanList.add((HmbMsg)msgBean);
+                msgBeanList.add((HmbMsg) msgBean);
             } catch (Exception e) {
                 logger.error("解包时出现错误！", e);
                 throw new RuntimeException("解包时出现错误！", e);
@@ -149,10 +153,10 @@ public class HmbMessageFactory {
     /**
      * 创建单个新IsoMessage
      */
-    private IsoMessage newMessage(HmbMsg hmbMsg) throws IllegalAccessException {
+    private IsoMessage newMessage(HmbMsg hmbMsg, boolean isLastMsg) throws IllegalAccessException {
         HmbMessage hmbMessage = (HmbMessage) hmbMsg.getClass().getAnnotation(HmbMessage.class);
         if (hmbMessage == null) {
-            logger.error("报文BEAN注解定义错误!" );
+            logger.error("报文BEAN注解定义错误!");
             throw new RuntimeException("报文BEAN注解定义错误!");
         }
         String msgCode = hmbMessage.value();
@@ -183,7 +187,7 @@ public class HmbMessageFactory {
                 } else {
                     fieldValue = "01" + msgCode;
                 }
-            } 
+            }
             int isotype = Hmb8583FieldTypes[fieldno - 1];
             IsoType isoType;
             switch (isotype) {
@@ -202,6 +206,7 @@ public class HmbMessageFactory {
             }
             m.setValue(fieldno, fieldValue, isoType, 0);
         }
+        m.setLastMsg(isLastMsg);
         return m;
     }
 
@@ -214,27 +219,29 @@ public class HmbMessageFactory {
             isoMessage = parseMessage(buf, pos);
             isoMessageList.add(isoMessage);
             pos += isoMessage.getLength();
-            if(!isoMessage.isHasNext()){
+            if (isoMessage.isLastMsg()) {
                 break;
             }
-        } while (pos <= buf.length);
+        } while (pos < buf.length);
 
         return isoMessageList;
     }
 
     /**
      * 根据BEAN注解创建新8583报文
+     * buf 去掉7+4 长度后的整个报文
      */
     private IsoMessage parseMessage(byte[] buf, int pos)
             throws ParseException, UnsupportedEncodingException {
         IsoMessage m = new IsoMessage();
-        String msgCode = new String(buf, pos + 16 + 1 + 2, 3, encoding);
+        String msgCode = new String(buf, pos + 32 + 1 + 2, 3, encoding);
         m.setMsgCode(msgCode);
-        int dataFieldPos = pos + 16;
+        int dataFieldPos = pos + 32;
 
         //处理Bitmap （128b）
         BitSet bs = new BitSet(128);
         int bitIndex = 0;
+        /* 二进制bitmap处理  zhanrui 20120312
         for (int i = pos; i < pos + 16; i++) {
             int bit = 128;
             for (int b = 0; b < 8; b++) {
@@ -242,6 +249,27 @@ public class HmbMessageFactory {
                 bit >>= 1;
             }
         }
+        */
+        for (int i = 0; i < 32; i++) {
+            int bm = i + pos;
+            if (buf[bm] >= '0' && buf[bm] <= '9') {
+                bs.set(bitIndex++, ((buf[bm] - 48) & 8) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 48) & 4) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 48) & 2) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 48) & 1) > 0);
+            } else if (buf[bm] >= 'A' && buf[bm] <= 'F') {
+                bs.set(bitIndex++, ((buf[bm] - 55) & 8) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 55) & 4) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 55) & 2) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 5) & 1) > 0);
+            } else if (buf[bm] >= 'a' && buf[bm] <= 'f') {
+                bs.set(bitIndex++, ((buf[bm] - 87) & 8) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 87) & 4) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 87) & 2) > 0);
+                bs.set(bitIndex++, ((buf[bm] - 87) & 1) > 0);
+            }
+        }
+
         Map<Integer, Field> annotatedFields = parseMap.get(msgCode);
         if (annotatedFields == null) {
             String info = "子报文码" + msgCode + "信息未定义！";
@@ -249,9 +277,9 @@ public class HmbMessageFactory {
             throw new RuntimeException(info);
         }
         // 检查转换模板中是否设置所需的域信息
-        for (int i = 0; i < bs.length(); i++) {
+        for (int i = 0; i < bs.length() - 1; i++) {
             if (bs.get(i)) {
-                if (!annotatedFields.containsKey(i+1)) {
+                if (!annotatedFields.containsKey(i + 1)) {
                     logger.error("ISO8583 MessageFactory 无法保存域 {}: 没有配置信息", i + 1);
                     throw new RuntimeException("ISO8583 域配置信息出现错误！");
                 }
@@ -282,20 +310,22 @@ public class HmbMessageFactory {
                 dataFieldPos += 2;
             } else if (val.getType() == IsoType.LLLVAR) {
                 dataFieldPos += 3;
-            } else if(val.getType() == IsoType.LVAR) {
+            } else if (val.getType() == IsoType.LVAR) {
                 dataFieldPos++;
             }
         }
         //后续处理
         m.setLength(dataFieldPos - pos);
-        String nextflag = (String) m.getField(128).getValue();
-        m.setHasNext("1".equals(nextflag));
+        //String nextflag = (String) m.getField(128).getValue();
+        m.setLastMsg(!bs.get(127));
+        //m.setHasNext("1".equals(nextflag));
         return m;
     }
 
 
     /**
      * 根据isomessage的内容填写msgBean的内容
+     *
      * @param msgBean
      * @param message
      * @throws IllegalAccessException
@@ -323,10 +353,12 @@ public class HmbMessageFactory {
     //===============================================================================
 
     private void initParseMap() {
+        HmbMsg msg = new HmbMsg();
+        this.packageName = msg.getClass().getPackage().getName();
         for (int i = 1; i <= 999; i++) {
             String sn = StringUtils.leftPad("" + i, 3, "0");
             try {
-                Class clazz = Class.forName(packageName + ".Msg" + sn);
+                Class clazz = Class.forName(this.packageName + ".Msg" + sn);
                 HmbMessage hmbMessage = (HmbMessage) clazz.getAnnotation(HmbMessage.class);
                 if (hmbMessage != null) {
                     String msgCode = hmbMessage.value();

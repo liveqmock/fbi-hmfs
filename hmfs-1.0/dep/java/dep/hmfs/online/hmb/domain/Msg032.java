@@ -55,4 +55,92 @@ public class Msg032 extends SubMsg{
     //F61£ºµ¥Î»Ãû³Æ
     @Hmb8583Field(61)
     public String orgName;
+
+    public String getCbsActno() {
+        return cbsActno;
+    }
+
+    public void setCbsActno(String cbsActno) {
+        this.cbsActno = cbsActno;
+    }
+
+    public String getSettleActno1() {
+        return settleActno1;
+    }
+
+    public void setSettleActno1(String settleActno1) {
+        this.settleActno1 = settleActno1;
+    }
+
+    public String getSettleActtype1() {
+        return settleActtype1;
+    }
+
+    public void setSettleActtype1(String settleActtype1) {
+        this.settleActtype1 = settleActtype1;
+    }
+
+    public String getCbsActtype() {
+        return cbsActtype;
+    }
+
+    public void setCbsActtype(String cbsActtype) {
+        this.cbsActtype = cbsActtype;
+    }
+
+    public String getCbsActname() {
+        return cbsActname;
+    }
+
+    public void setCbsActname(String cbsActname) {
+        this.cbsActname = cbsActname;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(String branchId) {
+        this.branchId = branchId;
+    }
+
+    public String getDepositType() {
+        return depositType;
+    }
+
+    public void setDepositType(String depositType) {
+        this.depositType = depositType;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
 }

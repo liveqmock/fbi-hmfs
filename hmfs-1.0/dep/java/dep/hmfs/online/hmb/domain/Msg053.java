@@ -47,4 +47,76 @@ public class Msg053 extends SubMsg{
     //F61£ºµ¥Î»Ãû³Æ
     @Hmb8583Field(61)
     public String orgName;
+
+    public String getInfoName() {
+        return infoName;
+    }
+
+    public void setInfoName(String infoName) {
+        this.infoName = infoName;
+    }
+
+    public String getCbsActno() {
+        return cbsActno;
+    }
+
+    public void setCbsActno(String cbsActno) {
+        this.cbsActno = cbsActno;
+    }
+
+    public String getCbsActtype() {
+        return cbsActtype;
+    }
+
+    public void setCbsActtype(String cbsActtype) {
+        this.cbsActtype = cbsActtype;
+    }
+
+    public String getCbsActname() {
+        return cbsActname;
+    }
+
+    public void setCbsActname(String cbsActname) {
+        this.cbsActname = cbsActname;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(String branchId) {
+        this.branchId = branchId;
+    }
+
+    public String getDepositType() {
+        return depositType;
+    }
+
+    public void setDepositType(String depositType) {
+        this.depositType = depositType;
+    }
+
+    public String getSchemeNo() {
+        return schemeNo;
+    }
+
+    public void setSchemeNo(String schemeNo) {
+        this.schemeNo = schemeNo;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
 }

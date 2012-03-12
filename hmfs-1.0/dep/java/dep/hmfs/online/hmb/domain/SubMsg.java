@@ -13,4 +13,12 @@ public class SubMsg extends HmbMsg{
     //F8£º¶¯×÷´úÂë
     @Hmb8583Field(8)
     public String actionCode = "#";
+
+    public String getActionCode() {
+        return actionCode;
+    }
+
+    public void setActionCode(String actionCode) {
+        this.actionCode = actionCode;
+    }
 }

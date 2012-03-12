@@ -33,4 +33,52 @@ public class SummaryMsg extends HmbMsg{
     //F7：报文的截止交易日期，如果截至日期为非工作日，则需要顺延到下一工作日
     @Hmb8583Field(7)
     public String msgEndDate = "#";
+
+    public String getMsgSn() {
+        return msgSn;
+    }
+
+    public void setMsgSn(String msgSn) {
+        this.msgSn = msgSn;
+    }
+
+    public int getSubmsgNum() {
+        return submsgNum;
+    }
+
+    public void setSubmsgNum(int submsgNum) {
+        this.submsgNum = submsgNum;
+    }
+
+    public String getSendSysId() {
+        return sendSysId;
+    }
+
+    public void setSendSysId(String sendSysId) {
+        this.sendSysId = sendSysId;
+    }
+
+    public String getOrigSysId() {
+        return origSysId;
+    }
+
+    public void setOrigSysId(String origSysId) {
+        this.origSysId = origSysId;
+    }
+
+    public String getMsgDt() {
+        return msgDt;
+    }
+
+    public void setMsgDt(String msgDt) {
+        this.msgDt = msgDt;
+    }
+
+    public String getMsgEndDate() {
+        return msgEndDate;
+    }
+
+    public void setMsgEndDate(String msgEndDate) {
+        this.msgEndDate = msgEndDate;
+    }
 }

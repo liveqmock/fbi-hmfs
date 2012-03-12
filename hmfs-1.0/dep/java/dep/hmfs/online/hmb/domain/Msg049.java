@@ -35,5 +35,53 @@ public class Msg049 extends SubMsg{
     //F91：关联报文编号
     @Hmb8583Field(91)
     public String linkMsgSn;
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getReceiptNo() {
+        return receiptNo;
+    }
+
+    public void setReceiptNo(String receiptNo) {
+        this.receiptNo = receiptNo;
+    }
+
+    public String getVoucherSts() {
+        return voucherSts;
+    }
+
+    public void setVoucherSts(String voucherSts) {
+        this.voucherSts = voucherSts;
+    }
+
+    public String getVoucherType() {
+        return voucherType;
+    }
+
+    public void setVoucherType(String voucherType) {
+        this.voucherType = voucherType;
+    }
+
+    public String getLinkMsgSn() {
+        return linkMsgSn;
+    }
+
+    public void setLinkMsgSn(String linkMsgSn) {
+        this.linkMsgSn = linkMsgSn;
+    }
 }
 

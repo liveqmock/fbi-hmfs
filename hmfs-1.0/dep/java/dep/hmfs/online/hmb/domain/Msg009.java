@@ -65,4 +65,111 @@ public class Msg009 extends SummaryMsg {
     //F45£º½»Ò×½ð¶î1
     @Hmb8583Field(45)
     public BigDecimal txnAmt1;
+
+    //=====================
+
+
+    public String getTxnType() {
+        return txnType;
+    }
+
+    public void setTxnType(String txnType) {
+        this.txnType = txnType;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public String getOrigTxnCode() {
+        return origTxnCode;
+    }
+
+    public void setOrigTxnCode(String origTxnCode) {
+        this.origTxnCode = origTxnCode;
+    }
+
+    public String getInfoId1() {
+        return infoId1;
+    }
+
+    public void setInfoId1(String infoId1) {
+        this.infoId1 = infoId1;
+    }
+
+    public String getInfoIdType1() {
+        return infoIdType1;
+    }
+
+    public void setInfoIdType1(String infoIdType1) {
+        this.infoIdType1 = infoIdType1;
+    }
+
+    public String getInfoId2() {
+        return infoId2;
+    }
+
+    public void setInfoId2(String infoId2) {
+        this.infoId2 = infoId2;
+    }
+
+    public String getInfoIdType2() {
+        return infoIdType2;
+    }
+
+    public void setInfoIdType2(String infoIdType2) {
+        this.infoIdType2 = infoIdType2;
+    }
+
+    public String getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(String districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getFundActno1() {
+        return fundActno1;
+    }
+
+    public void setFundActno1(String fundActno1) {
+        this.fundActno1 = fundActno1;
+    }
+
+    public String getFundActtype1() {
+        return fundActtype1;
+    }
+
+    public void setFundActtype1(String fundActtype1) {
+        this.fundActtype1 = fundActtype1;
+    }
+
+    public String getPayinCbsActno() {
+        return payinCbsActno;
+    }
+
+    public void setPayinCbsActno(String payinCbsActno) {
+        this.payinCbsActno = payinCbsActno;
+    }
+
+    public String getPayinCbsActtype() {
+        return payinCbsActtype;
+    }
+
+    public void setPayinCbsActtype(String payinCbsActtype) {
+        this.payinCbsActtype = payinCbsActtype;
+    }
+
+    public BigDecimal getTxnAmt1() {
+        return txnAmt1;
+    }
+
+    public void setTxnAmt1(BigDecimal txnAmt1) {
+        this.txnAmt1 = txnAmt1;
+    }
 }

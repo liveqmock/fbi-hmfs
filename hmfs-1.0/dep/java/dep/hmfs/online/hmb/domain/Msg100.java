@@ -31,4 +31,44 @@ public class Msg100 extends HmbMsg{
     //F11：用于说明报文处理代码的对应错误信息，如果报文处理代码为“99”,则表示业务处理错误信息的详细描述。
     @Hmb8583Field(11)
     public String rtnInfo;
+
+    public String getMsgSn() {
+        return msgSn;
+    }
+
+    public void setMsgSn(String msgSn) {
+        this.msgSn = msgSn;
+    }
+
+    public String getSendSysId() {
+        return sendSysId;
+    }
+
+    public void setSendSysId(String sendSysId) {
+        this.sendSysId = sendSysId;
+    }
+
+    public String getOrigSysId() {
+        return origSysId;
+    }
+
+    public void setOrigSysId(String origSysId) {
+        this.origSysId = origSysId;
+    }
+
+    public String getRtnInfoCode() {
+        return rtnInfoCode;
+    }
+
+    public void setRtnInfoCode(String rtnInfoCode) {
+        this.rtnInfoCode = rtnInfoCode;
+    }
+
+    public String getRtnInfo() {
+        return rtnInfo;
+    }
+
+    public void setRtnInfo(String rtnInfo) {
+        this.rtnInfo = rtnInfo;
+    }
 }

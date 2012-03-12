@@ -16,8 +16,8 @@ public class IsoMessage {
     
     // 包长度
     private int length;
-    // 是否有后续子报文
-    private boolean isHasNext = false;
+    // 是否是报文中最后一个子报文
+    private boolean isLastMsg = false;
 
     public IsoMessage() {
     }
@@ -120,7 +120,10 @@ public class IsoMessage {
                 bs.set(i - 1);
             }
         }
-        //Write bitmap to stream
+
+        //Write bitmap
+        /*
+        //二进制处理
         int pos = 128;
         int b = 0;
         for (int i = 0; i < bs.size(); i++) {
@@ -134,6 +137,24 @@ public class IsoMessage {
                 b = 0;
             }
         }
+        */
+
+        //BITMAP字符处理    zhanrui 20120312修改
+        int pos = 0;
+        int lim = bs.size() / 4;
+        for (int i = 0; i < lim; i++) {
+            int nibble = 0;
+            if (bs.get(pos++))
+                nibble |= 8;
+            if (bs.get(pos++))
+                nibble |= 4;
+            if (bs.get(pos++))
+                nibble |= 2;
+            if (bs.get(pos++))
+                nibble |= 1;
+            bout.write(HEX[nibble]);
+        }
+
         //Fields
         for (int i = 1; i < 129; i++) {
             IsoValue<?> v = fields[i];
@@ -181,11 +202,11 @@ public class IsoMessage {
         this.length = length;
     }
 
-    public boolean isHasNext() {
-        return isHasNext;
+    public boolean isLastMsg() {
+        return isLastMsg;
     }
 
-    public void setHasNext(boolean hasNext) {
-        isHasNext = hasNext;
+    public void setLastMsg(boolean lastMsg) {
+        isLastMsg = lastMsg;
     }
 }

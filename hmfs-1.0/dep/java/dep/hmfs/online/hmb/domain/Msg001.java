@@ -23,4 +23,28 @@ public class Msg001 extends SummaryMsg{
     //F14:交易类型 发起方的交易类型码
     @Hmb8583Field(14)
     public String origTxnCode = "#";
+
+    public String getTxnType() {
+        return txnType;
+    }
+
+    public void setTxnType(String txnType) {
+        this.txnType = txnType;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public String getOrigTxnCode() {
+        return origTxnCode;
+    }
+
+    public void setOrigTxnCode(String origTxnCode) {
+        this.origTxnCode = origTxnCode;
+    }
 }
