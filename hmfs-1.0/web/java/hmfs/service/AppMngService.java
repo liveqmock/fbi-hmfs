@@ -1,10 +1,13 @@
 package hmfs.service;
 
+import common.enums.SysCtlSts;
 import common.repository.hmfs.dao.HmSctMapper;
 import common.repository.hmfs.model.HmSct;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,5 +23,18 @@ public class AppMngService {
 
     public HmSct getAppSysStatus(){
          return hmSctMapper.selectByPrimaryKey("1");
+    }
+
+    /**
+     *   向国土局签到
+     */
+    @Transactional
+    public void processSignon(){
+        //TODO
+        HmSct hmSct = getAppSysStatus();
+        hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
+        hmSct.setSignonDt(new Date());
+        hmSctMapper.updateByPrimaryKey(hmSct);
+
     }
 }

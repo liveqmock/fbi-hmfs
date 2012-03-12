@@ -6,7 +6,7 @@
 <generatorConfiguration>
     <classPathEntry location="/svn-haierfip/ref/ojdbc6.jar"/>
 
-    <!--信息-->
+    <!--信息 -->
     <context id="AllInfo" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
                         connectionURL="jdbc:oracle:thin:@localhost:1521:orcl"
@@ -41,7 +41,6 @@
         </table>
         -->
 
-
 <!--
         <table schema="hmfs" tableName="hm_sct">
             <property name="ignoreQualifiersAtRuntime" value="true" />
@@ -72,4 +71,7 @@
         </table>
 -->
 
+
+
+    </context>
 </generatorConfiguration>

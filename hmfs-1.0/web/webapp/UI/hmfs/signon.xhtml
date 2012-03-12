@@ -11,13 +11,16 @@
                 border: none;
                 color: #999999;
             }
+
             .input-col-xl {
                 width: 120px;
             }
+
             .input-col-xxl {
                 width: 500px;
                 text-align: right
             }
+
             .datagrid-help td {
                 padding: 1;
             }
@@ -40,10 +43,11 @@
                         return true;
                     else
                         return false;
-                }else{
+                } else {
                     return false;
                 }
             }
+
             function doOnLoad() {
                 var w_width;
                 var w_height;
@@ -57,39 +61,38 @@
                 document.getElementById('top').style.marginTop = (w_height - 300) / 2 + 'px';
                 document.getElementById('top').style.marginLeft = (w_width - 600) / 2 + 'px';
             }
+
             //]]>
         </script>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
-            <!--<p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">-->
-                <!--<p:tab title="银行向维修资金系统签到">-->
-                    <div class="entry" id="top">
-                        <p:growl id="growl"/>
-                        <h:form id="form">
-                            <p:panel header="签到操作" id="input" style="width:550px;">
-                                <h:panelGrid columns="2" cellspacing="5" style="margin-top:15px;margin-left: 20px"
-                                             columnClasses="input-col-xl,input-col-xl">
-                                    <h:outputLabel value="当前系统日期:"/>
-                                    <p:inputText size="30" value="#{appMngAction.sysDate}" />
-                                    <h:outputLabel value="当前系统时间:"/>
-                                    <p:inputText  size="30" value="#{appMngAction.sysTime}" />
-                                    <h:outputLabel value="当前系统状态:"/>
-                                    <p:inputText  size="30" value="#{appMngAction.sysSts}"  />
-                                    <h:outputLabel/>
-                                </h:panelGrid>
-                                <p:separator/>
-                                <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
-                                    <h:commandButton id="nextButton" value=" 发起签到 "
-                                                     action="#{appMngAction.onNextButton}"
-                                                     ajax="false">
-                                    </h:commandButton>
-                                </h:panelGrid>
-                            </p:panel>
-                        </h:form>
-                    </div>
-                <!--</p:tab>-->
-            <!--</p:tabView>-->
+            <div class="entry" id="top">
+                <p:growl id="growl"/>
+                <h:form id="form">
+                    <p:panel header="签到操作" id="input" style="width:550px;">
+                        <h:panelGrid columns="2" cellspacing="5" style="margin-top:15px;margin-left: 20px"
+                                     columnClasses="input-col-xl,input-col-xl">
+                            <h:outputLabel value="当前系统日期:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysDate}"/>
+                            <h:outputLabel value="当前系统时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysTime}"/>
+                            <h:outputLabel value="当前系统状态:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysSts}"/>
+                            <h:outputLabel value="上次签到时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.lastSignonTime}"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <p:separator/>
+                        <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
+                            <h:commandButton id="nextButton" value=" 发起签到 "
+                                             action="#{appMngAction.onNextButton}"
+                                             ajax="false">
+                            </h:commandButton>
+                        </h:panelGrid>
+                    </p:panel>
+                </h:form>
+            </div>
         </div>
     </ui:define>
 </ui:composition>

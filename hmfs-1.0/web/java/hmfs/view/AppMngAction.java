@@ -26,6 +26,8 @@ public class AppMngAction {
     private String sysTime;
     private String txnDate;
     private String sysSts;
+    private String lastSignonTime;
+    private HmSct hmSct;
 
     @ManagedProperty(value="#{appMngService}")
     private AppMngService appMngService;
@@ -37,24 +39,28 @@ public class AppMngAction {
         this.txnDate = this.sysDate;
         this.sysTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
-        SysCtlSts sysCtlSts = getSysStatus();
+        HmSct hmSct = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
+        this.lastSignonTime =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(hmSct.getSignonDt());
     }
 
     public String onNextButton() {
-        SysCtlSts sysCtlSts = getSysStatus();
+        HmSct hmSct = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHECKED)) {
             //
-            MessageUtil.addInfo("对帐成功。");
+            try {
+                appMngService.processSignon();
+                MessageUtil.addInfo("向国土局系统签到成功......");
+            } catch (Exception e) {
+                MessageUtil.addError("签到失败。" + e.getMessage());
+            }
         }else{
             MessageUtil.addError("系统初始或与国土局对帐完成后方可签到。");
         }
+        init();
         return null;
-    }
-
-    private SysCtlSts getSysStatus() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        return SysCtlSts.valueOfAlias(hmSct.getSysSts());
     }
 
     //=============================
@@ -97,5 +103,21 @@ public class AppMngAction {
 
     public void setSysSts(String sysSts) {
         this.sysSts = sysSts;
+    }
+
+    public HmSct getHmSct() {
+        return hmSct;
+    }
+
+    public void setHmSct(HmSct hmSct) {
+        this.hmSct = hmSct;
+    }
+
+    public String getLastSignonTime() {
+        return lastSignonTime;
+    }
+
+    public void setLastSignonTime(String lastSignonTime) {
+        this.lastSignonTime = lastSignonTime;
     }
 }
