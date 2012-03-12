@@ -28,7 +28,6 @@ public class TIA3002 extends TIA implements Serializable {
     public static class Body extends TIABody {
         public String refundApplyNo;                  // 退款通知书编号
         public String refundAmt;                      // 退款金额
-        public String txnSerialNo;                  // 交易流水号
     }
 
 }

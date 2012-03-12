@@ -4,8 +4,6 @@ import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.service.HisMsginLogService;
-import common.service.HmActinfoCbsService;
-import common.service.HmActinfoFundService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA1002;
@@ -36,10 +34,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
 
     @Autowired
     private HisMsginLogService hisMsginLogService;
-    @Autowired
-    private HmActinfoFundService hmActinfoFundService;
-    @Autowired
-    private HmActinfoCbsService hmActinfoCbsService;
     @Autowired
     private BookkeepingService bookkeepingService;
     @Autowired
@@ -112,7 +106,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
                 record.accountName = hisMsginLog.getInfoName();
                 record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
                 record.address = hisMsginLog.getInfoAddr();
-                record.houseArea = hisMsginLog.getBuilderArea().toString();
+                record.houseArea = hisMsginLog.getBuilderArea() == null ? "" : String.format("%.2f", hisMsginLog.getBuilderArea());
                 // TODO  待定字段：房屋类型、电话号码、工程造价、缴款比例
                 record.houseType = "";
                 record.phoneNo = "";
