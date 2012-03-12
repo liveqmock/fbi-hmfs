@@ -24,9 +24,10 @@ public class HmActinfoCbsService {
     public HmActinfoCbs getFirstHmActinfoCbs() {
          return hmActinfoCbsMapper.selectByExample(new HmActinfoCbsExample()).get(0);
     }
-    public HmActinfoCbs qryHmActinfoCbsBySettleActNo(String settleActNo) {
+
+    public HmActinfoCbs qryHmActinfoCbsByNo(String cbsActNo) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
-        example.createCriteria().andSettleActno1EqualTo(settleActNo);
+        example.createCriteria().andCbsActnoEqualTo(cbsActNo);
         List<HmActinfoCbs> actinfoCbsList = hmActinfoCbsMapper.selectByExample(example);
         return actinfoCbsList.size() > 0 ? actinfoCbsList.get(0) : null;
     }
