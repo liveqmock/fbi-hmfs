@@ -30,7 +30,7 @@ public class Msg095 extends SubMsg{
     @Hmb8583Field(53)
     public String dcFlag;
 
-    //F54：8位日期＋6位时间（格式为：YYYYMMDDHHMMSS）
+    //F54：8位日期＋6位时间（格式为：yyyyMMddHHmmss）
     @Hmb8583Field(54)
     public String txnDt;
 

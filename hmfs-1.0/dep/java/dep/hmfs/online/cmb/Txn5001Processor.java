@@ -26,7 +26,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
         /*
         开户账号	30	维修资金监管部门账号
         账户金额	16	账号当日余额
-        日期	8	YYYYMMDD
+        日期	8	yyyyMMdd
          */
         TIA5001 tia5001 = new TIA5001();
         tia5001.body.hmbAccountNo = new String(bytes, 0, 30).trim();

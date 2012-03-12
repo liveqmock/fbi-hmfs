@@ -32,7 +32,7 @@ public class TIA5001 extends TIA implements Serializable {
         /*
         开户账号	30	维修资金监管部门账号
         账户金额	16	账号当日余额
-        日期	8	YYYYMMDD        
+        日期	8	yyyyMMdd
          */
         public String hmbAccountNo = "";                // 开户账号
         public String accountBalance = "";              // 账户金额

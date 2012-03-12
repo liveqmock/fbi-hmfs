@@ -54,10 +54,11 @@ public class BookkeepingService {
     public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc) throws ParseException {
         int cnt = 0;
         for (HisMsginLog msginLog : msginLogList) {
-           cnt += fundActBookkeepingByMsgin(msginLog, dc); 
+            cnt += fundActBookkeepingByMsgin(msginLog, dc);
         }
         return cnt;
     }
+
     // 根据子报文内容更新核算账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
     private int fundActBookkeepingByMsgin(HisMsginLog msginLog, String dc) throws ParseException {
@@ -73,15 +74,18 @@ public class BookkeepingService {
     @Transactional
     private int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
         HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(fundActno);
+        if (hmActinfoFund == null) {
+            throw new RuntimeException("未找到核算账户！");
+        }
         return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, hmActinfoFund, amt, dc, actionCode);
     }
 
     @Transactional
     private int cbsActUpdate(HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc) throws ParseException {
 
-        String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
+        String strToday = SystemService.formatTodayByPattern("yyyy-MM-DD");
         if (!strToday.equals(hmActinfoCbs.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "YYYY-MM-DD");
+            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyy-MM-DD");
             hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
                     .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
             hmActinfoCbs.setLastActBal(hmActinfoCbs.getActBal());
@@ -106,8 +110,8 @@ public class BookkeepingService {
         txnCbsLog.setPkid(UUID.randomUUID().toString());
         txnCbsLog.setTxnSn(cbsSerialNo);
         txnCbsLog.setTxnSubSn("00001");
-        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
-        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         txnCbsLog.setTxnCode("1002");
         txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
@@ -121,9 +125,9 @@ public class BookkeepingService {
     @Transactional
     private int fundActUpdate(HmActinfoFund hmActinfoFund, BigDecimal amt, String dc) throws ParseException {
 
-        String strToday = SystemService.formatTodayByPattern("YYYY-MM-DD");
+        String strToday = SystemService.formatTodayByPattern("yyyy-MM-DD");
         if (!strToday.equals(hmActinfoFund.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "YYYY-MM-DD");
+            long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyy-MM-DD");
             hmActinfoFund.setIntcPdt(hmActinfoFund.getIntcPdt()
                     .add(hmActinfoFund.getLastActBal().multiply(new BigDecimal(days))));
             hmActinfoFund.setLastActBal(hmActinfoFund.getActBal());
@@ -154,8 +158,8 @@ public class BookkeepingService {
         txnFundLog.setTxnAmt(amt);
         txnFundLog.setDcFlag(dc);
         txnFundLog.setLastActBal(hmActinfoFund.getLastActBal());
-        txnFundLog.setTxnDate(SystemService.formatTodayByPattern("YYYYMMDD"));
-        txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHMMSS"));
+        txnFundLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         txnFundLog.setTxnCode("1002");
         txnFundLog.setActionCode(actionCode);
         return txnFundLogMapper.insertSelective(txnFundLog);

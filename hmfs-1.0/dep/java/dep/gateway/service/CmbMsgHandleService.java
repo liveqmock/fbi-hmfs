@@ -52,6 +52,7 @@ public class CmbMsgHandleService implements IMessageHandler {
             logger.error("交易处理发生异常！", e);
             strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
+        strBuilder.append(tiaHeader.txnCode);
         if (toa != null) {
             strBuilder.append(toa.toString());
         }

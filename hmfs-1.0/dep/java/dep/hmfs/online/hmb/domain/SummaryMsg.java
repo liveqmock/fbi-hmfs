@@ -26,7 +26,7 @@ public class SummaryMsg extends HmbMsg{
     @Hmb8583Field(5)
     public String origSysId = "#";
 
-    //F6：报文产生的时间：8位日期＋6位时间（格式为：YYYYMMDDHHMMSS）
+    //F6：报文产生的时间：8位日期＋6位时间（格式为：yyyyMMddHHmmss）
     @Hmb8583Field(6)
     public String msgDt = "#";
 
