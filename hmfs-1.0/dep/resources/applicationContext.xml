@@ -46,7 +46,7 @@
 
     <bean id="cmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
         <property name="port" value="61601"/>
-        <property name="serverHandler" ref="webServerHandler"/>
+        <property name="serverHandler" ref="cmbServerHandler"/>
     </bean>
 
     <bean id="webSocketServer" class="dep.gateway.xsocket.server.XSocketServer">

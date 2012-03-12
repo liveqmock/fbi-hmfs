@@ -1,8 +1,13 @@
 package dep.hmfs.online.cmb;
 
+import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.online.cmb.domain.base.TOA;
+import dep.hmfs.online.hmb.domain.HmbMsg;
 import dep.util.PropertyManager;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,5 +23,15 @@ public abstract class AbstractTxnProcessor {
     protected int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
     protected int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
 
-    public abstract TOA process(byte[] bytes) throws Exception;
+    public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes, HmbMessageFactory mf) throws Exception {
+        if (socketBlockClient == null) {
+            socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
+        }
+        byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
+        return mf.unmarshal(hmfsDatagram);
+    }
+
+    public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
+
+
 }

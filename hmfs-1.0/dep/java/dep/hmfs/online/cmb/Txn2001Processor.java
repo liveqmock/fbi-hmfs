@@ -23,7 +23,7 @@ public class Txn2001Processor extends AbstractTxnProcessor {
     private HisMsginLogService hisMsginLogService;
 
     @Override
-    public TOA process(byte[] bytes) {
+    public TOA process(String txnSerialNo, byte[] bytes) {
         TIA2001 tia2001 = new TIA2001();
         tia2001.body.drawApplyNo = new String(bytes, 0, 18).trim();
 

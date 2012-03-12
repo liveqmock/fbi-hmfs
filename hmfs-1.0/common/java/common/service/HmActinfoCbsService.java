@@ -21,6 +21,9 @@ public class HmActinfoCbsService {
     @Autowired
     private HmActinfoCbsMapper hmActinfoCbsMapper;
     
+    public HmActinfoCbs getFirstHmActinfoCbs() {
+         return hmActinfoCbsMapper.selectByExample(new HmActinfoCbsExample()).get(0);
+    }
     public HmActinfoCbs qryHmActinfoCbsBySettleActNo(String settleActNo) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
         example.createCriteria().andSettleActno1EqualTo(settleActNo);

@@ -48,13 +48,13 @@ public class WebMsgHandleService implements IMessageHandler {
             toaHeader.txnCode = tiaHeader.txnCode;
 
             AbstractTxnProcessor txnProcessor = (AbstractTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
-            toa = txnProcessor.process(datagramBytes);
+            toa = txnProcessor.process(tiaHeader.serialNo, datagramBytes);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             toaHeader.errorCode = CbsErrorCode.SYSTEM_ERROR.getCode();
         }
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 18, " "));
+        strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 16, " "));
         strBuilder.append(toaHeader.errorCode).append(toaHeader.txnCode);
         if (toa != null) {
             strBuilder.append(toa.toString());

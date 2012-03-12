@@ -23,7 +23,7 @@ public class Txn1001Processor extends AbstractTxnProcessor {
     private HisMsginLogService hisMsginLogService;
 
     @Override
-    public TOA process(byte[] bytes) throws Exception{
+    public TOA process(String txnSerialNo, byte[] bytes) throws Exception{
         TIA1001 tia1001 = new TIA1001();
         tia1001.body.payApplyNo = new String(bytes, 0, 18).trim();
 

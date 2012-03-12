@@ -42,22 +42,16 @@ public class CmbMsgHandleService implements IMessageHandler {
         byte[] datagramBytes = new byte[bytes.length - 24];
         System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
 
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
         try {
-            // 生成返回报文头
-            toaHeader = new TOAHeader();
-            toaHeader.serialNo = tiaHeader.serialNo;
-            toaHeader.errorCode = "0000";
-            toaHeader.txnCode = tiaHeader.txnCode;
-
             AbstractTxnProcessor txnProcessor = (AbstractTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
-            toa = txnProcessor.process(datagramBytes);
+            toa = txnProcessor.process(tiaHeader.serialNo, datagramBytes);
+            strBuilder.append(tiaHeader.errorCode);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
-            toaHeader.errorCode = CbsErrorCode.SYSTEM_ERROR.getCode();
+            strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 18, " "));
-        strBuilder.append(toaHeader.errorCode).append(toaHeader.txnCode);
         if (toa != null) {
             strBuilder.append(toa.toString());
         }

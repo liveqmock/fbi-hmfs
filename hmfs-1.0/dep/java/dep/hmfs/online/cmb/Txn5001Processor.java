@@ -22,7 +22,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
     @Autowired
     private HisMsginLogService hisMsginLogService;
     @Override
-    public TOA process(byte[] bytes) {
+    public TOA process(String txnSerialNo, byte[] bytes) {
         /*
         开户账号	30	维修资金监管部门账号
         账户金额	16	账号当日余额

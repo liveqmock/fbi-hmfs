@@ -24,7 +24,7 @@ public class Txn3002Processor extends AbstractTxnProcessor {
     private HisMsginLogService hisMsginLogService;
 
     @Override
-    public TOA process(byte[] bytes) {
+    public TOA process(String txnSerialNo, byte[] bytes) {
         TIA3002 tia3002 = new TIA3002();
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();
         tia3002.body.refundAmt = new String(bytes, 18, 16).trim();
