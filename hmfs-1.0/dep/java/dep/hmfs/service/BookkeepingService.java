@@ -83,9 +83,9 @@ public class BookkeepingService {
     @Transactional
     private int cbsActUpdate(HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc) throws ParseException {
 
-        String strToday = SystemService.formatTodayByPattern("yyyy-MM-DD");
+        String strToday = SystemService.formatTodayByPattern("yyyy-MM-dd");
         if (!strToday.equals(hmActinfoCbs.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyy-MM-DD");
+            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyy-MM-dd");
             hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
                     .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
             hmActinfoCbs.setLastActBal(hmActinfoCbs.getActBal());
@@ -125,9 +125,9 @@ public class BookkeepingService {
     @Transactional
     private int fundActUpdate(HmActinfoFund hmActinfoFund, BigDecimal amt, String dc) throws ParseException {
 
-        String strToday = SystemService.formatTodayByPattern("yyyy-MM-DD");
+        String strToday = SystemService.formatTodayByPattern("yyyy-MM-dd");
         if (!strToday.equals(hmActinfoFund.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyy-MM-DD");
+            long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyy-MM-dd");
             hmActinfoFund.setIntcPdt(hmActinfoFund.getIntcPdt()
                     .add(hmActinfoFund.getLastActBal().multiply(new BigDecimal(days))));
             hmActinfoFund.setLastActBal(hmActinfoFund.getActBal());
