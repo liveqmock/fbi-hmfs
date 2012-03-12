@@ -50,15 +50,15 @@ public class TOA1002 extends TOA implements Serializable {
                     delimiter = "|";
                 }
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(emptyToUnderline(accountName)).append("|");
-                stringBuilder.append(emptyToUnderline(txAmt)).append("|");
-                stringBuilder.append(emptyToUnderline(address)).append("|");
-                stringBuilder.append(emptyToUnderline(houseArea)).append("|");
-                stringBuilder.append(emptyToUnderline(phoneNo)).append("|");
-                stringBuilder.append(emptyToUnderline(houseType)).append("|");
-                stringBuilder.append(emptyToUnderline(projAmt)).append("|");
-                stringBuilder.append(emptyToUnderline(payPart)).append("|");
-                stringBuilder.append(emptyToUnderline(accountNo));
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountName)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(txAmt)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(address)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseArea)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(phoneNo)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseType)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(projAmt)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(payPart)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountNo));
 
                 System.out.println(stringBuilder.toString());
                 return stringBuilder.toString();
@@ -82,7 +82,7 @@ public class TOA1002 extends TOA implements Serializable {
         return stringBuilder.toString();
     }
 
-    private static String emptyToUnderline(String field) {
-        return StringUtils.isEmpty(field) ? "_" : field;
+    private static String emptyToUnderlineAndWipeVertical(String field) {
+        return StringUtils.isEmpty(field) ? "_" : field.replaceAll("\\|", "");
     }
 }

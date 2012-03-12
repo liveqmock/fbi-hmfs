@@ -119,4 +119,5 @@ public class Txn1002Processor extends AbstractTxnProcessor {
 
         return toa1002;
     }
+    
 }

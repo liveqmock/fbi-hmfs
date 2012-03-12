@@ -25,6 +25,7 @@ public class HisMsginLogService {
 
     // 根据申请单号查询汇总报文信息
     public HisMsginLog qryTotalMsgByMsgSn(String msgSn, String msgType) {
+
         HisMsginLogExample example = new HisMsginLogExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo(msgType)
                 .andTxnCtlStsNotEqualTo(TxnCtlSts.TXN_CANCEL.getCode());
@@ -40,6 +41,7 @@ public class HisMsginLogService {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
                     .andTxnCtlStsNotEqualTo(TxnCtlSts.TXN_CANCEL.getCode());
         }
+        example.setOrderByClause("MSG_SUB_SN");
         return hisMsginLogMapper.selectByExample(example);
     }
 

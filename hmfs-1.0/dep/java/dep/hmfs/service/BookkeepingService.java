@@ -1,7 +1,7 @@
 package dep.hmfs.service;
 
 import common.enums.DCFlagCode;
-import common.enums.SystemService;
+import common.service.SystemService;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.dao.TxnCbsLogMapper;
