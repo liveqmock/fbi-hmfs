@@ -4,7 +4,6 @@ import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.service.HisMsginLogService;
-import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.cmb.domain.txn.TOA1002;
@@ -41,8 +40,6 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     private TxnCheckService txnCheckService;
     @Autowired
     private SynTxnResponseService synTxnResponseService;
-
-    private HmbMessageFactory mf = new HmbMessageFactory();
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
@@ -85,7 +82,11 @@ public class Txn1002Processor extends AbstractTxnProcessor {
     }
 
     private TOA1002 getPayInfoDatagram(String txnCode, HisMsginLog msginLog, TIA1002 tia1002, List<HisMsginLog> payInfoList) throws Exception {
-        if (synTxnResponseService.communicateWithHmb(txnCode, synTxnResponseService.initMsg006ByTotalMsgin(msginLog), payInfoList)) {
+
+        // 查询所有子报文
+        String[] payMsgTypes = {"01033", "01035", "01045"};
+        List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
+        if (synTxnResponseService.communicateWithHmb(txnCode, synTxnResponseService.initMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
             TOA1002 toa1002 = new TOA1002();
             toa1002.body.payApplyNo = tia1002.body.payApplyNo;
             if (payInfoList.size() > 0) {

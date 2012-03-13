@@ -83,6 +83,6 @@ public class TOA1002 extends TOA implements Serializable {
     }
 
     private static String emptyToUnderlineAndWipeVertical(String field) {
-        return StringUtils.isEmpty(field) ? "_" : field.replaceAll("\\|", "");
+        return StringUtils.isEmpty(field) ? "" : field.replaceAll("\\|", "");
     }
 }

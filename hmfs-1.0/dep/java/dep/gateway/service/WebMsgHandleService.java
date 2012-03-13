@@ -59,7 +59,7 @@ public class WebMsgHandleService implements IMessageHandler {
         if (toa != null) {
             strBuilder.append(toa.toString());
         }
-        String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, "");
+        String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
 
         return (totalLength + strBuilder.toString()).getBytes();
     }
