@@ -81,12 +81,14 @@
                             <p:inputText size="30" value="#{appMngAction.sysSts}"/>
                             <h:outputLabel value="上次签到时间:"/>
                             <p:inputText size="30" value="#{appMngAction.lastSignonTime}"/>
+                            <h:outputLabel value="上次签退时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.lastSignoutTime}"/>
                             <h:outputLabel/>
                         </h:panelGrid>
                         <p:separator/>
                         <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
-                            <h:commandButton id="nextButton" value=" 发起签到 "
-                                             action="#{appMngAction.onNextButton}"
+                            <h:commandButton id="nextButton" value=" 签  到 "
+                                             action="#{appMngAction.onLogon}"
                                              ajax="false">
                             </h:commandButton>
                         </h:panelGrid>
