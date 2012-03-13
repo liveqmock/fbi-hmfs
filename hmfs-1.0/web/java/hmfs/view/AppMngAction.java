@@ -128,7 +128,7 @@ public class AppMngAction {
                 MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
-            MessageUtil.addError("主机对帐成功后方可进行房产局对帐。");
+            MessageUtil.addError("主机对帐成功后方可进行国土局对帐。");
         }
         init();
         return null;
@@ -137,21 +137,21 @@ public class AppMngAction {
     public String onCheckDetl() {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
+        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS) ||sysCtlSts.equals(SysCtlSts.HMB_BALCHK_SUCCESS)) {
             try {
                 String response = depService.process("1000|chkdetl");
                 String[] fields = response.split("\\|");
                 if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("流水对帐处理完成，流水对帐成功。");
                 }else{
-                    MessageUtil.addError("流水对帐处理完成，结果不符，请查询。" + response);
+                    MessageUtil.addError("流水对帐处理未完成。" + response);
                 }
             } catch (Exception e) {
               logger.error("对帐处理失败， 请重新发起对帐。" ,e);
                MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
-            MessageUtil.addError("主机对帐成功后方可进行房产局对帐。");
+            MessageUtil.addError("主机对帐成功或国土局余额对帐完成后方可进行国土局流水对帐。");
         }
         init();
         return null;

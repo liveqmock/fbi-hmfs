@@ -22,9 +22,6 @@ public class AppMngService {
     @Resource
     private HmSctMapper hmSctMapper;
 
-    @Resource
-    private  DepService depService;
-
     public HmSct getAppSysStatus(){
          return hmSctMapper.selectByPrimaryKey("1");
     }

@@ -76,8 +76,8 @@ public class AppBaseService {
     public boolean processChkActBal() {
         //TODO
         HmSct hmSct = getAppSysStatus();
-        if (!hmSct.getSysSts().endsWith(SysCtlSts.SIGNOUT.getCode())) {
-            throw new RuntimeException("系统状态错误，签退后方可进行对帐操作。");
+        if (!hmSct.getSysSts().equals(SysCtlSts.HOST_CHK_SUCCESS.getCode())) {
+            throw new RuntimeException("系统状态错误，主机对帐成功后方可进行国土局对帐操作。");
         }
 
         //depService.doSend
@@ -109,8 +109,9 @@ public class AppBaseService {
     public boolean processChkActDetl() {
         //TODO
         HmSct hmSct = getAppSysStatus();
-        if (!hmSct.getSysSts().endsWith(SysCtlSts.SIGNOUT.getCode())) {
-            throw new RuntimeException("系统状态错误，签退后方可进行对帐操作。");
+        if (!hmSct.getSysSts().equals(SysCtlSts.HOST_CHK_SUCCESS.getCode())
+                && !hmSct.getSysSts().equals(SysCtlSts.HMB_BALCHK_SUCCESS.getCode())) {
+            throw new RuntimeException("系统状态错误，主机对帐成功或国土局余额对帐完成后方可进行国土局流水对帐。");
         }
 
         //depService.doSend

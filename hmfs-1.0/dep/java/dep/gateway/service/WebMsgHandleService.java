@@ -34,7 +34,7 @@ public class WebMsgHandleService implements IMessageHandler {
             response = txnProcessor.process(request);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
-            response = txnCode + "|9999|交易处理发生异常！" + e.getMessage();
+            response = "9999|交易处理发生异常！" + e.getMessage();
         }
 
         response = txnCode + "|" + response;

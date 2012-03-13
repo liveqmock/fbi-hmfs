@@ -46,11 +46,11 @@ public class WebTxn1000Processor extends AbstractWebTxnProcessor {
         return "0000"; //成功
     }
     private String doChkbal() {
-        appBaseService.processSignon();
+        appBaseService.processChkActBal();
         return "0000"; //成功
     }
     private String doChkdetl() {
-        appBaseService.processSignon();
+        appBaseService.processChkActDetl();
         return "0000"; //成功
     }
 }
