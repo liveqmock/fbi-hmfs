@@ -7,7 +7,7 @@ import hmfs.xsocket.domain.base.TIAHeader;
 
 import java.io.Serializable;
 
-public class TIA1001 extends TIA implements Serializable {
+public class TIA1000 extends TIA implements Serializable {
 
     public Header header = new Header();
     public Body body = new Body();
@@ -27,7 +27,7 @@ public class TIA1001 extends TIA implements Serializable {
     }
 
     public static class Body extends TIABody {
-        public String payApplyNo;                  // Ω…øÓ…Í«Îµ•∫≈
+        public String actionCode = "";
     }
 
 }
