@@ -27,8 +27,8 @@ public class TxnVouchLogService {
     private TxnVouchLogMapper txnVouchLogMapper;
 
     @Transactional
-    public int insertVouchsByNo(int startNo, int endNo, String cbsSerialNo) {
-        for (int i = startNo; i <= endNo; i++) {
+    public long insertVouchsByNo(long startNo, long endNo, String cbsSerialNo) {
+        for (long i = startNo; i <= endNo; i++) {
             TxnVouchLog txnVouchLog = new TxnVouchLog();
             txnVouchLog.setPkid(UUID.randomUUID().toString());
             txnVouchLog.setTxnSn(SystemService.getDatagramNo());
@@ -44,7 +44,7 @@ public class TxnVouchLogService {
     }
 
     @Transactional
-    public int updateVouchsToSts(int startNo, int endNo, VouchStatus vouchStatus, TIA4001 tia4001, String cbsSerialNo) {
+    public long updateVouchsToSts(long startNo, long endNo, VouchStatus vouchStatus, TIA4001 tia4001, String cbsSerialNo) {
         List<TxnVouchLog> txnVouchLogList = qryVouchsByNo(startNo, endNo);
         for (TxnVouchLog record : txnVouchLogList) {
             record.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
@@ -56,9 +56,11 @@ public class TxnVouchLogService {
         return endNo - startNo + 1;
     }
 
-    public List<TxnVouchLog> qryVouchsByNo(int startNo, int endNo) {
+    public List<TxnVouchLog> qryVouchsByNo(long startNo, long endNo) {
         TxnVouchLogExample example = new TxnVouchLogExample();
-        example.createCriteria().andVchStsEqualTo(VouchStatus.VOUCH_RECEIVED.getCode());
+        example.createCriteria().andVchStsEqualTo(VouchStatus.VOUCH_RECEIVED.getCode())
+                .andVchNumGreaterThanOrEqualTo(String.valueOf(startNo))
+        .andVchNumLessThanOrEqualTo(String.valueOf(endNo));
         return txnVouchLogMapper.selectByExample(example);
     }
 }

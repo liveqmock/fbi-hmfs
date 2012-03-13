@@ -118,9 +118,9 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             // 1001 交款查询
             //String datagram = "123456789012345600001001123456789123456789";
             // 1002 交款
-            String datagram = "12345678901234560000100212345678912345678920.00           ";
+            //String datagram = "12345678901234560000100212345678912345678920.00           ";
             // 2001 支取查询
-            //String datagram = "123456789012345600002001123456789123456789";
+            String datagram = "123456789012345600002001123456789123456788";
             // 2002 支取
             // String datagram = "1234567890123456000020021234567891234567892000000.00      ";
             /*

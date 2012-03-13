@@ -40,8 +40,8 @@ public class Txn4001Processor extends AbstractTxnProcessor {
         缴款通知书编号	    18	    非必填项，凭证使用时填写
          */
         // TODO 确认凭证编号是否全是字符串
-        int startNo = Integer.parseInt(tia4001.body.billStartNo);
-        int endNo = Integer.parseInt(tia4001.body.billEndNo);
+        long startNo = Long.parseLong(tia4001.body.billStartNo);
+        long endNo = Long.parseLong(tia4001.body.billEndNo);
         if (VouchStatus.VOUCH_RECEIVED.getCode().equals(tia4001.body.billStatus)) {
             txnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo);
         }else if(VouchStatus.VOUCH_USED.getCode().equals(tia4001.body.billStatus)) {
@@ -49,7 +49,7 @@ public class Txn4001Processor extends AbstractTxnProcessor {
         }else if(VouchStatus.VOUCH_CANCEL.getCode().equals(tia4001.body.billStatus)) {
             txnVouchLogService.updateVouchsToSts(startNo, endNo, VouchStatus.VOUCH_CANCEL, tia4001, txnSerialNo);
         }else {
-            throw new RuntimeException("票据状态错误！");
+            throw new RuntimeException("票据状态错误！票据状态：" + tia4001.body.billStatus);
         }
         return null;
     }
