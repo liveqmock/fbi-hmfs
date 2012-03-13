@@ -1,10 +1,23 @@
 package dep.gateway.service;
 
+import common.enums.TxnCtlSts;
+import common.repository.hmfs.dao.HisMsginLogMapper;
+import common.repository.hmfs.model.HisMsginLog;
+import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
+import dep.hmfs.online.hmb.domain.HmbMsg;
+import dep.hmfs.online.hmb.domain.Msg100;
+import dep.util.PropertyManager;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,37 +33,54 @@ public class HmbMsgHandleService implements IMessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(CmbMsgHandleService.class);
 
     @Autowired
-    private HmbMessageFactory hmbMessageFactory;
-
+    private HmbMessageFactory mf;
+    @Autowired
+    private HisMsginLogMapper hisMsginLogMapper;
 
     @Override
     public byte[] handleMessage(byte[] bytes) {
-        // TODO
-/*
-            Map<String, List<IsoMessage>> txnMessageMap = hmbMessageFactory.unmashal(bytes);
+        /*
+        1:报文类型
+        2:报文编号
+        4:发送方编号
+        5:报文发起方编号
+        10:报文处理代码
+        11:报文处理信息
+         */
+        Msg100 msg100 = new Msg100();
+        // TODO 报文编号
+        msg100.setMsgSn("#");
+        msg100.sendSysId = PropertyManager.getProperty("");
+        try {
+            Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(bytes);
+            String txnCode = (String) rtnMap.keySet().toArray()[0];
+            logger.info("【本地服务端HmbMsgHandleService】接收到交易码：" + txnCode);
+            int index = 0;
+            String msgSn = "";
+            for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
+                HisMsginLog msginLog = new HisMsginLog();
+                BeanUtils.copyProperties(msginLog, hmbMsg);
+                String guid = UUID.randomUUID().toString();
+                msginLog.setPkid(guid);
+                msginLog.setTxnCode(txnCode);
+                msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+                msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
 
-            logger.info("【本地服务端】接收交易编码：" + txnMessageMap.keySet().iterator().next());
-            for (IsoMessage isoMessage : txnMessageMap.entrySet().iterator().next().getValue()) {
-                logger.info("【本地服务端】接收报文编号：" + isoMessage.getField(1));
+                index++;
+                if (index == 1) {
+                    msgSn = msginLog.getMsgSn();
+                } else {
+                    msginLog.setMsgSn(msgSn);
+                }
+                msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+                msginLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+
+                hisMsginLogMapper.insert(msginLog);
             }
-*/
-            // TODO
-/*
-            IsoMessage m = hmbMessageFactory.newMessage();
-
-            m.setValue(4, "sfsfs", IsoType.LVAR, 0);
-            m.setValue(12, new Date(), IsoType.TIME, 0);
-            m.setValue(15, new Date(), IsoType.DATE4, 0);
-            m.setValue(17, new Date(), IsoType.DATE_EXP, 0);
-            m.setValue(37, 12345678, IsoType.LLVAR, 12);
-            m.setValue(41, "TEST-TERMINAL", IsoType.ALPHA, 16);
-            m.setHasNext(false);
-            FileOutputStream fout = new FileOutputStream("d:/tmp/iso.bin");
-            m.write(fout);
-
-            fout.close();
-*/
-
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        // TODO
         return null;
     }
 }

@@ -112,7 +112,6 @@ class HmbContentHandler extends ContentHandler {
 
             byteArrayOutStream.flush();
             nbc.setAttachment(hdl);
-           // String datagram = null; //  strBuilder.toString();
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 

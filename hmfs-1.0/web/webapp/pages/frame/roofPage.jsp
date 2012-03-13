@@ -132,7 +132,7 @@
     <tr width="100%" height="50px" style="margin-bottom: 0px;margin-top:0px;margin:0px;padding:0px">
         <td width="50%" style="height:50" colspan="4">
             <img  src="../../images/hmfs.jpg" width="110px" height="50px" style="margin-left:40px; " >
-            <img  src="../../images/qdhmfs.png" width="310px" height="50px" style="margin-left:5px; " >
+            <img  src="../../images/hmfs_yh.png" width="310px" height="50px" style="margin-left:5px; " >
         </td>
         <td width="50%" style="height:50;text-align:right" colspan="1">
             <font color="#5F6A78"> <span>ฤ๚บร,<%=username%>! </span> </font>
