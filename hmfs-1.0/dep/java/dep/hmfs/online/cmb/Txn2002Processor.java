@@ -7,6 +7,7 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA2002;
 import dep.hmfs.service.BookkeepingService;
+import dep.hmfs.service.SynTxnResponseService;
 import dep.hmfs.service.TxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,8 @@ public class Txn2002Processor extends AbstractTxnProcessor {
     private BookkeepingService bookkeepingService;
     @Autowired
     private TxnCheckService txnCheckService;
+    @Autowired
+    private SynTxnResponseService synTxnResponseService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
@@ -47,7 +50,7 @@ public class Txn2002Processor extends AbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (txnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
             // 支取交易。
-            return handleDrawTxn(txnSerialNo, tia2002, drawSubMsgTypes, drawInfoList);
+            return handleDrawTxn(txnSerialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return null;
@@ -58,7 +61,7 @@ public class Txn2002Processor extends AbstractTxnProcessor {
       支取交易。
     */
     @Transactional
-    private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
+    private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
 
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia2002.body.drawAmt), DCFlagCode.TXN_OUT.getCode());
@@ -68,21 +71,14 @@ public class Txn2002Processor extends AbstractTxnProcessor {
 
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", subMsgTypes, TxnCtlSts.TXN_SUCCESS);
 
-        // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
-        // TODO 组装8583 报文
-        if (notifyHmb()) {
+        String[] payMsgTypes = {"01042"};
+        List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
+        if (synTxnResponseService.communicateWithHmb(totalMsginLog.getTxnCode(),
+                synTxnResponseService.createMsg008ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;
         } else {
-            throw new RuntimeException("通讯异常！");
+            throw new RuntimeException("2002发送报文至房管局交易失败！");
         }
     }
 
-    // TODO 调用8583接口处理发送报文 发送至房管局并解析返回结果
-    private boolean notifyHmb() throws Exception {
-        byte[] bytes = null;
-        //Map<String, List<HmbMsg>> rtnMap = sendDataUntilRcv(bytes, mf);
-        // TODO 解析8583报文
-        //logger.info((String) rtnMap.keySet().toArray()[0]);
-        return true;
-    }
 }

@@ -86,7 +86,7 @@ public class Txn1002Processor extends AbstractTxnProcessor {
         // 查询所有子报文
         String[] payMsgTypes = {"01033", "01035", "01045"};
         List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
-        if (synTxnResponseService.communicateWithHmb(txnCode, synTxnResponseService.initMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
+        if (synTxnResponseService.communicateWithHmb(txnCode, synTxnResponseService.createMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
             TOA1002 toa1002 = new TOA1002();
             toa1002.body.payApplyNo = tia1002.body.payApplyNo;
             if (payInfoList.size() > 0) {
