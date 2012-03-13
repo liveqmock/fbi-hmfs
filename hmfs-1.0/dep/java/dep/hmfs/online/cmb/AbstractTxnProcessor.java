@@ -18,18 +18,7 @@ import java.util.Map;
  */
 public abstract class AbstractTxnProcessor {
 
-    protected XSocketBlockClient socketBlockClient;
-    protected String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
-    protected int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
-    protected int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
 
-    public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes, HmbMessageFactory mf) throws Exception {
-        if (socketBlockClient == null) {
-            socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
-        }
-        byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
-        return mf.unmarshal(hmfsDatagram);
-    }
 
     public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
 

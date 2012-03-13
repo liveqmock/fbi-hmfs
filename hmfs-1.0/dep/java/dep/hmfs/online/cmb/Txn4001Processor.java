@@ -1,6 +1,5 @@
 package dep.hmfs.online.cmb;
 
-import common.enums.VouchStatus;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA4001;
 import dep.hmfs.service.TxnVouchLogService;
@@ -16,9 +15,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Txn4001Processor extends AbstractTxnProcessor {
-    
+
     @Autowired
     private TxnVouchLogService txnVouchLogService;
+
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
 
@@ -39,18 +39,9 @@ public class Txn4001Processor extends AbstractTxnProcessor {
         打印票据结束编号	12	    票据结束编号（单张销号该字段为空）
         缴款通知书编号	    18	    非必填项，凭证使用时填写
          */
-        // TODO 确认凭证编号是否全是字符串
         long startNo = Long.parseLong(tia4001.body.billStartNo);
         long endNo = Long.parseLong(tia4001.body.billEndNo);
-        if (VouchStatus.VOUCH_RECEIVED.getCode().equals(tia4001.body.billStatus)) {
-            txnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo);
-        }else if(VouchStatus.VOUCH_USED.getCode().equals(tia4001.body.billStatus)) {
-           txnVouchLogService.updateVouchsToSts(startNo, endNo, VouchStatus.VOUCH_USED, tia4001, txnSerialNo);
-        }else if(VouchStatus.VOUCH_CANCEL.getCode().equals(tia4001.body.billStatus)) {
-            txnVouchLogService.updateVouchsToSts(startNo, endNo, VouchStatus.VOUCH_CANCEL, tia4001, txnSerialNo);
-        }else {
-            throw new RuntimeException("票据状态错误！票据状态：" + tia4001.body.billStatus);
-        }
+        txnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
         return null;
     }
 }
