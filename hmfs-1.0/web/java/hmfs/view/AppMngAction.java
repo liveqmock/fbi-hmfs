@@ -3,6 +3,7 @@ package hmfs.view;
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.HmSct;
 import hmfs.service.AppMngService;
+import hmfs.service.DepService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import skyline.common.utils.MessageUtil;
@@ -39,6 +40,8 @@ public class AppMngAction {
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
+    @ManagedProperty(value = "#{depService}")
+    private DepService depService;
 
 
     @PostConstruct
@@ -61,10 +64,14 @@ public class AppMngAction {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
-            //
             try {
-                appMngService.processSignon();
-                MessageUtil.addInfo("向国土局系统签到成功......");
+                String response = depService.process("1000|signon");
+                String[] fields = response.split("\\|");
+                if ("0000".endsWith(fields[1])) { //签到成功
+                     MessageUtil.addInfo("向国土局系统签到成功......");
+                }else{
+                    MessageUtil.addError("签到失败。" + response);
+                }
             } catch (Exception e) {
                 logger.error("签到失败。请重新发起签到。" ,e);
                 MessageUtil.addError("签到失败。请重新发起签到。" + e.getMessage());
@@ -81,8 +88,13 @@ public class AppMngAction {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                appMngService.processSignout();
-                MessageUtil.addInfo("向国土局系统签退成功......");
+                String response = depService.process("1000|signout");
+                String[] fields = response.split("\\|");
+                if ("0000".endsWith(fields[1])) { //成功
+                    MessageUtil.addInfo("向国土局系统签退成功......");
+                }else{
+                    MessageUtil.addError("签退失败。" + response);
+                }
             } catch (Exception e) {
                logger.error("签退失败。请重新发起签退。" ,e);
                MessageUtil.addError("签退失败。请重新发起签退。" + e.getMessage());
@@ -104,10 +116,12 @@ public class AppMngAction {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
             try {
-                if (appMngService.processChkActBal()) {
+                String response = depService.process("1000|chkbal");
+                String[] fields = response.split("\\|");
+                if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("余额对帐处理完成，余额对帐成功。");
-                } else {
-                    MessageUtil.addError("余额对帐处理完成，结果不平，请查询。");
+                }else{
+                    MessageUtil.addError("余额对帐处理未完成。" + response);
                 }
             } catch (Exception e) {
                 logger.error("对帐处理失败， 请重新发起对帐。" ,e);
@@ -125,10 +139,12 @@ public class AppMngAction {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
             try {
-                if (appMngService.processChkActDetl()) {
+                String response = depService.process("1000|chkdetl");
+                String[] fields = response.split("\\|");
+                if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("流水对帐处理完成，流水对帐成功。");
-                } else {
-                    MessageUtil.addError("流水对帐处理完成，结果不符，请查询。");
+                }else{
+                    MessageUtil.addError("流水对帐处理完成，结果不符，请查询。" + response);
                 }
             } catch (Exception e) {
               logger.error("对帐处理失败， 请重新发起对帐。" ,e);
@@ -229,5 +245,13 @@ public class AppMngAction {
 
     public void setHmbChkTime(String hmbChkTime) {
         this.hmbChkTime = hmbChkTime;
+    }
+
+    public DepService getDepService() {
+        return depService;
+    }
+
+    public void setDepService(DepService depService) {
+        this.depService = depService;
     }
 }
