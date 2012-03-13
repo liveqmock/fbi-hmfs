@@ -7,7 +7,6 @@ import java.util.BitSet;
 import java.util.Map;
 
 public class IsoMessage {
-
     static final byte[] HEX = new byte[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private String msgCode;
@@ -16,6 +15,7 @@ public class IsoMessage {
     
     // 包长度
     private int length;
+
     // 是否是报文中最后一个子报文
     private boolean isLastMsg = false;
 

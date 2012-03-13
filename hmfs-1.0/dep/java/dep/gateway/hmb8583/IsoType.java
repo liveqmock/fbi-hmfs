@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public enum IsoType {
-
 	NUMERIC(true, 0),
 	ALPHA(true, 0),
     // 新增 1字节变长长度

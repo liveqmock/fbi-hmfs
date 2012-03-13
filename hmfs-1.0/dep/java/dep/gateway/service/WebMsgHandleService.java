@@ -1,15 +1,13 @@
 package dep.gateway.service;
 
-import common.enums.CbsErrorCode;
 import dep.ContainerManager;
-import dep.hmfs.online.cmb.AbstractTxnProcessor;
-import dep.hmfs.online.cmb.domain.base.TIAHeader;
-import dep.hmfs.online.cmb.domain.base.TOA;
-import dep.hmfs.online.cmb.domain.base.TOAHeader;
+import dep.hmfs.online.web.AbstractWebTxnProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,11 +16,6 @@ import org.springframework.stereotype.Service;
  * Time: 上午2:27
  * To change this template use File | Settings | File Templates.
  */
-/*
-A2流水号	（16位）
-A3错误码	（4位）
-A4服务类型	（4位）
- */
 
 @Service
 public class WebMsgHandleService implements IMessageHandler {
@@ -30,37 +23,31 @@ public class WebMsgHandleService implements IMessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebMsgHandleService.class);
 
     @Override
-    public byte[] handleMessage(byte[] bytes) {
-
-        TOAHeader toaHeader = null;
-        TOA toa = null;
-        TIAHeader tiaHeader = new TIAHeader();
-        tiaHeader.initFields(bytes);
-
-        byte[] datagramBytes = new byte[bytes.length - 24];
-        System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
-
+    public byte[] handleMessage(byte[] bytes) throws UnsupportedEncodingException {
+        String response = "";
+        String txnCode = "";
         try {
-            // TODO 生成返回报文头
-            toaHeader = new TOAHeader();
-            toaHeader.serialNo = tiaHeader.serialNo;
-            toaHeader.errorCode = "0000";
-            toaHeader.txnCode = tiaHeader.txnCode;
-
-            AbstractTxnProcessor txnProcessor = (AbstractTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
-            toa = txnProcessor.process(tiaHeader.serialNo, datagramBytes);
+            String request = new String(bytes);
+            String[] fields = request.split("\\|");
+            txnCode = fields[0];
+            AbstractWebTxnProcessor txnProcessor = (AbstractWebTxnProcessor) ContainerManager.getBean("webTxn" + txnCode + "Processor");
+            response = txnProcessor.process(request);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
-            toaHeader.errorCode = CbsErrorCode.SYSTEM_ERROR.getCode();
+            response = txnCode + "|9999|交易处理发生异常！" + e.getMessage();
         }
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(StringUtils.rightPad(toaHeader.serialNo, 16, " "));
-        strBuilder.append(toaHeader.errorCode).append(toaHeader.txnCode);
-        if (toa != null) {
-            strBuilder.append(toa.toString());
-        }
-        String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
 
-        return (totalLength + strBuilder.toString()).getBytes();
+        response = txnCode + "|" + response;
+        int len = 0;
+        try {
+            len = response.getBytes("GBK").length;
+        } catch (UnsupportedEncodingException e) {
+            logger.error("组包错误!" + e);
+            response = "9999";
+            len = 4;
+        }
+
+        String totalLength = StringUtils.rightPad(String.valueOf(len + 6), 6, ' ');
+        return (totalLength + response).getBytes("GBK");
     }
 }

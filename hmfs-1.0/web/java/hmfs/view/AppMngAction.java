@@ -66,6 +66,7 @@ public class AppMngAction {
                 appMngService.processSignon();
                 MessageUtil.addInfo("向国土局系统签到成功......");
             } catch (Exception e) {
+                logger.error("签到失败。请重新发起签到。" ,e);
                 MessageUtil.addError("签到失败。请重新发起签到。" + e.getMessage());
             }
         } else {
@@ -83,7 +84,8 @@ public class AppMngAction {
                 appMngService.processSignout();
                 MessageUtil.addInfo("向国土局系统签退成功......");
             } catch (Exception e) {
-                MessageUtil.addError("签退失败。请重新发起签退。" + e.getMessage());
+               logger.error("签退失败。请重新发起签退。" ,e);
+               MessageUtil.addError("签退失败。请重新发起签退。" + e.getMessage());
             }
         } else {
             MessageUtil.addError("系统签到完成后方可签退。");
@@ -108,6 +110,7 @@ public class AppMngAction {
                     MessageUtil.addError("余额对帐处理完成，结果不平，请查询。");
                 }
             } catch (Exception e) {
+                logger.error("对帐处理失败， 请重新发起对帐。" ,e);
                 MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
@@ -128,7 +131,8 @@ public class AppMngAction {
                     MessageUtil.addError("流水对帐处理完成，结果不符，请查询。");
                 }
             } catch (Exception e) {
-                MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
+              logger.error("对帐处理失败， 请重新发起对帐。" ,e);
+               MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
             MessageUtil.addError("主机对帐成功后方可进行房产局对帐。");

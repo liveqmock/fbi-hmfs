@@ -23,6 +23,8 @@ public class ContainerManager {
         hmbSocketServer.start();
         XSocketServer cbsSocketServer = (XSocketServer) getBean("cmbSocketServer");
         cbsSocketServer.start();
+        XSocketServer webSocketServer = (XSocketServer) getBean("webSocketServer");
+        webSocketServer.start();
     }
 
     public static Object getBean(String key) throws IOException {

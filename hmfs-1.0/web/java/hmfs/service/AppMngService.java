@@ -25,6 +25,9 @@ public class AppMngService {
     @Resource
     private HmSctMapper hmSctMapper;
 
+    @Resource
+    private  DepService depService;
+
     public HmSct getAppSysStatus(){
          return hmSctMapper.selectByPrimaryKey("1");
     }
@@ -35,11 +38,16 @@ public class AppMngService {
     @Transactional
     public void processSignon(){
         //TODO
-        HmSct hmSct = getAppSysStatus();
-        hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
-        hmSct.setSignonDt(new Date());
-        hmSctMapper.updateByPrimaryKey(hmSct);
-
+        String response = depService.process("1000|signon1");
+        String[] fields = response.split("\\|");
+        if ("0000".endsWith(fields[1])) { //Ç©µ½³É¹¦
+            HmSct hmSct = getAppSysStatus();
+            hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
+            hmSct.setSignonDt(new Date());
+            hmSctMapper.updateByPrimaryKey(hmSct);
+        }else{
+            throw new RuntimeException(response);
+        }
     }
 
     public void processSignout(){

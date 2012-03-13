@@ -1,5 +1,6 @@
 package hmfs.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,29 @@ public class DepService {
     private int depServerPort = PropertyManager.getIntProperty("xsocket_depserver_port");
     private int depServerTimeout = PropertyManager.getIntProperty("xsocket_depserver_timeout");
 
-    public String call(String actionCode) throws IOException {
-        if (actionCode == null || actionCode.length() != 3) {
-            logger.error("动作码参数错误！");
-            throw new IllegalArgumentException("动作码参数错误！");
+
+    public String process(String request) {
+        if (request == null) {
+            throw new RuntimeException("参数不能为空!");
+        }
+        int len = 0;
+        try {
+            len = request.getBytes("GBK").length + 0;
+            String totalLength = StringUtils.rightPad(String.valueOf(len + 6), 6, " ");
+            return call(totalLength + request);
+        } catch (Exception e) {
+            throw new RuntimeException("组包错误!" + e);
+        }
+    }
+
+    /**
+     * @param request 包括6位报文长度及内容
+     * @return
+     * @throws IOException
+     */
+    private String call(String request) throws IOException {
+        if (request == null || "".equals(request)) {
+            throw new IllegalArgumentException("参数错误！");
         }
         IBlockingConnection connection = null;
         String response = "";
@@ -37,29 +57,20 @@ public class DepService {
             connection.setEncoding("GBK");
             connection.setAutoflush(true);
 
-            connection.write("ACTION:" + actionCode + "\r\n");
+            connection.write(request);
             int bodyLength = 0;
             String line = null;
-            do {
-                line = connection.readStringByDelimiter("\r\n").trim();
-                //header
-                if (line.startsWith("Length:")) {
-                    bodyLength = new Integer(line.substring("Length:".length(), line.length()).trim());
-                }
-                if (line.length() > 0) {
-                    System.out.println(line);
-                }
-            } while (line.length() > 0);
 
-            //body
+            line = connection.readStringByLength(6);
+            bodyLength = new Integer(line.trim()) - 6;
+
             if (bodyLength > 0) {
                 response = connection.readStringByLength(bodyLength);
                 logger.info(response);
             }
             return response;
         } catch (Exception e) {
-            logger.error("DEP 链接错误！");
-            throw new RuntimeException("DEP 链接错误！");
+            throw new RuntimeException("DEP 链接错误！", e);
         } finally {
             if (connection != null) {
                 connection.close();

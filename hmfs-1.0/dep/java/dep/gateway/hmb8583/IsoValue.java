@@ -9,7 +9,6 @@ import java.util.Date;
 
 
 public class IsoValue<T> implements Cloneable {
-
     private IsoType type;
     private T value;
     private CustomField<T> encoder;

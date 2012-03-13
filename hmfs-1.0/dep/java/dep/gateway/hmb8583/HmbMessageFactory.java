@@ -352,9 +352,11 @@ public class HmbMessageFactory {
 
     //===============================================================================
 
+    /**
+     * 初始化 报文域 配置信息
+     */
     private void initParseMap() {
-        HmbMsg msg = new HmbMsg();
-        this.packageName = msg.getClass().getPackage().getName();
+        this.packageName = HmbMsg.class.getPackage().getName();
         for (int i = 1; i <= 999; i++) {
             String sn = StringUtils.leftPad("" + i, 3, "0");
             try {
