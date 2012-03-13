@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,7 +48,10 @@ public class HmbMsgHandleService implements IMessageHandler {
         Msg100 msg100 = new Msg100();
         // TODO 报文编号
         msg100.setMsgSn("#");
-        msg100.sendSysId = PropertyManager.getProperty("");
+        msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+        msg100.origSysId = "00";
+        msg100.rtnInfoCode = "00";
+        msg100.rtnInfoCode = "报文接收成功";
         try {
             Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(bytes);
             String txnCode = (String) rtnMap.keySet().toArray()[0];
@@ -78,9 +79,13 @@ public class HmbMsgHandleService implements IMessageHandler {
                 hisMsginLogMapper.insert(msginLog);
             }
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error("报文接收保存失败！", e);
+            msg100.rtnInfoCode = "99";
+            msg100.rtnInfoCode = "报文接收失败";
         }
-        // TODO
-        return null;
+        // 响应
+        List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
+        rtnHmbMsgList.add(msg100);
+        return mf.marshal("9999", rtnHmbMsgList);
     }
 }
