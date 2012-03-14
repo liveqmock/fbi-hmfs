@@ -22,10 +22,10 @@ public class HmbTxn6110Processor extends HmbAbstractTxnProcessor {
         msg004.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg004.origSysId = "00";
         msg004.rtnInfoCode = "00";
-        msg004.rtnInfo = "销户处理完成";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            hmbDetailMsgService.updateActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+            int cnt = hmbDetailMsgService.updateActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+            msg004.rtnInfo = cnt + "笔销户处理完成";
         } catch (Exception e) {
             logger.error("6110交易处理异常！", e);
             msg004.rtnInfoCode = "99";

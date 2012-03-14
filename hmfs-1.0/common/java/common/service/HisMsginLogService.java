@@ -34,10 +34,10 @@ public class HisMsginLogService {
         return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
     }
 
-    // 根据申请单号查询所有交款明细
+    // 根据申请单号查询所有明细
     public List<HisMsginLog> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
         HisMsginLogExample example = new HisMsginLogExample();
-        for(String msgType : msgTypes) {
+        for (String msgType : msgTypes) {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
                     .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
         }
@@ -56,5 +56,20 @@ public class HisMsginLogService {
         }
         return msginLogList.size();
     }
-    
+
+    // 更新初始状态的汇总报文和子报文状态
+    @Transactional
+    public int cancelMsginsByMsgSnAndTypes(String msgSn, String[] subMsgTypes) {
+        HisMsginLogExample example = new HisMsginLogExample();
+        for (String msgType : subMsgTypes) {
+            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
+                    .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
+        }
+        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        for (HisMsginLog record : msginLogList) {
+            record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
+            hisMsginLogMapper.updateByPrimaryKey(record);
+        }
+        return msginLogList.size();
+    }
 }

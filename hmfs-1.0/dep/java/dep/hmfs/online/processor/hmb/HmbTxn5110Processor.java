@@ -23,13 +23,13 @@ public class HmbTxn5110Processor extends HmbAbstractTxnProcessor {
         msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg100.origSysId = "00";
         msg100.rtnInfoCode = "00";
-        msg100.rtnInfo = "单位结算户开户处理完成";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
 
             Msg004 msg004 = (Msg004) hmbMsgList.get(0);
             if ("00".equals(msg004.rtnInfoCode)) {
-                hmbDetailMsgService.createActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+                int cnt = hmbDetailMsgService.createActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+                msg100.rtnInfo = cnt + "笔单位结算户开户处理完成";
             } else {
                 logger.info("5110国土局单位结算户开户处理失败！【国土局】返回信息：" + msg004.rtnInfo);
             }
