@@ -21,13 +21,13 @@ public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
         msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg100.origSysId = "00";
         msg100.rtnInfoCode = "00";
-        msg100.rtnInfoCode = "报文接收成功";
+        msg100.rtnInfo = "报文接收成功";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";
-            msg100.rtnInfoCode = "报文接收失败";
+            msg100.rtnInfo = "报文接收失败";
         }
         // 响应
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();

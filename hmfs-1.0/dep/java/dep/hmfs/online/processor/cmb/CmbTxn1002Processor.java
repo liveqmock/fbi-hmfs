@@ -3,7 +3,9 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmActinfoFund;
 import common.service.HisMsginLogService;
+import common.service.HmActinfoFundService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
@@ -40,6 +42,8 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
+    @Autowired
+    private HmActinfoFundService hmActinfoFundService;
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
@@ -93,13 +97,14 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HisMsginLog hisMsginLog : payInfoList) {
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    // TODO  待定字段：账户名，地址，房屋类型、电话号码、工程造价、缴款比例
+                    // TODO  待定字段：工程造价、缴款比例
+                    HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
                     record.accountName = hisMsginLog.getInfoName();
                     record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
                     record.address = hisMsginLog.getInfoAddr();
                     record.houseArea = hisMsginLog.getBuilderArea() == null ? "" : String.format("%.2f", hisMsginLog.getBuilderArea());
-                    record.houseType = "";
-                    record.phoneNo = "";
+                    record.houseType = actinfoFund.getHouseDepType();
+                    record.phoneNo = actinfoFund.getHouseCustPhone();
                     record.projAmt = "";   // String.format("%.2f", xxx);
                     record.payPart = "";
                     record.accountNo = hisMsginLog.getFundActno1();  // 业主核算户账号(维修资金账号)

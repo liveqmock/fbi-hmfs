@@ -23,11 +23,11 @@ public class CmbTxnVouchLogService {
     private TxnVouchLogMapper txnVouchLogMapper;
 
     @Transactional
-    public long insertVouchsByNo(long startNo, long endNo, String cbsSerialNo, String txnApplyNo, String vouchStatus) {
+    public long insertVouchsByNo(String msgSn, long startNo, long endNo, String cbsSerialNo, String txnApplyNo, String vouchStatus) {
         for (long i = startNo; i <= endNo; i++) {
             TxnVouchLog txnVouchLog = new TxnVouchLog();
             txnVouchLog.setPkid(UUID.randomUUID().toString());
-            txnVouchLog.setTxnSn(SystemService.getDatagramNo());
+            txnVouchLog.setTxnSn(msgSn);
             txnVouchLog.setTxnSubSn(String.valueOf(i - startNo));
             txnVouchLog.setFundTxnSn(txnApplyNo);
             txnVouchLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));

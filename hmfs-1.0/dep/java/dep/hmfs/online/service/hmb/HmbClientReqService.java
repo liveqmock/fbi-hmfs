@@ -2,14 +2,16 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmActinfoFund;
+import common.service.HisMsginLogService;
+import common.service.HmActinfoFundService;
 import common.service.SystemService;
-import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +28,10 @@ import java.util.Map;
 @Service
 public class HmbClientReqService extends HmbBaseService {
 
-    @Resource
-    HmbTxnsnGenerator txnsnGenerator;
-
+    @Autowired
+    private HisMsginLogService hisMsginLogService;
+    @Autowired
+    private HmActinfoFundService hmActinfoFundService;
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HisMsginLog> msginLogList) throws Exception {
 
@@ -49,9 +52,9 @@ public class HmbClientReqService extends HmbBaseService {
         return "00".equals(msg100.getRtnInfoCode());
     }
 
-    public boolean sendVouchsToHmb(long startNo, long endNo, String txnApplyNo, String vouchStatus) {
+    public boolean sendVouchsToHmb(String msgSn, long startNo, long endNo, String txnApplyNo, String vouchStatus) throws InvocationTargetException, IllegalAccessException {
         Msg005 msg005 = new Msg005();
-        msg005.msgSn = txnsnGenerator.generateTxnsn("5610");
+        msg005.msgSn = msgSn;
         msg005.submsgNum = (int) (endNo - startNo + 1);
         msg005.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg005.origSysId = msg005.sendSysId;
@@ -63,18 +66,39 @@ public class HmbClientReqService extends HmbBaseService {
             for (long i = startNo; i <= endNo; i++) {
                 Msg049 msg049 = new Msg049();
                 msg049.actionCode = "144";
-                msg049.receiptNo = String.valueOf(startNo);
+                msg049.receiptNo = String.valueOf(i);
                 msg049.voucherSts = vouchStatus;
-                msg049.voucherType = "00";   // 00-商品住宅
+                msg049.voucherType = "#";   // 00-商品住宅
                 hmbMsgList.add(msg049);
             }
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
+            String[] payMsgTypes = {"01035", "01045"};
+            List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);            
             for (long i = startNo; i <= endNo; i++) {
+                HisMsginLog msginLog = payInfoList.get((int)(i - startNo));
+                HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                
                 Msg037 msg037 = new Msg037();
+                BeanUtils.copyProperties(msg037, actinfoFund);
+
                 msg037.actionCode = "141";
-                msg037.receiptNo = String.valueOf(startNo);
-                msg037.voucherType = "00";   // 00-商品住宅
+                msg037.receiptNo = String.valueOf(i);
+                msg037.txnAmt1 = msginLog.getTxnAmt1();
+                msg037.payinActno = actinfoFund.getCbsActno();
+                msg037.voucherType = actinfoFund.getHouseDepType();
                 // TODO
+                //59:单位ID
+                //60:单位类型
+                //61:单位名称
+                //77:收据编号
+                //78:交存标准
+                //79:交存类型
+                //80:交存人
+                //81:户卡号
+                //82:购房合同号
+                //90:票据类型
+
+                msg037.linkMsgSn = msgSn;
                 hmbMsgList.add(msg037);
             }
         } else {
