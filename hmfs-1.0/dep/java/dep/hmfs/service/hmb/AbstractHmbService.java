@@ -41,9 +41,12 @@ abstract public class AbstractHmbService {
     HmbTxnsnGenerator txnsnGenerator;
 
     protected XSocketBlockClient socketBlockClient;
-    protected String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
-    protected int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
-    protected int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
+    protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
+    protected static int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
+    protected static int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
+    protected  static String SEND_SYS_ID =  PropertyManager.getProperty("SEND_SYS_ID");
+    protected  static String ORIG_SYS_ID =  PropertyManager.getProperty("ORIG_SYS_ID");
+
     protected HmbMessageFactory messageFactory = new HmbMessageFactory();
 
     public HmSct getAppSysStatus() {
@@ -53,8 +56,21 @@ abstract public class AbstractHmbService {
     protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum) {
         msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
-        msg.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
-        msg.origSysId = PropertyManager.getProperty("ORIG_SYS_ID");
+        msg.sendSysId = SEND_SYS_ID;
+        msg.origSysId = ORIG_SYS_ID;
+        msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        msg.msgEndDate = "#";
+    }
+
+    protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
+        msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
+        msg.submsgNum = submsgNum;
+        msg.sendSysId = SEND_SYS_ID;
+        if (isSync) {
+            msg.origSysId = ORIG_SYS_ID;
+        }else{
+            msg.origSysId = "00";
+        }
         msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg.msgEndDate = "#";
     }

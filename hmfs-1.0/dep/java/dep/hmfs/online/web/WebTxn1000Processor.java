@@ -1,6 +1,6 @@
 package dep.hmfs.online.web;
 
-import dep.hmfs.service.hmb.AppBaseService;
+import dep.hmfs.service.hmb.HmbCmnTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 public class WebTxn1000Processor extends AbstractWebTxnProcessor {
 
     @Resource
-    private AppBaseService appBaseService;
+    private HmbCmnTxnService appBaseService;
 
     @Override
     public String process(String request) throws Exception{
