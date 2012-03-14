@@ -8,7 +8,7 @@ import common.repository.hmfs.model.HisMsgoutLog;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.common.annotation.Hmb8583Field;
 import dep.hmfs.common.annotation.HmbMessage;
-import dep.hmfs.online.hmb.domain.*;
+import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

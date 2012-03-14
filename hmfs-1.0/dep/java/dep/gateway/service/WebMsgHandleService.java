@@ -1,7 +1,7 @@
 package dep.gateway.service;
 
 import dep.ContainerManager;
-import dep.hmfs.online.web.AbstractWebTxnProcessor;
+import dep.hmfs.online.processor.web.AbstractWebTxnProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

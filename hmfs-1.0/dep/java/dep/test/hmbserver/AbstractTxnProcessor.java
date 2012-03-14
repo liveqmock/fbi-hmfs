@@ -2,8 +2,8 @@ package dep.test.hmbserver;
 
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.online.hmb.domain.HmbMsg;
-import dep.hmfs.online.hmb.domain.SummaryMsg;
+import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import dep.util.PropertyManager;
 
 import java.util.List;

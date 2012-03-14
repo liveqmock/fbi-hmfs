@@ -2,8 +2,8 @@ package dep.gateway.service;
 
 import dep.ContainerManager;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.online.hmb.AbstractHmbTxnProcessor;
-import dep.hmfs.online.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.AbstractHmbTxnProcessor;
+import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

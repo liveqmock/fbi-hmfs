@@ -2,10 +2,10 @@ package dep.gateway.service;
 
 import common.enums.CbsErrorCode;
 import dep.ContainerManager;
-import dep.hmfs.online.cmb.AbstractCmbTxnProcessor;
-import dep.hmfs.online.cmb.domain.base.TIAHeader;
-import dep.hmfs.online.cmb.domain.base.TOA;
-import dep.hmfs.online.cmb.domain.base.TOAHeader;
+import dep.hmfs.online.processor.cmb.AbstractTxnProcessor;
+import dep.hmfs.online.processor.cmb.domain.base.TIAHeader;
+import dep.hmfs.online.processor.cmb.domain.base.TOA;
+import dep.hmfs.online.processor.cmb.domain.base.TOAHeader;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +45,8 @@ public class CmbMsgHandleService implements IMessageHandler {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
         try {
-            AbstractCmbTxnProcessor cmbTxnProcessor = (AbstractCmbTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
-            toa = cmbTxnProcessor.process(tiaHeader.serialNo, datagramBytes);
+            AbstractTxnProcessor txnProcessor = (AbstractTxnProcessor) ContainerManager.getBean("txn" + tiaHeader.txnCode + "Processor");
+            toa = txnProcessor.process(tiaHeader.serialNo, datagramBytes);
             strBuilder.append(tiaHeader.errorCode);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
