@@ -33,7 +33,7 @@ public class HmbCmnTxnService extends HmbBaseService {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
-                doHmbSignonTxn();
+                doHmbSignTxn("7000", "301");
                 hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
                 hmSct.setSignonDt(new Date());
                 hmSctMapper.updateByPrimaryKey(hmSct);
@@ -46,9 +46,8 @@ public class HmbCmnTxnService extends HmbBaseService {
         }
     }
 
-    private void doHmbSignonTxn() throws Exception {
+    private void doHmbSignTxn(String txnCode, String actionCode) throws Exception {
         boolean result = false;
-        String txnCode = "7000";
         Msg001 msg001 = new Msg001();
         assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//单笔批量？
@@ -56,7 +55,7 @@ public class HmbCmnTxnService extends HmbBaseService {
         msg001.origTxnCode = "#"; //TODO ????
 
         Msg096 msg096 = new Msg096();
-        msg096.actionCode = "301"; //301:签到
+        msg096.actionCode = actionCode; //301:签到
 
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(msg001);
@@ -85,11 +84,10 @@ public class HmbCmnTxnService extends HmbBaseService {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                //appMngService.processSignout();
+                doHmbSignTxn("7001", "302");
                 hmSct.setSysSts(SysCtlSts.SIGNOUT.getCode());
                 hmSct.setSignoutDt(new Date());
                 hmSctMapper.updateByPrimaryKey(hmSct);
-                //MessageUtil.addInfo("向国土局系统签退成功......");
             } catch (Exception e) {
                 logger.error("签退失败。请重新发起签退。", e);
                 throw new RuntimeException("签退失败。请重新发起签退。" + e.getMessage());
@@ -98,6 +96,8 @@ public class HmbCmnTxnService extends HmbBaseService {
             throw new RuntimeException("系统签到完成后方可签退。");
         }
     }
+    
+    
 
     @Transactional
     public boolean processChkActBal() {
