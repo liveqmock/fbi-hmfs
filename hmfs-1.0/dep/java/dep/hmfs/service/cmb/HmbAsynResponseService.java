@@ -41,9 +41,7 @@ public class HmbAsynResponseService {
     private HisMsgoutLogMapper hisMsgoutLogMapper;
 
     public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) throws Exception {
-        if (socketBlockClient == null) {
-            socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
-        }
+        socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
         byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
         return mf.unmarshal(hmfsDatagram);
     }
