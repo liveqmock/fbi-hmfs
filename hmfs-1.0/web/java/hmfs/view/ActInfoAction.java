@@ -36,6 +36,8 @@ public class ActInfoAction implements Serializable {
     private String txnDate;
     private String sysSts;
 
+    private String cbsActno;
+
     private List<HmActinfoFund> fundBalList;
     private List<HmActinfoCbs> cbsBalList;
     private List<TxnFundLog> fundDetlList;
@@ -71,6 +73,8 @@ public class ActInfoAction implements Serializable {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
+
+        this.cbsActno = actInfoService.selectCbsActno();
     }
 
     private void initList(){
@@ -108,9 +112,6 @@ public class ActInfoAction implements Serializable {
         return null;
     }
     public String onQueryCbsBal() {
-        if (StringUtils.isEmpty(qryParam.getEndActno())) {
-            qryParam.setEndActno(qryParam.getStartActno());
-        }
         try {
             this.cbsBalList = actInfoService.selectCbsActBal(qryParam);
             if (cbsBalList.isEmpty()) {
@@ -123,10 +124,6 @@ public class ActInfoAction implements Serializable {
     }
 
     public String onQueryCbsDetl(){
-        if (StringUtils.isEmpty(qryParam.getEndActno())) {
-            qryParam.setEndActno(qryParam.getStartActno());
-        }
-
         try {
             this.cbsDetlList = actInfoService.selectCbsActDetl(qryParam);
             if (cbsDetlList.isEmpty()) {
@@ -282,5 +279,13 @@ public class ActInfoAction implements Serializable {
 
     public void setSelectedCbsDetlRecords(TxnCbsLog[] selectedCbsDetlRecords) {
         this.selectedCbsDetlRecords = selectedCbsDetlRecords;
+    }
+
+    public String getCbsActno() {
+        return cbsActno;
+    }
+
+    public void setCbsActno(String cbsActno) {
+        this.cbsActno = cbsActno;
     }
 }

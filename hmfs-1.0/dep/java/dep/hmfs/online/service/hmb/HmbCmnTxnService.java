@@ -168,4 +168,14 @@ public class HmbCmnTxnService extends HmbBaseService {
 
         return result;
     }
+    @Transactional
+    public boolean processOpenact() {
+        //depService.doSend
+
+        //db
+
+        //check db
+
+        return true;
+    }
 }

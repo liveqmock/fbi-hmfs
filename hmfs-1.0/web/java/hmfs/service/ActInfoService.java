@@ -41,6 +41,14 @@ public class ActInfoService {
         return hmSctMapper.selectByPrimaryKey("1");
     }
 
+    public String selectCbsActno() {
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria();
+        return actinfoCbsMapper.selectByExample(example).get(0).getCbsActno();
+    }
+
+
+
     public List<HmActinfoFund> selectFundActBal(ActinfoQryParam param) {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria()
@@ -52,7 +60,7 @@ public class ActInfoService {
     public List<HmActinfoCbs> selectCbsActBal(ActinfoQryParam param) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
         example.createCriteria()
-                .andCbsActnoNotBetween(param.getStartActno(), param.getEndActno())
+                .andCbsActnoEqualTo(param.getStartActno())
                 .andActStsEqualTo(param.getActnoStatus());
         return actinfoCbsMapper.selectByExample(example);
     }
@@ -68,7 +76,7 @@ public class ActInfoService {
     public List<TxnCbsLog> selectCbsActDetl(ActinfoQryParam param) {
         TxnCbsLogExample example = new TxnCbsLogExample();
         example.createCriteria()
-                .andCbsAcctnoBetween(param.getStartActno(), param.getEndActno())
+                .andCbsAcctnoEqualTo(param.getStartActno())
                 .andTxnDateBetween(param.getStartDate(),param.getEndDate());
         return cbsLogMapper.selectByExample(example);
     }

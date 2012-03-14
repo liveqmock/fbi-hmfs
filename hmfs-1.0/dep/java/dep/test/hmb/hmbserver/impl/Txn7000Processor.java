@@ -24,6 +24,8 @@ public class Txn7000Processor extends AbstractTxnProcessor {
         Msg002 msg002 = new Msg002();
         assembleSummaryMsg(msg002, 1);
 
+        msg002.rtnInfoCode = "00";
+
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(msg002);
         byte[] txnBuf = messageFactory.marshal("7000", hmbMsgList);

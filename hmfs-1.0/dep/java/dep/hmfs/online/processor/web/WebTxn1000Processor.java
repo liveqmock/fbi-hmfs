@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 public class WebTxn1000Processor extends WebAbstractTxnProcessor {
 
     @Resource
-    private HmbCmnTxnService appBaseService;
+    private HmbCmnTxnService hmbCmnTxnService;
 
     @Override
     public String process(String request) throws Exception{
@@ -32,25 +32,32 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
             return doChkbal();
         }else if ("chkdetl".equalsIgnoreCase(actionCode)) {
             return doChkdetl();
+        }else if ("openact".equalsIgnoreCase(actionCode)) {
+            return doOpenact();
         }else{
             return "9999|动作码错误！";
         }
     }
 
     private String doSignon() {
-        appBaseService.processSignon();
+        hmbCmnTxnService.processSignon();
         return "0000"; //成功
     }
     private String doSignout() {
-        appBaseService.processSignout();
+        hmbCmnTxnService.processSignout();
         return "0000"; //成功
     }
     private String doChkbal() {
-        appBaseService.processChkActBal();
+        hmbCmnTxnService.processChkActBal();
         return "0000"; //成功
     }
+
     private String doChkdetl() {
-        appBaseService.processChkActDetl();
+        hmbCmnTxnService.processChkActDetl();
+        return "0000"; //成功
+    }
+    private String doOpenact() {
+        hmbCmnTxnService.processOpenact();
         return "0000"; //成功
     }
 }

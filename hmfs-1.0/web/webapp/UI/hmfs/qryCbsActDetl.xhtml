@@ -33,10 +33,8 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="起始帐号:"/>
+                                        <h:outputLabel value="会计帐号:"/>
                                         <p:inputText required="true" value="#{actInfoAction.qryParam.startActno}"/>
-                                        <h:outputLabel value="结束帐号:"/>
-                                        <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
                                         <h:outputLabel value="起始日期:" for="startDate"/>
                                         <p:inputText id="startDate" required="true" value="#{actInfoAction.qryParam.startDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
@@ -79,6 +77,9 @@
                                     <h:outputText value="#{record.txnAmt}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
+                                </p:column>
+                                <p:column headerText="借贷别" style="text-align: center">
+                                    <h:outputText value="#{record.dcFlag}"/>
                                 </p:column>
                                 <p:column headerText="上日余额">
                                     <h:outputText value="#{record.lastActBal}" style="float: right">
