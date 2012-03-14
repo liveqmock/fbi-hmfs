@@ -69,7 +69,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
         // 批量核算户账户信息更新
         cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
 
-        hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", subMsgTypes, TxnCtlSts.TXN_SUCCESS);
+        hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", subMsgTypes, TxnCtlSts.SUCCESS);
 
         String[] payMsgTypes = {"01042"};
         List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);

@@ -7,9 +7,9 @@ import java.util.Hashtable;
  */
 public enum VouchStatus implements EnumApp {
 
-    VOUCH_RECEIVED("1", "领用"),
-    VOUCH_USED("2", "使用"),
-    VOUCH_CANCEL("3", "撤销");
+    RECEIVED("1", "领用"),
+    USED("2", "使用"),
+    CANCEL("3", "撤销");
 
     private String code = null;
     private String title = null;

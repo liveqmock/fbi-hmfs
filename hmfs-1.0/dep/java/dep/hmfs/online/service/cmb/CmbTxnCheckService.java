@@ -23,13 +23,13 @@ public class CmbTxnCheckService {
             throw new RuntimeException("该笔交易不存在！");
         } else if (!(totalInfo.getTxnAmt1().compareTo(txnTotalAmt) == 0)) {
             throw new RuntimeException("实际交易金额和应交易金额不一致！");
-        } else if (TxnCtlSts.TXN_CANCEL.getCode().equals(totalInfo.getTxnCtlSts())) {
+        } else if (TxnCtlSts.CANCEL.getCode().equals(totalInfo.getTxnCtlSts())) {
             throw new RuntimeException("该笔交易已撤销！");
-        } else if (TxnCtlSts.TXN_INIT.getCode().equals(totalInfo.getTxnCtlSts()) ||
-                TxnCtlSts.TXN_HANDLING.getCode().equals(totalInfo.getTxnCtlSts())) {
+        } else if (TxnCtlSts.INIT.getCode().equals(totalInfo.getTxnCtlSts()) ||
+                TxnCtlSts.HANDLING.getCode().equals(totalInfo.getTxnCtlSts())) {
             // 正常进行交易。
             return true;
-        } else if (TxnCtlSts.TXN_SUCCESS.getCode().equals(totalInfo.getTxnCtlSts())) {
+        } else if (TxnCtlSts.SUCCESS.getCode().equals(totalInfo.getTxnCtlSts())) {
             // 交易已成功
             return false;
         } else {

@@ -67,7 +67,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         // 批量核算户账户信息更新
         cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
 
-        hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3002.body.refundApplyNo, "00005", subMsgTypes, TxnCtlSts.TXN_SUCCESS);
+        hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3002.body.refundApplyNo, "00005", subMsgTypes, TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
         String[] payMsgTypes = {"01039", "01043", "01033", "01051"};

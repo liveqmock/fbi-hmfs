@@ -7,10 +7,10 @@ import java.util.Hashtable;
  */
 public enum TxnCtlSts implements EnumApp {
 
-    TXN_INIT("00", "初始接收"),
-    TXN_CANCEL("01", "已撤销"),
-    TXN_HANDLING("10", "交易处理中"),
-    TXN_SUCCESS("20", "交易成功");
+    INIT("00", "初始接收"),
+    CANCEL("01", "已撤销"),
+    HANDLING("10", "交易处理中"),
+    SUCCESS("20", "交易成功");
 
     private String code = null;
     private String title = null;

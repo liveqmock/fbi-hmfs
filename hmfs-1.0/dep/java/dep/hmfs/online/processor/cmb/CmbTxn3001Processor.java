@@ -35,11 +35,11 @@ public class CmbTxn3001Processor extends CmbAbstractTxnProcessor {
             toa3001 = new TOA3001();
             toa3001.body.refundApplyNo = tia3001.body.refundApplyNo;
             toa3001.body.refundAmt = String.format("%.2f", totalRefundInfo.getTxnAmt1());
-            toa3001.body.refundFlag = TxnCtlSts.TXN_SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts()) ? "1" : "0";
+            toa3001.body.refundFlag = TxnCtlSts.SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts()) ? "1" : "0";
 
             // 更新退款汇总报文和子报文交易处理状态为：处理中
             String[] refundSubMsgTypes = {"01039", "01043"};
-            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3001.body.refundApplyNo, "00005", refundSubMsgTypes, TxnCtlSts.TXN_HANDLING);
+            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3001.body.refundApplyNo, "00005", refundSubMsgTypes, TxnCtlSts.HANDLING);
         }
 
         return toa3001;

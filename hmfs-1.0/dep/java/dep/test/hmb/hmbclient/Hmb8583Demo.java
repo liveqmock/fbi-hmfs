@@ -146,7 +146,7 @@ public class Hmb8583Demo {
                 msginLog.setMsgSn(msgSn);
             }
             msginLog.setMsgSubSn(StringUtils.leftPad(""+index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             msginLogMapper.insert(msginLog);
         }
@@ -187,7 +187,7 @@ public class Hmb8583Demo {
                 msgLog.setMsgSn(msgSn);
             }
             msgLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msgLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+            msgLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             msgLogMapper.insert(msgLog);
         }

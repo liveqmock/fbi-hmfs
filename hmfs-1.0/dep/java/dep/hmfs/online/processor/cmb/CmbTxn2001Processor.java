@@ -35,11 +35,11 @@ public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
             toa2001 = new TOA2001();
             toa2001.body.drawApplyNo = tia2001.body.drawApplyNo;
             toa2001.body.drawAmt = String.format("%.2f", totalDrawInfo.getTxnAmt1());
-            toa2001.body.drawFlag = TxnCtlSts.TXN_SUCCESS.getCode().equals(totalDrawInfo.getTxnCtlSts()) ? "1" : "0";
+            toa2001.body.drawFlag = TxnCtlSts.SUCCESS.getCode().equals(totalDrawInfo.getTxnCtlSts()) ? "1" : "0";
 
             // 更新汇总报文和子报文交易处理状态为：处理中
             String[] drawMsgTypes = {"01041"};
-            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.TXN_HANDLING);
+            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.HANDLING);
         }
 
         return toa2001;

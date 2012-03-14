@@ -35,11 +35,11 @@ public class CmbTxn1001Processor extends CmbAbstractTxnProcessor {
             toa1001 = new TOA1001();
             toa1001.body.payApplyNo = tia1001.body.payApplyNo;
             toa1001.body.payAmt = String.format("%.2f", totalPayInfo.getTxnAmt1());
-            toa1001.body.payFlag = TxnCtlSts.TXN_SUCCESS.getCode().equals(totalPayInfo.getTxnCtlSts()) ? "1" : "0";
+            toa1001.body.payFlag = TxnCtlSts.SUCCESS.getCode().equals(totalPayInfo.getTxnCtlSts()) ? "1" : "0";
 
             // 更新交款汇总信息和明细信息状态为：处理中 -- 更新完成后交款信息不可撤销
             String[] payMsgTypes = {"01035", "01045"};
-            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1001.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_HANDLING);
+            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1001.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.HANDLING);
         }
         return toa1001;
     }

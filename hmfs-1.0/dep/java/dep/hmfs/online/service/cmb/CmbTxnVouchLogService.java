@@ -39,26 +39,4 @@ public class CmbTxnVouchLogService {
         }
         return endNo - startNo + 1;
     }
-    /*
-    @Transactional
-    public long updateVouchsToSts(long startNo, long endNo, VouchStatus vouchStatus, TIA4001 tia4001, String cbsSerialNo) {
-        List<TxnVouchLog> txnVouchLogList = qryVouchsByNo(startNo, endNo);
-        for (TxnVouchLog record : txnVouchLogList) {
-            record.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            record.setVchSts(vouchStatus.getCode());
-            record.setFundTxnSn(tia4001.body.payApplyNo);
-            record.setCbsTxnSn(cbsSerialNo);
-            txnVouchLogMapper.updateByPrimaryKey(record);
-        }
-        return endNo - startNo + 1;
-    }
-
-    public List<TxnVouchLog> qryVouchsByNo(long startNo, long endNo) {
-        TxnVouchLogExample example = new TxnVouchLogExample();
-        example.createCriteria().andVchStsEqualTo(VouchStatus.VOUCH_RECEIVED.getCode())
-                .andVchNumGreaterThanOrEqualTo(String.valueOf(startNo))
-        .andVchNumLessThanOrEqualTo(String.valueOf(endNo));
-        return txnVouchLogMapper.selectByExample(example);
-    }
-    */
 }

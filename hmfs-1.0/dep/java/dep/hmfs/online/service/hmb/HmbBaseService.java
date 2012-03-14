@@ -105,7 +105,7 @@ import java.util.UUID;
                 msginLog.setMsgSn(msgSn);
             }
             msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             hisMsginLogMapper.insert(msginLog);
         }
@@ -133,7 +133,7 @@ import java.util.UUID;
                 msgoutLog.setMsgSn(msgSn);
             }
             msgoutLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msgoutLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+            msgoutLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             hisMsgoutLogMapper.insert(msgoutLog);
         }

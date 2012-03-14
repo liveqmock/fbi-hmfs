@@ -28,7 +28,7 @@ public class HisMsginLogService {
 
         HisMsginLogExample example = new HisMsginLogExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo(msgType)
-                .andTxnCtlStsNotEqualTo(TxnCtlSts.TXN_CANCEL.getCode());
+                .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
         List<HisMsginLog> hisMsginLogList = hisMsginLogMapper.selectByExample(example);
 
         return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
@@ -39,7 +39,7 @@ public class HisMsginLogService {
         HisMsginLogExample example = new HisMsginLogExample();
         for(String msgType : msgTypes) {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
-                    .andTxnCtlStsNotEqualTo(TxnCtlSts.TXN_CANCEL.getCode());
+                    .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
         }
         example.setOrderByClause("MSG_SUB_SN");
         return hisMsginLogMapper.selectByExample(example);
