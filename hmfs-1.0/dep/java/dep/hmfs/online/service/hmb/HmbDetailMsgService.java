@@ -1,18 +1,17 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.FundActnoStatus;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.service.HmActinfoFundService;
 import common.service.SystemService;
-import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.Msg032;
-import dep.hmfs.online.processor.hmb.domain.Msg033;
-import dep.hmfs.online.processor.hmb.domain.Msg034;
+import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -36,6 +35,7 @@ public class HmbDetailMsgService extends HmbBaseService {
     @Autowired
     private HmActinfoFundService hmActinfoFundService;
 
+    @Transactional
     public int createActinfosByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01032".equals(hmbMsg.getMsgType())) {
@@ -64,12 +64,28 @@ public class HmbDetailMsgService extends HmbBaseService {
         return hmbMsgList.size();
     }
 
+    @Transactional
     public int updateActinfosByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01033".equals(hmbMsg.getMsgType())) {
                 Msg033 msg033 = (Msg033) hmbMsg;
                 HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msg033.fundActno1);
                 BeanUtils.copyProperties(hmActinfoFund, msg033);
+                hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+            } else {
+                throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
+            }
+        }
+        return hmbMsgList.size();
+    }
+
+    @Transactional
+    public int cancelActinfoFundsByMsgList(List<HmbMsg> hmbMsgList) {
+        for (HmbMsg hmbMsg : hmbMsgList) {
+            if ("01051".equals(hmbMsg.getMsgType())) {
+                Msg051 msg051 = (Msg051) hmbMsg;
+                HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msg051.fundActno1);
+                hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
             } else {
                 throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
@@ -87,7 +103,6 @@ public class HmbDetailMsgService extends HmbBaseService {
         actinfoFund.setIntcPdt(new BigDecimal(0));
         actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         actinfoFund.setRecversion(0);
-
         hmActinfoFundMapper.insert(actinfoFund);
     }
 }
