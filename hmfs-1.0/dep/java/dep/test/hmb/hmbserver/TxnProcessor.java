@@ -1,4 +1,4 @@
-package dep.test.hmbserver;
+package dep.test.hmb.hmbserver;
 
 /**
  * Created by IntelliJ IDEA.

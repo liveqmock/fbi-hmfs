@@ -1,4 +1,4 @@
-package dep.test.hmbserver;
+package dep.test.hmb.hmbserver;
 
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;

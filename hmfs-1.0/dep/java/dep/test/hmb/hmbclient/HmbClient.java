@@ -1,4 +1,4 @@
-package dep.test.hmbclient;
+package dep.test.hmb.hmbclient;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsginLogMapper;
