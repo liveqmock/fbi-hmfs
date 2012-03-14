@@ -31,8 +31,8 @@ import java.util.*;
  * Time: ÏÂÎç12:55
  * To change this template use File | Settings | File Templates.
  */
-public class HmbClient {
-    private static final Logger logger = LoggerFactory.getLogger(HmbClient.class);
+public class Hmb8583Demo {
+    private static final Logger logger = LoggerFactory.getLogger(Hmb8583Demo.class);
     private  ApplicationContext context;
     private String packageName = "dep.hmfs.online.hmb.domain";
     private Map<String, Map<Integer, Field>> parseMap = new HashMap<String, Map<Integer, Field>>();
@@ -40,7 +40,7 @@ public class HmbClient {
 
     private HmbMessageFactory mf = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
-        HmbClient client = new HmbClient();
+        Hmb8583Demo client = new Hmb8583Demo();
         client.context = new ClassPathXmlApplicationContext("applicationContext.xml");
 
 //        client.testMarshal();

@@ -38,7 +38,7 @@ abstract public class AbstractHmbService {
     protected HisMsginLogMapper hisMsginLogMapper;
 
     @Resource
-    HmbTxnsnGenerator txnsnGenerator;
+    protected HmbTxnsnGenerator hmbTxnsnGenerator;
 
     protected XSocketBlockClient socketBlockClient;
     protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
@@ -54,7 +54,7 @@ abstract public class AbstractHmbService {
     }
     
     protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
-        msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
+        msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
         if (isSync) {
