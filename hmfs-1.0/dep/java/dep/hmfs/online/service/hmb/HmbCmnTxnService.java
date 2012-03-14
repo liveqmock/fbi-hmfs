@@ -53,7 +53,7 @@ public class HmbCmnTxnService extends AbstractHmbService{
         boolean result = false;
         String txnCode = "7000";
         Msg001 msg001 = new Msg001();
-        assembleSummaryMsg(txnCode, msg001, 1);
+        assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//µ•± ≈˙¡ø£ø
         msg001.bizType = "#"; //????
         msg001.origTxnCode = "7000"; //TODO ????

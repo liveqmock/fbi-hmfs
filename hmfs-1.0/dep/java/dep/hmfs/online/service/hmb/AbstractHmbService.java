@@ -53,15 +53,6 @@ abstract public class AbstractHmbService {
         return hmSctMapper.selectByPrimaryKey("1");
     }
     
-    protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum) {
-        msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
-        msg.submsgNum = submsgNum;
-        msg.sendSysId = SEND_SYS_ID;
-        msg.origSysId = ORIG_SYS_ID;
-        msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
-        msg.msgEndDate = "#";
-    }
-
     protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
         msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;

@@ -8,7 +8,6 @@ import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
 import dep.hmfs.online.processor.hmb.domain.Msg008;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class HmbAsynResponseService extends AbstractHmbService{
+public class HmbAsynResponseService extends AbstractHmbService {
 
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HisMsginLog> msginLogList) throws Exception {
@@ -76,11 +75,7 @@ public class HmbAsynResponseService extends AbstractHmbService{
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
         Msg006 msg006 = new Msg006();
         BeanUtils.copyProperties(msg006, msginLog);
-
-        // TODO 报文编号生成
-        msg006.msgSn = "#";
-        msg006.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
-        msg006.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        assembleSummaryMsg(msginLog.getTxnCode(), msg006, 0, false);
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg006;
@@ -89,10 +84,7 @@ public class HmbAsynResponseService extends AbstractHmbService{
     public Msg008 createMsg008ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
         Msg008 msg008 = new Msg008();
         BeanUtils.copyProperties(msg008, msginLog);
-        // TODO 报文编号生成
-        msg008.setMsgSn("#");
-        msg008.setSendSysId(PropertyManager.getProperty("SEND_SYS_ID"));
-        msg008.setMsgDt(SystemService.formatTodayByPattern("yyyyMMddHHmmss"));
+        assembleSummaryMsg(msginLog.getTxnCode(), msg008, 0, false);
         msg008.setRtnInfoCode("00");
         msg008.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg008;
