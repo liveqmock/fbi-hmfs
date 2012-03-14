@@ -43,8 +43,11 @@ public class Txn5001Processor extends AbstractTxnProcessor {
         TIA5001 tia5001 = new TIA5001();
         tia5001.body.cbsActNo = new String(bytes, 0, 30).trim();
         tia5001.body.accountBalance = new String(bytes, 30, 16).trim();
-        tia5001.body.txnDate = new String(bytes, 46, 54).trim();
+        tia5001.body.txnDate = new String(bytes, 46, 8).trim();
 
+        logger.info("【前台】账号：" + tia5001.body.cbsActNo);
+        logger.info("【前台】余额：" + tia5001.body.accountBalance);
+        logger.info("【前台】交易日期：" + tia5001.body.txnDate);
         HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
         if (hmActinfoCbs == null) {
             throw new RuntimeException("该账户不存在！");
@@ -54,6 +57,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
             // TODO 发起国土局余额对账交易
             // 清余额对账表，明细对账表
             // TODO 新增-会计账号余额信息  -- 余额对账表
+
             // TODO 新增-会计账号明细    ---  明细对账表
             // 获取明细，开始主机对账
             if (bytes.length > 54) {
@@ -72,7 +76,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
             }
             List<TxnCbsLog> txnCbsLogList = txnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
             if (txnCbsLogList.size() != tia5001.body.recordList.size()) {
-                throw new RuntimeException("账户交易明细数不一致！");
+                throw new RuntimeException("账户交易明细数不一致！【本地】交易数：" + txnCbsLogList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
             } else {
                 int index = 0;
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
