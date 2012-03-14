@@ -100,9 +100,9 @@ public class AsynTxnResponseService {
         Msg006 msg006 = new Msg006();
         BeanUtils.copyProperties(msg006, msginLog);
         // TODO 报文编号生成
-        msg006.setMsgSn("#");
-        msg006.setSendSysId(PropertyManager.getProperty("SEND_SYS_ID"));
-        msg006.setMsgDt(SystemService.formatTodayByPattern("yyyyMMddHHmmss"));
+        msg006.msgSn = "#";
+        msg006.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+        msg006.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg006;
