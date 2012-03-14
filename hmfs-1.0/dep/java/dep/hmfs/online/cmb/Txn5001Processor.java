@@ -52,6 +52,9 @@ public class Txn5001Processor extends AbstractTxnProcessor {
             throw new RuntimeException("账户余额不一致！");
         } else {
             // TODO 发起国土局余额对账交易
+            // 清余额对账表，明细对账表
+            // TODO 新增-会计账号余额信息  -- 余额对账表
+            // TODO 新增-会计账号明细    ---  明细对账表
             // 获取明细，开始主机对账
             if (bytes.length > 54) {
                 byte[] detailBytes = new byte[bytes.length - 54];
