@@ -1,21 +1,20 @@
 package dep.hmfs.online.service.hmb;
 
-import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HisMsgoutLog;
-import common.service.SystemService;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
 import dep.hmfs.online.processor.hmb.domain.Msg008;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +24,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class HmbClientReqService extends AbstractHmbService {
+public class HmbClientReqService extends HmbBaseService {
 
     @Resource
     HmbTxnsnGenerator txnsnGenerator;
@@ -48,33 +47,6 @@ public class HmbClientReqService extends AbstractHmbService {
         Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
         Msg100 msg100 = (Msg100) rtnMsgMap.get("9999").get(0);
         return "00".equals(msg100.getRtnInfoCode());
-    }
-
-    public int saveMsgoutLogByMap(Map<String, List<HmbMsg>> rtnMap) throws InvocationTargetException, IllegalAccessException {
-        int index = 0;
-        String msgSn = "";
-        String txnCode = rtnMap.keySet().iterator().next();
-        for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
-            HisMsgoutLog msgoutLog = new HisMsgoutLog();
-            BeanUtils.copyProperties(msgoutLog, hmbMsg);
-            String guid = UUID.randomUUID().toString();
-            msgoutLog.setPkid(guid);
-            msgoutLog.setTxnCode(txnCode);
-            msgoutLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            msgoutLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
-
-            index++;
-            if (index == 1) {
-                msgSn = msgoutLog.getMsgSn();
-            } else {
-                msgoutLog.setMsgSn(msgSn);
-            }
-            msgoutLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msgoutLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
-
-            hisMsgoutLogMapper.insert(msgoutLog);
-        }
-        return index;
     }
 
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {

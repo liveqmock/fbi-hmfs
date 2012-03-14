@@ -5,6 +5,7 @@ import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.dao.HmSctMapper;
 import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HisMsgoutLog;
 import common.repository.hmfs.model.HmSct;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
@@ -17,6 +18,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
@@ -31,8 +33,9 @@ import java.util.UUID;
  * Time: ÏÂÎç2:35
  * To change this template use File | Settings | File Templates.
  */
-abstract public class AbstractHmbService {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractHmbService.class);
+@Service
+ public class HmbBaseService {
+    private static final Logger logger = LoggerFactory.getLogger(HmbBaseService.class);
 
     @Resource
     protected HmSctMapper hmSctMapper;
@@ -50,22 +53,22 @@ abstract public class AbstractHmbService {
     protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
     protected static int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
     protected static int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
-    protected  static String SEND_SYS_ID =  PropertyManager.getProperty("SEND_SYS_ID");
-    protected  static String ORIG_SYS_ID =  PropertyManager.getProperty("ORIG_SYS_ID");
+    protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
+    protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
     protected HmbMessageFactory messageFactory = new HmbMessageFactory();
 
     public HmSct getAppSysStatus() {
         return hmSctMapper.selectByPrimaryKey("1");
     }
-    
-    protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
+
+    protected void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
         msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
         if (isSync) {
             msg.origSysId = ORIG_SYS_ID;
-        }else{
+        } else {
             msg.origSysId = "00";
         }
         msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
@@ -107,6 +110,34 @@ abstract public class AbstractHmbService {
             hisMsginLogMapper.insert(msginLog);
         }
         return hmbMsgList.size();
+    }
+
+
+    public int saveMsgoutLogByMap(Map<String, List<HmbMsg>> rtnMap) throws InvocationTargetException, IllegalAccessException {
+        int index = 0;
+        String msgSn = "";
+        String txnCode = rtnMap.keySet().iterator().next();
+        for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
+            HisMsgoutLog msgoutLog = new HisMsgoutLog();
+            BeanUtils.copyProperties(msgoutLog, hmbMsg);
+            String guid = UUID.randomUUID().toString();
+            msgoutLog.setPkid(guid);
+            msgoutLog.setTxnCode(txnCode);
+            msgoutLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+            msgoutLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
+
+            index++;
+            if (index == 1) {
+                msgSn = msgoutLog.getMsgSn();
+            } else {
+                msgoutLog.setMsgSn(msgSn);
+            }
+            msgoutLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgoutLog.setTxnCtlSts(TxnCtlSts.TXN_INIT.getCode());
+
+            hisMsgoutLogMapper.insert(msgoutLog);
+        }
+        return index;
     }
 
 }

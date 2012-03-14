@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class HmbDirectResTxnProcessor extends HmbAbstractTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(HmbDirectResTxnProcessor.class);
+public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(HmbRecvResTxnProcessor.class);
 
     @Override
     public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
@@ -23,7 +23,7 @@ public class HmbDirectResTxnProcessor extends HmbAbstractTxnProcessor {
         msg100.rtnInfoCode = "00";
         msg100.rtnInfoCode = "报文接收成功";
         try {
-            hmbClientReqService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";

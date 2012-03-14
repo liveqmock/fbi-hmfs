@@ -3,7 +3,8 @@ package dep.hmfs.online.processor.hmb;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.service.hmb.HmbClientReqService;
+import dep.hmfs.online.service.hmb.HmbBaseService;
+import dep.hmfs.online.service.hmb.HmbDetailMsgService;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -18,11 +19,13 @@ import java.util.List;
 public abstract class HmbAbstractTxnProcessor {
 
     @Resource
-    protected HmbClientReqService hmbClientReqService;
+    protected HmbBaseService hmbBaseService;
     @Resource
     protected HmbMessageFactory mf;
     @Resource
     HmbTxnsnGenerator txnsnGenerator;
+    @Resource
+    protected HmbDetailMsgService hmbDetailMsgService;
 
     public abstract byte[] process(String txnCode, List<HmbMsg> hmbMsgList);
 

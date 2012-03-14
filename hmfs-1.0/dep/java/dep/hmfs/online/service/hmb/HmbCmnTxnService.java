@@ -24,7 +24,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class HmbCmnTxnService extends AbstractHmbService{
+public class HmbCmnTxnService extends HmbBaseService {
     private static final Logger logger = LoggerFactory.getLogger(HmbCmnTxnService.class);
 
     /**
