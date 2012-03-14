@@ -62,14 +62,14 @@ abstract public class AbstractHmbService {
         msg.msgEndDate = "#";
     }
 
-    protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
+    protected void assembleSummaryMsg(String  txnCode, SummaryMsg msg, int submsgNum, boolean isAsync) {
         msg.msgSn = txnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
-        if (isSync) {
-            msg.origSysId = ORIG_SYS_ID;
-        }else{
+        if (isAsync) {
             msg.origSysId = "00";
+        }else{
+            msg.origSysId = ORIG_SYS_ID;
         }
         msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg.msgEndDate = "#";
