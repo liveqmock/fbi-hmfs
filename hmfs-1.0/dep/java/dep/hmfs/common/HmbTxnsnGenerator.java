@@ -29,7 +29,7 @@ public class HmbTxnsnGenerator {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String generateTxnsn(String txnCode) {
-        String date = new SimpleDateFormat("yyyyMMdd").format(new Date()).substring(2);
+        String date = new SimpleDateFormat("yyMMdd").format(new Date());
         int sn = cmnMapper.selectTxnseq();
         cmnMapper.updateTxnseq(sn + 1);
         return date + leftPad("" + sn, 6, '0') + txnCode + SEND_SYS_ID;

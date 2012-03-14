@@ -1,4 +1,4 @@
-package dep.hmfs.service.cmb;
+package dep.hmfs.service.hmb;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;

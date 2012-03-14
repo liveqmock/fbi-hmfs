@@ -7,7 +7,7 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA2002;
 import dep.hmfs.service.cmb.BookkeepingService;
-import dep.hmfs.service.cmb.HmbAsynResponseService;
+import dep.hmfs.service.hmb.HmbAsynResponseService;
 import dep.hmfs.service.cmb.TxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

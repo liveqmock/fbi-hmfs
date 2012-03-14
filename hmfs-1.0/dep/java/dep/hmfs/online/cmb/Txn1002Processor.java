@@ -8,7 +8,7 @@ import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.cmb.domain.txn.TOA1002;
 import dep.hmfs.service.cmb.BookkeepingService;
-import dep.hmfs.service.cmb.HmbAsynResponseService;
+import dep.hmfs.service.hmb.HmbAsynResponseService;
 import dep.hmfs.service.cmb.TxnCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
