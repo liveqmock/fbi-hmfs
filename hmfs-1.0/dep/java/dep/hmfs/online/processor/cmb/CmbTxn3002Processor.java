@@ -76,7 +76,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
                 hmbAsynResponseService.createMsg006ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;
         } else {
-            throw new RuntimeException("3002发送报文至房管局交易失败！");
+            throw new RuntimeException("【3002发送报文至房管局交易失败！】");
         }
 
     }

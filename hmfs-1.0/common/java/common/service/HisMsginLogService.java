@@ -56,4 +56,5 @@ public class HisMsginLogService {
         }
         return msginLogList.size();
     }
+    
 }

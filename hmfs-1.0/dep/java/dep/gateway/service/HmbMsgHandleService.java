@@ -29,10 +29,10 @@ public class HmbMsgHandleService implements IMessageHandler {
     @Autowired
     private HmbMessageFactory mf;
 
-    // 异步【1】
-    private static final String[] ASYN_RES_TXNCODES = {"5110", "5150", "5210", "5230", "5310"};
-    // 同步【0】
-    private static final String[] SYN_RES_TXNCODES = {"5120", "5130", "5140", "5160", "5610",
+    // 接收后返回9999报文
+    private static final String[] ASYN_RES_TXNCODES = {"5150", "5210", "5230", "5310"};
+    // 需同步处理
+    private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5160", "5610",
             "6110", "6210", "6220", "7002"};
 
     @Override
@@ -45,7 +45,7 @@ public class HmbMsgHandleService implements IMessageHandler {
             logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【异步】保存到数据库。");
             return handleAsynMessage(txnCode, rtnMap.get(txnCode));
         } else {
-            logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【同步】由TxnProcessor处理。");
+            logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【同步】由HmbTxnProcessor处理。");
             return handleSynMessage(txnCode, rtnMap.get(txnCode));
         }
     }
@@ -66,7 +66,7 @@ public class HmbMsgHandleService implements IMessageHandler {
     // 【异步】保存到数据库
     public byte[] handleAsynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
         try {
-            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("asynHmbTxnProcessor");
+            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbAsynTxnProcessor");
             if (hmbAbstractTxnProcessor != null) {
                 return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
             }
