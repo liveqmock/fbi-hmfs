@@ -1,11 +1,11 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.VouchStatus;
 import common.repository.hmfs.model.HisMsginLog;
+import common.service.SystemService;
 import dep.hmfs.common.HmbTxnsnGenerator;
-import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.Msg006;
-import dep.hmfs.online.processor.hmb.domain.Msg008;
-import dep.hmfs.online.processor.hmb.domain.Msg100;
+import dep.hmfs.online.processor.hmb.domain.*;
+import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -49,10 +49,45 @@ public class HmbClientReqService extends HmbBaseService {
         return "00".equals(msg100.getRtnInfoCode());
     }
 
+    public boolean sendVouchsToHmb(long startNo, long endNo, String txnApplyNo, String vouchStatus) {
+        Msg005 msg005 = new Msg005();
+        msg005.msgSn = txnsnGenerator.generateTxnsn("5610");
+        msg005.submsgNum = (int) (endNo - startNo + 1);
+        msg005.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+        msg005.origSysId = msg005.sendSysId;
+        msg005.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
+        hmbMsgList.add(msg005);
+        // 领用
+        if (VouchStatus.RECEIVED.getCode().equals(vouchStatus) || VouchStatus.CANCEL.getCode().equals(vouchStatus)) {
+            for (long i = startNo; i <= endNo; i++) {
+                Msg049 msg049 = new Msg049();
+                msg049.actionCode = "144";
+                msg049.receiptNo = String.valueOf(startNo);
+                msg049.voucherSts = vouchStatus;
+                msg049.voucherType = "00";   // 00-商品住宅
+                hmbMsgList.add(msg049);
+            }
+        } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
+            for (long i = startNo; i <= endNo; i++) {
+                Msg037 msg037 = new Msg037();
+                msg037.actionCode = "141";
+                msg037.receiptNo = String.valueOf(startNo);
+                msg037.voucherType = "00";   // 00-商品住宅
+                // TODO
+                hmbMsgList.add(msg037);
+            }
+        } else {
+            throw new RuntimeException("票据状态错误: " + vouchStatus);
+        }
+        return true;
+    }
+
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
         Msg006 msg006 = new Msg006();
         BeanUtils.copyProperties(msg006, msginLog);
         assembleSummaryMsg(msginLog.getTxnCode(), msg006, 0, false);
+        msg006.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg006;
@@ -62,6 +97,7 @@ public class HmbClientReqService extends HmbBaseService {
         Msg008 msg008 = new Msg008();
         BeanUtils.copyProperties(msg008, msginLog);
         assembleSummaryMsg(msginLog.getTxnCode(), msg008, 0, false);
+        msg008.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg008.setRtnInfoCode("00");
         msg008.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg008;

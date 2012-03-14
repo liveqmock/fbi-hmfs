@@ -42,6 +42,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
         long startNo = Long.parseLong(tia4001.body.billStartNo);
         long endNo = Long.parseLong(tia4001.body.billEndNo);
         cmbTxnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
+
         return null;
     }
 }

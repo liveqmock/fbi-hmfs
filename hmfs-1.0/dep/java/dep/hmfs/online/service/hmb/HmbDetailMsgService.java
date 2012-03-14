@@ -83,9 +83,9 @@ public class HmbDetailMsgService extends HmbBaseService {
         }
         return hmbMsgList.size();
     }
-    
+
     private int createActinfoCbsByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
-        
+
         HmActinfoCbs actinfoCbs = new HmActinfoCbs();
         actinfoCbs.setPkid(UUID.randomUUID().toString());
         BeanUtils.copyProperties(actinfoCbs, hmbMsg);
@@ -94,7 +94,6 @@ public class HmbDetailMsgService extends HmbBaseService {
         actinfoCbs.setIntcPdt(new BigDecimal(0));
         actinfoCbs.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         actinfoCbs.setRecversion(0);
-
         return hmActinfoCbsMapper.insert(actinfoCbs);
     }
 
