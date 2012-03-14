@@ -1,34 +1,32 @@
 package hmfs.view;
 
+import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmActinfoFund;
-import common.repository.hmfs.model.HmSct;
-import common.repository.hmfs.model.TxnFundLog;
+import common.repository.hmfs.model.*;
 import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import skyline.common.utils.MessageUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: zhanrui
- * Date: 12-3-12
- * Time: 下午9:50
- * To change this template use File | Settings | File Templates.
+ * 帐户管理
  */
 @ManagedBean
 @ViewScoped
-public class ActInfoAction {
+public class ActInfoAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ActInfoAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -37,12 +35,19 @@ public class ActInfoAction {
     private String sysTime;
     private String txnDate;
     private String sysSts;
-    private List<HmActinfoFund> balList;
-    private List<TxnFundLog> detlList;
-    private HmActinfoFund[] selectedBalRecords;
-    private TxnFundLog[] selectedDetlRecords;
 
-    private static SelectItem[] actnoStatusList = new SelectItem[]{
+    private List<HmActinfoFund> fundBalList;
+    private List<HmActinfoCbs> cbsBalList;
+    private List<TxnFundLog> fundDetlList;
+    private List<TxnCbsLog>  cbsDetlList;
+    private HmActinfoFund[] selectedFundBalRecords;
+    private HmActinfoCbs[] selectedCbsBalRecords;
+    private TxnFundLog[] selectedFundDetlRecords;
+    private TxnCbsLog[] selectedCbsDetlRecords;
+
+    private FundActnoStatus fundActnoStatus = FundActnoStatus.NORMAL;
+
+    private SelectItem[] actnoStatusList = new SelectItem[]{
             new SelectItem("0", "正常"),
             new SelectItem("1", "销户"),
             new SelectItem("2", "封帐")
@@ -60,20 +65,78 @@ public class ActInfoAction {
         this.txnDate = this.sysDate;
         this.sysTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
+        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        this.qryParam.setStartDate(date);
+        this.qryParam.setEndDate(date);
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
     }
 
     private void initList(){
-        //this.balList = actInfoService.selectFundActInfo(qryParam);
+        //this.fundBalList = actInfoService.selectFundActInfo(qryParam);
     }
 
-    public String onQueryBal() {
-        this.balList = actInfoService.selectFundActInfo(qryParam);
+    public String onQueryFundBal() {
+        if (StringUtils.isEmpty(qryParam.getEndActno())) {
+            qryParam.setEndActno(qryParam.getStartActno());
+        }
+        try {
+            this.fundBalList = actInfoService.selectFundActBal(qryParam);
+            if (fundBalList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
         return null;
     }
 
+    public String onQueryFundDetl(){
+        if (StringUtils.isEmpty(qryParam.getEndActno())) {
+            qryParam.setEndActno(qryParam.getStartActno());
+        }
+
+        try {
+            this.fundDetlList = actInfoService.selectFundActDetl(qryParam);
+            if (fundDetlList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+    public String onQueryCbsBal() {
+        if (StringUtils.isEmpty(qryParam.getEndActno())) {
+            qryParam.setEndActno(qryParam.getStartActno());
+        }
+        try {
+            this.cbsBalList = actInfoService.selectCbsActBal(qryParam);
+            if (cbsBalList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
+    public String onQueryCbsDetl(){
+        if (StringUtils.isEmpty(qryParam.getEndActno())) {
+            qryParam.setEndActno(qryParam.getStartActno());
+        }
+
+        try {
+            this.cbsDetlList = actInfoService.selectCbsActDetl(qryParam);
+            if (cbsDetlList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
     //=============================
 
     public String getSysDate() {
@@ -133,12 +196,12 @@ public class ActInfoAction {
         this.actInfoService = actInfoService;
     }
 
-    public static SelectItem[] getActnoStatusList() {
+    public SelectItem[] getActnoStatusList() {
         return actnoStatusList;
     }
 
-    public static void setActnoStatusList(SelectItem[] actnoStatusList) {
-        ActInfoAction.actnoStatusList = actnoStatusList;
+    public void setActnoStatusList(SelectItem[] actnoStatusList) {
+        this.actnoStatusList = actnoStatusList;
     }
 
     public ActinfoQryParam getQryParam() {
@@ -149,35 +212,75 @@ public class ActInfoAction {
         this.qryParam = qryParam;
     }
 
-    public List<HmActinfoFund> getBalList() {
-        return balList;
+    public List<HmActinfoFund> getFundBalList() {
+        return fundBalList;
     }
 
-    public void setBalList(List<HmActinfoFund> balList) {
-        this.balList = balList;
+    public void setFundBalList(List<HmActinfoFund> fundBalList) {
+        this.fundBalList = fundBalList;
     }
 
-    public List<TxnFundLog> getDetlList() {
-        return detlList;
+    public List<TxnFundLog> getFundDetlList() {
+        return fundDetlList;
     }
 
-    public void setDetlList(List<TxnFundLog> detlList) {
-        this.detlList = detlList;
+    public void setFundDetlList(List<TxnFundLog> fundDetlList) {
+        this.fundDetlList = fundDetlList;
     }
 
-    public HmActinfoFund[] getSelectedBalRecords() {
-        return selectedBalRecords;
+    public HmActinfoFund[] getSelectedFundBalRecords() {
+        return selectedFundBalRecords;
     }
 
-    public void setSelectedBalRecords(HmActinfoFund[] selectedBalRecords) {
-        this.selectedBalRecords = selectedBalRecords;
+    public void setSelectedFundBalRecords(HmActinfoFund[] selectedFundBalRecords) {
+        this.selectedFundBalRecords = selectedFundBalRecords;
     }
 
-    public TxnFundLog[] getSelectedDetlRecords() {
-        return selectedDetlRecords;
+    public TxnFundLog[] getSelectedFundDetlRecords() {
+        return selectedFundDetlRecords;
     }
 
-    public void setSelectedDetlRecords(TxnFundLog[] selectedDetlRecords) {
-        this.selectedDetlRecords = selectedDetlRecords;
+    public void setSelectedFundDetlRecords(TxnFundLog[] selectedFundDetlRecords) {
+        this.selectedFundDetlRecords = selectedFundDetlRecords;
+    }
+
+    public FundActnoStatus getFundActnoStatus() {
+        return fundActnoStatus;
+    }
+
+    public void setFundActnoStatus(FundActnoStatus fundActnoStatus) {
+        this.fundActnoStatus = fundActnoStatus;
+    }
+
+    public List<HmActinfoCbs> getCbsBalList() {
+        return cbsBalList;
+    }
+
+    public void setCbsBalList(List<HmActinfoCbs> cbsBalList) {
+        this.cbsBalList = cbsBalList;
+    }
+
+    public List<TxnCbsLog> getCbsDetlList() {
+        return cbsDetlList;
+    }
+
+    public void setCbsDetlList(List<TxnCbsLog> cbsDetlList) {
+        this.cbsDetlList = cbsDetlList;
+    }
+
+    public HmActinfoCbs[] getSelectedCbsBalRecords() {
+        return selectedCbsBalRecords;
+    }
+
+    public void setSelectedCbsBalRecords(HmActinfoCbs[] selectedCbsBalRecords) {
+        this.selectedCbsBalRecords = selectedCbsBalRecords;
+    }
+
+    public TxnCbsLog[] getSelectedCbsDetlRecords() {
+        return selectedCbsDetlRecords;
+    }
+
+    public void setSelectedCbsDetlRecords(TxnCbsLog[] selectedCbsDetlRecords) {
+        this.selectedCbsDetlRecords = selectedCbsDetlRecords;
     }
 }

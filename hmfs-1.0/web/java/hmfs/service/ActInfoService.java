@@ -1,9 +1,7 @@
 package hmfs.service;
 
 import common.repository.hmfs.dao.*;
-import common.repository.hmfs.model.HmActinfoFund;
-import common.repository.hmfs.model.HmActinfoFundExample;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.*;
 import hmfs.common.model.ActinfoQryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +37,39 @@ public class ActInfoService {
     private TxnCbsLogMapper cbsLogMapper;
 
 
-    public HmSct getAppSysStatus(){
-         return hmSctMapper.selectByPrimaryKey("1");
+    public HmSct getAppSysStatus() {
+        return hmSctMapper.selectByPrimaryKey("1");
     }
 
-    public List<HmActinfoFund> selectFundActInfo(ActinfoQryParam param){
+    public List<HmActinfoFund> selectFundActBal(ActinfoQryParam param) {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria()
                 .andFundActno1Between(param.getStartActno(), param.getEndActno())
                 .andActStsEqualTo(param.getActnoStatus());
         return actinfoFundMapper.selectByExample(example);
+    }
+
+    public List<HmActinfoCbs> selectCbsActBal(ActinfoQryParam param) {
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria()
+                .andCbsActnoNotBetween(param.getStartActno(), param.getEndActno())
+                .andActStsEqualTo(param.getActnoStatus());
+        return actinfoCbsMapper.selectByExample(example);
+    }
+
+    public List<TxnFundLog> selectFundActDetl(ActinfoQryParam param) {
+        TxnFundLogExample example = new TxnFundLogExample();
+        example.createCriteria()
+                .andFundActnoBetween(param.getStartActno(), param.getEndActno())
+                .andTxnDateBetween(param.getStartDate(),param.getEndDate());
+        return fundLogMapper.selectByExample(example);
+    }
+
+    public List<TxnCbsLog> selectCbsActDetl(ActinfoQryParam param) {
+        TxnCbsLogExample example = new TxnCbsLogExample();
+        example.createCriteria()
+                .andCbsAcctnoBetween(param.getStartActno(), param.getEndActno())
+                .andTxnDateBetween(param.getStartDate(),param.getEndDate());
+        return cbsLogMapper.selectByExample(example);
     }
 }

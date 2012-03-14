@@ -11,6 +11,14 @@
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
                 <p:tab title="结算账户开户">
+                    <h:form>
+                        <h:panelGrid columns="2" cellspacing="5">
+                            <h:outputLabel value="当前系统日期:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysDate}"/>
+
+                            <p:commandButton value="aaa" action="#{appMngAction.onCheckDetl}"  />
+                        </h:panelGrid>
+                    </h:form>
                 </p:tab>
             </p:tabView>
         </div>

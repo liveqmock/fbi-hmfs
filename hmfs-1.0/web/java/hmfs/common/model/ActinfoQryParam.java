@@ -3,7 +3,10 @@ package hmfs.common.model;
 public class ActinfoQryParam {
     private String startActno = "";
     private String endActno = "";
+    private String actName = "";
     private String actnoStatus = "";
+    private String startDate = "";
+    private String endDate = "";
 
     public String getStartActno() {
         return startActno;
@@ -27,5 +30,29 @@ public class ActinfoQryParam {
 
     public void setActnoStatus(String actnoStatus) {
         this.actnoStatus = actnoStatus;
+    }
+
+    public String getActName() {
+        return actName;
+    }
+
+    public void setActName(String actName) {
+        this.actName = actName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }
