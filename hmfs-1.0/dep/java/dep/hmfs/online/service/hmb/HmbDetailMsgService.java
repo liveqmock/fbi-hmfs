@@ -40,17 +40,7 @@ public class HmbDetailMsgService extends HmbBaseService {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01032".equals(hmbMsg.getMsgType())) {
                 Msg032 msg032 = (Msg032) hmbMsg;
-
-                HmActinfoCbs actinfoCbs = new HmActinfoCbs();
-                actinfoCbs.setPkid(UUID.randomUUID().toString());
-                BeanUtils.copyProperties(actinfoCbs, msg032);
-                actinfoCbs.setActSts("0");
-                actinfoCbs.setActBal(new BigDecimal(0));
-                actinfoCbs.setIntcPdt(new BigDecimal(0));
-                actinfoCbs.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-                actinfoCbs.setRecversion(0);
-
-                hmActinfoCbsMapper.insert(actinfoCbs);
+                createActinfoCbsByHmbMsg(msg032);
             } else if ("01033".equals(hmbMsg.getMsgType())) {
                 Msg033 msg033 = (Msg033) hmbMsg;
                 createActinfoFundByHmbMsg(msg033);
@@ -93,8 +83,22 @@ public class HmbDetailMsgService extends HmbBaseService {
         }
         return hmbMsgList.size();
     }
+    
+    private int createActinfoCbsByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
+        
+        HmActinfoCbs actinfoCbs = new HmActinfoCbs();
+        actinfoCbs.setPkid(UUID.randomUUID().toString());
+        BeanUtils.copyProperties(actinfoCbs, hmbMsg);
+        actinfoCbs.setActSts("0");
+        actinfoCbs.setActBal(new BigDecimal(0));
+        actinfoCbs.setIntcPdt(new BigDecimal(0));
+        actinfoCbs.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        actinfoCbs.setRecversion(0);
 
-    private void createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
+        return hmActinfoCbsMapper.insert(actinfoCbs);
+    }
+
+    private int createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
         HmActinfoFund actinfoFund = new HmActinfoFund();
         actinfoFund.setPkid(UUID.randomUUID().toString());
         BeanUtils.copyProperties(actinfoFund, hmbMsg);
@@ -103,6 +107,6 @@ public class HmbDetailMsgService extends HmbBaseService {
         actinfoFund.setIntcPdt(new BigDecimal(0));
         actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         actinfoFund.setRecversion(0);
-        hmActinfoFundMapper.insert(actinfoFund);
+        return hmActinfoFundMapper.insert(actinfoFund);
     }
 }
