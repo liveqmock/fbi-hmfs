@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class Txn4001Processor extends AbstractTxnProcessor {
+public class Txn4001Processor extends AbstractCmbTxnProcessor {
 
     @Autowired
     private TxnVouchLogService txnVouchLogService;

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 // TODO 支取冲正--待定
 @Component
-public class Txn2003Processor extends AbstractTxnProcessor {
+public class Txn2003Processor extends AbstractCmbTxnProcessor {
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
         TIA2003 tia2003 = new TIA2003();

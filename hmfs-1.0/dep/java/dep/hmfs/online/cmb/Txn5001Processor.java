@@ -23,7 +23,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class Txn5001Processor extends AbstractTxnProcessor {
+public class Txn5001Processor extends AbstractCmbTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(Txn5001Processor.class);
 
     @Autowired
@@ -48,6 +48,7 @@ public class Txn5001Processor extends AbstractTxnProcessor {
         logger.info("【前台】账号：" + tia5001.body.cbsActNo);
         logger.info("【前台】余额：" + tia5001.body.accountBalance);
         logger.info("【前台】交易日期：" + tia5001.body.txnDate);
+
         HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
         if (hmActinfoCbs == null) {
             throw new RuntimeException("该账户不存在！");

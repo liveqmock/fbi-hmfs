@@ -1,11 +1,14 @@
 package dep.hmfs.online.hmb;
 
-/**
- * Created by IntelliJ IDEA.
- * User: zhanrui
- * Date: 12-3-11
- * Time: обнГ1:08
- * To change this template use File | Settings | File Templates.
- */
-public class Txn5110Processor {
+import dep.hmfs.online.hmb.domain.HmbMsg;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class Txn5110Processor extends AbstractHmbTxnProcessor{
+    @Override
+    public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
+        return new byte[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
