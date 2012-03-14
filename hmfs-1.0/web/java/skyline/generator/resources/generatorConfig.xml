@@ -69,6 +69,13 @@
         <table schema="hmfs" tableName="hm_joblog">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
+        <table schema="hmfs" tableName="hm_chk_act">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_chk_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+
 -->
 
 
