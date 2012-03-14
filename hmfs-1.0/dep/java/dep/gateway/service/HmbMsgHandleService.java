@@ -2,7 +2,7 @@ package dep.gateway.service;
 
 import dep.ContainerManager;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.online.processor.hmb.AbstractHmbTxnProcessor;
+import dep.hmfs.online.processor.hmb.HmbAbstractTxnProcessor;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +53,9 @@ public class HmbMsgHandleService implements IMessageHandler {
     // 【同步】保存到数据库
     public byte[] handleSynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
         try {
-            AbstractHmbTxnProcessor hmbTxnProcessor = (AbstractHmbTxnProcessor) ContainerManager.getBean("txn" + txnCode + "Processor");
-            if (hmbTxnProcessor != null) {
-                return hmbTxnProcessor.process(txnCode, hmbMsgList);
+            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
+            if (hmbAbstractTxnProcessor != null) {
+                return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
             }
         } catch (IOException e) {
             logger.error("HMFS报文同步处理异常！", e);
@@ -66,9 +66,9 @@ public class HmbMsgHandleService implements IMessageHandler {
     // 【异步】保存到数据库
     public byte[] handleAsynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
         try {
-            AbstractHmbTxnProcessor hmbTxnProcessor = (AbstractHmbTxnProcessor) ContainerManager.getBean("asynHmbTxnProcessor");
-            if (hmbTxnProcessor != null) {
-                return hmbTxnProcessor.process(txnCode, hmbMsgList);
+            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("asynHmbTxnProcessor");
+            if (hmbAbstractTxnProcessor != null) {
+                return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
             }
         } catch (IOException e) {
             logger.error("HMFS报文异步处理异常！", e);

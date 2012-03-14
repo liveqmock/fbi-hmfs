@@ -9,7 +9,7 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
  * Time: обнГ7:23
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractTxnProcessor {
+public abstract class CmbAbstractTxnProcessor {
 
     public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
 }

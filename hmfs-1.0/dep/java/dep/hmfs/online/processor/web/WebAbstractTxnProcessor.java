@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
  * Time: обнГ7:23
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractWebTxnProcessor {
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractWebTxnProcessor.class);
+public abstract class WebAbstractTxnProcessor {
+    protected static final Logger logger = LoggerFactory.getLogger(WebAbstractTxnProcessor.class);
 
     protected XSocketBlockClient socketBlockClient;
     protected String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");

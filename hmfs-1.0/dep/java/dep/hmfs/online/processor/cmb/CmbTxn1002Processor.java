@@ -28,9 +28,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class Txn1002Processor extends AbstractTxnProcessor {
+public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(Txn1002Processor.class);
+    private static final Logger logger = LoggerFactory.getLogger(CmbTxn1002Processor.class);
 
     @Autowired
     private HisMsginLogService hisMsginLogService;

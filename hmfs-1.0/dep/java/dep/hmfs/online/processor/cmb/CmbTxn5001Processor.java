@@ -23,8 +23,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class Txn5001Processor extends AbstractTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(Txn5001Processor.class);
+public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(CmbTxn5001Processor.class);
 
     @Autowired
     private HisMsginLogService hisMsginLogService;

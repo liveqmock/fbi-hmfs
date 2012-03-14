@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class WebTxn1000Processor extends AbstractWebTxnProcessor {
+public class WebTxn1000Processor extends WebAbstractTxnProcessor {
 
     @Resource
     private HmbCmnTxnService appBaseService;

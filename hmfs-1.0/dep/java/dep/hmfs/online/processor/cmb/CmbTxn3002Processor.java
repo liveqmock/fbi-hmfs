@@ -24,7 +24,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class Txn3002Processor extends AbstractTxnProcessor {
+public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
 
     @Autowired
     private HisMsginLogService hisMsginLogService;

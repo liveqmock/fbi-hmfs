@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class AsynTxnProcessor extends AbstractHmbTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(AsynTxnProcessor.class);
+public class HmbAsynTxnProcessor extends HmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(HmbAsynTxnProcessor.class);
     @Autowired
     private HmbMessageFactory mf;
     @Autowired

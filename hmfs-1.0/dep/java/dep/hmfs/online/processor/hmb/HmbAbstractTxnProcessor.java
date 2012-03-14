@@ -11,6 +11,6 @@ import java.util.List;
  * Time: обнГ7:23
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractHmbTxnProcessor {
+public abstract class HmbAbstractTxnProcessor {
     public abstract byte[] process(String txnCode, List<HmbMsg> hmbMsgList);
 }

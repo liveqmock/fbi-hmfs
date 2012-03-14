@@ -1,7 +1,7 @@
 package dep.gateway.service;
 
 import dep.ContainerManager;
-import dep.hmfs.online.processor.web.AbstractWebTxnProcessor;
+import dep.hmfs.online.processor.web.WebAbstractTxnProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,8 @@ public class WebMsgHandleService implements IMessageHandler {
             String request = new String(bytes);
             String[] fields = request.split("\\|");
             txnCode = fields[0];
-            AbstractWebTxnProcessor txnProcessor = (AbstractWebTxnProcessor) ContainerManager.getBean("webTxn" + txnCode + "Processor");
-            response = txnProcessor.process(request);
+            WebAbstractTxnProcessor abstractTxnProcessor = (WebAbstractTxnProcessor) ContainerManager.getBean("webTxn" + txnCode + "Processor");
+            response = abstractTxnProcessor.process(request);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             response = "9999|交易处理发生异常！" + e.getMessage();
