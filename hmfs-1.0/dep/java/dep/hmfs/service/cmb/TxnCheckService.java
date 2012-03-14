@@ -1,4 +1,4 @@
-package dep.hmfs.service;
+package dep.hmfs.service.cmb;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;

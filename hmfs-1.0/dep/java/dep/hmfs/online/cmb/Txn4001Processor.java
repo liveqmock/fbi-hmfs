@@ -2,7 +2,7 @@ package dep.hmfs.online.cmb;
 
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA4001;
-import dep.hmfs.service.TxnVouchLogService;
+import dep.hmfs.service.cmb.TxnVouchLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

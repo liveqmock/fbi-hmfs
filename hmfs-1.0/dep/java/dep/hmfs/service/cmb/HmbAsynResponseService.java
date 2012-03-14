@@ -1,4 +1,4 @@
-package dep.hmfs.service;
+package dep.hmfs.service.cmb;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
@@ -54,7 +54,6 @@ public class HmbAsynResponseService {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(totalHmbMsg);
         for (HisMsginLog msginLog : msginLogList) {
-
             HmbMsg detailMsg = (HmbMsg) Class.forName(HmbMsg.class.getPackage().getName()
                     + ".Msg" + msginLog.getMsgType().substring(2)).newInstance();
             BeanUtils.copyProperties(detailMsg, msginLog);

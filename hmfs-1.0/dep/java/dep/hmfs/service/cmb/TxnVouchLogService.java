@@ -1,4 +1,4 @@
-package dep.hmfs.service;
+package dep.hmfs.service.cmb;
 
 import common.repository.hmfs.dao.TxnVouchLogMapper;
 import common.repository.hmfs.model.TxnVouchLog;
