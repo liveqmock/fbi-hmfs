@@ -17,14 +17,18 @@ import java.util.List;
  */
 @Service
 public class HmActinfoFundService {
-    
+
     @Autowired
     private HmActinfoFundMapper hmActinfoFundMapper;
-    
+
     public HmActinfoFund qryHmActinfoFundByFundActNo(String fundActNo) {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActNo);
         List<HmActinfoFund> actinfoFundList = hmActinfoFundMapper.selectByExample(example);
-        return actinfoFundList.size() > 0 ? actinfoFundList.get(0) : null;
+        if (actinfoFundList.size() != 1) {
+            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！");
+        } else {
+            return actinfoFundList.get(0);
+        }
     }
 }

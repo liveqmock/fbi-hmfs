@@ -4,9 +4,11 @@ import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
+import common.service.HmActinfoFundService;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg032;
+import dep.hmfs.online.processor.hmb.domain.Msg033;
 import dep.hmfs.online.processor.hmb.domain.Msg034;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,10 @@ public class HmbDetailMsgService extends HmbBaseService {
     private HmActinfoCbsMapper hmActinfoCbsMapper;
     @Autowired
     private HmActinfoFundMapper hmActinfoFundMapper;
+    @Autowired
+    private HmActinfoFundService hmActinfoFundService;
 
-    public int createFundActByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    public int createActinfosByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01032".equals(hmbMsg.getMsgType())) {
                 Msg032 msg032 = (Msg032) hmbMsg;
@@ -47,23 +51,43 @@ public class HmbDetailMsgService extends HmbBaseService {
                 actinfoCbs.setRecversion(0);
 
                 hmActinfoCbsMapper.insert(actinfoCbs);
+            } else if ("01033".equals(hmbMsg.getMsgType())) {
+                Msg033 msg033 = (Msg033) hmbMsg;
+                createActinfoFundByHmbMsg(msg033);
             } else if ("01034".equals(hmbMsg.getMsgType())) {
                 Msg034 msg034 = (Msg034) hmbMsg;
-
-                HmActinfoFund actinfoFund = new HmActinfoFund();
-                actinfoFund.setPkid(UUID.randomUUID().toString());
-                BeanUtils.copyProperties(actinfoFund, msg034);
-                actinfoFund.setActSts("0");
-                actinfoFund.setActBal(new BigDecimal(0));
-                actinfoFund.setIntcPdt(new BigDecimal(0));
-                actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-                actinfoFund.setRecversion(0);
-
-                hmActinfoFundMapper.insert(actinfoFund);
+                createActinfoFundByHmbMsg(msg034);
             } else {
                 throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
             }
         }
         return hmbMsgList.size();
+    }
+
+    public int updateActinfosByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+        for (HmbMsg hmbMsg : hmbMsgList) {
+            if ("01033".equals(hmbMsg.getMsgType())) {
+                Msg033 msg033 = (Msg033) hmbMsg;
+                HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msg033.fundActno1);
+                BeanUtils.copyProperties(hmActinfoFund, msg033);
+                hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+            } else {
+                throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
+            }
+        }
+        return hmbMsgList.size();
+    }
+
+    private void createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
+        HmActinfoFund actinfoFund = new HmActinfoFund();
+        actinfoFund.setPkid(UUID.randomUUID().toString());
+        BeanUtils.copyProperties(actinfoFund, hmbMsg);
+        actinfoFund.setActSts("0");
+        actinfoFund.setActBal(new BigDecimal(0));
+        actinfoFund.setIntcPdt(new BigDecimal(0));
+        actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        actinfoFund.setRecversion(0);
+
+        hmActinfoFundMapper.insert(actinfoFund);
     }
 }
