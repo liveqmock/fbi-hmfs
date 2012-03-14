@@ -8,7 +8,7 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
 import dep.hmfs.online.service.cmb.CmbBookkeepingService;
-import dep.hmfs.online.service.hmb.HmbAsynResponseService;
+import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
-    private HmbAsynResponseService hmbAsynResponseService;
+    private HmbClientReqService hmbClientReqService;
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
@@ -86,7 +86,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         // 查询所有子报文
         String[] payMsgTypes = {"01033", "01035", "01045"};
         List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
-        if (hmbAsynResponseService.communicateWithHmb(txnCode, hmbAsynResponseService.createMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
+        if (hmbClientReqService.communicateWithHmb(txnCode, hmbClientReqService.createMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
             TOA1002 toa1002 = new TOA1002();
             toa1002.body.payApplyNo = tia1002.body.payApplyNo;
             if (payInfoList.size() > 0) {

@@ -1,6 +1,5 @@
 package dep.hmfs.online.processor.hmb;
 
-import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
 import dep.util.PropertyManager;
@@ -8,15 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class HmbAsynTxnProcessor extends HmbAbstractTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(HmbAsynTxnProcessor.class);
-    @Resource
-    HmbTxnsnGenerator txnsnGenerator;
+public class HmbDirectResTxnProcessor extends HmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(HmbDirectResTxnProcessor.class);
 
     @Override
     public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
@@ -27,7 +23,7 @@ public class HmbAsynTxnProcessor extends HmbAbstractTxnProcessor {
         msg100.rtnInfoCode = "00";
         msg100.rtnInfoCode = "报文接收成功";
         try {
-            insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbClientReqService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";

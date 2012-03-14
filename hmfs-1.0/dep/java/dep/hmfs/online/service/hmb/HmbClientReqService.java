@@ -4,6 +4,7 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HisMsgoutLog;
 import common.service.SystemService;
+import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
 import dep.hmfs.online.processor.hmb.domain.Msg008;
@@ -12,6 +13,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -23,7 +25,10 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class HmbAsynResponseService extends AbstractHmbService {
+public class HmbClientReqService extends AbstractHmbService {
+
+    @Resource
+    HmbTxnsnGenerator txnsnGenerator;
 
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HisMsginLog> msginLogList) throws Exception {

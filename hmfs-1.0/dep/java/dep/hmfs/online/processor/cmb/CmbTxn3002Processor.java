@@ -7,7 +7,7 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
 import dep.hmfs.online.service.cmb.CmbBookkeepingService;
-import dep.hmfs.online.service.hmb.HmbAsynResponseService;
+import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
-    private HmbAsynResponseService hmbAsynResponseService;
+    private HmbClientReqService hmbClientReqService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
@@ -72,8 +72,8 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         // 5230 退款子报文序号
         String[] payMsgTypes = {"01039", "01043", "01033", "01051"};
         List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
-        if (hmbAsynResponseService.communicateWithHmb(totalMsginLog.getTxnCode(),
-                hmbAsynResponseService.createMsg006ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
+        if (hmbClientReqService.communicateWithHmb(totalMsginLog.getTxnCode(),
+                hmbClientReqService.createMsg006ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;
         } else {
             throw new RuntimeException("【3002发送报文至房管局交易失败！】");
