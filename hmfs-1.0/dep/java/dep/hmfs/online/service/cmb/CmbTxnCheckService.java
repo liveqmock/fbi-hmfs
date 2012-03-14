@@ -15,7 +15,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class TxnCheckService {
+public class CmbTxnCheckService {
 
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HisMsginLog totalInfo, List<HisMsginLog> detailInfoList, BigDecimal txnTotalAmt) {

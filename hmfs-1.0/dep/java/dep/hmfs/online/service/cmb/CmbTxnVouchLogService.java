@@ -17,7 +17,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class TxnVouchLogService {
+public class CmbTxnVouchLogService {
 
     @Autowired
     private TxnVouchLogMapper txnVouchLogMapper;

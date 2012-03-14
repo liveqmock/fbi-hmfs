@@ -27,7 +27,7 @@ import java.util.UUID;
  */
 // º«’À“µŒÒ
 @Service
-public class BookkeepingService {
+public class CmbBookkeepingService {
 
     @Autowired
     private HmActinfoCbsMapper hmActinfoCbsMapper;

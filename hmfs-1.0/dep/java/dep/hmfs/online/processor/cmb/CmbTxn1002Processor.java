@@ -7,9 +7,9 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
-import dep.hmfs.online.service.cmb.BookkeepingService;
+import dep.hmfs.online.service.cmb.CmbBookkeepingService;
 import dep.hmfs.online.service.hmb.HmbAsynResponseService;
-import dep.hmfs.online.service.cmb.TxnCheckService;
+import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,9 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HisMsginLogService hisMsginLogService;
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private CmbBookkeepingService cmbBookkeepingService;
     @Autowired
-    private TxnCheckService txnCheckService;
+    private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
     private HmbAsynResponseService hmbAsynResponseService;
 
@@ -55,7 +55,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         // 查询交易子报文记录
         List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (txnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
+        if (cmbTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
             return handlePayTxnAndsendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
         } else {
@@ -71,10 +71,10 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     private TOA1002 handlePayTxnAndsendToHmb(String cbsSerialNo, HisMsginLog totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws Exception, IOException {
 
         // 会计账号记账
-        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode());
+        cmbBookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode());
 
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode());
+        cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode());
 
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.TXN_SUCCESS);
 

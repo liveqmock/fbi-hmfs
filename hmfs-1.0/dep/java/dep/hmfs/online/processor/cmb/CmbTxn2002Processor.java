@@ -6,9 +6,9 @@ import common.repository.hmfs.model.HisMsginLog;
 import common.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA2002;
-import dep.hmfs.online.service.cmb.BookkeepingService;
+import dep.hmfs.online.service.cmb.CmbBookkeepingService;
 import dep.hmfs.online.service.hmb.HmbAsynResponseService;
-import dep.hmfs.online.service.cmb.TxnCheckService;
+import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +29,9 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HisMsginLogService hisMsginLogService;
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private CmbBookkeepingService cmbBookkeepingService;
     @Autowired
-    private TxnCheckService txnCheckService;
+    private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
     private HmbAsynResponseService hmbAsynResponseService;
 
@@ -48,7 +48,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
         // 查询交易子报文记录
         List<HisMsginLog> drawInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(tia2002.body.drawApplyNo, drawSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (txnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
+        if (cmbTxnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
             // 支取交易。
             return handleDrawTxn(txnSerialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
         } else {
@@ -64,10 +64,10 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
     private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
 
         // 会计账号记账
-        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia2002.body.drawAmt), DCFlagCode.TXN_OUT.getCode());
+        cmbBookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia2002.body.drawAmt), DCFlagCode.TXN_OUT.getCode());
 
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
+        cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
 
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", subMsgTypes, TxnCtlSts.TXN_SUCCESS);
 

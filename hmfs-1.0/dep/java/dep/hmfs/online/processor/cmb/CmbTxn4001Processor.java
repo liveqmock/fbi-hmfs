@@ -2,7 +2,7 @@ package dep.hmfs.online.processor.cmb;
 
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA4001;
-import dep.hmfs.online.service.cmb.TxnVouchLogService;
+import dep.hmfs.online.service.cmb.CmbTxnVouchLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
 
     @Autowired
-    private TxnVouchLogService txnVouchLogService;
+    private CmbTxnVouchLogService cmbTxnVouchLogService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
@@ -41,7 +41,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
          */
         long startNo = Long.parseLong(tia4001.body.billStartNo);
         long endNo = Long.parseLong(tia4001.body.billEndNo);
-        txnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
+        cmbTxnVouchLogService.insertVouchsByNo(startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
         return null;
     }
 }
