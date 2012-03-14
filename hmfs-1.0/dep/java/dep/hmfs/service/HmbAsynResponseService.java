@@ -28,7 +28,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class AsynTxnResponseService {
+public class HmbAsynResponseService {
 
     private XSocketBlockClient socketBlockClient;
     private String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");

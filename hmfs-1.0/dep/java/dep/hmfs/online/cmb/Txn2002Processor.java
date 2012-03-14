@@ -7,7 +7,7 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.cmb.domain.base.TOA;
 import dep.hmfs.online.cmb.domain.txn.TIA2002;
 import dep.hmfs.service.BookkeepingService;
-import dep.hmfs.service.AsynTxnResponseService;
+import dep.hmfs.service.HmbAsynResponseService;
 import dep.hmfs.service.TxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class Txn2002Processor extends AbstractTxnProcessor {
     @Autowired
     private TxnCheckService txnCheckService;
     @Autowired
-    private AsynTxnResponseService asynTxnResponseService;
+    private HmbAsynResponseService hmbAsynResponseService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
@@ -73,8 +73,8 @@ public class Txn2002Processor extends AbstractTxnProcessor {
 
         String[] payMsgTypes = {"01042"};
         List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
-        if (asynTxnResponseService.communicateWithHmb(totalMsginLog.getTxnCode(),
-                asynTxnResponseService.createMsg008ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
+        if (hmbAsynResponseService.communicateWithHmb(totalMsginLog.getTxnCode(),
+                hmbAsynResponseService.createMsg008ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;
         } else {
             throw new RuntimeException("2002发送报文至房管局交易失败！");
