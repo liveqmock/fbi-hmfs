@@ -92,6 +92,7 @@ public class AppBaseService {
         List<HmbMsg> msgList = responseMap.get(txnCode);
         if (msgList == null || msgList.size() == 0) {
             //
+            throw new RuntimeException("接收国土局报文出错，报文为空");
         }
 
         Msg002 msg002 = (Msg002) msgList.get(0);
