@@ -33,7 +33,7 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
         }else if ("chkdetl".equalsIgnoreCase(actionCode)) {
             return doChkdetl();
         }else if ("openact".equalsIgnoreCase(actionCode)) {
-            return doOpenact();
+            return doOpenact(request);
         }else{
             return "9999|动作码错误！";
         }
@@ -56,8 +56,8 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
         hmbCmnTxnService.processChkActDetl();
         return "0000"; //成功
     }
-    private String doOpenact() {
-        hmbCmnTxnService.processOpenact();
+    private String doOpenact(String request) {
+        hmbCmnTxnService.processOpenactRequest(request);
         return "0000"; //成功
     }
 }

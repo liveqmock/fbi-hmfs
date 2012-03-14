@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 /**
@@ -24,7 +25,7 @@ import java.text.SimpleDateFormat;
  */
 @ManagedBean
 @ViewScoped
-public class OpenActInfoAction {
+public class OpenActInfoAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(OpenActInfoAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
- public class HmbBaseService {
+public class HmbBaseService {
     private static final Logger logger = LoggerFactory.getLogger(HmbBaseService.class);
 
     @Resource
@@ -62,11 +63,17 @@ import java.util.UUID;
         return hmSctMapper.selectByPrimaryKey("1");
     }
 
-    protected void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isSync) {
+    /**
+     * @param txnCode
+     * @param msg
+     * @param submsgNum
+     * @param isInitStart 是否是交易的第一个发起方
+     */
+    protected void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
         msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
-        if (isSync) {
+        if (isInitStart) {
             msg.origSysId = ORIG_SYS_ID;
         } else {
             msg.origSysId = "00";
@@ -75,15 +82,21 @@ import java.util.UUID;
         msg.msgEndDate = "#";
     }
 
-    protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) throws Exception {
+    protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
         byte[] hmfsDatagram;
         try {
             socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
             hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
+            return messageFactory.unmarshal(hmfsDatagram);
+        } catch (Exception e) {
+            throw new RuntimeException("通讯或解包错误.", e);
         } finally {
-            socketBlockClient.close();
+            try {
+                socketBlockClient.close();
+            } catch (IOException e) {
+                //
+            }
         }
-        return messageFactory.unmarshal(hmfsDatagram);
     }
 
     public int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {

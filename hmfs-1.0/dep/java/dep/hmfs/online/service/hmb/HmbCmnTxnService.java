@@ -2,10 +2,7 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.HmSct;
-import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.Msg001;
-import dep.hmfs.online.processor.hmb.domain.Msg002;
-import dep.hmfs.online.processor.hmb.domain.Msg096;
+import dep.hmfs.online.processor.hmb.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,8 +52,8 @@ public class HmbCmnTxnService extends HmbBaseService {
         Msg001 msg001 = new Msg001();
         assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//单笔批量？
-        msg001.bizType = "#"; //????
-        msg001.origTxnCode = "7000"; //TODO ????
+        msg001.bizType = "3"; //????
+        msg001.origTxnCode = "#"; //TODO ????
 
         Msg096 msg096 = new Msg096();
         msg096.actionCode = "301"; //301:签到
@@ -169,13 +166,48 @@ public class HmbCmnTxnService extends HmbBaseService {
         return result;
     }
     @Transactional
-    public boolean processOpenact() {
-        //depService.doSend
+    public void processOpenactRequest(String request) {
+        String txnCode = "5110";
+        Msg003 msg003 = new Msg003();
+        assembleSummaryMsg(txnCode, msg003, 1, true);
 
-        //db
+        msg003.txnType = "1";//单笔批量？
+        msg003.bizType = "1"; //
+        msg003.origTxnCode = "9110";
 
-        //check db
+        String[] fields = request.split("\\|");
 
-        return true;
+        Msg031 msg031 = new Msg031();
+        msg031.actionCode = "100";
+        int f = 2;
+        msg031.cbsActno = fields[f++];
+        msg031.cbsActtype = fields[f++];
+        msg031.cbsActname  = fields[f++];
+        msg031.bankName  = fields[f++];
+        msg031.branchId  = fields[f++];
+        msg031.depositType  = fields[f++];
+        msg031.orgId   = fields[f++];
+        msg031.orgType  = fields[f++];
+        msg031.orgName   = fields[f];
+
+        List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
+        hmbMsgList.add(msg003);
+        hmbMsgList.add(msg031);
+        byte[] txnBuf = messageFactory.marshal(txnCode, hmbMsgList);
+        //发送报文
+        Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(txnBuf);
+        List<HmbMsg> msgList = responseMap.get("9999");
+        if (msgList == null || msgList.size() == 0) {
+            throw new RuntimeException("接收国土局报文出错，报文为空");
+        }
+
+        Msg100 msg100 = (Msg100) msgList.get(0);
+        if (!msg100.rtnInfoCode.equals("00")) {
+            throw new RuntimeException("国土局返回错误信息：" + msg100.rtnInfo);
+        }
+    }
+
+    private void processOpenactRequest(){
+
     }
 }
