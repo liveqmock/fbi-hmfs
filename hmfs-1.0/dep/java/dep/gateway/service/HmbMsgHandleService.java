@@ -30,10 +30,10 @@ public class HmbMsgHandleService implements IMessageHandler {
     private HmbMessageFactory mf;
 
     // 接收后返回9999报文
-    private static final String[] ASYN_RES_TXNCODES = {"5150", "5210", "5230", "5310"};
+    private static final String[] ASYN_RES_TXNCODES = {"5210", "5230", "5310"};
     // 需同步处理
-    private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5160", "5610",
-            "6110", "6210", "6220", "7002"};
+    private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5150",
+                                                      "5160", "6110", "6210", "6220", "7002"};
 
     @Override
     public byte[] handleMessage(byte[] bytes) {
