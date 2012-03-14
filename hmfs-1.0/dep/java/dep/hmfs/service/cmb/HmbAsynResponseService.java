@@ -42,7 +42,7 @@ public class HmbAsynResponseService {
 
     public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) throws Exception {
         socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
-        byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcv(bytes, 7);
+        byte[] hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
         return mf.unmarshal(hmfsDatagram);
     }
 

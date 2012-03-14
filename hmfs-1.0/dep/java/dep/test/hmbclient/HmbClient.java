@@ -46,7 +46,7 @@ public class HmbClient {
 //        client.testMarshal();
 //        client.testUnmarshal();
 
-//        client.processMsgIn("5140");
+        client.processMsgIn("5140");
 //        client.processMsgIn("5210");
 //        client.processMsgIn("5230");
 //        client.processMsgIn("5610");
@@ -54,13 +54,13 @@ public class HmbClient {
 //        client.processMsgIn("7001");
 //        client.processMsgIn("7003");
 
-        client.processMsgOut("5140");
-        client.processMsgOut("5210");
-        client.processMsgOut("5230");
-        client.processMsgOut("5610");
-        client.processMsgOut("7000");
-        client.processMsgOut("7001");
-        client.processMsgOut("7003");
+//        client.processMsgOut("5140");
+//        client.processMsgOut("5210");
+//        client.processMsgOut("5230");
+//        client.processMsgOut("5610");
+//        client.processMsgOut("7000");
+//        client.processMsgOut("7001");
+//        client.processMsgOut("7003");
     }
 
     private void testMarshal() throws IOException {

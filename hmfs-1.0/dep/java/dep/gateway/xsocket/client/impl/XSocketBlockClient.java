@@ -51,14 +51,29 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         return datagram;
     }
 
-    public byte[] sendDataUntilRcv(byte[] dataBytes, int headLength) throws Exception {
-
+    /**
+     * 国土局客户端
+     */
+    public byte[] sendDataUntilRcvToHmb(byte[] dataBytes) throws Exception {
             logger.info("【本地客户端】发送报文：" + new String(dataBytes));
             byte[] datagramBytes = null;
             if (sendData(dataBytes)) {
-                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(headLength).trim());
+                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(7).trim());
                 logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
-                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength - headLength);
+                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength + 4);
+            }
+            logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
+            logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
+            return datagramBytes;
+        }
+
+    public byte[] sendDataUntilRcvToDep(byte[] dataBytes) throws Exception {
+            logger.info("【本地客户端】发送报文：" + new String(dataBytes));
+            byte[] datagramBytes = null;
+            if (sendData(dataBytes)) {
+                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(6).trim());
+                logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
+                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength - 6);
             }
             logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
             logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
