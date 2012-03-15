@@ -64,30 +64,6 @@ public class WebTxn7004Processor extends WebAbstractTxnProcessor{
         hmbMsgList.add(msg001);
 
         //子报文处理  095-核算户 092-结算户
-/*
-        List<TxnFundLog> txnFundLogList = hmbCmnTxnService.selectFundActinfo();
-        for (HmActinfoFund hmActinfoFund : txnFundLogList) {
-            Msg098 msg098 = new Msg098();
-            msg098.actionCode = "304"; //304:日终对账
-            msg098.infoId1 = hmActinfoFund.getInfoId1();
-            msg098.infoIdType1 = hmActinfoFund.getInfoIdType1();
-            msg098.cellNum = Integer.parseInt(hmActinfoFund.getCellNum());
-            msg098.builderArea = new BigDecimal(hmActinfoFund.getBuilderArea());
-            msg098.fundActno1 = hmActinfoFund.getFundActno1();
-            msg098.fundActtype1 = hmActinfoFund.getFundActtype1();
-            hmbMsgList.add(msg098);
-        }
-        List<HmActinfoCbs> actinfoCbsList = hmbCmnTxnService.selectCbsActinfo();
-        for (HmActinfoCbs hmActinfoCbs : actinfoCbsList) {
-            Msg094 msg094 = new Msg094();
-            msg094.actionCode = "304"; //304:日终对账
-            msg094.orgId = hmActinfoCbs.getOrgId();
-            msg094.orgType = hmActinfoCbs.getOrgType();
-            msg094.settleActno1 = hmActinfoCbs.getSettleActno1();
-            msg094.settleActtype1 = hmActinfoCbs.getSettleActtype1();
-            hmbMsgList.add(msg094);
-        }
-*/
         return  messageFactory.marshal(txnCode, hmbMsgList);
     }
 }
