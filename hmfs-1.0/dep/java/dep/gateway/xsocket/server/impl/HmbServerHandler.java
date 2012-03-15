@@ -119,6 +119,7 @@ class HmbContentHandler extends ContentHandler {
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
             nbc.write(resBytesMsg);
             nbc.flush();
+            byteArrayOutStream.reset();
         }
         return true;
     }

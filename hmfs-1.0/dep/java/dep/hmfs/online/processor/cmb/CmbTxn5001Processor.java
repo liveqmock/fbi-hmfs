@@ -6,6 +6,7 @@ import common.service.HmActinfoCbsService;
 import common.service.TxnCbsLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
+import dep.hmfs.online.processor.web.WebTxn7003Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     private HmActinfoCbsService hmActinfoCbsService;
     @Autowired
     private TxnCbsLogService txnCbsLogService;
+    @Autowired
+    private WebTxn7003Processor webTxn7003Processor;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
@@ -52,11 +55,6 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
         } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActinfoCbs.getActBal()) != 0) {
             throw new RuntimeException("账户余额不一致！");
         } else {
-            // TODO 发起国土局余额对账交易
-            // 清余额对账表，明细对账表
-            // TODO 新增-会计账号余额信息  -- 余额对账表
-
-            // TODO 新增-会计账号明细    ---  明细对账表
             // 获取明细，开始主机对账
             if (bytes.length > 54) {
                 byte[] detailBytes = new byte[bytes.length - 54];
@@ -88,7 +86,9 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     index++;
                 }
                 // 至此，本地对账结束
-                // TODO 发起国土局明细对账
+                // 发起国土局余额对账
+                webTxn7003Processor.process(null);
+                // TODO 发起国土局明细对账【暂无此交易】
             }
         }
 

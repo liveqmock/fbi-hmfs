@@ -113,13 +113,13 @@ class CmbContentHandler extends ContentHandler {
             //nbc.setAttachment(null);
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
-            byteArrayOutStream.close();
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = cmbMsgHandleService.handleMessage(bytesDatagram);
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
             logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
             nbc.write(resBytesMsg);
             nbc.flush();
+            byteArrayOutStream.reset();
         }
         return false;
     }

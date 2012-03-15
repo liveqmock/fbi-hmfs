@@ -77,26 +77,25 @@ public class HmbClientReqService extends HmbBaseService {
             for (long i = startNo; i <= endNo; i++) {
                 HisMsginLog msginLog = payInfoList.get((int)(i - startNo));
                 HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
-                
+
                 Msg037 msg037 = new Msg037();
                 BeanUtils.copyProperties(msg037, actinfoFund);
 
                 msg037.actionCode = "141";
-                msg037.receiptNo = String.valueOf(i);
                 msg037.txnAmt1 = msginLog.getTxnAmt1();
+                msg037.receiptNo = String.valueOf(i);
                 msg037.payinActno = actinfoFund.getCbsActno();
                 msg037.voucherType = actinfoFund.getHouseDepType();
+
                 // TODO
                 //59:单位ID
                 //60:单位类型
                 //61:单位名称
                 //77:收据编号
-                //78:交存标准
                 //79:交存类型
                 //80:交存人
                 //81:户卡号
                 //82:购房合同号
-                //90:票据类型
 
                 msg037.linkMsgSn = msgSn;
                 hmbMsgList.add(msg037);

@@ -10,8 +10,8 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
 import dep.hmfs.online.service.cmb.CmbBookkeepingService;
-import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.cmb.CmbTxnCheckService;
+import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,14 +96,17 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
             if (payInfoList.size() > 0) {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HisMsginLog hisMsginLog : payInfoList) {
+                    HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    record.accountName = hisMsginLog.getInfoName();
+                    record.accountName = hisMsginLog.getInfoName();   //21
                     record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
-                    record.address = hisMsginLog.getInfoAddr();
+                    record.address = hisMsginLog.getInfoAddr();    //22
+                    // 24
                     record.houseArea = hisMsginLog.getBuilderArea() == null ? "" : String.format("%.2f", hisMsginLog.getBuilderArea());
-                    record.houseType = hisMsginLog.getHouseDepType();
-                    record.phoneNo = hisMsginLog.getHouseCustPhone();
-                    String field83 = hisMsginLog.getDepStandard2();
+
+                    record.houseType = actinfoFund.getHouseDepType();
+                    record.phoneNo = actinfoFund.getHouseCustPhone();
+                    String field83 = actinfoFund.getDepStandard2();
                     if (field83 == null) {
                         record.projAmt = "";
                         record.payPart = "";

@@ -50,9 +50,9 @@
     </bean>
 
     <bean id="webSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
-            <property name="port" value="61602"/>
-            <property name="serverHandler" ref="webServerHandler"/>
-        </bean>
+        <property name="port" value="61602"/>
+        <property name="serverHandler" ref="webServerHandler"/>
+    </bean>
 
     <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
