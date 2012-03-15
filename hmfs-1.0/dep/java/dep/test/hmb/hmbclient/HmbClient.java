@@ -17,8 +17,8 @@ public class HmbClient implements Runnable {
     private boolean done = false;
 
     //private ApplicationContext context;
-    protected  static String SEND_SYS_ID =  PropertyManager.getProperty("SEND_SYS_ID");
-    protected  static String ORIG_SYS_ID =  PropertyManager.getProperty("ORIG_SYS_ID");
+    protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
+    protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
     private static ClassPathXmlApplicationContext context;
 
 
@@ -31,7 +31,7 @@ public class HmbClient implements Runnable {
         try {
             while (sock != null && sock.isConnected()) {
                 if (sock.getInputStream().read(lenbuf) == 7) {
-                    int size = new Integer(new String(lenbuf));
+                    int size = new Integer(new String(lenbuf)) + 4;
                     byte[] buf = new byte[size];
                     sock.getInputStream().read(buf);
                     log.info("HMB Client 接收响应:" + new String(buf));
@@ -72,11 +72,19 @@ public class HmbClient implements Runnable {
 
         //byte[] txnbuf = "00005495140FE1D8080000000000000000000000001500003181202290009995140001220020014201203092111271#1113491010629869423001381019F9E04000001021461083DC0000150103331050629869423009102000999011裕环路195号017市北区裕环路195号0110574.7101312320000229226351101#1#15100000000000006010030青岛市棚户区改造开发建设指挥部100010010001001010101010101001001081019F9E04000001021461083DC0000050103331050629872726021102000999XXX001001010001#025市北区裕环路195号1单元1010110574.710131232000022925935701232000022922635111510000000000000601#001#11001001#0030|001#10113XXX1131011#01#010".getBytes();
         //byte[] txnbuf = ((HmbClientService)context.getBean("hmbClientService")).getTxnbuf_5210();
-        byte[] txnbuf = ((HmbClientService)context.getBean("hmbClientService")).getTxnbuf("5110", "120314000101511000");
+
+        //5110
+//        byte[] txnbuf = ((HmbClientService)context.getBean("hmbClientService")).getTxnbuf("5110", "120314000101511000");
+
+        //5210  1+1
+//        byte[] txnbuf = ((HmbClientService) context.getBean("hmbClientService")).getTxnbuf("5210", "120314000002521000");
+
+        //5210 1+7200
+        byte[] txnbuf = ((HmbClientService) context.getBean("hmbClientService")).getTxnbuf("5210", "120314000001521000");
 
         String txnmsg = new String(txnbuf);
         log.info("TXN MSG:" + txnmsg);
-        
+
         sock.getOutputStream().write(txnbuf);
         log.debug("等待响应中...");
 
