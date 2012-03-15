@@ -3,8 +3,6 @@ package dep.hmfs.online.processor.hmb.domain;
 import dep.hmfs.common.annotation.Hmb8583Field;
 import dep.hmfs.common.annotation.HmbMessage;
 
-import java.math.BigDecimal;
-
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -44,11 +42,11 @@ public class Msg028 extends SubMsg{
 
     //F23：分户数
     @Hmb8583Field(23)
-    public int cellNum;
+    public String cellNum;
 
     //F24：建筑面积
     @Hmb8583Field(24)
-    public BigDecimal builderArea;
+    public String builderArea;
 
     //F25：归属区县ID
     @Hmb8583Field(25)
@@ -114,19 +112,19 @@ public class Msg028 extends SubMsg{
         this.infoAddr = infoAddr;
     }
 
-    public int getCellNum() {
+    public String getCellNum() {
         return cellNum;
     }
 
-    public void setCellNum(int cellNum) {
+    public void setCellNum(String cellNum) {
         this.cellNum = cellNum;
     }
 
-    public BigDecimal getBuilderArea() {
+    public String getBuilderArea() {
         return builderArea;
     }
 
-    public void setBuilderArea(BigDecimal builderArea) {
+    public void setBuilderArea(String builderArea) {
         this.builderArea = builderArea;
     }
 

@@ -7,7 +7,6 @@ import dep.hmfs.online.service.hmb.HmbCmnTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +70,8 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
             msg098.actionCode = "304"; //304:хужу╤тук
             msg098.infoId1 = hmActinfoFund.getInfoId1();
             msg098.infoIdType1 = hmActinfoFund.getInfoIdType1();
-            msg098.cellNum = Integer.parseInt(hmActinfoFund.getCellNum());
-            msg098.builderArea = new BigDecimal(hmActinfoFund.getBuilderArea());
+            msg098.cellNum = hmActinfoFund.getCellNum();
+            msg098.builderArea = hmActinfoFund.getBuilderArea();
             msg098.fundActno1 = hmActinfoFund.getFundActno1();
             msg098.fundActtype1 = hmActinfoFund.getFundActtype1();
             hmbMsgList.add(msg098);

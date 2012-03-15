@@ -24,11 +24,11 @@ public class Msg098 extends SubMsg{
 
     //F23：分户数
     @Hmb8583Field(23)
-    public int cellNum;
+    public String cellNum;
 
     //F24：建筑面积
     @Hmb8583Field(24)
-    public BigDecimal builderArea;
+    public String builderArea;
 
     //F28：核算户账号1。
     @Hmb8583Field(28)
@@ -58,19 +58,19 @@ public class Msg098 extends SubMsg{
         this.infoIdType1 = infoIdType1;
     }
 
-    public int getCellNum() {
+    public String getCellNum() {
         return cellNum;
     }
 
-    public void setCellNum(int cellNum) {
+    public void setCellNum(String cellNum) {
         this.cellNum = cellNum;
     }
 
-    public BigDecimal getBuilderArea() {
+    public String getBuilderArea() {
         return builderArea;
     }
 
-    public void setBuilderArea(BigDecimal builderArea) {
+    public void setBuilderArea(String builderArea) {
         this.builderArea = builderArea;
     }
 

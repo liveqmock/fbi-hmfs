@@ -80,13 +80,10 @@
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 
--->
- <!--       <table schema="hmfs" tableName="tmp_msgin_log">
-            <property name="ignoreQualifiersAtRuntime" value="true" />
-        </table>-->
-        <table schema="hmfs" tableName="hm_actinfo_fund">
+        <table schema="hmfs" tableName="tmp_msgout_log">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
+-->
 
 
     </context>
