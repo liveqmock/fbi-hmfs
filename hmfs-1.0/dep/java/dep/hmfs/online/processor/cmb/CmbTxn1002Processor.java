@@ -97,16 +97,25 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HisMsginLog hisMsginLog : payInfoList) {
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    // TODO  待定字段：工程造价、缴款比例
                     HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
                     record.accountName = hisMsginLog.getInfoName();
                     record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
                     record.address = hisMsginLog.getInfoAddr();
                     record.houseArea = hisMsginLog.getBuilderArea() == null ? "" : String.format("%.2f", hisMsginLog.getBuilderArea());
-                    record.houseType = actinfoFund.getHouseDepType();
-                    record.phoneNo = actinfoFund.getHouseCustPhone();
-                    record.projAmt = "";   // String.format("%.2f", xxx);
-                    record.payPart = "";
+                    record.houseType = hisMsginLog.getHouseDepType();
+                    record.phoneNo = hisMsginLog.getHouseCustPhone();
+                    String field83 = hisMsginLog.getDepStandard2();
+                    if (field83 == null) {
+                        record.projAmt = "";
+                        record.payPart = "";
+                    } else if (field83.endsWith("|") || !field83.contains("|")) {
+                        record.projAmt = new StringBuilder(field83).deleteCharAt(field83.length() - 1).toString();
+                        record.payPart = "";
+                    } else {
+                        String[] fields83 = field83.split("\\|");
+                        record.projAmt = fields83[0];
+                        record.payPart = fields83[1];
+                    }
                     record.accountNo = hisMsginLog.getFundActno1();  // 业主核算户账号(维修资金账号)
                     toa1002.body.recordList.add(record);
                 }

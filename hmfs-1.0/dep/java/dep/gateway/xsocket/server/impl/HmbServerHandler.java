@@ -1,10 +1,9 @@
 package dep.gateway.xsocket.server.impl;
 
-import dep.gateway.xsocket.server.ContentHandler;
-import dep.gateway.xsocket.server.IServerHandler;
 import dep.gateway.service.HmbMsgHandleService;
 import dep.gateway.service.IMessageHandler;
-import org.apache.commons.lang.StringUtils;
+import dep.gateway.xsocket.server.ContentHandler;
+import dep.gateway.xsocket.server.IServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
