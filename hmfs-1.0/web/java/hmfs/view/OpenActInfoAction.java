@@ -126,4 +126,11 @@ public class OpenActInfoAction implements Serializable {
         this.msg031 = msg031;
     }
 
+    public ActInfoService getActInfoService() {
+        return actInfoService;
+    }
+
+    public void setActInfoService(ActInfoService actInfoService) {
+        this.actInfoService = actInfoService;
+    }
 }
