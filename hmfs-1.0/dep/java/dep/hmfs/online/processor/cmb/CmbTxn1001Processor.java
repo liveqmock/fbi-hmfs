@@ -6,6 +6,8 @@ import common.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1001;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1001;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,14 +21,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class CmbTxn1001Processor extends CmbAbstractTxnProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(CmbTxn1001Processor.class);
     @Autowired
     private HisMsginLogService hisMsginLogService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception{
+        logger.info("【报文正文长度】:" + bytes.length);
         TIA1001 tia1001 = new TIA1001();
         tia1001.body.payApplyNo = new String(bytes, 0, 18).trim();
-
+        logger.info("【申请单号】：" + tia1001.body.payApplyNo);
+        
         TOA1001 toa1001 = null;
         // 查询交款汇总信息
         HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia1001.body.payApplyNo, "00005");

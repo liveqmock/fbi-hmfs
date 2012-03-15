@@ -5,7 +5,6 @@ import dep.ContainerManager;
 import dep.hmfs.online.processor.cmb.CmbAbstractTxnProcessor;
 import dep.hmfs.online.processor.cmb.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
-import dep.hmfs.online.processor.cmb.domain.base.TOAHeader;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +33,10 @@ public class CmbMsgHandleService implements IMessageHandler {
     @Override
     public byte[] handleMessage(byte[] bytes) {
 
-        TOAHeader toaHeader = null;
         TOA toa = null;
         TIAHeader tiaHeader = new TIAHeader();
         tiaHeader.initFields(bytes);
-
+        logger.info("¡¾Á÷Ë®ºÅ¡¿£º" + tiaHeader.serialNo + " ¡¾´íÎóÂë¡¿£º" + tiaHeader.errorCode);
         byte[] datagramBytes = new byte[bytes.length - 24];
         System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
 

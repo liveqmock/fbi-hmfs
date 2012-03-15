@@ -66,7 +66,7 @@ public class HmbMsgHandleService implements IMessageHandler {
     // 【异步】保存到数据库
     public byte[] handleAsynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
         try {
-            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbAsynTxnProcessor");
+            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbRecvResTxnProcessor");
             if (hmbAbstractTxnProcessor != null) {
                 return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
             }
