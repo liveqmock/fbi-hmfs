@@ -4,6 +4,7 @@ import dep.gateway.hmb8583.util.HexCodec;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -28,7 +29,12 @@ public class IsoValue<T> implements Cloneable {
         this.value = value;
         if (type == IsoType.LVAR || type == IsoType.LLVAR || type == IsoType.LLLVAR) {
             if (custom == null) {
-                length = value.toString().length();
+                //length = value.toString().length();
+                try {
+                    length = value.toString().getBytes(encoding).length;
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException("±àÂë´íÎó.", e);
+                }
             } else {
                 String enc = custom.encodeField(value);
                 if (enc == null) {
