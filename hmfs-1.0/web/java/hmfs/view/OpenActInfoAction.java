@@ -65,8 +65,8 @@ public class OpenActInfoAction implements Serializable {
             try {
                 String response = depService.process("1000|openact|" + getMsg031Str());
                 String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //签到成功
-                     MessageUtil.addInfo("结算户开户处理成功......");
+                if ("0000".endsWith(fields[1])) { //成功
+                     MessageUtil.addInfo("结算户开户请求发送成功, 国土局已受理, 稍等请查询帐户信息...");
                 }else{
                     MessageUtil.addError("处理失败。" + response);
                 }
