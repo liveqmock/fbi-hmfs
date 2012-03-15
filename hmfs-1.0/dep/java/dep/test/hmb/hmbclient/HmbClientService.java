@@ -57,4 +57,31 @@ public class HmbClientService{
         }
     }
 
+    public byte[] getTxnbuf(String txnCode, String msgSn)  {
+        TmpMsginLogExample example =  new TmpMsginLogExample();
+        //example.or().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
+        //example.or().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo("01%");
+        example.createCriteria().andMsgSnEqualTo(msgSn);
+        example.setOrderByClause("msg_type, submsg_num");
+
+        List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
+        //int subMsgNum = msginLogList.size();
+        List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
+        try {
+            String pkgName = HmbMsg.class.getPackage().getName();
+            for (TmpMsginLog msginLog : msginLogList) {
+                String msgCode = msginLog.getMsgType().substring(2);
+                HmbMsg detailMsg = (HmbMsg) Class.forName(pkgName + ".Msg" + msgCode).newInstance();
+//                BeanUtils.copyProperties(detailMsg, msginLog);
+                PropertyUtils.copyProperties(detailMsg, msginLog);
+                hmbMsgList.add(detailMsg);
+            }
+            Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();
+            outMap.put(txnCode, hmbMsgList);
+            return  messageFactory.marshal(txnCode, hmbMsgList);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
