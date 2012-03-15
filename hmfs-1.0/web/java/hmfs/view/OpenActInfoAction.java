@@ -1,8 +1,10 @@
 package hmfs.view;
 
 import common.enums.SysCtlSts;
+import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmSct;
 import hmfs.common.model.Msg031;
+import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
 import hmfs.service.DepService;
 import org.slf4j.Logger;
@@ -35,17 +37,28 @@ public class OpenActInfoAction implements Serializable {
     private AppMngService appMngService;
     @ManagedProperty(value = "#{depService}")
     private DepService depService;
-
+    @ManagedProperty(value = "#{actInfoService}")
+    private ActInfoService actInfoService;
 
     @PostConstruct
     public void init() {
-
+          msg031.cbsActtype = "#";
+          msg031.depositType = "#";
+          msg031.bankName = "市南支行";
+          msg031.branchId = "6160001";
+          msg031.orgId = "ORGID0001001";
+          msg031.orgName = "单位名称";
+          msg031.orgType = "#";
     }
 
     public String onCommit() {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
+            HmActinfoCbs actinfoCbs =  actInfoService.selectCbsActnoRecord(msg031.cbsActno);
+            if ("1".endsWith(actinfoCbs.getActSts())) {
+                //TODO
+            }
             try {
                 String response = depService.process("1000|openact|" + getMsg031Str());
                 String[] fields = response.split("\\|");

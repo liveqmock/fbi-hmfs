@@ -70,15 +70,21 @@ public class ActInfoAction implements Serializable {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
         this.qryParam.setStartDate(date);
         this.qryParam.setEndDate(date);
+        this.qryParam.setActnoStatus(FundActnoStatus.NORMAL.getCode());
+
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
 
         this.cbsActno = actInfoService.selectCbsActno();
+        initList();
     }
 
     private void initList(){
-        //this.fundBalList = actInfoService.selectFundActInfo(qryParam);
+        this.fundBalList = actInfoService.selectAllFundActBal(qryParam);
+        this.fundDetlList = actInfoService.selectFundActDetl(qryParam);
+        this.cbsBalList = actInfoService.selectAllCbsActBal(qryParam);
+        this.cbsDetlList = actInfoService.selectCbsActDetl(qryParam);
     }
 
     public String onQueryFundBal() {

@@ -46,9 +46,20 @@ public class ActInfoService {
         example.createCriteria();
         return actinfoCbsMapper.selectByExample(example).get(0).getCbsActno();
     }
+    public HmActinfoCbs selectCbsActnoRecord(String actno) {
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria().andCbsActnoEqualTo(actno);
+        return actinfoCbsMapper.selectByExample(example).get(0);
+    }
 
 
-
+    //∫ÀÀ„ªß”‡∂Ó
+    public List<HmActinfoFund> selectAllFundActBal(ActinfoQryParam param) {
+        HmActinfoFundExample example = new HmActinfoFundExample();
+        example.createCriteria()
+                .andActStsEqualTo(param.getActnoStatus());
+        return actinfoFundMapper.selectByExample(example);
+    }
     public List<HmActinfoFund> selectFundActBal(ActinfoQryParam param) {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria()
@@ -57,6 +68,13 @@ public class ActInfoService {
         return actinfoFundMapper.selectByExample(example);
     }
 
+    //Ω·À„ªß”‡∂Ó
+    public List<HmActinfoCbs> selectAllCbsActBal(ActinfoQryParam param) {
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria()
+                .andActStsEqualTo(param.getActnoStatus());
+        return actinfoCbsMapper.selectByExample(example);
+    }
     public List<HmActinfoCbs> selectCbsActBal(ActinfoQryParam param) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
         example.createCriteria()
@@ -65,6 +83,7 @@ public class ActInfoService {
         return actinfoCbsMapper.selectByExample(example);
     }
 
+    //∫ÀÀ„ªß√˜œ∏
     public List<TxnFundLog> selectFundActDetl(ActinfoQryParam param) {
         TxnFundLogExample example = new TxnFundLogExample();
         example.createCriteria()
