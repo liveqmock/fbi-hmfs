@@ -76,8 +76,8 @@ public class HmbClientService{
                 PropertyUtils.copyProperties(detailMsg, msginLog);
                 hmbMsgList.add(detailMsg);
             }
-            Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();
-            outMap.put(txnCode, hmbMsgList);
+            //Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();
+            //outMap.put(txnCode, hmbMsgList);
             return  messageFactory.marshal(txnCode, hmbMsgList);
         } catch (Exception e) {
             throw new RuntimeException(e);

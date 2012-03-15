@@ -121,6 +121,10 @@ public class IsoMessage {
             }
         }
 
+        if (!this.isLastMsg) {
+            bs.set(127);
+        }
+
         //Write bitmap
         /*
         //二进制处理
@@ -156,7 +160,7 @@ public class IsoMessage {
         }
 
         //Fields
-        for (int i = 1; i < 129; i++) {
+        for (int i = 1; i < 128; i++) {
             IsoValue<?> v = fields[i];
             if (v != null) {
                 try {

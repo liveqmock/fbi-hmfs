@@ -34,6 +34,7 @@ public class HmbClient implements Runnable {
                     int size = new Integer(new String(lenbuf));
                     byte[] buf = new byte[size];
                     sock.getInputStream().read(buf);
+                    log.info("HMB Client Ω” ’œÏ”¶:" + new String(buf));
                 } else {
                     return;
                 }
