@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.SysCtlSts;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +52,9 @@ public class HmbBaseService {
     @Resource
     protected HmbTxnsnGenerator hmbTxnsnGenerator;
 
+    @Resource
+    protected HmbMessageFactory messageFactory;
+
     protected XSocketBlockClient socketBlockClient;
     protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
     protected static int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
@@ -57,10 +62,18 @@ public class HmbBaseService {
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
-    protected HmbMessageFactory messageFactory = new HmbMessageFactory();
 
     public HmSct getAppSysStatus() {
         return hmSctMapper.selectByPrimaryKey("1");
+    }
+
+    //TODO trans
+    public void  setAppSysStatus(SysCtlSts sysCtlSts){
+        HmSct hmSct = getAppSysStatus();
+        hmSct.setSysSts(sysCtlSts.getCode());
+
+        hmSct.setHostChkDt(new Date());
+        hmSctMapper.updateByPrimaryKey(hmSct);
     }
 
     /**
@@ -69,7 +82,7 @@ public class HmbBaseService {
      * @param submsgNum
      * @param isInitStart 是否是交易的第一个发起方
      */
-    protected void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
+    public void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
         msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
@@ -82,7 +95,7 @@ public class HmbBaseService {
         msg.msgEndDate = "#";
     }
 
-    protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
+    public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
         byte[] hmfsDatagram;
         try {
             socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);

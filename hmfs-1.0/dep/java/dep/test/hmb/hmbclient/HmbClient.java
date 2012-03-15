@@ -80,7 +80,9 @@ public class HmbClient implements Runnable {
 //        byte[] txnbuf = ((HmbClientService) context.getBean("hmbClientService")).getTxnbuf("5210", "120314000002521000");
 
         //5210 1+7200
-        byte[] txnbuf = ((HmbClientService) context.getBean("hmbClientService")).getTxnbuf("5210", "120314000001521000");
+//        byte[] txnbuf = ((HmbClientService) context.getBean("hmbClientService")).getTxnbuf("5210", "120314000001521000");
+
+        byte[] txnbuf = "00003245120FE1D8080000000000000000000000001500003181203150048295120001120020014201203150903201#11134212107139449423001281019F9E04000001021461083DC00000501033310507139449423009101004763014青岛测试项目11014青岛测试项目1101001001212320001325026351101#1#15100000000000003010028和记黄埔地产（青岛）有限公司1000100100010010101010101010010010".getBytes();
 
         String txnmsg = new String(txnbuf);
         log.info("TXN MSG:" + txnmsg);

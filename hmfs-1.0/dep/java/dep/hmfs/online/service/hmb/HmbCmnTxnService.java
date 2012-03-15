@@ -1,13 +1,16 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.dao.*;
+import common.repository.hmfs.model.*;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +26,21 @@ import java.util.Map;
 @Service
 public class HmbCmnTxnService extends HmbBaseService {
     private static final Logger logger = LoggerFactory.getLogger(HmbCmnTxnService.class);
+
+    @Resource
+    private HmActinfoFundMapper  hmActinfoFundMapper;
+
+    @Resource
+    private HmActinfoCbsMapper hmActinfoCbsMapper;
+
+    @Resource
+    private HmChkActMapper hmChkActMapper;
+    @Resource
+    private HmChkLogMapper hmChkLogMapper;
+    @Resource
+    private TxnFundLogMapper txnFundLogMapper;
+    @Resource
+    private TxnCbsLogMapper txnCbsLogMapper;
 
     /**
      * 向国土局签到
@@ -76,7 +94,9 @@ public class HmbCmnTxnService extends HmbBaseService {
         }
     }
 
-
+    /**
+     * 签退
+     */
     @Transactional
     public void processSignout() {
         //TODO
@@ -96,42 +116,13 @@ public class HmbCmnTxnService extends HmbBaseService {
             throw new RuntimeException("系统签到完成后方可签退。");
         }
     }
-    
-    
 
-    @Transactional
-    public boolean processChkActBal() {
-        //TODO
-        HmSct hmSct = getAppSysStatus();
-        if (!hmSct.getSysSts().equals(SysCtlSts.HOST_CHK_SUCCESS.getCode())) {
-            throw new RuntimeException("系统状态错误，主机对帐成功后方可进行国土局对帐操作。");
-        }
 
-        //depService.doSend
 
-        //db
-
-        //check db
-
-        boolean result = false;
-        //余额核对无误后，置系统状态
-        if (1 == 1) {
-            hmSct = getAppSysStatus();
-            SysCtlSts currentSysSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
-            if (currentSysSts.equals(SysCtlSts.HMB_DETLCHK_SUCCESS)) {
-                hmSct.setSysSts(SysCtlSts.HMB_CHK_SUCCESS.getCode());
-            } else {
-                hmSct.setSysSts(SysCtlSts.HMB_BALCHK_SUCCESS.getCode());
-            }
-            //TODO
-            hmSct.setHostChkDt(new Date());
-            hmSctMapper.updateByPrimaryKey(hmSct);
-            result = true;
-        }
-
-        return result;
-    }
-
+    /**
+     * 流水对帐
+     * @return
+     */
     @Transactional
     public boolean processChkActDetl() {
         //TODO
@@ -165,6 +156,11 @@ public class HmbCmnTxnService extends HmbBaseService {
 
         return result;
     }
+
+    /**
+     * 结算户开户交易
+     * @param request
+     */
     @Transactional
     public void processOpenactRequest(String request) {
         String txnCode = "5110";
@@ -207,7 +203,78 @@ public class HmbCmnTxnService extends HmbBaseService {
         }
     }
 
-    private void processOpenactRequest(){
 
+    //===============================service db============================
+
+    /**
+     * 核算账户余额
+     * @return
+     */
+    public List<HmActinfoFund> selectFundActinfo(){
+        HmActinfoFundExample example = new HmActinfoFundExample();
+        example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
+        return hmActinfoFundMapper.selectByExample(example);
+    }
+
+    /**
+     * 结算账户余额
+     * @return
+     */
+    public List<HmActinfoCbs> selectCbsActinfo(){
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
+        return hmActinfoCbsMapper.selectByExample(example);
+    }
+    /**
+     * 核算账户流水
+     * @return
+     */
+    public List<TxnFundLog> selectFundTxnDetl(String yyyymmdd){
+        TxnFundLogExample example = new TxnFundLogExample();
+        example.createCriteria().andTxnDateEqualTo(yyyymmdd);
+        return txnFundLogMapper.selectByExample(example);
+    }
+
+    /**
+     * 处理国土局返回的余额对帐信息
+     */
+    @Transactional
+    public void processChkBalResponse(List<HmbMsg> msgList){
+        Msg002 msg002 = (Msg002) msgList.get(0);
+        String txnDate = msg002.msgDt.substring(0,8);
+        for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setSendSysId("00");
+            if (hmbMsg instanceof Msg098) {
+                hmChkAct.setActno(((Msg098) hmbMsg).fundActno1);
+                hmChkAct.setActbal(((Msg098) hmbMsg).getActBal());
+            }else{
+                hmChkAct.setActno(((Msg094) hmbMsg).settleActno1);
+                hmChkAct.setActbal(((Msg094) hmbMsg).getActBal());
+            }
+            hmChkActMapper.insert(hmChkAct);
+        }
+    }
+    /**
+     * 处理国土局返回的流水对帐信息
+     */
+    @Transactional
+    public void processChkDetlResponse(List<HmbMsg> msgList){
+        Msg002 msg002 = (Msg002) msgList.get(0);
+        String txnDate = msg002.msgDt.substring(0,8);
+        for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setSendSysId("00");
+            if (hmbMsg instanceof Msg095) {
+                hmChkAct.setActno(((Msg095) hmbMsg).fundActno1);
+                hmChkAct.setActbal(((Msg095) hmbMsg).getTxnAmt1());
+            }else{
+                hmChkAct.setActno(((Msg092) hmbMsg).settleActno1);
+                hmChkAct.setActbal(((Msg092) hmbMsg).getTxnAmt1());
+            }
+            hmChkActMapper.insert(hmChkAct);
+        }
     }
 }

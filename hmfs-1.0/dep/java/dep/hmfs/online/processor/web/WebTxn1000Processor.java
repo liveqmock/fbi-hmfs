@@ -18,6 +18,9 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
     @Resource
     private HmbCmnTxnService hmbCmnTxnService;
 
+    @Resource
+    private WebTxn7003Processor webTxn7003Processor;
+
     @Override
     public String process(String request) throws Exception{
         String actionCode = request.split("\\|")[1];
@@ -48,7 +51,8 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
         return "0000"; //成功
     }
     private String doChkbal() {
-        hmbCmnTxnService.processChkActBal();
+        //hmbCmnTxnService.processChkActBal();
+        webTxn7003Processor.process(null);
         return "0000"; //成功
     }
 
