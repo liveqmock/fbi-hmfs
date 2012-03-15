@@ -17,6 +17,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,10 +56,12 @@ public class OpenActInfoAction implements Serializable {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
-            HmActinfoCbs actinfoCbs =  actInfoService.selectCbsActnoRecord(msg031.cbsActno);
+            List<HmActinfoCbs> actinfoCbsList =  actInfoService.selectCbsActnoRecord(msg031.cbsActno);
+/*
             if ("1".endsWith(actinfoCbs.getActSts())) {
                 //TODO
             }
+*/
             try {
                 String response = depService.process("1000|openact|" + getMsg031Str());
                 String[] fields = response.split("\\|");

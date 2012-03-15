@@ -46,10 +46,11 @@ public class ActInfoService {
         example.createCriteria();
         return actinfoCbsMapper.selectByExample(example).get(0).getCbsActno();
     }
-    public HmActinfoCbs selectCbsActnoRecord(String actno) {
+    public List<HmActinfoCbs> selectCbsActnoRecord(String actno) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
         example.createCriteria().andCbsActnoEqualTo(actno);
-        return actinfoCbsMapper.selectByExample(example).get(0);
+        List<HmActinfoCbs> actinfoCbsList = actinfoCbsMapper.selectByExample(example);
+        return actinfoCbsList;
     }
 
 
