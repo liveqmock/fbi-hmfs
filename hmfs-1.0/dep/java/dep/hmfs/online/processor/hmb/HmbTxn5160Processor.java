@@ -25,7 +25,7 @@ public class HmbTxn5160Processor extends HmbAbstractTxnProcessor {
         msg004.rtnInfo = "核算户信息更新处理完成";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            int cnt = hmbDetailMsgService.updateActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+            int cnt = hmbDetailMsgService.updateActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
             msg004.rtnInfo = cnt + "核算户信息更新处理完成";
         } catch (Exception e) {
             logger.error("5160交易处理异常！", e);

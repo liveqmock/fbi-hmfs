@@ -97,7 +97,6 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HisMsginLog hisMsginLog : payInfoList) {
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
                     record.accountName = hisMsginLog.getInfoName();
                     record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
                     record.address = hisMsginLog.getInfoAddr();

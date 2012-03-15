@@ -24,7 +24,7 @@ public class HmbTxn6110Processor extends HmbAbstractTxnProcessor {
         msg004.rtnInfoCode = "00";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            int cnt = hmbDetailMsgService.cancelActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+            int cnt = hmbDetailMsgService.cancelActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
             msg004.rtnInfo = cnt + "笔销户处理完成";
         } catch (Exception e) {
             logger.error("6110交易处理异常！", e);

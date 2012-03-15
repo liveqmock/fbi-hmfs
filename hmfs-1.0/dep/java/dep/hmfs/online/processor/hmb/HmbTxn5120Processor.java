@@ -24,7 +24,8 @@ public class HmbTxn5120Processor extends HmbAbstractTxnProcessor {
         msg004.rtnInfoCode = "00";
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            int cnt = hmbDetailMsgService.createActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size() - 1));
+            List<HmbMsg> subMsgList = hmbMsgList.subList(1, hmbMsgList.size());
+            int cnt = hmbDetailMsgService.createActinfosByMsgList(subMsgList);
             msg004.rtnInfo = cnt + "笔项目核算户开户处理完成";
 
         } catch (Exception e) {
