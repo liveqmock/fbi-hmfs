@@ -2,7 +2,6 @@ package dep.hmfs.online.processor.cmb;
 
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
-import common.service.HisMsginLogService;
 import common.service.HmActinfoCbsService;
 import common.service.TxnCbsLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
@@ -26,8 +25,6 @@ import java.util.List;
 public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(CmbTxn5001Processor.class);
 
-    @Autowired
-    private HisMsginLogService hisMsginLogService;
     @Autowired
     private HmActinfoCbsService hmActinfoCbsService;
     @Autowired

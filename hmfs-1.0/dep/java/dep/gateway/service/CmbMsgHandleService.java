@@ -36,6 +36,7 @@ public class CmbMsgHandleService implements IMessageHandler {
         TOA toa = null;
         TIAHeader tiaHeader = new TIAHeader();
         tiaHeader.initFields(bytes);
+        logger.info("【报文长度】：" + bytes.length);
         logger.info("【流水号】：" + tiaHeader.serialNo + " 【错误码】：" + tiaHeader.errorCode);
         byte[] datagramBytes = new byte[bytes.length - 24];
         System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);

@@ -13,7 +13,6 @@ public abstract class ContentHandler implements IDataHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ContentHandler.class);
 
-    //private StringBuilder strBuilder = new StringBuilder();
     protected ByteArrayOutputStream byteArrayOutStream;
     protected byte[] bytesDatagram;
     protected IMessageHandler msgHandleService;
