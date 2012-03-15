@@ -117,11 +117,7 @@ class HmbContentHandler extends ContentHandler {
 
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = hmbMsgHandleService.handleMessage(bytesDatagram);
-            String dataLength = StringUtils.leftPad(String.valueOf(resBytesMsg.length - 4), 7, '0');
-
-            logger.info("【本地服务端】发送报文长度:" + dataLength);
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
-            nbc.write(dataLength);
             nbc.write(resBytesMsg);
             nbc.flush();
         }

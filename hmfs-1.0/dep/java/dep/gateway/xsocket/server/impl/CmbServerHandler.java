@@ -16,6 +16,7 @@ import java.nio.BufferUnderflowException;
 /**
  * 服务端数据处理类 监听中间业务平台
  * 6位报文长度
+ *
  * @author zxb
  */
 @Component
@@ -25,6 +26,7 @@ public class CmbServerHandler implements IServerHandler {
     private static final int DATA_LENGTH_FIELD_LENGTH = 6;
     @Autowired
     private CmbMsgHandleService cmbMsgHandleService;
+
     /**
      * 连接的成功时的操作
      */
@@ -125,11 +127,11 @@ class CmbContentHandler extends ContentHandler {
 
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = cmbMsgHandleService.handleMessage(bytesDatagram);
-            nbc.write(resBytesMsg);
-            nbc.flush();
-
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
             logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
+            nbc.write(resBytesMsg);
+            nbc.write("\0");
+            nbc.flush();
         }
         return true;
     }

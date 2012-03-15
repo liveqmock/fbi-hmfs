@@ -49,7 +49,7 @@ public class HmbCmnTxnService extends HmbBaseService {
     private void doHmbSignTxn(String txnCode, String actionCode) throws Exception {
         boolean result = false;
         Msg001 msg001 = new Msg001();
-        assembleSummaryMsg(txnCode, msg001, 1, false);
+        assembleSummaryMsg(txnCode, msg001, 1, true);
         msg001.txnType = "1";//µ•± ≈˙¡ø£ø
         msg001.bizType = "3"; //????
         msg001.origTxnCode = "#"; //TODO ????

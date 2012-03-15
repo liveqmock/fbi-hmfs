@@ -40,6 +40,8 @@ public class HmbMsgHandleService implements IMessageHandler {
         Map<String, List<HmbMsg>> rtnMap = mf.unmarshal(bytes);
         String txnCode = (String) rtnMap.keySet().toArray()[0];
         logger.info("【本地服务端HmbMsgHandleService】接收到交易码：" + txnCode);
+        logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文和子报文总数：" + rtnMap.get(txnCode).size());
+        logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文类型：" + rtnMap.get(txnCode).get(0).getMsgType());
         if (Arrays.asList(ASYN_RES_TXNCODES).contains(txnCode)) {
             // 异步保存到数据库，返回9999报文
             logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【异步】保存到数据库。");
