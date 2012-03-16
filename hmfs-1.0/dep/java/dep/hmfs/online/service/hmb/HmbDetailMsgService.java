@@ -5,9 +5,11 @@ import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
+import common.repository.hmfs.model.HmActinfoFundExample;
 import common.service.HmActinfoFundService;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
+import dep.hmfs.online.service.cmb.CmbBookkeepingService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +38,10 @@ public class HmbDetailMsgService extends HmbBaseService {
     private HmActinfoFundMapper hmActinfoFundMapper;
     @Autowired
     private HmActinfoFundService hmActinfoFundService;
+
+    @Autowired
+    private CmbBookkeepingService bookkeepingService;
+
 
     @Transactional
     public int createActinfosByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
@@ -107,5 +115,52 @@ public class HmbDetailMsgService extends HmbBaseService {
         actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         actinfoFund.setRecversion(0);
         return hmActinfoFundMapper.insert(actinfoFund);
+    }
+
+    /**
+     * 项目拆分合并
+     */
+    public void splitFundActinfo(String txnCode, List<HmbMsg> hmbMsgList)  {
+        //更新核算户信息
+        try {
+            for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
+                changeFundActinfo((Msg033)hmbMsg);
+            }
+        } catch (Exception e) {
+            throw  new RuntimeException("核算户信息更新错误！", e);
+        }
+
+        Msg009 msg009 = (Msg009) hmbMsgList.get(0);
+        String payOutActno = msg009.fundActno1;
+        String payInActno = msg009.payinCbsActno;
+        String msgSn = msg009.getMsgSn();
+        BigDecimal amt = msg009.txnAmt1;
+
+        //余额、流水处理
+        try {
+            bookkeepingService.fundActBookkeeping(msgSn, payOutActno, amt,  "D", "145");
+            bookkeepingService.fundActBookkeeping(msgSn, payInActno, amt, "C", "145");
+        } catch (ParseException e) {
+            throw  new RuntimeException("帐务处理错误！", e);
+        }
+    }
+
+
+    //更新核算帐户信息
+    @Transactional
+    private void changeFundActinfo(Msg033 msg) throws InvocationTargetException, IllegalAccessException {
+        HmActinfoFundExample example = new  HmActinfoFundExample();
+        example.createCriteria().andFundActno1EqualTo(msg.fundActno1);
+        List<HmActinfoFund> actinfoFundList = hmActinfoFundMapper.selectByExample(example);
+        if (actinfoFundList.size() == 0) {
+            throw new RuntimeException("账户信息不存在。");
+        }
+        //TODO  检查多条？
+        HmActinfoFund actinfoFund = actinfoFundList.get(0);
+        int recversion = actinfoFund.getRecversion() + 1;
+        BeanUtils.copyProperties(actinfoFund, msg);
+        actinfoFund.setRemark("TXN6210 项目拆分合并" + new Date().toString());
+        actinfoFund.setRecversion(recversion);
+        hmActinfoFundMapper.updateByPrimaryKey(actinfoFund);
     }
 }

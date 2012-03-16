@@ -25,11 +25,6 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
 
     @Override
     public String process(String request)  {
-        //TODO
-        //HmSct hmSct = hmbCmnTxnService.getAppSysStatus();
-        //if (!hmSct.getSysSts().equals(SysCtlSts.HOST_CHK_SUCCESS.getCode())) {
-        //    throw new RuntimeException("系统状态错误，主机对帐成功后方可进行国土局对帐操作。");
-        //}
 
         String txnCode = "7003";
         //发送报文
@@ -47,6 +42,8 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
         }else{
             //保存到本地数据库
             hmbCmnTxnService.processChkBalResponse(msgList);
+            //数据核对处理
+
         }
 
         return null;

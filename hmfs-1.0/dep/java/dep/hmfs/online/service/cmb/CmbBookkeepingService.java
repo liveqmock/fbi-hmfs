@@ -72,8 +72,9 @@ public class CmbBookkeepingService {
         return fund1Rlt + fund2Rlt + setl1Rlt;
     }
 
+    //核算户记帐 处理余额及流水
     @Transactional
-    private int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
+    public int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
         HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(fundActno);
         if (hmActinfoFund == null) {
             return 0;

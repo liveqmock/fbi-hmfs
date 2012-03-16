@@ -256,6 +256,21 @@ public class HmbCmnTxnService extends HmbBaseService {
             hmChkActMapper.insert(hmChkAct);
         }
     }
+
+    /**
+     * 校验余额对帐数据
+     * @return
+     */
+    @Transactional
+    public boolean verifyActBalData(String txnDate){
+        //SEND_SYS_ID
+        HmChkActExample example = new HmChkActExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        //List<HmChkAct> hmChkActMapper
+
+        //TODO  sql
+        return false;
+    }
     /**
      * 处理国土局返回的流水对帐信息
      */
