@@ -51,6 +51,7 @@ public class CmbBookkeepingService {
     }
 
     // [批量]根据子报文内容更新核算账户信息
+    @Transactional
     public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc) throws ParseException {
         int cnt = 0;
         for (HisMsginLog msginLog : msginLogList) {
@@ -75,7 +76,7 @@ public class CmbBookkeepingService {
     private int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
         HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(fundActno);
         if (hmActinfoFund == null) {
-            throw new RuntimeException("未找到核算账户！");
+            return 0;
         }
         return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, hmActinfoFund, amt, dc, actionCode);
     }
