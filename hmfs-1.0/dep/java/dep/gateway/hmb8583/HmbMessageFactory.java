@@ -187,6 +187,7 @@ public class HmbMessageFactory {
                 } else {
                     fieldValue = "01" + msgCode;
                 }
+                if ("100".equals(msgCode))  fieldValue = "00100";
             }
             int isotype = Hmb8583FieldTypes[fieldno - 1];
             IsoType isoType;
