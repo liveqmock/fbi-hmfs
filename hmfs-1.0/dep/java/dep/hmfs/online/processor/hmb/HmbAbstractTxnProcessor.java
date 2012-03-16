@@ -60,6 +60,6 @@ public abstract class HmbAbstractTxnProcessor {
         msg004.msgEndDate = "#";
         msg004.origMsgSn = msgSn;
 
-        return null;
+        return msg004;
     }
 }
