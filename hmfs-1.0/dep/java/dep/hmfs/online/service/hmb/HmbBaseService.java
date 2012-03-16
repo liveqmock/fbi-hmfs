@@ -6,6 +6,7 @@ import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.dao.HmSctMapper;
 import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HisMsginLogExample;
 import common.repository.hmfs.model.HisMsgoutLog;
 import common.repository.hmfs.model.HmSct;
 import common.service.SystemService;
@@ -68,7 +69,7 @@ public class HmbBaseService {
     }
 
     //TODO trans
-    public void  setAppSysStatus(SysCtlSts sysCtlSts){
+    public void setAppSysStatus(SysCtlSts sysCtlSts) {
         HmSct hmSct = getAppSysStatus();
         hmSct.setSysSts(sysCtlSts.getCode());
 
@@ -112,9 +113,20 @@ public class HmbBaseService {
         }
     }
 
-    public int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    public int updateMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         int index = 0;
         String msgSn = "";
+        HisMsginLogExample example = new HisMsginLogExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn);
+        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        for (HisMsginLog record : msginLogList) {
+            if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
+                record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
+                hisMsginLogMapper.updateByPrimaryKey(record);
+            } else {
+                throw new RuntimeException("报文非初始状态，不接收重复接收");
+            }
+        }
         for (HmbMsg hmbMsg : hmbMsgList) {
             HisMsginLog msginLog = new HisMsginLog();
             BeanUtils.copyProperties(msginLog, hmbMsg);

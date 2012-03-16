@@ -20,7 +20,7 @@ public class HmbTxn5120Processor extends HmbAbstractTxnProcessor {
 
         Msg004 msg004 = createRtnMsg004(msgSn);
         try {
-            hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
             Msg003 msg003 = (Msg003)hmbMsgList.get(0);
             msg004.infoId1 = msg003.infoId1;
             msg004.infoIdType1 = msg003.infoIdType1;

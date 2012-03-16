@@ -49,8 +49,15 @@ public class HmbClientReqService extends HmbBaseService {
         saveMsgoutLogByMap(outMap);
         byte[] txnBuf = messageFactory.marshal(txnCode, hmbMsgList);
         Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
-        Msg100 msg100 = (Msg100) rtnMsgMap.get("9999").get(0);
-        return "00".equals(msg100.getRtnInfoCode());
+        List<HmbMsg> rtnMsgList = rtnMsgMap.get("9999");
+        // 重复发送时，返回发送的报文
+        if (rtnMsgList == null) {
+            return true;
+        } else {
+            // 当且仅当首次发送交易信息时，返回9999报文
+            Msg100 msg100 = (Msg100) rtnMsgList.get(0);
+            return "00".equals(msg100.getRtnInfoCode());
+        }
     }
 
     public boolean sendVouchsToHmb(String msgSn, long startNo, long endNo, String txnApplyNo, String vouchStatus) throws InvocationTargetException, IllegalAccessException {

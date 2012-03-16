@@ -27,7 +27,7 @@ public class HmbTxn5150Processor extends HmbAbstractTxnProcessor {
         Msg006 msg006 = new Msg006();
         List<HmbMsg> detailHmbMsgList = hmbMsgList.subList(1, hmbMsgList.size());
         try {
-            hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
             Msg005 msg005 = (Msg005) hmbMsgList.get(0);
             BeanUtils.copyProperties(msg006, msg005);
             msg006.msgSn = msgSn;

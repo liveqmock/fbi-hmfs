@@ -26,7 +26,7 @@ public class HmActinfoFundService {
         example.createCriteria().andFundActno1EqualTo(fundActNo);
         List<HmActinfoFund> actinfoFundList = hmActinfoFundMapper.selectByExample(example);
         if (actinfoFundList.size() != 1) {
-            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！");
+            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！【核算户号】：" + fundActNo);
         } else {
             return actinfoFundList.get(0);
         }

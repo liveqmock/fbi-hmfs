@@ -127,7 +127,7 @@ class WebContentHandler extends ContentHandler {
             byte[] resBytesMsg = webMsgHandleService.handleMessage(bytesDatagram);
             nbc.write(resBytesMsg);
             nbc.flush();
-            byteArrayOutStream.reset();
+            //byteArrayOutStream.reset();
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
             logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
         }

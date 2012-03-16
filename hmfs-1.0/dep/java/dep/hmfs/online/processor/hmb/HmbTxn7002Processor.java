@@ -29,7 +29,7 @@ public class HmbTxn7002Processor extends HmbAbstractTxnProcessor {
         msg002.origSysId = "00";
         msg002.rtnInfoCode = "00";
         try {
-            hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
             Msg001 msg001 = (Msg001)hmbMsgList.get(0);
             msg002.origMsgSn = msg001.msgSn;
 

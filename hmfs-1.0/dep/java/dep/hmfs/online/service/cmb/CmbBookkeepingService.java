@@ -1,7 +1,6 @@
 package dep.hmfs.online.service.cmb;
 
 import common.enums.DCFlagCode;
-import common.service.SystemService;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.dao.TxnCbsLogMapper;
@@ -9,6 +8,8 @@ import common.repository.hmfs.dao.TxnFundLogMapper;
 import common.repository.hmfs.model.*;
 import common.service.HmActinfoCbsService;
 import common.service.HmActinfoFundService;
+import common.service.SystemService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,9 +88,13 @@ public class CmbBookkeepingService {
 
         String strToday = SystemService.formatTodayByPattern("yyyy-MM-dd");
         if (!strToday.equals(hmActinfoCbs.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyy-MM-dd");
-            hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
-                    .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
+            if (!StringUtils.isEmpty(hmActinfoCbs.getLastTxnDt())) {
+                long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyy-MM-dd");
+                hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
+                        .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
+            } else {
+                hmActinfoCbs.setIntcPdt(new BigDecimal(0));
+            }
             hmActinfoCbs.setLastActBal(hmActinfoCbs.getActBal());
             hmActinfoCbs.setLastTxnDt(strToday);
         }
@@ -129,9 +134,13 @@ public class CmbBookkeepingService {
 
         String strToday = SystemService.formatTodayByPattern("yyyy-MM-dd");
         if (!strToday.equals(hmActinfoFund.getLastTxnDt())) {
-            long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyy-MM-dd");
-            hmActinfoFund.setIntcPdt(hmActinfoFund.getIntcPdt()
-                    .add(hmActinfoFund.getLastActBal().multiply(new BigDecimal(days))));
+            if (!StringUtils.isEmpty(hmActinfoFund.getLastTxnDt())) {
+                long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyy-MM-dd");
+                hmActinfoFund.setIntcPdt(hmActinfoFund.getIntcPdt()
+                        .add(hmActinfoFund.getLastActBal().multiply(new BigDecimal(days))));
+            } else {
+                hmActinfoFund.setIntcPdt(new BigDecimal(0));
+            }
             hmActinfoFund.setLastActBal(hmActinfoFund.getActBal());
             hmActinfoFund.setLastTxnDt(strToday);
         }
