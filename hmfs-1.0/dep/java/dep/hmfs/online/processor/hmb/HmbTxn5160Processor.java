@@ -19,7 +19,7 @@ public class HmbTxn5160Processor extends HmbAbstractTxnProcessor {
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         Msg004 msg004 = createRtnMsg004(msgSn);
         try {
-            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
             Msg003 msg003 = (Msg003) hmbMsgList.get(0);
             msg004.infoId1 = msg003.infoId1;
             msg004.infoIdType1 = msg003.infoIdType1;

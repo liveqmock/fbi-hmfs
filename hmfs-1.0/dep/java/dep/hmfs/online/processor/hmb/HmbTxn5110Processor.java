@@ -25,7 +25,7 @@ public class HmbTxn5110Processor extends HmbAbstractTxnProcessor {
         msg100.origSysId = "00";
         msg100.rtnInfoCode = "00";
         try {
-            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
 
             Msg004 msg004 = (Msg004) hmbMsgList.get(0);
             if ("00".equals(msg004.rtnInfoCode)) {

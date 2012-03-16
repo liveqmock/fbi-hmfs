@@ -113,7 +113,7 @@ public class HmbBaseService {
         }
     }
 
-    public int updateMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    public int updateOrInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         int index = 0;
         String msgSn = "";
         HisMsginLogExample example = new HisMsginLogExample();

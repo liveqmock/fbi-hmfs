@@ -18,7 +18,7 @@ public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
 
         Msg100 msg100 = createRtnMsg100(msgSn);
         try {
-            hmbBaseService.updateMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";
