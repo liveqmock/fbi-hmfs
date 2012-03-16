@@ -11,5 +11,5 @@ import java.text.ParseException;
  * To change this template use File | Settings | File Templates.
  */
 public interface IMessageHandler {
-    byte[] handleMessage(byte[] bytes) throws IOException, ParseException;
+    byte[] handleMessage(byte[] bytes) throws IOException, ParseException, ClassNotFoundException;
 }

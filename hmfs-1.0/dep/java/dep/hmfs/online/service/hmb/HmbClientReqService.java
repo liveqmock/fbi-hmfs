@@ -32,6 +32,7 @@ public class HmbClientReqService extends HmbBaseService {
     private HisMsginLogService hisMsginLogService;
     @Autowired
     private HmActinfoFundService hmActinfoFundService;
+
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HisMsginLog> msginLogList) throws Exception {
 
@@ -73,9 +74,10 @@ public class HmbClientReqService extends HmbBaseService {
             }
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
             String[] payMsgTypes = {"01035", "01045"};
-            List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);            
+            List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);
+            HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
-                HisMsginLog msginLog = payInfoList.get((int)(i - startNo));
+                HisMsginLog msginLog = payInfoList.get((int) (i - startNo));
                 HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
 
                 Msg037 msg037 = new Msg037();
@@ -85,18 +87,19 @@ public class HmbClientReqService extends HmbBaseService {
                 msg037.txnAmt1 = msginLog.getTxnAmt1();
                 msg037.receiptNo = String.valueOf(i);
                 msg037.payinActno = actinfoFund.getCbsActno();
-                msg037.voucherType = actinfoFund.getHouseDepType();
-
-                // TODO
+                // TODO 房屋交存类型 1-商品房 ===== 票据类型 00-商品住宅
+                if ("1".equals(totalPayInfo.getHouseDepType())) {
+                    msg037.voucherType = "00";
+                }
+                msg037.depType = totalPayInfo.getHouseDepType();
+                //80:交存人       21 信息名称
+                msg037.depPerson = msginLog.getInfoName();
                 //59:单位ID
+                msg037.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
                 //60:单位类型
+                msg037.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
                 //61:单位名称
-                //77:收据编号
-                //79:交存类型
-                //80:交存人
-                //81:户卡号
-                //82:购房合同号
-
+                msg037.orgName = PropertyManager.getProperty("hmfs_bank_unit_name");
                 msg037.linkMsgSn = msgSn;
                 hmbMsgList.add(msg037);
             }
@@ -109,7 +112,10 @@ public class HmbClientReqService extends HmbBaseService {
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
         Msg006 msg006 = new Msg006();
         BeanUtils.copyProperties(msg006, msginLog);
-        assembleSummaryMsg(msginLog.getTxnCode(), msg006, 0, false);
+        msg006.submsgNum = 0;
+        msg006.sendSysId = SEND_SYS_ID;
+        msg006.origSysId = "00";
+        msg006.msgEndDate = "#";
         msg006.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
@@ -119,8 +125,11 @@ public class HmbClientReqService extends HmbBaseService {
     public Msg008 createMsg008ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
         Msg008 msg008 = new Msg008();
         BeanUtils.copyProperties(msg008, msginLog);
-        assembleSummaryMsg(msginLog.getTxnCode(), msg008, 0, false);
+        msg008.submsgNum = 0;
+        msg008.sendSysId = SEND_SYS_ID;
+        msg008.origSysId = "00";
         msg008.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        msg008.msgEndDate = "#";
         msg008.setRtnInfoCode("00");
         msg008.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg008;

@@ -2,7 +2,6 @@ package dep.hmfs.online.processor.hmb;
 
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,13 +14,9 @@ public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(HmbRecvResTxnProcessor.class);
 
     @Override
-    public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
-        Msg100 msg100 = new Msg100();
-        msg100.msgSn = txnsnGenerator.generateTxnsn(txnCode);
-        msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
-        msg100.origSysId = "00";
-        msg100.rtnInfoCode = "00";
-        msg100.rtnInfo = "报文接收成功";
+    public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
+
+        Msg100 msg100 = createRtnMsg100(msgSn);
         try {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);
         } catch (Exception e) {

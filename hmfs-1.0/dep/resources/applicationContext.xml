@@ -40,7 +40,7 @@
     <tx:annotation-driven/>
 
     <bean id="hmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
-        <property name="port" value="61600"/>
+        <property name="port" value="41014"/>
         <property name="serverHandler" ref="hmbServerHandler"/>
     </bean>
 

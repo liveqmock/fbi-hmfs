@@ -4,6 +4,7 @@ import dep.ContainerManager;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.HmbAbstractTxnProcessor;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,23 +43,23 @@ public class HmbMsgHandleService implements IMessageHandler {
         logger.info("【本地服务端HmbMsgHandleService】接收到交易码：" + txnCode);
         logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文和子报文总数：" + rtnMap.get(txnCode).size());
         logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文类型：" + rtnMap.get(txnCode).get(0).getMsgType());
-
+        String msgSn = ((SummaryMsg)rtnMap.get(txnCode).get(0)).msgSn;
         if (Arrays.asList(ASYN_RES_TXNCODES).contains(txnCode)) {
             // 异步保存到数据库，返回9999报文
             logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【异步】保存到数据库。");
-            return handleAsynMessage(txnCode, rtnMap.get(txnCode));
+            return handleAsynMessage(txnCode, msgSn, rtnMap.get(txnCode));
         } else {
             logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【同步】由HmbTxnProcessor处理。");
-            return handleSynMessage(txnCode, rtnMap.get(txnCode));
+            return handleSynMessage(txnCode, msgSn, rtnMap.get(txnCode));
         }
     }
 
     // 【同步】保存到数据库
-    public byte[] handleSynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
+    public byte[] handleSynMessage(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         try {
             HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
             if (hmbAbstractTxnProcessor != null) {
-                return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
+                return hmbAbstractTxnProcessor.process(txnCode, msgSn, hmbMsgList);
             }
         } catch (IOException e) {
             logger.error("HMFS报文同步处理异常！", e);
@@ -67,11 +68,11 @@ public class HmbMsgHandleService implements IMessageHandler {
     }
 
     // 【异步】保存到数据库
-    public byte[] handleAsynMessage(String txnCode, List<HmbMsg> hmbMsgList) {
+    public byte[] handleAsynMessage(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         try {
             HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbRecvResTxnProcessor");
             if (hmbAbstractTxnProcessor != null) {
-                return hmbAbstractTxnProcessor.process(txnCode, hmbMsgList);
+                return hmbAbstractTxnProcessor.process(txnCode, msgSn, hmbMsgList);
             }
         } catch (IOException e) {
             logger.error("HMFS报文异步处理异常！", e);

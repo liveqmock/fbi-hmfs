@@ -12,12 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Deprecated
 public class HmbTxn5110Processor extends HmbAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn5110Processor.class);
 
     @Override
-    public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
+    public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         Msg100 msg100 = new Msg100();
         msg100.msgSn = txnsnGenerator.generateTxnsn(txnCode);
         msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");

@@ -22,9 +22,9 @@ public class HmbTxn7002Processor extends HmbAbstractTxnProcessor {
     private HisMsginLogService hisMsginLogService;
     private static final String[] CAN_CANCEL_CODES = {"01035", "01039", "01041", "01043", "01045"};
     @Override
-    public byte[] process(String txnCode, List<HmbMsg> hmbMsgList) {
+    public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         Msg002 msg002 = new Msg002();
-        msg002.msgSn = txnsnGenerator.generateTxnsn(txnCode);
+        msg002.msgSn = msgSn;
         msg002.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg002.origSysId = "00";
         msg002.rtnInfoCode = "00";
