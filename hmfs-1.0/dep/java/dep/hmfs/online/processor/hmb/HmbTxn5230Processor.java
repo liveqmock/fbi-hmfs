@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@Deprecated
-public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(HmbRecvResTxnProcessor.class);
+public class HmbTxn5230Processor extends HmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(HmbTxn5230Processor.class);
 
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
@@ -20,6 +19,7 @@ public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
         Msg100 msg100 = createRtnMsg100(msgSn);
         try {
             hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
+            hmbDetailMsgService.updateActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";

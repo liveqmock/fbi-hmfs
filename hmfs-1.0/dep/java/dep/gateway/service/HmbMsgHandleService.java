@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +30,10 @@ public class HmbMsgHandleService implements IMessageHandler {
     private HmbMessageFactory mf;
 
     // 接收后返回9999报文
-    private static final String[] ASYN_RES_TXNCODES = {"5210", "5230", "5310"};
+    //private static final String[] ASYN_RES_TXNCODES = {"5210", "5310"};
     // 需同步处理
-    private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5150",
-                                                      "5160", "6110", "6210", "6220", "7002"};
+    //private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5150",
+    //"5160", "6110", "6210", "6220", "7002"};
 
     @Override
     public byte[] handleMessage(byte[] bytes) {
@@ -43,40 +42,14 @@ public class HmbMsgHandleService implements IMessageHandler {
         logger.info("【本地服务端HmbMsgHandleService】接收到交易码：" + txnCode);
         logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文和子报文总数：" + rtnMap.get(txnCode).size());
         logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文类型：" + rtnMap.get(txnCode).get(0).getMsgType());
-        String msgSn = ((SummaryMsg)rtnMap.get(txnCode).get(0)).msgSn;
-        if (Arrays.asList(ASYN_RES_TXNCODES).contains(txnCode)) {
-            // 异步保存到数据库，返回9999报文
-            logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【异步】保存到数据库。");
-            return handleAsynMessage(txnCode, msgSn, rtnMap.get(txnCode));
-        } else {
-            logger.info("【本地服务端HmbMsgHandleService】处理交易方式：【同步】由HmbTxnProcessor处理。");
-            return handleSynMessage(txnCode, msgSn, rtnMap.get(txnCode));
-        }
-    }
-
-    // 【同步】保存到数据库
-    public byte[] handleSynMessage(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
+        String msgSn = ((SummaryMsg) rtnMap.get(txnCode).get(0)).msgSn;
+        HmbAbstractTxnProcessor hmbAbstractTxnProcessor = null;
         try {
-            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
-            if (hmbAbstractTxnProcessor != null) {
-                return hmbAbstractTxnProcessor.process(txnCode, msgSn, hmbMsgList);
-            }
+            hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
         } catch (IOException e) {
-            logger.error("HMFS报文同步处理异常！", e);
+            logger.error("HMFS报文处理异常！", e);
         }
-        return null;
-    }
+        return hmbAbstractTxnProcessor != null ? null : hmbAbstractTxnProcessor.process(txnCode, msgSn, rtnMap.get(txnCode));
 
-    // 【异步】保存到数据库
-    public byte[] handleAsynMessage(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
-        try {
-            HmbAbstractTxnProcessor hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbRecvResTxnProcessor");
-            if (hmbAbstractTxnProcessor != null) {
-                return hmbAbstractTxnProcessor.process(txnCode, msgSn, hmbMsgList);
-            }
-        } catch (IOException e) {
-            logger.error("HMFS报文异步处理异常！", e);
-        }
-        return null;
     }
 }

@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@Deprecated
-public class HmbRecvResTxnProcessor extends HmbAbstractTxnProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(HmbRecvResTxnProcessor.class);
+public class HmbTxn5210Processor extends HmbAbstractTxnProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(HmbTxn5210Processor.class);
 
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {

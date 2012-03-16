@@ -46,7 +46,11 @@ public class CmbMsgHandleService implements IMessageHandler {
         try {
             CmbAbstractTxnProcessor txnProcessorCmb = (CmbAbstractTxnProcessor) ContainerManager.getBean("cmbTxn" + tiaHeader.txnCode + "Processor");
             toa = txnProcessorCmb.process(tiaHeader.serialNo, datagramBytes);
-            strBuilder.append(tiaHeader.errorCode);
+            if (toa == null) {   // 无报文明细
+                strBuilder.append("1000");
+            } else {
+                strBuilder.append(tiaHeader.errorCode);
+            }
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());

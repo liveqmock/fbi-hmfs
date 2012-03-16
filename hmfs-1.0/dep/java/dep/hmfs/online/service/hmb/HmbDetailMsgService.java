@@ -68,14 +68,16 @@ public class HmbDetailMsgService extends HmbBaseService {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01033".equals(hmbMsg.getMsgType())) {
                 Msg033 msg033 = (Msg033) hmbMsg;
-                HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msg033.fundActno1);
-                BeanUtils.copyProperties(hmActinfoFund, msg033);
-                hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
-            } else {
-                throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
+                updateActinfosByMsg(msg033);
             }
         }
         return hmbMsgList.size();
+    }
+
+    private int updateActinfosByMsg(Msg033 msg033) throws InvocationTargetException, IllegalAccessException {
+        HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msg033.fundActno1);
+        BeanUtils.copyProperties(hmActinfoFund, msg033);
+        return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
     }
 
     @Transactional
@@ -204,7 +206,7 @@ public class HmbDetailMsgService extends HmbBaseService {
     @Transactional
     private void op115deposite(String msgSn, Msg035 msg035) throws ParseException {
         // 会计账号记账
-        bookkeepingService.cbsActBookkeeping("HMB"+SystemService.formatTodayByPattern("yyyyMMddHHmmss"),
+        bookkeepingService.cbsActBookkeeping("HMB" + SystemService.formatTodayByPattern("yyyyMMddHHmmss"),
                 msg035.txnAmt1, DCFlagCode.TXN_IN.getCode());
 
         // 批量核算户账户信息更新

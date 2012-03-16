@@ -55,40 +55,40 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
      * 国土局客户端
      */
     public byte[] sendDataUntilRcvToHmb(byte[] dataBytes) throws Exception {
-            logger.info("【本地客户端】发送报文：" + new String(dataBytes));
-            byte[] datagramBytes = null;
-            if (sendData(dataBytes)) {
-                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(7).trim());
-                logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
-                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength + 4);
-            }
-            logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
-            logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
-            return datagramBytes;
+        logger.info("【本地客户端】发送报文：" + new String(dataBytes));
+        byte[] datagramBytes = null;
+        if (sendData(dataBytes)) {
+            int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(7).trim());
+            logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
+            datagramBytes = blockingConnection.readBytesByLength(garamTotalLength + 4);
         }
+        logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
+        logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
+        return datagramBytes;
+    }
 
     public byte[] sendDataUntilRcvToDep(byte[] dataBytes) throws Exception {
-            logger.info("【本地客户端】发送报文：" + new String(dataBytes));
-            byte[] datagramBytes = null;
-            if (sendData(dataBytes)) {
-                int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(6).trim());
-                logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
-                datagramBytes = blockingConnection.readBytesByLength(garamTotalLength - 6);
-            }
-            logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
-            logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
-            return datagramBytes;
+        logger.info("【本地客户端】发送报文：" + new String(dataBytes));
+        byte[] datagramBytes = null;
+        if (sendData(dataBytes)) {
+            int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(6).trim());
+            logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
+            datagramBytes = blockingConnection.readBytesByLength(garamTotalLength - 6);
         }
+        logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
+        logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
+        return datagramBytes;
+    }
 
     private boolean sendData(byte[] dataBytes) throws IOException {
-            if (blockingConnection == null || !blockingConnection.isOpen()) {
-                throw new RuntimeException("未建立连接！");
-            } else {
-                blockingConnection.write(dataBytes);
-                blockingConnection.flush();
-            }
-            return true;
+        if (blockingConnection == null || !blockingConnection.isOpen()) {
+            throw new RuntimeException("未建立连接！");
+        } else {
+            blockingConnection.write(dataBytes);
+            blockingConnection.flush();
         }
+        return true;
+    }
 
     private boolean sendData(String dataContent) throws IOException {
         if (blockingConnection == null || !blockingConnection.isOpen()) {
@@ -134,11 +134,15 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             //String datagram = "48    237327          000010011                 ";
             //String datagram = "123456789012345600001001120316004833521000";
             // 1002 交款
-            String datagram = "1234567890123456000010021203160048355210009565.56         ";
+            //String datagram = "1234567890123456000010021203160048355210009565.56         ";
             // 2001 支取查询
-            //String datagram = "123456789012345600002001123456789123456788";
+            //String datagram = "123456789012345600002001120316004838523000";
             // 2002 支取
             // String datagram = "1234567890123456000020021234567891234567892000000.00      ";
+            // 3001 退款查询
+            //String datagram = "123456789012345600003001120316004838523000";
+            // 3002 退款
+             String datagram = "1234567890123456000030021203160048385230001000.00         ";
             /*
             票据状态	1	1:领用；2:使用；3:作废
             打印票据起始编号	12	票据起始编号
