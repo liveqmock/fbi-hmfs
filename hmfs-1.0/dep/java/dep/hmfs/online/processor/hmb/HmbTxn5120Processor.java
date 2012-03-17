@@ -3,10 +3,8 @@ package dep.hmfs.online.processor.hmb;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg003;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
-import dep.hmfs.online.service.HmActinfoFundService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

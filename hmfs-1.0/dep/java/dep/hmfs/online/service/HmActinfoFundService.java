@@ -70,9 +70,17 @@ public class HmActinfoFundService {
     @Transactional
     public int updateActinfoFundsByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         for (HmbMsg hmbMsg : hmbMsgList) {
+            // 核算户信息变更
             if ("01033".equals(hmbMsg.getMsgType())) {
                 Msg033 msg033 = (Msg033) hmbMsg;
                 updateActinfosByMsg(msg033);
+            } else if ("01051".equals(hmbMsg.getMsgType())) {
+                Msg051 msg051 = (Msg051) hmbMsg;
+                HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
+                hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+            } else {
+                throw new RuntimeException("报文体中含有非核算户更新子报文序号" + hmbMsg.getMsgType() + "！");
             }
         }
         return hmbMsgList.size();
@@ -105,10 +113,13 @@ public class HmActinfoFundService {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
                 HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
+                if(hmActinfoFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+                    throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
+                }
                 hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
             } else {
-                throw new RuntimeException("报文中包含未定义的子报文，子报文序号错误！");
+                throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
         }
         return hmbMsgList.size();
