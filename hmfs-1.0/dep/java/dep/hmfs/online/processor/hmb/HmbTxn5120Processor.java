@@ -3,8 +3,10 @@ package dep.hmfs.online.processor.hmb;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg003;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
+import dep.hmfs.online.service.HmActinfoFundService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -26,13 +28,13 @@ public class HmbTxn5120Processor extends HmbAbstractTxnProcessor {
             msg004.infoIdType1 = msg003.infoIdType1;
             msg004.districtId = msg003.districtId;
             List<HmbMsg> subMsgList = hmbMsgList.subList(1, hmbMsgList.size());
-            int cnt = hmbDetailMsgService.createActinfosByMsgList(subMsgList);
-            msg004.rtnInfo = cnt + "笔项目核算户开户处理完成";
+            int cnt = hmActinfoFundService.createActinfoFundsByMsgList(subMsgList);
+            msg004.rtnInfo = cnt + "笔项目核算户开户完成";
 
         } catch (Exception e) {
             logger.error("5120交易处理异常！", e);
             msg004.rtnInfoCode = "99";
-            msg004.rtnInfo = "报文接收失败";
+            msg004.rtnInfo = "报文接收处理失败";
         }
         // 响应
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();

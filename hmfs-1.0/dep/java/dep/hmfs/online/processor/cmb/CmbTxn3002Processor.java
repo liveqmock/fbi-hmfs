@@ -3,10 +3,10 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
+import dep.hmfs.online.service.BookkeepingService;
 import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
-import dep.hmfs.online.service.cmb.CmbBookkeepingService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HisMsginLogService hisMsginLogService;
     @Autowired
-    private CmbBookkeepingService cmbBookkeepingService;
+    private BookkeepingService bookkeepingService;
     @Autowired
     private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
@@ -63,9 +63,9 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
 
         // 会计账号记账
-        cmbBookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia3002.body.refundAmt), DCFlagCode.TXN_OUT.getCode());
+        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia3002.body.refundAmt), DCFlagCode.TXN_OUT.getCode());
         // 批量核算户账户信息更新
-        cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
+        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
 
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3002.body.refundApplyNo, "00005", subMsgTypes, TxnCtlSts.SUCCESS);
 

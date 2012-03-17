@@ -3,9 +3,11 @@ package dep.hmfs.online.processor.hmb;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
+import dep.hmfs.online.service.HmActinfoFundService;
 import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
 public class HmbTxn5110Processor extends HmbAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn5110Processor.class);
+    @Autowired
+    private HmActinfoFundService hmActinfoFundService;
 
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
@@ -29,8 +33,8 @@ public class HmbTxn5110Processor extends HmbAbstractTxnProcessor {
 
             Msg004 msg004 = (Msg004) hmbMsgList.get(0);
             if ("00".equals(msg004.rtnInfoCode)) {
-                int cnt = hmbDetailMsgService.createActinfosByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
-                msg100.rtnInfo = cnt + "笔单位结算户开户处理完成";
+                int cnt = hmActinfoFundService.createActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+                msg100.rtnInfo = cnt + "笔单位结算户开户完成";
             } else {
                 logger.info("5110国土局单位结算户开户处理失败！【国土局】返回信息：" + msg004.rtnInfo);
             }

@@ -4,12 +4,12 @@ import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
+import dep.hmfs.online.service.BookkeepingService;
 import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.service.HmActinfoFundService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
-import dep.hmfs.online.service.cmb.CmbBookkeepingService;
 import dep.hmfs.online.service.cmb.CmbTxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.apache.commons.lang.StringUtils;
@@ -38,7 +38,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HisMsginLogService hisMsginLogService;
     @Autowired
-    private CmbBookkeepingService cmbBookkeepingService;
+    private BookkeepingService bookkeepingService;
     @Autowired
     private CmbTxnCheckService cmbTxnCheckService;
     @Autowired
@@ -76,10 +76,10 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     private TOA1002 handlePayTxnAndsendToHmb(String cbsSerialNo, HisMsginLog totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws Exception, IOException {
 
         // 会计账号记账
-        cmbBookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode());
+        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode());
 
         // 批量核算户账户信息更新
-        cmbBookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode());
+        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode());
 
         hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.SUCCESS);
 

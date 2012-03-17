@@ -6,10 +6,11 @@ import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
+import dep.hmfs.online.service.HmActinfoFundService;
 import dep.hmfs.online.service.hmb.HmbBaseService;
-import dep.hmfs.online.service.hmb.HmbDetailMsgService;
 import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,13 +25,14 @@ import java.util.List;
 public abstract class HmbAbstractTxnProcessor {
 
     @Resource
-    protected HmbBaseService hmbBaseService;
-    @Resource
     protected HmbMessageFactory mf;
     @Resource
     HmbTxnsnGenerator txnsnGenerator;
     @Resource
-    protected HmbDetailMsgService hmbDetailMsgService;
+    protected HmbBaseService hmbBaseService;
+    @Autowired
+    protected HmActinfoFundService hmActinfoFundService;
+
 
     public abstract byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList);
 
@@ -43,7 +45,7 @@ public abstract class HmbAbstractTxnProcessor {
         msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg100.origSysId = "00";
         msg100.rtnInfoCode = "00";
-        msg100.rtnInfo = "报文接收成功";
+        msg100.rtnInfo = "报文处理成功";
         return msg100;
     }
 
@@ -56,10 +58,10 @@ public abstract class HmbAbstractTxnProcessor {
         msg004.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg004.origSysId = "00";
         msg004.rtnInfoCode = "00";
+        msg004.rtnInfo = "报文处理成功";
         msg004.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg004.msgEndDate = "#";
         msg004.origMsgSn = msgSn;
-
         return msg004;
     }
 }

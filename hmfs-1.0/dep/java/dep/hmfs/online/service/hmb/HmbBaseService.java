@@ -117,15 +117,14 @@ public class HmbBaseService {
         int index = 0;
         String msgSn = "";
         HisMsginLogExample example = new HisMsginLogExample();
-        example.createCriteria().andMsgSnEqualTo(msgSn);
+        example.createCriteria().andMsgSnEqualTo(msgSn).andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
         List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        if(msginLogList.size() == 0) {
+            throw new RuntimeException("该交易报文已进入业务处理状态");
+        }
         for (HisMsginLog record : msginLogList) {
-            if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
                 record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
                 hisMsginLogMapper.updateByPrimaryKey(record);
-            } else {
-                throw new RuntimeException("报文非初始状态，重复接收失败");
-            }
         }
         for (HmbMsg hmbMsg : hmbMsgList) {
             HisMsginLog msginLog = new HisMsginLog();

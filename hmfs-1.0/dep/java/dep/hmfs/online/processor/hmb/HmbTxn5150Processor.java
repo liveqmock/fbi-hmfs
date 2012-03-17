@@ -1,6 +1,5 @@
 package dep.hmfs.online.processor.hmb;
 
-import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg005;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
@@ -8,7 +7,6 @@ import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,8 +17,6 @@ import java.util.List;
 public class HmbTxn5150Processor extends HmbAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn5150Processor.class);
-    @Autowired
-    private HisMsginLogService hisMsginLogService;
 
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
@@ -36,8 +32,8 @@ public class HmbTxn5150Processor extends HmbAbstractTxnProcessor {
             msg006.origMsgSn = msg005.msgSn;
             msg006.rtnInfoCode = "00";
 
-            int cnt = hmbDetailMsgService.createActinfosByMsgList(detailHmbMsgList);
-            msg006.rtnInfo = cnt + "笔5150开户处理完成,待交款。";
+            int cnt = hmActinfoFundService.createActinfoFundsByMsgList(detailHmbMsgList);
+            msg006.rtnInfo = cnt + "笔5150报文接收完成。";
         } catch (Exception e) {
             logger.error("5150交易处理异常！", e);
             msg006.rtnInfoCode = "99";

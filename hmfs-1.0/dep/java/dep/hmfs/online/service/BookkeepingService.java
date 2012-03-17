@@ -1,4 +1,4 @@
-package dep.hmfs.online.service.cmb;
+package dep.hmfs.online.service;
 
 import common.enums.DCFlagCode;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 // º«’À“µŒÒ
 @Service
-public class CmbBookkeepingService {
+public class BookkeepingService {
 
     @Autowired
     private HmActinfoCbsMapper hmActinfoCbsMapper;
