@@ -2,8 +2,8 @@ package dep.hmfs.online.processor.cmb;
 
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
-import common.service.HmActinfoCbsService;
-import common.service.TxnCbsLogService;
+import dep.hmfs.online.service.HmActinfoCbsService;
+import dep.hmfs.online.service.TxnCbsLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn7003Processor;

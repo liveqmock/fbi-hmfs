@@ -1,4 +1,4 @@
-package common.service;
+package dep.hmfs.online.service;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsginLogMapper;

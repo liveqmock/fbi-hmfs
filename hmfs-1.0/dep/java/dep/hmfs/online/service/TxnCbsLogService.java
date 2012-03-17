@@ -1,4 +1,4 @@
-package common.service;
+package dep.hmfs.online.service;
 
 import common.repository.hmfs.dao.TxnCbsLogMapper;
 import common.repository.hmfs.model.TxnCbsLog;

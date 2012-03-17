@@ -7,7 +7,7 @@ import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.repository.hmfs.model.HmActinfoFundExample;
-import common.service.HmActinfoFundService;
+import dep.hmfs.online.service.HmActinfoFundService;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.cmb.CmbBookkeepingService;

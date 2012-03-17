@@ -1,6 +1,6 @@
 package dep.hmfs.online.processor.hmb;
 
-import common.service.HisMsginLogService;
+import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg001;
 import dep.hmfs.online.processor.hmb.domain.Msg002;

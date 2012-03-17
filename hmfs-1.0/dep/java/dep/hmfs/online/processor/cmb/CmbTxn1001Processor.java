@@ -2,7 +2,7 @@ package dep.hmfs.online.processor.cmb;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
-import common.service.HisMsginLogService;
+import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1001;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1001;
