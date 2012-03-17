@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.web;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg001;
 import dep.hmfs.online.processor.hmb.domain.Msg002;
-import dep.hmfs.online.service.hmb.HmbCmnTxnService;
+import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Component
 public class WebTxn7004Processor extends WebAbstractTxnProcessor{
     @Resource
-    private  HmbCmnTxnService hmbCmnTxnService;
+    private HmbSysTxnService hmbSysTxnService;
 
     @Override
     public String process(String request)  {
@@ -46,7 +46,7 @@ public class WebTxn7004Processor extends WebAbstractTxnProcessor{
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         }else{
             //保存到本地数据库
-            hmbCmnTxnService.processChkBalResponse(msgList);
+            hmbSysTxnService.processChkBalResponse(msgList);
         }
 
         return null;
@@ -57,7 +57,7 @@ public class WebTxn7004Processor extends WebAbstractTxnProcessor{
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
-        hmbCmnTxnService.assembleSummaryMsg(txnCode, msg001, 1, false);
+        hmbSysTxnService.assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//单笔批量？
         msg001.bizType = "#"; //?
         msg001.origTxnCode = "#"; //TODO ????

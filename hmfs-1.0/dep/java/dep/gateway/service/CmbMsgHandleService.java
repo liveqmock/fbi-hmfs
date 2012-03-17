@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 A2流水号	（16位）
 A3错误码	（4位）
 A4服务类型	（4位）
-A5包编号	（4位）
-A6最后一包标志	（1位）
  */
 
 @Service

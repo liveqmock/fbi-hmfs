@@ -5,12 +5,11 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
 import dep.hmfs.online.service.BookkeepingService;
-import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.service.HmActinfoFundService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
-import dep.hmfs.online.service.cmb.CmbTxnCheckService;
+import dep.hmfs.online.service.cbs.CbsTxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -36,11 +35,9 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(CmbTxn1002Processor.class);
 
     @Autowired
-    private HisMsginLogService hisMsginLogService;
-    @Autowired
     private BookkeepingService bookkeepingService;
     @Autowired
-    private CmbTxnCheckService cmbTxnCheckService;
+    private CbsTxnCheckService cbsTxnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
@@ -56,11 +53,11 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         String[] payMsgTypes = {"01035", "01045"};
 
         // 查询交易汇总报文记录
-        HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
+        HisMsginLog totalPayInfo = hmbBaseService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
         // 查询交易子报文记录
-        List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
+        List<HisMsginLog> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (cmbTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
+        if (cbsTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
             return handlePayTxnAndsendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
         } else {
@@ -81,7 +78,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         // 批量核算户账户信息更新
         bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode());
 
-        hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.SUCCESS);
+        hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.SUCCESS);
 
         return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
     }
@@ -90,7 +87,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
 
         // 查询所有子报文
         String[] payMsgTypes = {"01033", "01035", "01045"};
-        List<HisMsginLog> detailMsginLogs = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
+        List<HisMsginLog> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
         if (hmbClientReqService.communicateWithHmb(txnCode, hmbClientReqService.createMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
             TOA1002 toa1002 = new TOA1002();
             toa1002.body.payApplyNo = tia1002.body.payApplyNo;

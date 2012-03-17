@@ -6,8 +6,6 @@ import common.repository.hmfs.dao.HmActinfoFundMapper;
 import common.repository.hmfs.dao.TxnCbsLogMapper;
 import common.repository.hmfs.dao.TxnFundLogMapper;
 import common.repository.hmfs.model.*;
-import dep.hmfs.online.service.HmActinfoCbsService;
-import dep.hmfs.online.service.HmActinfoFundService;
 import common.service.SystemService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,10 +3,9 @@ package dep.hmfs.online.service.hmb;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
-import dep.hmfs.online.service.HisMsginLogService;
-import dep.hmfs.online.service.HmActinfoFundService;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
+import dep.hmfs.online.service.HmActinfoFundService;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,6 @@ import java.util.Map;
 @Service
 public class HmbClientReqService extends HmbBaseService {
 
-    @Autowired
-    private HisMsginLogService hisMsginLogService;
     @Autowired
     private HmActinfoFundService hmActinfoFundService;
 
@@ -81,8 +78,8 @@ public class HmbClientReqService extends HmbBaseService {
             }
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
             String[] payMsgTypes = {"01035", "01045"};
-            List<HisMsginLog> payInfoList = hisMsginLogService.qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);
-            HisMsginLog totalPayInfo = hisMsginLogService.qryTotalMsgByMsgSn(txnApplyNo, "00005");
+            List<HisMsginLog> payInfoList = qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);
+            HisMsginLog totalPayInfo = qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
                 HisMsginLog msginLog = payInfoList.get((int) (i - startNo));
                 HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());

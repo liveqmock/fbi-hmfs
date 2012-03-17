@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.cmb;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
 import dep.hmfs.online.service.HmActinfoCbsService;
-import dep.hmfs.online.service.TxnCbsLogService;
+import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn7003Processor;
@@ -29,7 +29,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HmActinfoCbsService hmActinfoCbsService;
     @Autowired
-    private TxnCbsLogService txnCbsLogService;
+    private CbsTxnCbsLogService cbsTxnCbsLogService;
     @Autowired
     private WebTxn7003Processor webTxn7003Processor;
 
@@ -70,7 +70,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     tia5001.body.recordList.add(record);
                 }
             }
-            List<TxnCbsLog> txnCbsLogList = txnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
+            List<TxnCbsLog> txnCbsLogList = cbsTxnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
             if (txnCbsLogList.size() != tia5001.body.recordList.size()) {
                 throw new RuntimeException("账户交易明细数不一致！【本地】交易数：" + txnCbsLogList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
             } else {

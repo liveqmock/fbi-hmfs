@@ -2,11 +2,9 @@ package dep.hmfs.online.processor.cmb;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
-import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA2001;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA2001;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,9 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
 
-    @Autowired
-    private HisMsginLogService hisMsginLogService;
-
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
         TIA2001 tia2001 = new TIA2001();
@@ -29,7 +24,7 @@ public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
 
         TOA2001 toa2001 = null;
         // 查询汇总信息
-        HisMsginLog totalDrawInfo = hisMsginLogService.qryTotalMsgByMsgSn(tia2001.body.drawApplyNo, "00007");
+        HisMsginLog totalDrawInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2001.body.drawApplyNo, "00007");
 
         if (totalDrawInfo != null) {
             toa2001 = new TOA2001();
@@ -39,7 +34,7 @@ public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
 
             // 更新汇总报文和子报文交易处理状态为：处理中
             String[] drawMsgTypes = {"01041"};
-            hisMsginLogService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.HANDLING);
+            hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.HANDLING);
         }
 
         return toa2001;

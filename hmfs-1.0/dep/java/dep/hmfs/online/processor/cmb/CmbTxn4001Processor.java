@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.cmb;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA4001;
-import dep.hmfs.online.service.cmb.CmbTxnVouchLogService;
+import dep.hmfs.online.service.cbs.CbsTxnVouchLogService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
 
     @Autowired
-    private CmbTxnVouchLogService cmbTxnVouchLogService;
+    private CbsTxnVouchLogService cbsTxnVouchLogService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
@@ -53,7 +53,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
             throw new RuntimeException("起止号输入有误！");
         }
         String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
-        cmbTxnVouchLogService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
+        cbsTxnVouchLogService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
         if(!hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo, tia4001.body.billStatus)) {
             throw new RuntimeException("票据状态发送至国土局出现异常");
         }

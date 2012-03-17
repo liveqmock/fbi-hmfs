@@ -1,4 +1,4 @@
-package dep.hmfs.online.service.cmb;
+package dep.hmfs.online.service.cbs;
 
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
@@ -15,7 +15,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class CmbTxnCheckService {
+public class CbsTxnCheckService {
 
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HisMsginLog totalInfo, List<HisMsginLog> detailInfoList, BigDecimal txnTotalAmt) {

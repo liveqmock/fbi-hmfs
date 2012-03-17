@@ -20,7 +20,9 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -48,9 +50,6 @@ public class HmbBaseService {
     protected HisMsgoutLogMapper hisMsgoutLogMapper;
 
     @Resource
-    protected HisMsginLogMapper hisMsginLogMapper;
-
-    @Resource
     protected HmbTxnsnGenerator hmbTxnsnGenerator;
 
     @Resource
@@ -63,6 +62,61 @@ public class HmbBaseService {
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
+    @Autowired
+    protected HisMsginLogMapper hisMsginLogMapper;
+
+    // 根据申请单号查询汇总报文信息
+    public HisMsginLog qryTotalMsgByMsgSn(String msgSn, String msgType) {
+
+        HisMsginLogExample example = new HisMsginLogExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo(msgType)
+                .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
+        List<HisMsginLog> hisMsginLogList = hisMsginLogMapper.selectByExample(example);
+
+        return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
+    }
+
+    // 根据申请单号查询所有明细
+    public List<HisMsginLog> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
+        HisMsginLogExample example = new HisMsginLogExample();
+        for (String msgType : msgTypes) {
+            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
+                    .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
+        }
+        example.setOrderByClause("MSG_SUB_SN");
+        return hisMsginLogMapper.selectByExample(example);
+    }
+
+    // 更新汇总报文和子报文交易处理状态
+    @Transactional
+    public int updateMsginsTxnCtlStsByMsgSnAndTypes(String msgSn, String totalMsgType, String[] subMsgTypes, TxnCtlSts txnCtlSts) {
+        List<HisMsginLog> msginLogList = qrySubMsgsByMsgSnAndTypes(msgSn, subMsgTypes);
+        msginLogList.add(qryTotalMsgByMsgSn(msgSn, totalMsgType));
+        for (HisMsginLog record : msginLogList) {
+            record.setTxnCtlSts(txnCtlSts.getCode());
+            hisMsginLogMapper.updateByPrimaryKey(record);
+        }
+        return msginLogList.size();
+    }
+
+    // 更新初始状态的汇总报文和子报文状态
+    @Transactional
+    public int cancelMsginsByMsgSnAndTypes(String msgSn, String[] subMsgTypes) {
+        HisMsginLogExample example = new HisMsginLogExample();
+        for (String msgType : subMsgTypes) {
+            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
+                    .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
+        }
+        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        if (msginLogList.size() == 0) {
+            throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
+        }
+        for (HisMsginLog record : msginLogList) {
+            record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
+            hisMsginLogMapper.updateByPrimaryKey(record);
+        }
+        return msginLogList.size();
+    }
 
     public HmSct getAppSysStatus() {
         return hmSctMapper.selectByPrimaryKey("1");

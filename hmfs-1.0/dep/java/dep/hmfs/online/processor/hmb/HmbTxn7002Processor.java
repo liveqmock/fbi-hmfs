@@ -1,6 +1,5 @@
 package dep.hmfs.online.processor.hmb;
 
-import dep.hmfs.online.service.HisMsginLogService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg001;
 import dep.hmfs.online.processor.hmb.domain.Msg002;
@@ -8,7 +7,6 @@ import dep.hmfs.online.processor.hmb.domain.Msg099;
 import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,8 +16,6 @@ import java.util.List;
 public class HmbTxn7002Processor extends HmbAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn7002Processor.class);
-    @Autowired
-    private HisMsginLogService hisMsginLogService;
     private static final String[] CAN_CANCEL_CODES = {"01035", "01039", "01041", "01043", "01045"};
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
@@ -34,7 +30,7 @@ public class HmbTxn7002Processor extends HmbAbstractTxnProcessor {
             msg002.origMsgSn = msg001.msgSn;
 
             Msg099 msg099 = (Msg099)hmbMsgList.get(1);
-            int cnt = hisMsginLogService.cancelMsginsByMsgSnAndTypes(msg099.origMsgSn, CAN_CANCEL_CODES);
+            int cnt = hmbBaseService.cancelMsginsByMsgSnAndTypes(msg099.origMsgSn, CAN_CANCEL_CODES);
             msg002.rtnInfo = cnt + "笔交易撤销处理完成";
 
         } catch (Exception e) {

@@ -1,4 +1,4 @@
-package dep.hmfs.online.service;
+package dep.hmfs.online.service.cbs;
 
 import common.repository.hmfs.dao.TxnCbsLogMapper;
 import common.repository.hmfs.model.TxnCbsLog;
@@ -16,7 +16,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class TxnCbsLogService {
+public class CbsTxnCbsLogService {
     
     @Autowired
     private TxnCbsLogMapper txnCbsLogMapper;

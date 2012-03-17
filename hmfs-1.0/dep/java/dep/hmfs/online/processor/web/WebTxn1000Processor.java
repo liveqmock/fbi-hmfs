@@ -1,6 +1,6 @@
 package dep.hmfs.online.processor.web;
 
-import dep.hmfs.online.service.hmb.HmbCmnTxnService;
+import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 public class WebTxn1000Processor extends WebAbstractTxnProcessor {
 
     @Resource
-    private HmbCmnTxnService hmbCmnTxnService;
+    private HmbSysTxnService hmbSysTxnService;
 
     @Resource
     private WebTxn7003Processor webTxn7003Processor;
@@ -43,11 +43,11 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
     }
 
     private String doSignon() {
-        hmbCmnTxnService.processSignon();
+        hmbSysTxnService.processSignon();
         return "0000"; //成功
     }
     private String doSignout() {
-        hmbCmnTxnService.processSignout();
+        hmbSysTxnService.processSignout();
         return "0000"; //成功
     }
     private String doChkbal() {
@@ -57,11 +57,11 @@ public class WebTxn1000Processor extends WebAbstractTxnProcessor {
     }
 
     private String doChkdetl() {
-        hmbCmnTxnService.processChkActDetl();
+        hmbSysTxnService.processChkActDetl();
         return "0000"; //成功
     }
     private String doOpenact(String request) {
-        hmbCmnTxnService.processOpenactRequest(request);
+        hmbSysTxnService.processOpenactRequest(request);
         return "0000"; //成功
     }
 }

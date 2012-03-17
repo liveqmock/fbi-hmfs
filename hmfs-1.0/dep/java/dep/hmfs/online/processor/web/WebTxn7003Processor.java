@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.web;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
 import dep.hmfs.online.processor.hmb.domain.*;
-import dep.hmfs.online.service.hmb.HmbCmnTxnService;
+import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Component
 public class WebTxn7003Processor extends WebAbstractTxnProcessor{
     @Resource
-    private  HmbCmnTxnService hmbCmnTxnService;
+    private HmbSysTxnService hmbSysTxnService;
 
     @Override
     public String process(String request)  {
@@ -41,7 +41,7 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         }else{
             //保存到本地数据库
-            hmbCmnTxnService.processChkBalResponse(msgList);
+            hmbSysTxnService.processChkBalResponse(msgList);
             //数据核对处理
 
         }
@@ -54,14 +54,14 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
-        hmbCmnTxnService.assembleSummaryMsg(txnCode, msg001, 1, false);
+        hmbSysTxnService.assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//单笔批量？
         msg001.bizType = "#"; //?
         msg001.origTxnCode = "#"; //TODO ????
         hmbMsgList.add(msg001);
 
         //子报文处理  098 094
-        List<HmActinfoFund> actinfoFundList = hmbCmnTxnService.selectFundActinfo();
+        List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
         for (HmActinfoFund hmActinfoFund : actinfoFundList) {
             Msg098 msg098 = new Msg098();
             msg098.actionCode = "304"; //304:日终对账
@@ -73,7 +73,7 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
             msg098.fundActtype1 = hmActinfoFund.getFundActtype1();
             hmbMsgList.add(msg098);
         }
-        List<HmActinfoCbs> actinfoCbsList = hmbCmnTxnService.selectCbsActinfo();
+        List<HmActinfoCbs> actinfoCbsList = hmbSysTxnService.selectCbsActinfo();
         for (HmActinfoCbs hmActinfoCbs : actinfoCbsList) {
             Msg094 msg094 = new Msg094();
             msg094.actionCode = "304"; //304:日终对账

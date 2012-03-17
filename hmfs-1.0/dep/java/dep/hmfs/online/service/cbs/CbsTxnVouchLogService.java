@@ -1,4 +1,4 @@
-package dep.hmfs.online.service.cmb;
+package dep.hmfs.online.service.cbs;
 
 import common.repository.hmfs.dao.TxnVouchLogMapper;
 import common.repository.hmfs.model.TxnVouchLog;
@@ -17,7 +17,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class CmbTxnVouchLogService {
+public class CbsTxnVouchLogService {
 
     @Autowired
     private TxnVouchLogMapper txnVouchLogMapper;
