@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.sql.SQLException;
 
 import pub.platform.form.config.DBConfig;
+import pub.platform.utils.Basic;
 
 //import com.zt.trace.Debug;
 
@@ -39,12 +40,12 @@ import pub.platform.form.config.DBConfig;
  */
 
 public class RecordSet {
-    private List    records    = new ArrayList();
-    private HashMap metadata   = new HashMap();
-    private List    fieldNames = new ArrayList();
-    private int currentNo   = -1;
+    private List records = new ArrayList();
+    private HashMap metadata = new HashMap();
+    private List fieldNames = new ArrayList();
+    private int currentNo = -1;
     private int recordCount = 0;
-    private int fieldCount  = 0;
+    private int fieldCount = 0;
 
     /**
      * @param rs
@@ -54,8 +55,7 @@ public class RecordSet {
         init(rs);
     }
 
-    public RecordSet(ResultSet rs, int no)
-    {
+    public RecordSet(ResultSet rs, int no) {
         init(rs, no);
     }
 
@@ -81,8 +81,7 @@ public class RecordSet {
         currentNo = 0;
     }
 
-    public void beforeFirst()
-    {
+    public void beforeFirst() {
         currentNo = -1;
     }
 
@@ -91,37 +90,40 @@ public class RecordSet {
      * @roseuid 3E5D86D10365
      */
     public boolean isLast() {
-        return currentNo == recordCount-1;
+        return currentNo == recordCount - 1;
     }
 
     /**
      * change by zhouwei on 2004-04-13
+     *
      * @roseuid 3E5D7CA3008D
      */
     public void last() {
-        currentNo = recordCount-1;
+        currentNo = recordCount - 1;
     }
 
     /**
      * change by zhouwei on 2004-04-13
+     *
      * @roseuid 3E5D7CA3008D
      */
     public boolean isAfterLast() {
-       return currentNo == recordCount;
+        return currentNo == recordCount;
     }
 
     /**
      * change by zhouwei on 2004-04-13
+     *
      * @return boolean
      * @roseuid 3E5D7CAA01D7
      */
     public boolean next() {
-        if ( currentNo < recordCount - 1 ) {
+        if (currentNo < recordCount - 1) {
             currentNo++;
             return true;
         } else {
-             currentNo++;
-             return false;
+            currentNo++;
+            return false;
         }
     }
 
@@ -130,8 +132,8 @@ public class RecordSet {
      * @roseuid 3E5D7CB200D5
      */
     public boolean previous() {
-        if ( currentNo > 0 ) {
-            currentNo --;
+        if (currentNo > 0) {
+            currentNo--;
             return true;
         }
         return false;
@@ -142,7 +144,7 @@ public class RecordSet {
      * @roseuid 3E5D7CC1000E
      */
     public void absolute(int idx) {
-        if ( idx >= 0 && idx < recordCount ) {
+        if (idx >= 0 && idx < recordCount) {
             currentNo = idx;
         }
     }
@@ -153,9 +155,9 @@ public class RecordSet {
      */
     public void relative(int idx) {
         currentNo += idx;
-        if ( currentNo < 0 )
+        if (currentNo < 0)
             currentNo = 0;
-        if ( currentNo > recordCount )
+        if (currentNo > recordCount)
             currentNo = recordCount - 1;
     }
 
@@ -180,11 +182,11 @@ public class RecordSet {
      * @roseuid 3E5D7DA30384
      */
     public void merge(List list) {
-        if ( list == null )
+        if (list == null)
             return;
-        for ( Iterator it = list.iterator() ; it.hasNext() ; ) {
+        for (Iterator it = list.iterator(); it.hasNext(); ) {
             Object obj = it.next();
-            if ( obj instanceof Record )
+            if (obj instanceof Record)
                 records.add(obj);
         }
     }
@@ -223,9 +225,9 @@ public class RecordSet {
      */
     public RecordMetaData getMetaData(int idx) {
         Collection cl = metadata.values();
-        for ( Iterator it = cl.iterator() ; it.hasNext() ; ) {
-            RecordMetaData rmd = (RecordMetaData)it.next();
-            if ( rmd.getSeqno() == idx )
+        for (Iterator it = cl.iterator(); it.hasNext(); ) {
+            RecordMetaData rmd = (RecordMetaData) it.next();
+            if (rmd.getSeqno() == idx)
                 return rmd;
         }
         return null;
@@ -233,21 +235,21 @@ public class RecordSet {
 
     /**
      * 返回结果集的列数量 （zhouwei add on 2004-01-13）
+     *
      * @param idx
      * @return com.zt.db.RecordMetaData
      * @roseuid 3E5D800400FF
      */
     public int getColumnCount() {
-         return metadata.size();
+        return metadata.size();
     }
 
     /**
-     *
      * @param name
      * @return
      */
     public RecordMetaData getMetaData(String name) {
-        return (RecordMetaData)metadata.get(name);
+        return (RecordMetaData) metadata.get(name);
     }
 
 
@@ -259,30 +261,33 @@ public class RecordSet {
      * @roseuid 3E5D883200BA
      */
     public boolean getBoolean(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return false;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
 
-        if ( rmd.getType() == MetaDataTypes.STRING_TP ) {
-            Record record = (Record)records.get(currentNo);
-            String value  = (String)record.get(columnIdx);
-            if ( value == null || value.equals("0") )
+        if (rmd.getType() == MetaDataTypes.STRING_TP) {
+            Record record = (Record) records.get(currentNo);
+            String value = (String) record.get(columnIdx);
+            if (value == null || value.equals("0"))
                 return false;
             return true;
-        } if ( rmd.getType() == MetaDataTypes.BOOLEAN_TP ) {
-            Record record = (Record)records.get(currentNo);
+        }
+        if (rmd.getType() == MetaDataTypes.BOOLEAN_TP) {
+            Record record = (Record) records.get(currentNo);
             Boolean value = (Boolean) record.get(columnIdx);
             return value.booleanValue();
         } else {
             return false;
         }
     }
-    public String getFieldName(int columnIdx){
-         String name = (String)fieldNames.get(columnIdx);
-         return name;
+
+    public String getFieldName(int columnIdx) {
+        String name = (String) fieldNames.get(columnIdx);
+        return name;
     }
+
     /**
      * @param columnIdx
      * @return byte[]
@@ -298,41 +303,41 @@ public class RecordSet {
      * @roseuid 3E5D88780133
      */
     public short getShort(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return 0;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return 0;
 
         switch (rmd.getType()) {
             case MetaDataTypes.BIGDECIMAL_TP:
-                return ((BigDecimal)value).shortValue();
+                return ((BigDecimal) value).shortValue();
             case MetaDataTypes.BIGINTEGER_TP:
-                return ((BigInteger)value).shortValue();
+                return ((BigInteger) value).shortValue();
             case MetaDataTypes.BOOLEAN_TP:
-                Boolean b = (Boolean)value;
-                if ( b.booleanValue() )
+                Boolean b = (Boolean) value;
+                if (b.booleanValue())
                     return 1;
                 else
                     return 0;
             case MetaDataTypes.DOUBLE_TP:
-                return ((Double)value).shortValue();
+                return ((Double) value).shortValue();
             case MetaDataTypes.FLOAT_TP:
-                return ((Float)value).shortValue();
+                return ((Float) value).shortValue();
             case MetaDataTypes.INTEGER_TP:
-                return ((Integer)value).shortValue();
+                return ((Integer) value).shortValue();
             case MetaDataTypes.LONG_TP:
-                return ((Long)value).shortValue();
+                return ((Long) value).shortValue();
             case MetaDataTypes.SHORT_TP:
-                return ((Short)value).shortValue();
+                return ((Short) value).shortValue();
             case MetaDataTypes.STRING_TP:
                 try {
-                    return Short.parseShort( (String) value);
-                } catch ( Exception e ) {
+                    return Short.parseShort((String) value);
+                } catch (Exception e) {
                     return 0;
                 }
             default:
@@ -346,41 +351,41 @@ public class RecordSet {
      * @roseuid 3E5D888D0269
      */
     public int getInt(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return 0;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return 0;
 
         switch (rmd.getType()) {
             case MetaDataTypes.BIGDECIMAL_TP:
-                return ((BigDecimal)value).intValue();
+                return ((BigDecimal) value).intValue();
             case MetaDataTypes.BIGINTEGER_TP:
-                return ((BigInteger)value).intValue();
+                return ((BigInteger) value).intValue();
             case MetaDataTypes.BOOLEAN_TP:
-                Boolean b = (Boolean)value;
-                if ( b.booleanValue() )
+                Boolean b = (Boolean) value;
+                if (b.booleanValue())
                     return 1;
                 else
                     return 0;
             case MetaDataTypes.DOUBLE_TP:
-                return ((Double)value).intValue();
+                return ((Double) value).intValue();
             case MetaDataTypes.FLOAT_TP:
-                return ((Float)value).intValue();
+                return ((Float) value).intValue();
             case MetaDataTypes.INTEGER_TP:
-                return ((Integer)value).intValue();
+                return ((Integer) value).intValue();
             case MetaDataTypes.LONG_TP:
-                return ((Long)value).intValue();
+                return ((Long) value).intValue();
             case MetaDataTypes.SHORT_TP:
-                return ((Short)value).intValue();
+                return ((Short) value).intValue();
             case MetaDataTypes.STRING_TP:
                 try {
-                    return Integer.parseInt( (String) value);
-                } catch ( Exception e ) {
+                    return Integer.parseInt((String) value);
+                } catch (Exception e) {
                     return 0;
                 }
             default:
@@ -394,41 +399,41 @@ public class RecordSet {
      * @roseuid 3E5D889C0301
      */
     public long getLong(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return 0;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return 0;
 
         switch (rmd.getType()) {
             case MetaDataTypes.BIGDECIMAL_TP:
-                return ((BigDecimal)value).longValue();
+                return ((BigDecimal) value).longValue();
             case MetaDataTypes.BIGINTEGER_TP:
-                return ((BigInteger)value).longValue();
+                return ((BigInteger) value).longValue();
             case MetaDataTypes.BOOLEAN_TP:
-                Boolean b = (Boolean)value;
-                if ( b.booleanValue() )
+                Boolean b = (Boolean) value;
+                if (b.booleanValue())
                     return 1;
                 else
                     return 0;
             case MetaDataTypes.DOUBLE_TP:
-                return ((Double)value).longValue();
+                return ((Double) value).longValue();
             case MetaDataTypes.FLOAT_TP:
-                return ((Float)value).longValue();
+                return ((Float) value).longValue();
             case MetaDataTypes.INTEGER_TP:
-                return ((Integer)value).longValue();
+                return ((Integer) value).longValue();
             case MetaDataTypes.LONG_TP:
-                return ((Long)value).longValue();
+                return ((Long) value).longValue();
             case MetaDataTypes.SHORT_TP:
-                return ((Short)value).longValue();
+                return ((Short) value).longValue();
             case MetaDataTypes.STRING_TP:
                 try {
-                    return Long.parseLong( (String) value);
-                } catch ( Exception e ) {
+                    return Long.parseLong((String) value);
+                } catch (Exception e) {
                     return 0;
                 }
             default:
@@ -442,41 +447,41 @@ public class RecordSet {
      * @roseuid 3E5D88AF00C4
      */
     public float getFloat(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return 0;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return 0;
 
         switch (rmd.getType()) {
             case MetaDataTypes.BIGDECIMAL_TP:
-                return ((BigDecimal)value).floatValue();
+                return ((BigDecimal) value).floatValue();
             case MetaDataTypes.BIGINTEGER_TP:
-                return ((BigInteger)value).floatValue();
+                return ((BigInteger) value).floatValue();
             case MetaDataTypes.BOOLEAN_TP:
-                Boolean b = (Boolean)value;
-                if ( b.booleanValue() )
+                Boolean b = (Boolean) value;
+                if (b.booleanValue())
                     return 1;
                 else
                     return 0;
             case MetaDataTypes.DOUBLE_TP:
-                return ((Double)value).floatValue();
+                return ((Double) value).floatValue();
             case MetaDataTypes.FLOAT_TP:
-                return ((Float)value).floatValue();
+                return ((Float) value).floatValue();
             case MetaDataTypes.INTEGER_TP:
-                return ((Integer)value).floatValue();
+                return ((Integer) value).floatValue();
             case MetaDataTypes.LONG_TP:
-                return ((Long)value).floatValue();
+                return ((Long) value).floatValue();
             case MetaDataTypes.SHORT_TP:
-                return ((Short)value).floatValue();
+                return ((Short) value).floatValue();
             case MetaDataTypes.STRING_TP:
                 try {
-                    return Float.parseFloat( (String) value);
-                } catch ( Exception e ) {
+                    return Float.parseFloat((String) value);
+                } catch (Exception e) {
                     return 0;
                 }
             default:
@@ -490,41 +495,41 @@ public class RecordSet {
      * @roseuid 3E5D88C701AE
      */
     public double getDouble(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return 0;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return 0;
 
         switch (rmd.getType()) {
             case MetaDataTypes.BIGDECIMAL_TP:
-                return ((BigDecimal)value).doubleValue();
+                return ((BigDecimal) value).doubleValue();
             case MetaDataTypes.BIGINTEGER_TP:
-                return ((BigInteger)value).doubleValue();
+                return ((BigInteger) value).doubleValue();
             case MetaDataTypes.BOOLEAN_TP:
-                Boolean b = (Boolean)value;
-                if ( b.booleanValue() )
+                Boolean b = (Boolean) value;
+                if (b.booleanValue())
                     return 1;
                 else
                     return 0;
             case MetaDataTypes.DOUBLE_TP:
-                return ((Double)value).doubleValue();
+                return ((Double) value).doubleValue();
             case MetaDataTypes.FLOAT_TP:
-                return ((Float)value).doubleValue();
+                return ((Float) value).doubleValue();
             case MetaDataTypes.INTEGER_TP:
-                return ((Integer)value).doubleValue();
+                return ((Integer) value).doubleValue();
             case MetaDataTypes.LONG_TP:
-                return ((Long)value).doubleValue();
+                return ((Long) value).doubleValue();
             case MetaDataTypes.SHORT_TP:
-                return ((Short)value).doubleValue();
+                return ((Short) value).doubleValue();
             case MetaDataTypes.STRING_TP:
                 try {
-                    return Double.parseDouble( (String) value);
-                } catch ( Exception e ) {
+                    return Double.parseDouble((String) value);
+                } catch (Exception e) {
                     return 0;
                 }
             default:
@@ -547,17 +552,17 @@ public class RecordSet {
      * @roseuid 3E5D88F000F9
      */
     public String getString(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return null;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return null;
 
-        if (( rmd.getType() == MetaDataTypes.CALENDAR_TP )||(rmd.getType() == MetaDataTypes.TIMESTAMP_TP )){
+        if ((rmd.getType() == MetaDataTypes.CALENDAR_TP) || (rmd.getType() == MetaDataTypes.TIMESTAMP_TP)) {
             String[] DateStr = value.toString().trim().split(" ");
             return DateStr[0];
         }
@@ -565,14 +570,14 @@ public class RecordSet {
     }
 
     public String getTimeString(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return null;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null )
+        if (value == null)
             return null;
 
         return value.toString().trim().split("\\.")[0];
@@ -584,26 +589,26 @@ public class RecordSet {
      * @roseuid 3E5D8903036D
      */
     public Date getCalendar(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return null;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
-        if ( value == null ){
+        if (value == null) {
             return null;
-        }else{
+        } else {
         }
 
 
-        if (( rmd.getType() == MetaDataTypes.CALENDAR_TP )||(rmd.getType() == MetaDataTypes.TIMESTAMP_TP )){
-            Date d=(Date)value;
+        if ((rmd.getType() == MetaDataTypes.CALENDAR_TP) || (rmd.getType() == MetaDataTypes.TIMESTAMP_TP)) {
+            Date d = (Date) value;
 
             //Calendar c=Calendar.getInstance();
             //c.set(1900+d.getYear(),d.getMonth(),d.getDate());
             return d;
-        }else{
+        } else {
             return null;
         }
     }
@@ -614,12 +619,12 @@ public class RecordSet {
      * @roseuid 3E5D894200B1
      */
     public Object getObject(int columnIdx) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
             return null;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
         Object value = record.get(columnIdx);
         return value;
     }
@@ -640,7 +645,7 @@ public class RecordSet {
      * @roseuid 3E5D8A760186
      */
     public boolean getBoolean(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return false;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getBoolean(columnIdx);
@@ -661,7 +666,7 @@ public class RecordSet {
      * @roseuid 3E5D8AA50089
      */
     public short getShort(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getShort(columnIdx);
@@ -673,7 +678,7 @@ public class RecordSet {
      * @roseuid 3E5D8AB803C6
      */
     public int getInt(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getInt(columnIdx);
@@ -685,7 +690,7 @@ public class RecordSet {
      * @roseuid 3E5D8AD60210
      */
     public long getLong(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getLong(columnIdx);
@@ -697,7 +702,7 @@ public class RecordSet {
      * @roseuid 3E5D8AF00286
      */
     public float getFloat(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getFloat(columnIdx);
@@ -709,7 +714,7 @@ public class RecordSet {
      * @roseuid 3E5D8B0300C1
      */
     public double getDouble(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getDouble(columnIdx);
@@ -721,7 +726,7 @@ public class RecordSet {
      * @roseuid 3E5D8B110053
      */
     public char getChar(String columnName) throws Exception {
-        if ( columnName == null )
+        if (columnName == null)
             return 0;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getChar(columnIdx);
@@ -733,13 +738,14 @@ public class RecordSet {
      * @roseuid 3E5D8B1F0189
      */
     public String getString(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return "";
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getString(columnIdx);
     }
+
     public String getTimeString(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return "";
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getTimeString(columnIdx);
@@ -748,24 +754,25 @@ public class RecordSet {
 
     /**
      * If the value of the column is null, String returned is set with "";
+     *
      * @param columnName
      * @return
      */
     public String getStringSmart(String columnName) {
-         if ( columnName == null ) {
-              return "";
-         }
-         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
+        if (columnName == null) {
+            return "";
+        }
+        int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
 
-         String columnValue = null;
+        String columnValue = null;
 
-         if(getString(columnIdx) != null) {
-              columnValue = getString(columnIdx).trim();
-         } else {
-              columnValue = "";
-         }
+        if (getString(columnIdx) != null) {
+            columnValue = getString(columnIdx).trim();
+        } else {
+            columnValue = "";
+        }
 
-         return columnValue;
+        return columnValue;
     }
 
     /**
@@ -774,7 +781,7 @@ public class RecordSet {
      * @roseuid 3E5D8B310121
      */
     public Date getCalendar(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return null;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getCalendar(columnIdx);
@@ -786,7 +793,7 @@ public class RecordSet {
      * @roseuid 3E5D8B4601A3
      */
     public Object getObject(String columnName) {
-        if ( columnName == null )
+        if (columnName == null)
             return null;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
         return getObject(columnIdx);
@@ -799,10 +806,10 @@ public class RecordSet {
      * @roseuid 3E5D8B55035D
      */
     public Object getObject(String columnName, String type) throws Exception {
-        if ( columnName == null )
+        if (columnName == null)
             return null;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
-        return getObject(columnIdx,type);
+        return getObject(columnIdx, type);
     }
 
     /**
@@ -811,28 +818,30 @@ public class RecordSet {
      * @roseuid 3E5D8981013E
      */
     public void setObject(int columnIdx, Object obj) {
-        if ( columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount )
-            return ;
+        if (columnIdx < 0 || columnIdx > fieldCount || currentNo < 0 || currentNo > recordCount)
+            return;
 
-        String name = (String)fieldNames.get(columnIdx);
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
-        Record record = (Record)records.get(currentNo);
-        record.set(columnIdx,obj);
+        String name = (String) fieldNames.get(columnIdx);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+        Record record = (Record) records.get(currentNo);
+        record.set(columnIdx, obj);
     }
+
     /**
      * @param columnIdx
      * @param obj
      * @roseuid 3E5D8981013E
      */
     public void setObject(String columnName, Object obj) {
-        if ( columnName == null )
-            return ;
+        if (columnName == null)
+            return;
         int columnIdx = fieldNames.indexOf(columnName.toLowerCase());
-        setObject(columnIdx,obj);
+        setObject(columnIdx, obj);
     }
 
     /**
      * 获得记录数
+     *
      * @return
      */
     public int getRecordCount() {
@@ -841,6 +850,7 @@ public class RecordSet {
 
     /**
      * 获得当前记录号
+     *
      * @return
      */
     public int getCurrentNo() {
@@ -849,6 +859,7 @@ public class RecordSet {
 
     /**
      * 获得栏位个数
+     *
      * @return
      */
     public int getfieldCount() {
@@ -863,7 +874,7 @@ public class RecordSet {
      * @roseuid 3E5D8A2B00D4
      */
     public int findColumn(String name) {
-        RecordMetaData rmd = (RecordMetaData)metadata.get(name);
+        RecordMetaData rmd = (RecordMetaData) metadata.get(name);
         return rmd.getSeqno();
     }
 
@@ -873,7 +884,7 @@ public class RecordSet {
     public void close() {
         records.clear();
         metadata.clear();
-        records  = null;
+        records = null;
         metadata = null;
     }
 
@@ -888,22 +899,27 @@ public class RecordSet {
             for (int i = 1; i <= count; i++) {
                 String name = rsmd.getColumnName(i);
 
-                if ( name != null )
+                if (name != null)
                     name = name.toLowerCase();
                 String typeName = rsmd.getColumnClassName(i);
                 String caption = rsmd.getColumnLabel(i);
 
-                RecordMetaData rmd = new RecordMetaData(name, typeName, caption,i);
-                metadata.put(name,rmd);
+                //---20120317  zhanrui for db2
+                if (Basic.getDbType().equals("DB2")) {
+                    caption = caption.toLowerCase();
+                    name = caption;
+                }
+                //---
+
+                RecordMetaData rmd = new RecordMetaData(name, typeName, caption, i);
+                metadata.put(name, rmd);
                 fieldNames.add(name);
-//Debug.debug(name+"="+typeName+"="+caption);
             }
             fieldCount = count;
-//Debug.debug(""+rs.getRow());
             while (rs.next()) {
                 ArrayList record = new ArrayList();
                 for (int i = 1; i <= count; i++) {
-                    String name = (String)fieldNames.get(i-1);
+                    String name = (String) fieldNames.get(i - 1);
                     RecordMetaData rmd = (RecordMetaData) metadata.get(name);
 
 
@@ -963,93 +979,93 @@ public class RecordSet {
 //Debug.debug("转换完毕");
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-             System.out.print(sqle.getMessage());
+            System.out.print(sqle.getMessage());
         }
     }
 
-    private void init(ResultSet rs,int resultNo) {
-    if (rs == null)
-        return;
+    private void init(ResultSet rs, int resultNo) {
+        if (rs == null)
+            return;
 
-    try {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int count = rsmd.getColumnCount();
-        for (int i = 1; i <= count; i++) {
-            String name = rsmd.getColumnName(i);
-            if ( name != null )
-                name = name.toLowerCase();
-            String typeName = rsmd.getColumnClassName(i);
-            String caption = rsmd.getColumnLabel(i);
-            RecordMetaData rmd = new RecordMetaData(name, typeName, caption,i);
-            metadata.put(name,rmd);
-            fieldNames.add(name);
-        }
-        fieldCount = count;
-
-       while (rs.next()) {
-            ArrayList record = new ArrayList();
-            if ( !DBConfig.config() ) {
-                 count = 1;
-            }
+        try {
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int count = rsmd.getColumnCount();
             for (int i = 1; i <= count; i++) {
-                String name = (String)fieldNames.get(i-1);
-                RecordMetaData rmd = (RecordMetaData) metadata.get(name);
+                String name = rsmd.getColumnName(i);
+                if (name != null)
+                    name = name.toLowerCase();
+                String typeName = rsmd.getColumnClassName(i);
+                String caption = rsmd.getColumnLabel(i);
+                RecordMetaData rmd = new RecordMetaData(name, typeName, caption, i);
+                metadata.put(name, rmd);
+                fieldNames.add(name);
+            }
+            fieldCount = count;
 
-                //System.out.println(rmd.getType());
+            while (rs.next()) {
+                ArrayList record = new ArrayList();
+                if (!DBConfig.config()) {
+                    count = 1;
+                }
+                for (int i = 1; i <= count; i++) {
+                    String name = (String) fieldNames.get(i - 1);
+                    RecordMetaData rmd = (RecordMetaData) metadata.get(name);
 
-                switch (rmd.getType()) {
-                    case MetaDataTypes.BIGDECIMAL_TP:
-                    case MetaDataTypes.BIGINTEGER_TP:
-                        record.add(rs.getBigDecimal(i));
-                        break;
-                    case MetaDataTypes.BOOLEAN_TP:
-                        record.add(new Boolean(rs.getBoolean(i)));
-                        break;
-                    case MetaDataTypes.BYTE_TP:
-                        record.add(new Byte(rs.getByte(i)));
-                        break;
-                    case MetaDataTypes.CALENDAR_TP:
-                        java.sql.Date d = rs.getDate(i);
+                    //System.out.println(rmd.getType());
+
+                    switch (rmd.getType()) {
+                        case MetaDataTypes.BIGDECIMAL_TP:
+                        case MetaDataTypes.BIGINTEGER_TP:
+                            record.add(rs.getBigDecimal(i));
+                            break;
+                        case MetaDataTypes.BOOLEAN_TP:
+                            record.add(new Boolean(rs.getBoolean(i)));
+                            break;
+                        case MetaDataTypes.BYTE_TP:
+                            record.add(new Byte(rs.getByte(i)));
+                            break;
+                        case MetaDataTypes.CALENDAR_TP:
+                            java.sql.Date d = rs.getDate(i);
 //                            Calendar calendar = GregorianCalendar.getInstance();
 //                            System.out.println("aaaaaaaa"+d);
 //                            calendar.set(d.getYear()+1900,d.getMonth(),d.getDay());
-                        record.add(d);
-                        break;
-                    case MetaDataTypes.CHARACTER_TP:
-                        break;
-                    case MetaDataTypes.DOUBLE_TP:
-                        record.add(new Double(rs.getDouble(i)));
-                        break;
-                    case MetaDataTypes.FLOAT_TP:
-                        record.add(new Float(rs.getFloat(i)));
-                        break;
-                    case MetaDataTypes.INTEGER_TP:
-                        record.add(new Integer(rs.getInt(i)));
-                        break;
-                    case MetaDataTypes.LONG_TP:
-                        record.add(new Long(rs.getLong(i)));
-                        break;
-                    case MetaDataTypes.SHORT_TP:
-                        record.add(new Short(rs.getShort(i)));
-                        break;
-                    case MetaDataTypes.STRING_TP:
-                        record.add(rs.getString(i));
-                        break;
-                    default:
-                        InputStream is = rs.getBinaryStream(i);
-                        record.add(is);
-                } //switch
-            } // for
+                            record.add(d);
+                            break;
+                        case MetaDataTypes.CHARACTER_TP:
+                            break;
+                        case MetaDataTypes.DOUBLE_TP:
+                            record.add(new Double(rs.getDouble(i)));
+                            break;
+                        case MetaDataTypes.FLOAT_TP:
+                            record.add(new Float(rs.getFloat(i)));
+                            break;
+                        case MetaDataTypes.INTEGER_TP:
+                            record.add(new Integer(rs.getInt(i)));
+                            break;
+                        case MetaDataTypes.LONG_TP:
+                            record.add(new Long(rs.getLong(i)));
+                            break;
+                        case MetaDataTypes.SHORT_TP:
+                            record.add(new Short(rs.getShort(i)));
+                            break;
+                        case MetaDataTypes.STRING_TP:
+                            record.add(rs.getString(i));
+                            break;
+                        default:
+                            InputStream is = rs.getBinaryStream(i);
+                            record.add(is);
+                    } //switch
+                } // for
 
-            records.add(new Record(record));
-            recordCount++;
-            if(recordCount==resultNo){
-                break;
-            }
-        } // while
-    } catch (SQLException sqle) {
-        sqle.printStackTrace();
+                records.add(new Record(record));
+                recordCount++;
+                if (recordCount == resultNo) {
+                    break;
+                }
+            } // while
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
     }
-}
 
 }

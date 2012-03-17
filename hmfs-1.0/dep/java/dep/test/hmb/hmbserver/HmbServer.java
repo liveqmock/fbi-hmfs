@@ -85,7 +85,7 @@ public class HmbServer implements Runnable {
     //==========================================================================
     public static void main(String[] args) throws Exception {
         messageFactory = new HmbMessageFactory();
-        ServerSocket server = new ServerSocket(60000);
+        ServerSocket server = new ServerSocket(42014);
         log.info("开始接收报文...");
         while (true) {
             Socket sock = server.accept();
