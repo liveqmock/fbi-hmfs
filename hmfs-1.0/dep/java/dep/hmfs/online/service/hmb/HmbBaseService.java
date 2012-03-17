@@ -117,34 +117,38 @@ public class HmbBaseService {
         int index = 0;
         String msgSn = "";
         HisMsginLogExample example = new HisMsginLogExample();
-        example.createCriteria().andMsgSnEqualTo(msgSn).andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
+        example.createCriteria().andMsgSnEqualTo(msgSn);
         List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
-        if(msginLogList.size() == 0) {
-            throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
-        }
-        for (HisMsginLog record : msginLogList) {
-                record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
-                hisMsginLogMapper.updateByPrimaryKey(record);
-        }
-        for (HmbMsg hmbMsg : hmbMsgList) {
-            HisMsginLog msginLog = new HisMsginLog();
-            BeanUtils.copyProperties(msginLog, hmbMsg);
-            String guid = UUID.randomUUID().toString();
-            msginLog.setPkid(guid);
-            msginLog.setTxnCode(txnCode);
-            msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
-
-            index++;
-            if (index == 1) {
-                msgSn = msginLog.getMsgSn();
-            } else {
-                msginLog.setMsgSn(msgSn);
+        if (msginLogList.size() > 0) {
+            for (HisMsginLog record : msginLogList) {
+                if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
+                    record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
+                    hisMsginLogMapper.updateByPrimaryKey(record);
+                } else {
+                    throw new RuntimeException("该交易已进入处理流程，无法撤销");
+                }
             }
-            msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+        } else {
+            for (HmbMsg hmbMsg : hmbMsgList) {
+                HisMsginLog msginLog = new HisMsginLog();
+                BeanUtils.copyProperties(msginLog, hmbMsg);
+                String guid = UUID.randomUUID().toString();
+                msginLog.setPkid(guid);
+                msginLog.setTxnCode(txnCode);
+                msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+                msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
 
-            hisMsginLogMapper.insert(msginLog);
+                index++;
+                if (index == 1) {
+                    msgSn = msginLog.getMsgSn();
+                } else {
+                    msginLog.setMsgSn(msgSn);
+                }
+                msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+                msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+
+                hisMsginLogMapper.insert(msginLog);
+            }
         }
         return hmbMsgList.size();
     }
