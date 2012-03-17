@@ -49,7 +49,7 @@ public class HmbMsgHandleService implements IMessageHandler {
         } catch (IOException e) {
             logger.error("HMFS报文处理异常！", e);
         }
-        return hmbAbstractTxnProcessor != null ? null : hmbAbstractTxnProcessor.process(txnCode, msgSn, rtnMap.get(txnCode));
+        return hmbAbstractTxnProcessor == null ? null : hmbAbstractTxnProcessor.process(txnCode, msgSn, rtnMap.get(txnCode));
 
     }
 }

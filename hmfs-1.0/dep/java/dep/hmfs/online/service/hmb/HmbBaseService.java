@@ -124,7 +124,7 @@ public class HmbBaseService {
                 record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
                 hisMsginLogMapper.updateByPrimaryKey(record);
             } else {
-                throw new RuntimeException("报文非初始状态，不接收重复接收");
+                throw new RuntimeException("报文非初始状态，重复接收失败");
             }
         }
         for (HmbMsg hmbMsg : hmbMsgList) {
