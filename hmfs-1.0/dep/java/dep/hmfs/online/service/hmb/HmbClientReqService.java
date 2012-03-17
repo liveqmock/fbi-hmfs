@@ -47,7 +47,7 @@ public class HmbClientReqService extends HmbBaseService {
         byte[] txnBuf = messageFactory.marshal(txnCode, hmbMsgList);
         Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
         List<HmbMsg> rtnMsgList = rtnMsgMap.get("9999");
-        // 重复发送时，返回发送的报文
+        // 重复发送时，返回发送的报文 rtnMsgList应为null
         if (rtnMsgList == null) {
             return true;
         } else {
@@ -110,7 +110,12 @@ public class HmbClientReqService extends HmbBaseService {
         } else {
             throw new RuntimeException("票据状态错误: " + vouchStatus);
         }
-        return true;
+        byte[] txnBuf = messageFactory.marshal("5610", hmbMsgList);
+        Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
+        List<HmbMsg> rtnMsgList = rtnMsgMap.get("5610");
+        // 当且仅当首次发送交易信息时，返回9999报文
+        SummaryResponseMsg msg006 = (SummaryResponseMsg) rtnMsgList.get(0);
+        return "00".equals(msg006.rtnInfoCode);
     }
 
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
