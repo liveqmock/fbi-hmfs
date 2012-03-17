@@ -5,7 +5,7 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
 import dep.hmfs.online.service.BookkeepingService;
-import dep.hmfs.online.service.HmActinfoFundService;
+import dep.hmfs.online.service.HmbActinfoService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
@@ -41,7 +41,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
-    private HmActinfoFundService hmActinfoFundService;
+    private HmbActinfoService hmbActinfoService;
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
@@ -94,7 +94,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
             if (payInfoList.size() > 0) {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HisMsginLog hisMsginLog : payInfoList) {
-                    HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
+                    HmActinfoFund actinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
                     record.accountName = hisMsginLog.getInfoName();   //21
                     record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());

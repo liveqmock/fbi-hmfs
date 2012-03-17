@@ -37,15 +37,12 @@ public class BookkeepingService {
     @Autowired
     private TxnFundLogMapper txnFundLogMapper;
     @Autowired
-    private HmActinfoFundService hmActinfoFundService;
-    @Autowired
-    private HmActinfoCbsService hmActinfoCbsService;
-
+    private HmbActinfoService hmbActinfoService;
 
     // 更新会计账号信息
     @Transactional
     public int cbsActBookkeeping(String cbsSerialNo, BigDecimal amt, String dc) throws ParseException {
-        HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.getFirstHmActinfoCbs();
+        HmActinfoCbs hmActinfoCbs = hmbActinfoService.getFirstHmActinfoCbs();
         return cbsActUpdate(hmActinfoCbs, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActinfoCbs, amt, dc);
     }
 
@@ -74,7 +71,7 @@ public class BookkeepingService {
     //核算户记帐 处理余额及流水
     @Transactional
     public int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
-        HmActinfoFund hmActinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(fundActno);
+        HmActinfoFund hmActinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
         if (hmActinfoFund == null) {
             return 0;
         }

@@ -24,7 +24,7 @@ public class HmbTxn6110Processor extends HmbAbstractTxnProcessor {
             msg004.infoId1 = msg003.infoId1;
             msg004.infoIdType1 = msg003.infoIdType1;
             msg004.districtId = msg003.districtId;
-            int cnt = hmActinfoFundService.cancelActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+            int cnt = hmbActinfoService.cancelActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
             msg004.rtnInfo = cnt + "笔销户处理完成";
         } catch (Exception e) {
             logger.error("6110交易处理异常！", e);

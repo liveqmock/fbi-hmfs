@@ -4,7 +4,7 @@ import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg005;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
-import dep.hmfs.online.service.HmActinfoFundService;
+import dep.hmfs.online.service.HmbActinfoService;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class HmbTxn6220Processor extends HmbAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn6220Processor.class);
     @Autowired
-    private HmActinfoFundService hmActinfoFundService;
+    private HmbActinfoService hmbActinfoService;
 
     @Override
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
@@ -38,7 +38,7 @@ public class HmbTxn6220Processor extends HmbAbstractTxnProcessor {
         summaryMsg.rtnInfoCode = "00";
 
         try {
-            hmActinfoFundService.handleTxn6220(txnCode, hmbMsgList);
+            hmbActinfoService.handleTxn6220(txnCode, hmbMsgList);
             summaryMsg.rtnInfo = "交易处理完成.";
         } catch (Exception e) {
             logger.error(txnCode + "交易处理异常！", e);

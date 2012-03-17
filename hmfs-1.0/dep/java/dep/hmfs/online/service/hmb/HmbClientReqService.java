@@ -5,7 +5,7 @@ import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
-import dep.hmfs.online.service.HmActinfoFundService;
+import dep.hmfs.online.service.HmbActinfoService;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class HmbClientReqService extends HmbBaseService {
 
     @Autowired
-    private HmActinfoFundService hmActinfoFundService;
+    private HmbActinfoService hmbActinfoService;
 
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HisMsginLog> msginLogList) throws Exception {
@@ -82,7 +82,7 @@ public class HmbClientReqService extends HmbBaseService {
             HisMsginLog totalPayInfo = qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
                 HisMsginLog msginLog = payInfoList.get((int) (i - startNo));
-                HmActinfoFund actinfoFund = hmActinfoFundService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                HmActinfoFund actinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
 
                 Msg037 msg037 = new Msg037();
                 BeanUtils.copyProperties(msg037, actinfoFund);

@@ -24,7 +24,7 @@ public class HmbTxn5140Processor extends HmbAbstractTxnProcessor {
             msg004.infoId1 = msg003.infoId1;
             msg004.infoIdType1 = msg003.infoIdType1;
             msg004.districtId = msg003.districtId;
-            int cnt = hmActinfoFundService.createActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+            int cnt = hmbActinfoService.createActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
             msg004.rtnInfo = cnt + "笔项目分户开户处理完成";
 
         } catch (Exception e) {

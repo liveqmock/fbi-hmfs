@@ -6,7 +6,7 @@ import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.hmfs.online.service.HmActinfoFundService;
+import dep.hmfs.online.service.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbBaseService;
 import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +31,7 @@ public abstract class HmbAbstractTxnProcessor {
     @Resource
     protected HmbBaseService hmbBaseService;
     @Autowired
-    protected HmActinfoFundService hmActinfoFundService;
+    protected HmbActinfoService hmbActinfoService;
 
 
     public abstract byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList);

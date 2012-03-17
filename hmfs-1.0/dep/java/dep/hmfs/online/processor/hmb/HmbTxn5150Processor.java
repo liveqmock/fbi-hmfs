@@ -32,7 +32,7 @@ public class HmbTxn5150Processor extends HmbAbstractTxnProcessor {
             msg006.origMsgSn = msg005.msgSn;
             msg006.rtnInfoCode = "00";
 
-            int cnt = hmActinfoFundService.createActinfoFundsByMsgList(detailHmbMsgList);
+            int cnt = hmbActinfoService.createActinfoFundsByMsgList(detailHmbMsgList);
             msg006.rtnInfo = cnt + "笔5150报文接收完成。";
         } catch (Exception e) {
             logger.error("5150交易处理异常！", e);

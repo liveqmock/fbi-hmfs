@@ -2,11 +2,11 @@ package dep.hmfs.online.processor.cmb;
 
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
-import dep.hmfs.online.service.HmActinfoCbsService;
-import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn7003Processor;
+import dep.hmfs.online.service.HmbActinfoService;
+import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(CmbTxn5001Processor.class);
 
     @Autowired
-    private HmActinfoCbsService hmActinfoCbsService;
+    private HmbActinfoService hmbActinfoService;
     @Autowired
     private CbsTxnCbsLogService cbsTxnCbsLogService;
     @Autowired
@@ -49,7 +49,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
         logger.info("【前台】余额：" + tia5001.body.accountBalance);
         logger.info("【前台】交易日期：" + tia5001.body.txnDate);
 
-        HmActinfoCbs hmActinfoCbs = hmActinfoCbsService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
+        HmActinfoCbs hmActinfoCbs = hmbActinfoService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
         if (hmActinfoCbs == null) {
             throw new RuntimeException("该账户不存在！");
         } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActinfoCbs.getActBal()) != 0) {

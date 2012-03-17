@@ -2,7 +2,10 @@ package dep.hmfs.online.service;
 
 import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
+import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
+import common.repository.hmfs.model.HmActinfoCbs;
+import common.repository.hmfs.model.HmActinfoCbsExample;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.repository.hmfs.model.HmActinfoFundExample;
 import common.service.SystemService;
@@ -27,12 +30,40 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class HmActinfoFundService {
+public class HmbActinfoService {
 
     @Autowired
     private HmActinfoFundMapper hmActinfoFundMapper;
     @Autowired
     private BookkeepingService bookkeepingService;
+
+    @Autowired
+    private HmActinfoCbsMapper hmActinfoCbsMapper;
+
+    public HmActinfoCbs getFirstHmActinfoCbs() {
+        return hmActinfoCbsMapper.selectByExample(new HmActinfoCbsExample()).get(0);
+    }
+
+    public HmActinfoCbs qryHmActinfoCbsByNo(String cbsActNo) {
+        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        example.createCriteria().andCbsActnoEqualTo(cbsActNo);
+        List<HmActinfoCbs> actinfoCbsList = hmActinfoCbsMapper.selectByExample(example);
+        return actinfoCbsList.size() > 0 ? actinfoCbsList.get(0) : null;
+    }
+
+    private int createActinfoCbsByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
+
+        HmActinfoCbs actinfoCbs = new HmActinfoCbs();
+
+        actinfoCbs.setPkid(UUID.randomUUID().toString());
+        BeanUtils.copyProperties(actinfoCbs, hmbMsg);
+        actinfoCbs.setActSts("0");
+        actinfoCbs.setActBal(new BigDecimal(0));
+        actinfoCbs.setIntcPdt(new BigDecimal(0));
+        actinfoCbs.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        actinfoCbs.setRecversion(0);
+        return hmActinfoCbsMapper.insert(actinfoCbs);
+    }
 
     public HmActinfoFund qryHmActinfoFundByFundActNo(String fundActNo) {
         HmActinfoFundExample example = new HmActinfoFundExample();
@@ -113,7 +144,7 @@ public class HmActinfoFundService {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
                 HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
-                if(hmActinfoFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+                if (hmActinfoFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
                     throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                 }
                 hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());

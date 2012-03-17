@@ -24,7 +24,7 @@ public class HmbTxn5160Processor extends HmbAbstractTxnProcessor {
             msg004.infoId1 = msg003.infoId1;
             msg004.infoIdType1 = msg003.infoIdType1;
             msg004.districtId = msg003.districtId;
-            int cnt = hmActinfoFundService.updateActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+            int cnt = hmbActinfoService.updateActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
             msg004.rtnInfo = cnt + "笔核算户信息更新处理完成";
         } catch (Exception e) {
             logger.error("5160交易处理异常！", e);

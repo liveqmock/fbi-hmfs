@@ -38,7 +38,7 @@ public class HmbTxn6210Processor extends HmbAbstractTxnProcessor {
         try {
             //TODO 事务处理
             hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            hmActinfoFundService.splitFundActinfo(txnCode, hmbMsgList);
+            hmbActinfoService.splitFundActinfo(txnCode, hmbMsgList);
             summaryMsg.rtnInfo = "交易处理完成.";
         } catch (Exception e) {
             logger.error(txnCode + "交易处理异常！", e);
