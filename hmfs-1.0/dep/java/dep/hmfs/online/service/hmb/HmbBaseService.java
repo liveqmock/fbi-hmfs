@@ -5,10 +5,8 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.dao.HmSctMapper;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HisMsginLogExample;
-import common.repository.hmfs.model.HisMsgoutLog;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.dao.TmpMsginLogMapper;
+import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
@@ -45,15 +43,14 @@ public class HmbBaseService {
 
     @Resource
     protected HmSctMapper hmSctMapper;
-
     @Resource
     protected HisMsgoutLogMapper hisMsgoutLogMapper;
-
     @Resource
     protected HmbTxnsnGenerator hmbTxnsnGenerator;
-
     @Resource
     protected HmbMessageFactory messageFactory;
+    @Resource
+    protected TmpMsginLogMapper tmpMsginLogMapper;
 
     protected XSocketBlockClient socketBlockClient;
     protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
@@ -101,7 +98,7 @@ public class HmbBaseService {
 
     // 更新初始状态的汇总报文和子报文状态
     @Transactional
-    public int cancelMsginsByMsgSnAndTypes(String msgSn, String[] subMsgTypes) {
+    public int cancelMsginsByMsgSnAndTypes(String msgSn, String[] subMsgTypes) throws InvocationTargetException, IllegalAccessException {
         HisMsginLogExample example = new HisMsginLogExample();
         for (String msgType : subMsgTypes) {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
@@ -112,8 +109,11 @@ public class HmbBaseService {
             throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
         }
         for (HisMsginLog record : msginLogList) {
-            record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
-            hisMsginLogMapper.updateByPrimaryKey(record);
+            // TODO 撤销的交易报文表
+            TmpMsginLog tmpMsginLog = new TmpMsginLog();
+            BeanUtils.copyProperties(tmpMsginLog, record);
+            tmpMsginLogMapper.insert(tmpMsginLog);
+            hisMsginLogMapper.deleteByPrimaryKey(record.getPkid());
         }
         return msginLogList.size();
     }
@@ -167,43 +167,57 @@ public class HmbBaseService {
         }
     }
 
+    /**
+     * @param txnCode
+     * @param hmbMsgList
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException    收取报文后，若数据库中已存在此报文，且此报文仍为初始状态（未进行业务处理），则更新
+     */
+    @Transactional
     public int updateOrInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
-        int index = 0;
         String msgSn = "";
         HisMsginLogExample example = new HisMsginLogExample();
-        example.createCriteria().andMsgSnEqualTo(msgSn);
+        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
         List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
         if (msginLogList.size() > 0) {
             for (HisMsginLog record : msginLogList) {
                 if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
-                    record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());
-                    hisMsginLogMapper.updateByPrimaryKey(record);
+                    return msginLogList.size();
                 } else {
                     throw new RuntimeException("该交易已进入处理流程，无法撤销");
                 }
             }
         } else {
-            for (HmbMsg hmbMsg : hmbMsgList) {
-                HisMsginLog msginLog = new HisMsginLog();
-                BeanUtils.copyProperties(msginLog, hmbMsg);
-                String guid = UUID.randomUUID().toString();
-                msginLog.setPkid(guid);
-                msginLog.setTxnCode(txnCode);
-                msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-                msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
-
-                index++;
-                if (index == 1) {
-                    msgSn = msginLog.getMsgSn();
-                } else {
-                    msginLog.setMsgSn(msgSn);
-                }
-                msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-                msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
-
-                hisMsginLogMapper.insert(msginLog);
-            }
+            return insertMsginsByHmbMsgList(txnCode, hmbMsgList);
         }
+        return 1;
+    }
+
+    private int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+        int index = 0;
+        String msgSn = "";
+        for (HmbMsg hmbMsg : hmbMsgList) {
+            HisMsginLog msginLog = new HisMsginLog();
+            BeanUtils.copyProperties(msginLog, hmbMsg);
+            String guid = UUID.randomUUID().toString();
+            msginLog.setPkid(guid);
+            msginLog.setTxnCode(txnCode);
+            msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+            msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
+
+            index++;
+            if (index == 1) {
+                msgSn = msginLog.getMsgSn();
+            } else {
+                msginLog.setMsgSn(msgSn);
+            }
+            msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+
+            hisMsginLogMapper.insert(msginLog);
+        }
+
         return hmbMsgList.size();
     }
 
