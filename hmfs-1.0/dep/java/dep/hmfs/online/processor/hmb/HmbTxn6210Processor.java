@@ -9,6 +9,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class HmbTxn6210Processor extends HmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn6210Processor.class);
 
     @Override
+    @Transactional
     public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         Msg009 msg009 = (Msg009) hmbMsgList.get(0);
 
