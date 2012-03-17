@@ -120,7 +120,7 @@ public class HmbBaseService {
         example.createCriteria().andMsgSnEqualTo(msgSn).andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
         List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
         if(msginLogList.size() == 0) {
-            throw new RuntimeException("该交易报文已进入业务处理状态");
+            throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
         }
         for (HisMsginLog record : msginLogList) {
                 record.setTxnCtlSts(TxnCtlSts.CANCEL.getCode());

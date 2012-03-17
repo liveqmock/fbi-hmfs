@@ -40,7 +40,7 @@ public class HmbTxn7002Processor extends HmbAbstractTxnProcessor {
         } catch (Exception e) {
             logger.error("7002交易处理异常！", e);
             msg002.rtnInfoCode = "99";
-            msg002.rtnInfo = "报文接收失败";
+            msg002.rtnInfo = "交易失败,原因：" + e.getMessage();
         }
         // 响应
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();

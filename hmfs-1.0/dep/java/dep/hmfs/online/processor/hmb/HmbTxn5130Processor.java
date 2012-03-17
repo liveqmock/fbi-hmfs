@@ -25,11 +25,11 @@ public class HmbTxn5130Processor extends HmbAbstractTxnProcessor {
             msg004.infoIdType1 = msg003.infoIdType1;
             msg004.districtId = msg003.districtId;
             int cnt = hmActinfoFundService.createActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
-            msg004.rtnInfo = cnt + "笔分户核算户开户处理完成";
+            msg004.rtnInfo = cnt + "笔分户核算户开户完成";
         } catch (Exception e) {
             logger.error("5130交易处理异常！", e);
             msg004.rtnInfoCode = "99";
-            msg004.rtnInfo = "报文接收失败";
+            msg004.rtnInfo = "交易失败,原因：" + e.getMessage();
         }
         // 响应
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();

@@ -29,7 +29,7 @@ public class HmbTxn6110Processor extends HmbAbstractTxnProcessor {
         } catch (Exception e) {
             logger.error("6110交易处理异常！", e);
             msg004.rtnInfoCode = "99";
-            msg004.rtnInfo = "报文接收失败";
+            msg004.rtnInfo = "交易失败,原因：" + e.getMessage();
         }
         // 响应
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
