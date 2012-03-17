@@ -5,7 +5,7 @@ import common.repository.hmfs.model.TxnCbsLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn7003Processor;
-import dep.hmfs.online.service.HmbActinfoService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

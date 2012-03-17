@@ -1,4 +1,4 @@
-package dep.hmfs.online.service;
+package dep.hmfs.online.service.cbs;
 
 import common.enums.DCFlagCode;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
@@ -7,6 +7,7 @@ import common.repository.hmfs.dao.TxnCbsLogMapper;
 import common.repository.hmfs.dao.TxnFundLogMapper;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.hmb;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.hmfs.online.service.HmbActinfoService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

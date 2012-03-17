@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
-import dep.hmfs.online.service.BookkeepingService;
+import dep.hmfs.online.service.cbs.BookkeepingService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
 import dep.hmfs.online.service.hmb.HmbClientReqService;

@@ -5,7 +5,7 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA2002;
-import dep.hmfs.online.service.BookkeepingService;
+import dep.hmfs.online.service.cbs.BookkeepingService;
 import dep.hmfs.online.service.cbs.CbsTxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.springframework.beans.factory.annotation.Autowired;

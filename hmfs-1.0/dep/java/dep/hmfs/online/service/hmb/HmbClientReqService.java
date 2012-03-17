@@ -5,7 +5,6 @@ import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
-import dep.hmfs.online.service.HmbActinfoService;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

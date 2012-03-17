@@ -6,7 +6,7 @@ import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg004;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.hmfs.online.service.HmbActinfoService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbBaseService;
 import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;

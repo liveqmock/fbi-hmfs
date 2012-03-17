@@ -4,7 +4,7 @@ import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg005;
 import dep.hmfs.online.processor.hmb.domain.Msg006;
-import dep.hmfs.online.service.HmbActinfoService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
