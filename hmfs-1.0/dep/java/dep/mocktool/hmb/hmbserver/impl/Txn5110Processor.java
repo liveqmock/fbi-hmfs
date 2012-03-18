@@ -1,8 +1,8 @@
-package dep.test.hmb.hmbserver.impl;
+package dep.mocktool.hmb.hmbserver.impl;
 
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg100;
-import dep.test.hmb.hmbserver.AbstractTxnProcessor;
+import dep.mocktool.hmb.hmbserver.AbstractTxnProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

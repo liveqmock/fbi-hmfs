@@ -1,4 +1,4 @@
-package dep.test.hmb.hmbclient;
+package dep.mocktool.hmb.hmbclient;
 
 import common.repository.hmfs.dao.TmpMsginLogMapper;
 import common.repository.hmfs.model.TmpMsginLog;

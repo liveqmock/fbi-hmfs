@@ -43,7 +43,6 @@ public class WebTxn9000Processor extends WebAbstractTxnProcessor{
             //保存到本地数据库
             hmbSysTxnService.processChkBalResponse(msgList);
             //数据核对处理
-
         }
 
         return null;

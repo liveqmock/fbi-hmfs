@@ -1,4 +1,4 @@
-package dep.test.hmb.hmbclient;
+package dep.mocktool.hmb.hmbclient;
 
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.util.PropertyManager;

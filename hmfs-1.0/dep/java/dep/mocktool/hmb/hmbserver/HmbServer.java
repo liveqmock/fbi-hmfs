@@ -1,4 +1,4 @@
-package dep.test.hmb.hmbserver;
+package dep.mocktool.hmb.hmbserver;
 
 import dep.gateway.hmb8583.HmbMessageFactory;
 import org.slf4j.Logger;

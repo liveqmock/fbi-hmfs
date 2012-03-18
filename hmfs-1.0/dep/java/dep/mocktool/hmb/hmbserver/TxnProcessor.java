@@ -1,4 +1,4 @@
-package dep.test.hmb.hmbserver;
+package dep.mocktool.hmb.hmbserver;
 
 /**
  * Created by IntelliJ IDEA.
