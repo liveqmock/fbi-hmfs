@@ -27,10 +27,10 @@ public class ContainerManager {
         webSocketServer.start();
     }
 
-    public static Object getBean(String key) throws IOException {
-        if (context == null) {
+    public static Object getBean(String key) {
+        /*if (context == null) {
             init();
-        }
+        }*/
         return context.getBean(key);
     }
 

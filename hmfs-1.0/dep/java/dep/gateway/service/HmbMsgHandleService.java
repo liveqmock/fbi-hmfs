@@ -1,16 +1,20 @@
 package dep.gateway.service;
 
+import common.service.SystemService;
 import dep.ContainerManager;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.HmbAbstractTxnProcessor;
-import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
+import dep.hmfs.online.processor.hmb.HmbAsyncAbstractTxnProcessor;
+import dep.hmfs.online.processor.hmb.domain.*;
+import dep.util.PropertyManager;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +33,11 @@ public class HmbMsgHandleService implements IMessageHandler {
     @Autowired
     private HmbMessageFactory mf;
 
-    // 接收后返回9999报文
-    //private static final String[] ASYN_RES_TXNCODES = {"5210", "5310"};
-    // 需同步处理
-    //private static final String[] SYN_RES_TXNCODES = {"5110", "5120", "5130", "5140", "5150",
-    //"5160", "6110", "6210", "6220", "7002"};
+    /*// 接收后返回9999报文
+    private static final String[] ASYN_RES_TXNCODES = {"5210", "5310"};
+    // 需同步处理 暂时去掉 5110，5150
+    private static final String[] SYN_RES_TXNCODES = {"5120", "5130", "5140", "5160",
+            "6110", "6210", "6220", "7002"};*/
 
     @Override
     public byte[] handleMessage(byte[] bytes) {
@@ -41,15 +45,83 @@ public class HmbMsgHandleService implements IMessageHandler {
         String txnCode = (String) rtnMap.keySet().toArray()[0];
         logger.info("【本地服务端HmbMsgHandleService】接收到交易码：" + txnCode);
         logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文和子报文总数：" + rtnMap.get(txnCode).size());
-        logger.info("【本地服务端HmbMsgHandleService】接收到汇总报文类型：" + rtnMap.get(txnCode).get(0).getMsgType());
-        String msgSn = ((SummaryMsg) rtnMap.get(txnCode).get(0)).msgSn;
-        HmbAbstractTxnProcessor hmbAbstractTxnProcessor = null;
-        try {
-            hmbAbstractTxnProcessor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
-        } catch (IOException e) {
-            logger.error("HMFS报文处理异常！", e);
+        SummaryMsg summaryMsg = (SummaryMsg) rtnMap.get(txnCode).get(0);
+        String msgType = summaryMsg.msgType;
+        String msgSn = summaryMsg.msgSn;
+        HmbAbstractTxnProcessor processor = null;
+        processor = (HmbAbstractTxnProcessor) ContainerManager.getBean("hmbTxn" + txnCode + "Processor");
+        if (processor instanceof HmbAsyncAbstractTxnProcessor) {
+            return asyncHandleMessage(processor, txnCode, msgSn, rtnMap.get(txnCode));
+        } else {
+            return syncHandleMessage(processor, txnCode, msgType, msgSn, rtnMap.get(txnCode));
         }
-        return hmbAbstractTxnProcessor == null ? null : hmbAbstractTxnProcessor.process(txnCode, msgSn, rtnMap.get(txnCode));
+    }
 
+    private byte[] asyncHandleMessage(HmbAbstractTxnProcessor processor, String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
+        Msg100 msg100 = createRtnMsg100(msgSn);
+        try {
+            int cnt = processor.run(txnCode, msgSn, hmbMsgList);
+            msg100.rtnInfo = cnt + "笔子报文处理成功";
+        } catch (Exception e) {
+            logger.error("报文接收保存失败！", e);
+            msg100.rtnInfoCode = "99";
+            msg100.rtnInfo = "交易失败,原因：" + e.getMessage();
+        }
+        // 响应
+        List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
+        rtnHmbMsgList.add(msg100);
+        return mf.marshal("9999", rtnHmbMsgList);
+    }
+
+    private byte[] syncHandleMessage(HmbAbstractTxnProcessor processor, String txnCode, String msgType, String msgSn, List<HmbMsg> hmbMsgList) {
+        String rtnMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msgType) + 1), 3, "0");
+        SummaryResponseMsg summaryMsg = null;
+        try {
+            summaryMsg = (SummaryResponseMsg) Class.forName(SummaryMsg.class.getPackage().getName() + ".Msg" + rtnMsgType).newInstance();
+            HmbMsg hmbMsg = hmbMsgList.get(0);
+            BeanUtils.copyProperties(summaryMsg, hmbMsg);
+            summaryMsg.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+            summaryMsg.origSysId = "00";
+            summaryMsg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+            summaryMsg.rtnInfoCode = "00";
+            int cnt = processor.run(txnCode, msgSn, hmbMsgList);
+            summaryMsg.rtnInfo = cnt + "笔" + txnCode + "交易子报文处理成功";
+        } catch (Exception e) {
+            logger.error("交易失败.交易码:" + txnCode, e);
+            summaryMsg.rtnInfoCode = "99";
+            summaryMsg.rtnInfo = "交易失败,原因：" + e.getMessage();
+        }
+        List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
+        rtnHmbMsgList.add(summaryMsg);
+        return mf.marshal(txnCode, rtnHmbMsgList);
+    }
+
+    private Msg100 createRtnMsg100(String msgSn) {
+        if (StringUtils.isEmpty(msgSn)) {
+            throw new RuntimeException("响应报文编号不能为空！");
+        }
+        Msg100 msg100 = new Msg100();
+        msg100.msgSn = msgSn;
+        msg100.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+        msg100.origSysId = "00";
+        msg100.rtnInfoCode = "00";
+        msg100.rtnInfo = "报文处理成功";
+        return msg100;
+    }
+
+    private Msg004 createRtnMsg004(String msgSn) {
+        if (StringUtils.isEmpty(msgSn)) {
+            throw new RuntimeException("响应报文编号不能为空！");
+        }
+        Msg004 msg004 = new Msg004();
+        msg004.msgSn = msgSn;
+        msg004.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
+        msg004.origSysId = "00";
+        msg004.rtnInfoCode = "00";
+        msg004.rtnInfo = "报文处理成功";
+        msg004.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        msg004.msgEndDate = "#";
+        msg004.origMsgSn = msgSn;
+        return msg004;
     }
 }

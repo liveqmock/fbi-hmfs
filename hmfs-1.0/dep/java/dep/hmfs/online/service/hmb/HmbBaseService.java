@@ -168,11 +168,15 @@ public class HmbBaseService {
     }
 
     /**
+     * 接收并保存交易报文
+     *
      * @param txnCode
      * @param hmbMsgList
      * @return
      * @throws InvocationTargetException
-     * @throws IllegalAccessException    收取报文后，若数据库中已存在此报文，且此报文仍为初始状态（未进行业务处理），则更新
+     * @throws IllegalAccessException    收取报文后，若数据库中已存在此报文，且此报文仍为初始状态（未进行业务处理），则返回成功
+     *                                   否则，视为已进入业务处理状态，返回失败 （撤销的报文记录已存入TMP_MSGIN_LOG）
+     *                                   若目前无此报文，则新增。
      */
     @Transactional
     public int updateOrInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
