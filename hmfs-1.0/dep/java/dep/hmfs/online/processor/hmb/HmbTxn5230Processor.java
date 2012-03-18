@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @Component
-public class HmbTxn5230Processor extends HmbSyncAbstractTxnProcessor {
+public class HmbTxn5230Processor extends HmbAsyncAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn5230Processor.class);
 
     @Override
