@@ -50,8 +50,8 @@ public class HmbTxn6210Processor extends HmbSyncAbstractTxnProcessor {
         BigDecimal amt = msg009.txnAmt1;
 
         //余额、流水处理
-        bookkeepingService.fundActBookkeeping(msgSn, payOutActno, amt, "D", "145");
-        bookkeepingService.fundActBookkeeping(msgSn, payInActno, amt, "C", "145");
+        bookkeepingService.fundActBookkeeping(msgSn, payOutActno, amt, "D", "145", "145");
+        bookkeepingService.fundActBookkeeping(msgSn, payInActno, amt, "C", "145", "145");
         return hmbMsgList.size() - 1;
     }
 
