@@ -131,10 +131,14 @@ public class HmbActinfoService {
         if (isExistFundActNo(actinfoFund.getFundActno1())) {
             return 1;
         }
+        String today = SystemService.formatTodayByPattern("yyyyMMdd");
+        BigDecimal zero = new BigDecimal(0);
         actinfoFund.setActSts("0");
-        actinfoFund.setActBal(new BigDecimal(0));
-        actinfoFund.setIntcPdt(new BigDecimal(0));
-        actinfoFund.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        actinfoFund.setLastActBal(zero);
+        actinfoFund.setLastTxnDt(today);
+        actinfoFund.setActBal(zero);
+        actinfoFund.setIntcPdt(zero);
+        actinfoFund.setOpenActDate(today);
         actinfoFund.setRecversion(0);
         return hmActinfoFundMapper.insert(actinfoFund);
     }
