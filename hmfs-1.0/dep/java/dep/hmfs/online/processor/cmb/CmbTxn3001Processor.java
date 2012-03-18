@@ -35,6 +35,8 @@ public class CmbTxn3001Processor extends CmbAbstractTxnProcessor {
             // 更新退款汇总报文和子报文交易处理状态为：处理中
             String[] refundSubMsgTypes = {"01039", "01043"};
             hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3001.body.refundApplyNo, "00005", refundSubMsgTypes, TxnCtlSts.HANDLING);
+        }else {
+            throw new RuntimeException("1000没有查询到交易明细");
         }
 
         return toa3001;
