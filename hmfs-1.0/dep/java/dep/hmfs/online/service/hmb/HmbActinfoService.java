@@ -160,35 +160,11 @@ public class HmbActinfoService {
     /**
      * 项目拆分合并
      */
-    public void splitFundActinfo(String txnCode, List<HmbMsg> hmbMsgList) {
-        //更新核算户信息
-        try {
-            for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
-                op145changeFundActinfo((Msg033) hmbMsg);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("核算户信息更新错误！", e);
-        }
-
-        Msg009 msg009 = (Msg009) hmbMsgList.get(0);
-        String payOutActno = msg009.fundActno1;
-        String payInActno = msg009.payinCbsActno;
-        String msgSn = msg009.getMsgSn();
-        BigDecimal amt = msg009.txnAmt1;
-
-        //余额、流水处理
-        try {
-            bookkeepingService.fundActBookkeeping(msgSn, payOutActno, amt, "D", "145");
-            bookkeepingService.fundActBookkeeping(msgSn, payInActno, amt, "C", "145");
-        } catch (ParseException e) {
-            throw new RuntimeException("帐务处理错误！", e);
-        }
-    }
 
 
     //更新核算帐户信息 (不开立新户)
     @Transactional
-    private void op145changeFundActinfo(Msg033 msg) throws InvocationTargetException, IllegalAccessException {
+    public void op145changeFundActinfo(Msg033 msg) throws InvocationTargetException, IllegalAccessException {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria().andFundActno1EqualTo(msg.fundActno1);
         List<HmActinfoFund> actinfoFundList = hmActinfoFundMapper.selectByExample(example);
@@ -204,29 +180,9 @@ public class HmbActinfoService {
         hmActinfoFundMapper.updateByPrimaryKey(actinfoFund);
     }
 
-    //-------------分户核算户 合并拆分-------------------------------
-    @Transactional
-    public void handleTxn6220(String msgSn, List<HmbMsg> hmbMsgList) {
-        try {
-            //TODO 汇总报文处理？
-
-            for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
-                String msgType = hmbMsg.getMsgType();
-                if ("01051".equals(msgType)) {
-                    op125cancelActinfoFunds(msgSn, (Msg051) hmbMsg);
-                } else if ("01033".equals(msgType)) {
-                    createActinfoFundByHmbMsg(hmbMsg);
-                } else if ("01035".equals(msgType)) {
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("交易处理失败。", e);
-        }
-    }
-
 
     //125:取款销户
-    private void op125cancelActinfoFunds(String msgSn, Msg051 msg051) throws ParseException {
+    public void op125cancelActinfoFunds(String msgSn, Msg051 msg051) throws ParseException {
         //销户
         HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
         hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
@@ -241,7 +197,7 @@ public class HmbActinfoService {
 
     //115:存款
     @Transactional
-    private void op115deposite(String msgSn, Msg035 msg035) throws ParseException {
+    public void op115deposite(String msgSn, Msg035 msg035) throws ParseException {
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping("HMB" + SystemService.formatTodayByPattern("yyyyMMddHHmmss"),
                 msg035.txnAmt1, DCFlagCode.TXN_IN.getCode());

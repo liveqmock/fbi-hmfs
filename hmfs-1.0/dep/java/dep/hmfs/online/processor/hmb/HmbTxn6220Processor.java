@@ -1,53 +1,46 @@
 package dep.hmfs.online.processor.hmb;
 
-import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.Msg005;
-import dep.hmfs.online.processor.hmb.domain.Msg006;
-import dep.hmfs.online.service.hmb.HmbActinfoService;
-import dep.util.PropertyManager;
-import org.apache.commons.beanutils.PropertyUtils;
+import dep.hmfs.online.processor.hmb.domain.Msg051;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.List;
 
+/**
+ * 分户拆分合并
+ */
 @Component
-public class HmbTxn6220Processor extends HmbAbstractTxnProcessor {
+public class HmbTxn6220Processor extends HmbSyncAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn6220Processor.class);
-    @Autowired
-    private HmbActinfoService hmbActinfoService;
+
 
     @Override
-    public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
-        Msg005 msg005 = (Msg005) hmbMsgList.get(0);
-
-        Msg006 summaryMsg = new Msg006();
+    public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         try {
-            PropertyUtils.copyProperties(summaryMsg, msg005);
+            return handleTxn6220(txnCode, hmbMsgList);
         } catch (Exception e) {
-            throw new RuntimeException("报文转换错误！");
+            logger.error("分户拆分合并出现错误.", e);
+            throw new RuntimeException("分户拆分合并出现错误.", e);
         }
-        summaryMsg.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
-        summaryMsg.origSysId = "00";
-        summaryMsg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
-        summaryMsg.rtnInfoCode = "00";
-
-        try {
-            hmbActinfoService.handleTxn6220(txnCode, hmbMsgList);
-            summaryMsg.rtnInfo = "交易处理完成.";
-        } catch (Exception e) {
-            logger.error(txnCode + "交易处理异常！", e);
-            summaryMsg.rtnInfoCode = "99";
-            summaryMsg.rtnInfo = "交易失败,原因：" + e.getMessage();
-        }
-        // 响应
-        List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
-        rtnHmbMsgList.add(summaryMsg);
-        return mf.marshal(txnCode, rtnHmbMsgList);
     }
+
+    public int handleTxn6220(String msgSn, List<HmbMsg> hmbMsgList) throws ParseException, InvocationTargetException, IllegalAccessException {
+        for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
+            String msgType = hmbMsg.getMsgType();
+            if ("01051".equals(msgType)) {
+                hmbActinfoService.op125cancelActinfoFunds(msgSn, (Msg051) hmbMsg);
+            } else if ("01033".equals(msgType)) {
+                hmbActinfoService.createActinfoFundByHmbMsg(hmbMsg);
+            } else if ("01035".equals(msgType)) {
+            }
+        }
+        return  hmbMsgList.size() - 1;
+    }
+
+
 }

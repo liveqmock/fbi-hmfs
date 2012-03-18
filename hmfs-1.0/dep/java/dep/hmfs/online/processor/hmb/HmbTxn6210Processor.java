@@ -1,53 +1,58 @@
 package dep.hmfs.online.processor.hmb;
 
-import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg009;
-import dep.hmfs.online.processor.hmb.domain.Msg010;
-import dep.util.PropertyManager;
-import org.apache.commons.beanutils.BeanUtils;
+import dep.hmfs.online.processor.hmb.domain.Msg033;
+import dep.hmfs.online.service.cbs.BookkeepingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.List;
 
+/**
+ * 项目拆分合并
+ */
 @Component
-public class HmbTxn6210Processor extends HmbAbstractTxnProcessor {
+public class HmbTxn6210Processor extends HmbSyncAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn6210Processor.class);
 
+    @Autowired
+    protected BookkeepingService bookkeepingService;
+
     @Override
     @Transactional
-    public byte[] process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
-        Msg009 msg009 = (Msg009) hmbMsgList.get(0);
-
-        Msg010 summaryMsg = new Msg010();
+    public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
         try {
-            BeanUtils.copyProperties(summaryMsg, msg009);
+            return splitFundActinfo(txnCode, hmbMsgList);
         } catch (Exception e) {
-            throw new RuntimeException("报文转换错误！");
+            logger.error("项目拆分合并出现错误.", e);
+            throw new RuntimeException("项目拆分合并出现错误.", e);
         }
-        summaryMsg.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
-        summaryMsg.origSysId = "00";
-        summaryMsg.msgDt =  SystemService.formatTodayByPattern("yyyyMMddHHmmss");
-        summaryMsg.rtnInfoCode = "00";
-
-        try {
-            //TODO 事务处理
-            hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
-            hmbActinfoService.splitFundActinfo(txnCode, hmbMsgList);
-            summaryMsg.rtnInfo = "交易处理完成.";
-        } catch (Exception e) {
-            logger.error(txnCode + "交易处理异常！", e);
-            summaryMsg.rtnInfoCode = "99";
-            summaryMsg.rtnInfo = "交易失败,原因：" + e.getMessage();;
-        }
-        // 响应
-        List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
-        rtnHmbMsgList.add(summaryMsg);
-        return mf.marshal(txnCode, rtnHmbMsgList);
     }
+
+    public int splitFundActinfo(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException, ParseException {
+        //更新核算户信息
+        for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
+            hmbActinfoService.op145changeFundActinfo((Msg033) hmbMsg);
+        }
+
+        Msg009 msg009 = (Msg009) hmbMsgList.get(0);
+        String payOutActno = msg009.fundActno1;
+        String payInActno = msg009.payinCbsActno;
+        String msgSn = msg009.getMsgSn();
+        BigDecimal amt = msg009.txnAmt1;
+
+        //余额、流水处理
+        bookkeepingService.fundActBookkeeping(msgSn, payOutActno, amt, "D", "145");
+        bookkeepingService.fundActBookkeeping(msgSn, payInActno, amt, "C", "145");
+        return hmbMsgList.size() - 1;
+    }
+
 }
