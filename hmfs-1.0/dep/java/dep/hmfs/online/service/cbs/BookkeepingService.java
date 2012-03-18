@@ -120,6 +120,7 @@ public class BookkeepingService {
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
         txnCbsLog.setTxnAmt(amt);
         txnCbsLog.setDcFlag(dc);
+        txnCbsLog.setReverseFlag("0");
         txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
         return txnCbsLogMapper.insertSelective(txnCbsLog);
     }
