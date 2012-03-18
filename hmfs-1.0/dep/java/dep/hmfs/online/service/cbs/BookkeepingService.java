@@ -169,6 +169,7 @@ public class BookkeepingService {
         txnFundLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         txnFundLog.setTxnCode("1002");
+        txnFundLog.setReverseFlag("0");
         txnFundLog.setActionCode(actionCode);
         return txnFundLogMapper.insertSelective(txnFundLog);
     }

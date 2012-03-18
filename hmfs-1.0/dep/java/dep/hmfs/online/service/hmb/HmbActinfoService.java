@@ -4,10 +4,7 @@ import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
-import common.repository.hmfs.model.HmActinfoCbs;
-import common.repository.hmfs.model.HmActinfoCbsExample;
-import common.repository.hmfs.model.HmActinfoFund;
-import common.repository.hmfs.model.HmActinfoFundExample;
+import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.cbs.BookkeepingService;
@@ -117,12 +114,34 @@ public class HmbActinfoService {
         }
         return hmbMsgList.size();
     }
+    
+    @Transactional
+    public int updateActinfoFundsByMsginList(List<HisMsginLog> fundInfoList) throws InvocationTargetException, IllegalAccessException {
+        for(HisMsginLog msginLog : fundInfoList) {
+            if ("01033".equals(msginLog.getMsgType())) {
+                 updateActinfosByMsginLog(msginLog);
+             } else if ("01051".equals(msginLog.getMsgType())) {
+                 HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                 hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                 hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+             } else {
+                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + msginLog.getMsgType() + "！");
+             }  
+        }
+        return fundInfoList.size();
+    }
 
     private int updateActinfosByMsg(Msg033 msg033) throws InvocationTargetException, IllegalAccessException {
         HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg033.fundActno1);
         BeanUtils.copyProperties(hmActinfoFund, msg033);
         return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
     }
+
+    private int updateActinfosByMsginLog(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
+            HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+            BeanUtils.copyProperties(hmActinfoFund, msginLog);
+            return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+        }
 
     public int createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
         HmActinfoFund actinfoFund = new HmActinfoFund();

@@ -6,6 +6,7 @@ import common.repository.hmfs.model.HisMsginLog;
 import dep.hmfs.online.service.cbs.BookkeepingService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.cbs.CbsTxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     private CbsTxnCheckService cbsTxnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
+    @Autowired
+    private HmbActinfoService hmbActinfoService;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
@@ -38,7 +41,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();
         tia3002.body.refundAmt = new String(bytes, 18, 16).trim();
 
-        String[] refundSubMsgTypes = {"01039", "01043"};
+        String[] refundSubMsgTypes = {"01039", "01043", "01033", "01051"};
 
         HisMsginLog totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3002.body.refundApplyNo, "00005");
         // 查询交易子报文记录
@@ -57,13 +60,15 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
       支取交易。
     */
     @Transactional
-    private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
+    private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> fundInfoList) throws Exception {
 
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia3002.body.refundAmt), DCFlagCode.TXN_OUT.getCode());
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode());
+        bookkeepingService.fundActBookkeepingByMsgins(fundInfoList, DCFlagCode.TXN_OUT.getCode());
 
+        hmbActinfoService.updateActinfoFundsByMsginList(fundInfoList);
+        
         hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3002.body.refundApplyNo, "00005", subMsgTypes, TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
