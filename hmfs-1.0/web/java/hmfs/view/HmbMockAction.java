@@ -24,8 +24,8 @@ import java.util.List;
  */
 @ManagedBean
 @ViewScoped
-public class TxMsgAction implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(TxMsgAction.class);
+public class HmbMockAction implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(HmbMockAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private String sysDate;
@@ -36,10 +36,6 @@ public class TxMsgAction implements Serializable {
     private String txnCode;
     private String msgSn;
 
-    private List<HisMsgoutLog> hisMsgoutList;
-    private List<HisMsginLog> hisMsginList;
-    private HisMsginLog[] selectedHisMsginRecords;
-    private HisMsgoutLog[] selectedHisMsgoutRecords;
 
     private List<TmpMsgoutLog> tmpMsgoutList;
     private List<TmpMsginLog> tmpMsginList;
@@ -68,51 +64,14 @@ public class TxMsgAction implements Serializable {
     }
 
     private void initList() {
-        this.hisMsginList = appMngService.selectHisMsginList(txnCode, msgSn);
-        this.hisMsgoutList = appMngService.selectHisMsgoutList(txnCode, msgSn);
         this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
         this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
     }
 
 
-    public String onQueryHisMsgin() {
-        try {
-            this.hisMsginList = appMngService.selectHisMsginList(txnCode, msgSn);
-            if (hisMsginList.size() == 0) {
-                MessageUtil.addWarn("未查询到记录.");
-            }
-        } catch (Exception e) {
-            MessageUtil.addError("处理失败。" + e.getMessage());
-        }
-        return null;
-    }
-
-    public String onQueryHisMsgout() {
-        try {
-            this.hisMsgoutList = appMngService.selectHisMsgoutList(txnCode, msgSn);
-            if (hisMsgoutList.size() == 0) {
-                MessageUtil.addWarn("未查询到记录.");
-            }
-        } catch (Exception e) {
-            MessageUtil.addError("处理失败。" + e.getMessage());
-        }
-        return null;
-    }
-
-    public String onQueryTmpMsgin() {
-        try {
-            this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
-            if (tmpMsginList.size() == 0) {
-                MessageUtil.addWarn("未查询到记录.");
-            }
-        } catch (Exception e) {
-            MessageUtil.addError("处理失败。" + e.getMessage());
-        }
-        return null;
-    }
-
     public String onQueryTmpMsgout() {
         try {
+            this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
             this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
             if (tmpMsgoutList.size() == 0) {
                 MessageUtil.addWarn("未查询到记录.");
@@ -151,6 +110,8 @@ public class TxMsgAction implements Serializable {
             String[] fields = response.split("\\|");
             if ("0000".endsWith(fields[1])) { //成功
                 MessageUtil.addInfo("结算户开户请求发送成功, 国土局已受理, 稍等请查询帐户信息...");
+                this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
+                this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
             } else {
                 MessageUtil.addError("处理失败。" + response);
             }
@@ -163,12 +124,13 @@ public class TxMsgAction implements Serializable {
 
     //=============================
 
+
     public static SimpleDateFormat getSdf() {
         return sdf;
     }
 
     public static void setSdf(SimpleDateFormat sdf) {
-        TxMsgAction.sdf = sdf;
+        HmbMockAction.sdf = sdf;
     }
 
     public String getSysDate() {
@@ -217,38 +179,6 @@ public class TxMsgAction implements Serializable {
 
     public void setMsgSn(String msgSn) {
         this.msgSn = msgSn;
-    }
-
-    public List<HisMsgoutLog> getHisMsgoutList() {
-        return hisMsgoutList;
-    }
-
-    public void setHisMsgoutList(List<HisMsgoutLog> hisMsgoutList) {
-        this.hisMsgoutList = hisMsgoutList;
-    }
-
-    public List<HisMsginLog> getHisMsginList() {
-        return hisMsginList;
-    }
-
-    public void setHisMsginList(List<HisMsginLog> hisMsginList) {
-        this.hisMsginList = hisMsginList;
-    }
-
-    public HisMsginLog[] getSelectedHisMsginRecords() {
-        return selectedHisMsginRecords;
-    }
-
-    public void setSelectedHisMsginRecords(HisMsginLog[] selectedHisMsginRecords) {
-        this.selectedHisMsginRecords = selectedHisMsginRecords;
-    }
-
-    public HisMsgoutLog[] getSelectedHisMsgoutRecords() {
-        return selectedHisMsgoutRecords;
-    }
-
-    public void setSelectedHisMsgoutRecords(HisMsgoutLog[] selectedHisMsgoutRecords) {
-        this.selectedHisMsgoutRecords = selectedHisMsgoutRecords;
     }
 
     public List<TmpMsgoutLog> getTmpMsgoutList() {
