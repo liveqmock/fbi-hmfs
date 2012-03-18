@@ -41,7 +41,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();
         tia3002.body.refundAmt = new String(bytes, 18, 16).trim();
 
-        String[] refundSubMsgTypes = {"01039", "01043", "01033", "01051"};
+        String[] refundSubMsgTypes = {"01039", "01043"};
 
         HisMsginLog totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3002.body.refundApplyNo, "00005");
         // 查询交易子报文记录
@@ -57,7 +57,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     }
 
     /*
-      支取交易。
+      退款交易。
     */
     @Transactional
     private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> fundInfoList) throws Exception {
@@ -67,8 +67,10 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         // 批量核算户账户信息更新
         bookkeepingService.fundActBookkeepingByMsgins(fundInfoList, DCFlagCode.TXN_OUT.getCode());
 
-        hmbActinfoService.updateActinfoFundsByMsginList(fundInfoList);
-        
+        String[] updateFundMsgTypes = {"01033", "01051"};
+        List<HisMsginLog> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);
+        hmbActinfoService.updateActinfoFundsByMsginList(updateFundInfoList);
+
         hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia3002.body.refundApplyNo, "00005", subMsgTypes, TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
