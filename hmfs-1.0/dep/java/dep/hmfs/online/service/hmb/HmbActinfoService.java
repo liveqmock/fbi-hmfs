@@ -9,6 +9,7 @@ import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.cbs.BookkeepingService;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +117,7 @@ public class HmbActinfoService {
     }
     
     @Transactional
-    public int updateActinfoFundsByMsginList(List<HisMsginLog> fundInfoList) throws InvocationTargetException, IllegalAccessException {
+    public int updateActinfoFundsByMsginList(List<HisMsginLog> fundInfoList) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         for(HisMsginLog msginLog : fundInfoList) {
             if ("01033".equals(msginLog.getMsgType())) {
                  updateActinfosByMsginLog(msginLog);
@@ -137,9 +138,9 @@ public class HmbActinfoService {
         return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
     }
 
-    private int updateActinfosByMsginLog(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
+    private int updateActinfosByMsginLog(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
             HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
-            BeanUtils.copyProperties(hmActinfoFund, msginLog);
+            PropertyUtils.copyProperties(hmActinfoFund, msginLog);
             return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
         }
 

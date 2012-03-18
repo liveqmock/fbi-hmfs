@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 交易流水对帐.
+ * 交易流水对帐.  暂不用
  * User: zhanrui
  * Date: 12-3-15
  * Time: 下午1:45

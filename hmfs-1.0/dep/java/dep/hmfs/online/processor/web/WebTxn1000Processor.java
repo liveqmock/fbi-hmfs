@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * Created by IntelliJ IDEA.
+ * Ö÷¿Ø.
  * User: zhanrui
  * Date: 12-3-12
  * Time: ÉÏÎç11:47

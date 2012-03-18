@@ -36,7 +36,7 @@ public class Msg042 extends SubMsg{
 
     //F24：建筑面积
     @Hmb8583Field(24)
-    public BigDecimal builderArea;
+    public String builderArea;
 
     //F25：归属区县ID
     @Hmb8583Field(25)
@@ -114,11 +114,11 @@ public class Msg042 extends SubMsg{
         this.infoAddr = infoAddr;
     }
 
-    public BigDecimal getBuilderArea() {
+    public String getBuilderArea() {
         return builderArea;
     }
 
-    public void setBuilderArea(BigDecimal builderArea) {
+    public void setBuilderArea(String builderArea) {
         this.builderArea = builderArea;
     }
 
