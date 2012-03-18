@@ -32,8 +32,6 @@ public class HmbClientService{
     public byte[] getTxnbuf_5210()  {
         TmpMsginLogExample example =  new TmpMsginLogExample();
         example.or().andMsgSnEqualTo("120314000001521000").andMsgTypeEqualTo("00005");
-//        example.or().andMsgSnEqualTo("120314000001521000").andMsgTypeEqualTo("01035");
-//        example.or().andMsgSnEqualTo("120314000001521000").andMsgTypeEqualTo("01045");
         example.setOrderByClause("msg_type, submsg_num");
 
         List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
