@@ -72,10 +72,7 @@ public class HmbMockAction implements Serializable {
     public String onQueryTmpMsgout() {
         try {
             this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
-            this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
-            if (tmpMsgoutList.size() == 0) {
-                MessageUtil.addWarn("未查询到记录.");
-            }
+            this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }

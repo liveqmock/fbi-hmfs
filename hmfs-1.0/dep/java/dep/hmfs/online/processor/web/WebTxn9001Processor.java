@@ -58,13 +58,19 @@ public class WebTxn9001Processor extends WebAbstractTxnProcessor {
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getTxnbuf(txnCode, msgSn));
 
         //处理返回报文
-        List<HmbMsg> msgList = responseMap.get(txnCode);
+        String rtnTxnCode = (String) responseMap.keySet().toArray()[0];
+        List<HmbMsg> msgList = responseMap.get(rtnTxnCode);
+/*
         if (msgList == null || msgList.size() == 0) {
             throw new RuntimeException("接收DEP报文出错，报文为空");
         }
+*/
         //保存到本地数据库
-        deleteAndInsertMsginsByHmbMsgList(txnCode, msgList);
-        return null;
+        if ("9999".equals(rtnTxnCode)) {
+            rtnTxnCode = txnCode;
+        }
+        deleteAndInsertMsginsByHmbMsgList(rtnTxnCode, msgList);
+        return "完成交易，可查询交易结果。";
     }
 
     //=============
@@ -72,7 +78,7 @@ public class WebTxn9001Processor extends WebAbstractTxnProcessor {
     protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
         byte[] hmfsDatagram;
         try {
-            socketBlockClient = new XSocketBlockClient("localhost", 41014, 50000);
+            socketBlockClient = new XSocketBlockClient("127.0.0.1", 41014, 50000);
             hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
             return messageFactory.unmarshal(hmfsDatagram);
         } catch (Exception e) {

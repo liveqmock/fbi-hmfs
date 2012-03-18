@@ -26,7 +26,7 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="结算账户余额信息">
+                <p:tab title="会计帐号余额信息">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
@@ -34,7 +34,7 @@
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
                                         <h:outputLabel value="会计帐号:"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.startActno}"/>
+                                        <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
                                         <h:outputLabel value="帐号状态:"/>
                                         <h:selectOneMenu style="width:153px;"
                                                          value="#{actInfoAction.qryParam.actnoStatus}">

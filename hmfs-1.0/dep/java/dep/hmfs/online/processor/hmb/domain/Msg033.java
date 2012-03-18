@@ -3,6 +3,8 @@ package dep.hmfs.online.processor.hmb.domain;
 import dep.hmfs.common.annotation.Hmb8583Field;
 import dep.hmfs.common.annotation.HmbMessage;
 
+import java.math.BigDecimal;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhanrui
@@ -118,7 +120,7 @@ public class Msg033 extends SubMsg{
 
     //F106：购房款总额
     @Hmb8583Field(106)
-    public String houseTotalAmt;
+    public BigDecimal houseTotalAmt;
 
     //F38：会计帐号
     @Hmb8583Field(38)
@@ -332,11 +334,11 @@ public class Msg033 extends SubMsg{
         this.elevatorType = elevatorType;
     }
 
-    public String getHouseTotalAmt() {
+    public BigDecimal getHouseTotalAmt() {
         return houseTotalAmt;
     }
 
-    public void setHouseTotalAmt(String houseTotalAmt) {
+    public void setHouseTotalAmt(BigDecimal houseTotalAmt) {
         this.houseTotalAmt = houseTotalAmt;
     }
 

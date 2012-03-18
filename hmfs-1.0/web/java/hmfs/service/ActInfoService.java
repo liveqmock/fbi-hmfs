@@ -79,7 +79,7 @@ public class ActInfoService {
     public List<HmActinfoCbs> selectCbsActBal(ActinfoQryParam param) {
         HmActinfoCbsExample example = new HmActinfoCbsExample();
         example.createCriteria()
-                .andCbsActnoEqualTo(param.getStartActno())
+                .andCbsActnoEqualTo(param.getCbsActno())
                 .andActStsEqualTo(param.getActnoStatus());
         return actinfoCbsMapper.selectByExample(example);
     }
@@ -96,7 +96,7 @@ public class ActInfoService {
     public List<TxnCbsLog> selectCbsActDetl(ActinfoQryParam param) {
         TxnCbsLogExample example = new TxnCbsLogExample();
         example.createCriteria()
-                .andCbsAcctnoEqualTo(param.getStartActno())
+                .andCbsAcctnoEqualTo(param.getCbsActno())
                 .andTxnDateBetween(param.getStartDate(),param.getEndDate());
         return cbsLogMapper.selectByExample(example);
     }

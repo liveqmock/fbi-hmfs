@@ -29,7 +29,7 @@
 <p:tab title="报文发送处理">
 <h:form>
 <div id="qrytable">
-<p:growl id="msgs" showDetail="false"/>
+<p:messages id="msgs" showDetail="false"/>
 <p:panel style="margin-top:10px">
     <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
         <h:panelGrid columns="2" cellspacing="5">
@@ -41,11 +41,11 @@
         <h:panelGrid>
             <p:commandButton style="width:90px;" value="查询"
                              action="#{hmbMockAction.onQueryTmpMsgout}"
-                             update="pdt,msgs">
+                             update="pdt,pdt2, msgs">
             </p:commandButton>
             <p:commandButton style="width:90px;" value="发送"
                              action="#{hmbMockAction.onSendMockMsg}"
-                             update="pdt,msgs">
+                             update="pdt,pdt2, msgs">
             </p:commandButton>
         </h:panelGrid>
     </h:panelGrid>
@@ -58,6 +58,7 @@
         <h:outputText value=""/>
     </f:facet>
 </p:ajaxStatus>
+===>TMP_MSGOUT  待发送报文
 <p:dataTable id="pdt" dynamic="true" style="width:100%;"
              editable="true"
              rowEditListener="#{hmbMockAction.onSaveTmpMsgoutData}"
@@ -68,11 +69,7 @@
              paginator="true" rows="15" paginatorPosition="bottom"
              rowsPerPageTemplate="100,50,30,15,5"
              emptyMessage="数据记录为空...">
-<p:column headerText="系统主键">
-    <p:cellEditor><f:facet name="output"><h:outputText value="#{record.pkid}"/>
-    </f:facet><f:facet name="input"><p:inputText value="#{record.pkid}" label="pkid"/></f:facet>
-    </p:cellEditor>
-</p:column>
+
 <p:column headerText="交易码">
     <p:cellEditor><f:facet name="output"><h:outputText value="#{record.txnCode}"/>
     </f:facet><f:facet name="input"><p:inputText value="#{record.txnCode}" label="txnCode"/></f:facet>
@@ -573,7 +570,8 @@
 </p:column>
 </p:dataTable>
 </div>
-<div style="margin-top: 10px">
+<div style="margin-top: 20px">
+    ===>TMP_MSGIN  已接收报文
     <p:dataTable id="pdt2" dynamic="true" style="width:100%;"
                  value="#{hmbMockAction.tmpMsginList}" var="record"
                  rowKey="#{record.pkid}"
@@ -583,9 +581,9 @@
                  rowsPerPageTemplate="100,50,30,15,5"
                  emptyMessage="数据记录为空...">
         <p:column headerText="交易码"><h:outputText value="#{record.txnCode}"/></p:column>
+        <p:column headerText="报文编号"><h:outputText value="#{record.msgSn}"/></p:column>
         <p:column headerText="报文的子序号"><h:outputText value="#{record.msgSubSn}"/></p:column>
         <p:column headerText="报文类型"><h:outputText value="#{record.msgType}"/></p:column>
-        <p:column headerText="报文编号"><h:outputText value="#{record.msgSn}"/></p:column>
         <p:column headerText="子报文数"><h:outputText value="#{record.submsgNum}"/></p:column>
         <p:column headerText="发送方编号"><h:outputText value="#{record.sendSysId}"/></p:column>
         <p:column headerText="发起方编号"><h:outputText value="#{record.origSysId}"/></p:column>

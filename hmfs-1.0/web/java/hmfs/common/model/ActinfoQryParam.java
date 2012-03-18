@@ -1,12 +1,21 @@
 package hmfs.common.model;
 
 public class ActinfoQryParam {
+    private String cbsActno = "";
     private String startActno = "";
     private String endActno = "";
     private String actName = "";
     private String actnoStatus = "";
     private String startDate = "";
     private String endDate = "";
+
+    public String getCbsActno() {
+        return cbsActno;
+    }
+
+    public void setCbsActno(String cbsActno) {
+        this.cbsActno = cbsActno;
+    }
 
     public String getStartActno() {
         return startActno;
