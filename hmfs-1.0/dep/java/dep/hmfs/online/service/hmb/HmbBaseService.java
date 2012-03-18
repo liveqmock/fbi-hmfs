@@ -96,28 +96,6 @@ public class HmbBaseService {
         return msginLogList.size();
     }
 
-    // 更新初始状态的汇总报文和子报文状态
-    @Transactional
-    public int cancelMsginsByMsgSnAndTypes(String msgSn, String[] subMsgTypes) throws InvocationTargetException, IllegalAccessException {
-        HisMsginLogExample example = new HisMsginLogExample();
-        for (String msgType : subMsgTypes) {
-            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
-                    .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
-        }
-        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
-        if (msginLogList.size() == 0) {
-            throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
-        }
-        for (HisMsginLog record : msginLogList) {
-            // TODO 撤销的交易报文表
-            TmpMsginLog tmpMsginLog = new TmpMsginLog();
-            BeanUtils.copyProperties(tmpMsginLog, record);
-            tmpMsginLogMapper.insert(tmpMsginLog);
-            hisMsginLogMapper.deleteByPrimaryKey(record.getPkid());
-        }
-        return msginLogList.size();
-    }
-
     public HmSct getAppSysStatus() {
         return hmSctMapper.selectByPrimaryKey("1");
     }
