@@ -6,8 +6,6 @@ import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HisMsgoutLog;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.common.annotation.Hmb8583Field;
-import dep.hmfs.common.annotation.HmbMessage;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +17,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,9 +31,6 @@ import java.util.*;
 public class Hmb8583Demo {
     private static final Logger logger = LoggerFactory.getLogger(Hmb8583Demo.class);
     private  ApplicationContext context;
-    private String packageName = "dep.hmfs.online.hmb.domain";
-    private Map<String, Map<Integer, Field>> parseMap = new HashMap<String, Map<Integer, Field>>();
-
 
     private HmbMessageFactory mf = new HmbMessageFactory();
     public static void main(String[] args) throws Exception {
@@ -46,10 +40,11 @@ public class Hmb8583Demo {
 //        client.testMarshal();
 //        client.testUnmarshal();
 
-        client.processMsgIn("5120");
+//        client.processMsgIn("5120");
+//        client.processMsgIn("5130");
 //        client.processMsgIn("5140");
 //        client.processMsgIn("5210");
-//        client.processMsgIn("5230");
+        client.processMsgIn("5230");
 //        client.processMsgIn("5610");
 //        client.processMsgIn("7000");
 //        client.processMsgIn("7001");
@@ -104,14 +99,7 @@ public class Hmb8583Demo {
         logger.info((String) rtnMap.keySet().toArray()[0]);
     }
 
-    private void  processMsg004(){
-        Msg004 msg004 = new Msg004();
-    }
 
-    private void  generateMsgSn(){
-
-    }
-    
     private  void processMsgIn(String txnCode) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         FileInputStream fi = new FileInputStream("d:/tmp/in" + txnCode + ".txt");
 
@@ -191,40 +179,6 @@ public class Hmb8583Demo {
             msgLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             msgLogMapper.insert(msgLog);
-        }
-    }
-
-    private void initParseMap() {
-        for (int i = 1; i <= 999; i++) {
-            String sn = StringUtils.leftPad("" + i, 3, "0");
-            try {
-                Class clazz = Class.forName(packageName + ".Msg" + sn);
-                HmbMessage hmbMessage = (HmbMessage) clazz.getAnnotation(HmbMessage.class);
-                if (hmbMessage != null) {
-                    String msgCode = hmbMessage.value();
-                    Map<Integer, Field> annotatedFields = new TreeMap<Integer, Field>();
-                    initOneClassFileds(clazz, annotatedFields);
-                    parseMap.put(msgCode, annotatedFields);
-                }
-            } catch (ClassNotFoundException e) {
-                //skip
-            }
-        }
-    }
-
-    /**
-     * 递归查找父类域信息
-     */
-    private void initOneClassFileds(Class clazz, Map<Integer, Field> annotatedFields) {
-        for (Field field : clazz.getDeclaredFields()) {
-            Hmb8583Field msgField = field.getAnnotation(Hmb8583Field.class);
-            if (msgField != null) {
-                annotatedFields.put(msgField.value(), field);
-            }
-        }
-        Class superclazz = clazz.getSuperclass();
-        if (superclazz != Object.class) {
-            initOneClassFileds(superclazz, annotatedFields);
         }
     }
 

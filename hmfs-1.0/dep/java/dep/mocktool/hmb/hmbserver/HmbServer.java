@@ -3,6 +3,7 @@ package dep.mocktool.hmb.hmbserver;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,6 +25,8 @@ public class HmbServer implements Runnable {
     private static ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(1);
     private static HmbMessageFactory messageFactory;
 
+    private static ClassPathXmlApplicationContext context;
+
     private Socket socket;
 
     HmbServer(Socket sock) throws IOException {
@@ -38,7 +41,7 @@ public class HmbServer implements Runnable {
                     && Thread.currentThread().isAlive() && !Thread.currentThread().isInterrupted()) {
                 if (socket.getInputStream().read(lenbuf) == 7) {
                     int size = new Integer(new String(lenbuf));
-                    byte[] buf = new byte[size];
+                    byte[] buf = new byte[size + 4];
                     socket.getInputStream().read(buf);
                     count++;
                     threadPool.schedule(new Processor(buf, socket), 400, TimeUnit.MILLISECONDS);
@@ -66,12 +69,14 @@ public class HmbServer implements Runnable {
         public void run() {
             try {
                 String msgin = new String(msg);
-                log.debug("Parsing incoming: '{}'", msgin);
+                log.info("Parsing incoming: '{}'", msgin);
                 String txncode = msgin.substring(0,4);
 
-                String pkgname = TxnProcessor.class.getPackage().getName();
-                Class clazz = Class.forName(pkgname + ".impl.Txn" + txncode + "Processor");
-                TxnProcessor processor = (TxnProcessor) clazz.newInstance();
+//                String pkgname = TxnProcessor.class.getPackage().getName();
+//                Class clazz = Class.forName(pkgname + ".impl.Txn" + txncode + "Processor");
+//                TxnProcessor processor = (TxnProcessor) clazz.newInstance();
+
+                AbstractTxnProcessor processor = (AbstractTxnProcessor) context.getBean("txn" + txncode + "Processor");
 
                 byte[] gbks = processor.process(msg);
                 socket.getOutputStream().write(gbks);
@@ -84,7 +89,9 @@ public class HmbServer implements Runnable {
 
     //==========================================================================
     public static void main(String[] args) throws Exception {
-        messageFactory = new HmbMessageFactory();
+        //messageFactory = new HmbMessageFactory();
+        context = new ClassPathXmlApplicationContext("hmb-context.xml");
+
         ServerSocket server = new ServerSocket(42014);
         log.info("开始接收报文...");
         while (true) {

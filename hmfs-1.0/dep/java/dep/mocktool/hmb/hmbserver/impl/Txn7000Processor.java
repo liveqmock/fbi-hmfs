@@ -3,6 +3,7 @@ package dep.mocktool.hmb.hmbserver.impl;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg002;
 import dep.mocktool.hmb.hmbserver.AbstractTxnProcessor;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * Time: обнГ1:22
  * To change this template use File | Settings | File Templates.
  */
+@Service
 public class Txn7000Processor extends AbstractTxnProcessor {
     @Override
     public byte[] process(byte[] msgin) {

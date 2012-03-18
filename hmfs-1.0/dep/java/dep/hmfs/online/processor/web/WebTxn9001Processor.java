@@ -70,7 +70,7 @@ public class WebTxn9001Processor extends WebAbstractTxnProcessor {
             rtnTxnCode = txnCode;
         }
         deleteAndInsertMsginsByHmbMsgList(rtnTxnCode, msgList);
-        return "完成交易，可查询交易结果。";
+        return "0000|完成交易，可查询交易结果。";
     }
 
     //=============

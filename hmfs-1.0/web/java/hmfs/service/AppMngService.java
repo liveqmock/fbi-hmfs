@@ -40,28 +40,28 @@ public class AppMngService {
     public List<TmpMsgoutLog>  selectTmpMsgoutList(String txnCode, String msgSn){
         TmpMsgoutLogExample example = new TmpMsgoutLogExample();
         example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
-        example.setOrderByClause("msg_sub_sn");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
         return tmpMsgoutLogMapper.selectByExample(example);
     }
 
     public List<TmpMsginLog>  selectTmpMsginList(String txnCode, String msgSn){
         TmpMsginLogExample example = new TmpMsginLogExample();
         example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
-        example.setOrderByClause("msg_sub_sn");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
         return tmpMsginLogMapper.selectByExample(example);
     }
 
     public List<HisMsgoutLog>  selectHisMsgoutList(String txnCode, String msgSn){
         HisMsgoutLogExample example = new HisMsgoutLogExample();
         example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
-        example.setOrderByClause("msg_sub_sn");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
         return hisMsgoutLogMapper.selectByExample(example);
     }
 
     public List<HisMsginLog>  selectHisMsginList(String txnCode, String msgSn){
         HisMsginLogExample example = new HisMsginLogExample();
         example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
-        example.setOrderByClause("msg_sub_sn");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
         return hisMsginLogMapper.selectByExample(example);
     }
 

@@ -1,4 +1,4 @@
-package dep.gateway.xsocket.client.impl;
+package dep.mocktool.cbs;
 
 import dep.gateway.xsocket.client.ConnectClient;
 import org.apache.commons.lang.StringUtils;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 
 /**
- * 客户端接收服务端信息
+ * 主机客户端模拟
  *
  * @author zxb
  */
