@@ -42,41 +42,41 @@ public class BookkeepingService {
 
     // 更新会计账号信息
     @Transactional
-    public int cbsActBookkeeping(String cbsSerialNo, BigDecimal amt, String dc) throws ParseException {
+    public int cbsActBookkeeping(String cbsSerialNo, BigDecimal amt, String dc, String cbsTxnCode) throws ParseException {
         HmActinfoCbs hmActinfoCbs = hmbActinfoService.getFirstHmActinfoCbs();
-        return cbsActUpdate(hmActinfoCbs, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActinfoCbs, amt, dc);
+        return cbsActUpdate(hmActinfoCbs, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActinfoCbs, amt, dc, cbsTxnCode);
     }
 
     // [批量]根据子报文内容更新核算账户信息
     @Transactional
-    public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc) throws ParseException {
+    public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc, String cbsTxnCode) throws ParseException {
         int cnt = 0;
         for (HisMsginLog msginLog : msginLogList) {
-            cnt += fundActBookkeepingByMsgin(msginLog, dc);
+            cnt += fundActBookkeepingByMsgin(msginLog, dc, cbsTxnCode);
         }
         return cnt;
     }
 
     // 根据子报文内容更新核算账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
-    private int fundActBookkeepingByMsgin(HisMsginLog msginLog, String dc) throws ParseException {
+    private int fundActBookkeepingByMsgin(HisMsginLog msginLog, String dc, String cbsTxnCode) throws ParseException {
         int fund1Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getFundActno1(), msginLog.getTxnAmt1(),
-                dc, msginLog.getActionCode());
+                dc, cbsTxnCode, msginLog.getActionCode());
         int fund2Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getFundActno2(), msginLog.getTxnAmt1(),
-                dc, msginLog.getActionCode());
+                dc, cbsTxnCode, msginLog.getActionCode());
         int setl1Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getSettleActno1(), msginLog.getTxnAmt1(),
-                dc, msginLog.getActionCode());
+                dc, cbsTxnCode, msginLog.getActionCode());
         return fund1Rlt + fund2Rlt + setl1Rlt;
     }
 
     //核算户记帐 处理余额及流水
     @Transactional
-    public int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String actionCode) throws ParseException {
+    public int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
         HmActinfoFund hmActinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
         if (hmActinfoFund == null) {
             return 0;
         }
-        return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, hmActinfoFund, amt, dc, actionCode);
+        return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, hmActinfoFund, amt, dc, cbsTxnCode, actionCode);
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class BookkeepingService {
     }
 
     @Transactional
-    private int addTxnCbsLog(String cbsSerialNo, HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc) {
+    private int addTxnCbsLog(String cbsSerialNo, HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc, String cbsTxnCode) {
         // 新增CBS账户交易明细记录
         TxnCbsLog txnCbsLog = new TxnCbsLog();
         txnCbsLog.setPkid(UUID.randomUUID().toString());
@@ -115,7 +115,7 @@ public class BookkeepingService {
         txnCbsLog.setTxnSubSn("00001");
         txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
-        txnCbsLog.setTxnCode("1002");
+        txnCbsLog.setTxnCode(cbsTxnCode);
         txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
         txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
         txnCbsLog.setTxnAmt(amt);
@@ -155,7 +155,7 @@ public class BookkeepingService {
 
     // 新增核算账户交易明细记录
     @Transactional
-    private int addTxnFundLog(String msgSn, HmActinfoFund hmActinfoFund, BigDecimal amt, String dc, String actionCode) {
+    private int addTxnFundLog(String msgSn, HmActinfoFund hmActinfoFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
 
         TxnFundLog txnFundLog = new TxnFundLog();
         txnFundLog.setPkid(UUID.randomUUID().toString());
@@ -168,7 +168,7 @@ public class BookkeepingService {
         txnFundLog.setLastActBal(hmActinfoFund.getLastActBal());
         txnFundLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
-        txnFundLog.setTxnCode("1002");
+        txnFundLog.setTxnCode(cbsTxnCode);
         txnFundLog.setReverseFlag("0");
         txnFundLog.setActionCode(actionCode);
         return txnFundLogMapper.insertSelective(txnFundLog);
