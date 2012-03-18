@@ -33,4 +33,6 @@ public abstract class HmbAbstractTxnProcessor {
     @Transactional
     abstract public int run(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException;
 
+    abstract public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException;
+
 }

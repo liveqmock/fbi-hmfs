@@ -25,6 +25,4 @@ public abstract class HmbSyncAbstractTxnProcessor extends HmbAbstractTxnProcesso
         hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
         return process(txnCode, msgSn, hmbMsgList);
     }
-
-    abstract public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException;
 }
