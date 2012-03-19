@@ -21,8 +21,9 @@ public enum CbsErrorCode implements EnumApp {
     CBS_ACT_BAL_ERROR("2003", "账户余额不一致"),
     CBS_ACT_TXNS_ERROR("2004", "账户交易明细不一致"),
 
-    FUND_BAL_LESS("3001", "核算账户余额不足"),
-    FUND_NOT_EXIST("3002", "该核算户不存在"),
+    FUND_ACT_BAL_LESS("3001", "核算账户余额不足"),
+    FUND_ACT_NOT_EXIST("3002", "该核算户不存在"),
+    FUND_ACT_CHK_ERROR("3003", "国土局账户余额对账异常"),
 
     VOUCHER_NUM_ERROR("4001", "票据号码输入有误"),
     VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),

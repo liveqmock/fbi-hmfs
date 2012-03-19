@@ -90,10 +90,20 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                 }
                 // 至此，本地对账结束
                 // 发起国土局余额对账
-                webTxn7003Processor.process(null);
+                String res = null;
+                try {
+                    res = webTxn7003Processor.process(null);
+                } catch (Exception e) {
+                    logger.error("对账异常", e);
+                    throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
+                }
+                if ("0000".equals(webTxn7003Processor.process(null))) {
+                    return null;
+                } else {
+                    throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
+                }
                 // TODO 发起国土局明细对账【暂无此交易】
             }
         }
-        return null;
     }
 }
