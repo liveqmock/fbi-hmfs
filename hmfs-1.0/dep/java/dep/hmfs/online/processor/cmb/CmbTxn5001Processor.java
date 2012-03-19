@@ -97,7 +97,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     logger.error("∂‘’À“Ï≥£", e);
                     throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
                 }
-                if ("0000".equals(webTxn7003Processor.process(null))) {
+                if (webTxn7003Processor.process(null).startsWith("0000")) {
                     return null;
                 } else {
                     throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
