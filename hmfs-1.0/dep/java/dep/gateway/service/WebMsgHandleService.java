@@ -37,7 +37,7 @@ public class WebMsgHandleService implements IMessageHandler {
             response = "9999|交易处理发生异常！" + e.getMessage();
         }
 
-        response = txnCode + "|" + response;
+        //response = txnCode + "|" + response;
         int len = 0;
         try {
             len = response.getBytes("GBK").length;

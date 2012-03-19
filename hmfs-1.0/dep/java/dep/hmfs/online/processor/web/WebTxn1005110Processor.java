@@ -29,7 +29,7 @@ public class WebTxn1005110Processor extends WebAbstractHmbProductTxnProcessor{
      * 结算户开户交易
      * @param request
      */
-    public void processOpenactRequest(String request) {
+    private void processOpenactRequest(String request) {
         String txnCode = "5110";
         Msg003 msg003 = new Msg003();
         assembleSummaryMsg(txnCode, msg003, 1, true);
@@ -42,7 +42,7 @@ public class WebTxn1005110Processor extends WebAbstractHmbProductTxnProcessor{
 
         Msg031 msg031 = new Msg031();
         msg031.actionCode = "100";
-        int f = 2;
+        int f = 1;
         msg031.cbsActno = fields[f++];
         msg031.cbsActtype = fields[f++];
         msg031.cbsActname  = fields[f++];

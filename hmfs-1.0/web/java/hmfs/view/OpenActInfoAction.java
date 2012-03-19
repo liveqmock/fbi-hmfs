@@ -1,7 +1,6 @@
 package hmfs.view;
 
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmSct;
 import hmfs.common.model.Msg031;
 import hmfs.service.ActInfoService;
@@ -17,7 +16,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,16 +54,9 @@ public class OpenActInfoAction implements Serializable {
         HmSct hmSct = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
-            List<HmActinfoCbs> actinfoCbsList =  actInfoService.selectCbsActnoRecord(msg031.cbsActno);
-/*
-            if ("1".endsWith(actinfoCbs.getActSts())) {
-                //TODO
-            }
-*/
             try {
-                String response = depService.process("10005110|" + getMsg031Str());
-                String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //成功
+                String response = depService.process("1005110|" + getMsg031Str());
+                if (response.startsWith("0000")) { //成功
                      MessageUtil.addInfo("结算户开户请求发送成功, 国土局已受理, 稍等请查询帐户信息...");
                 }else{
                     MessageUtil.addError("处理失败。" + response);

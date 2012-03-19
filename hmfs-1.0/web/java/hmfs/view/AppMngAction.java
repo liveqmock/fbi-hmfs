@@ -67,8 +67,7 @@ public class AppMngAction implements Serializable {
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
                 String response = depService.process("1007000");
-                String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //签到成功
+                if (response.startsWith("0000")) { //成功
                      MessageUtil.addInfo("向国土局系统签到成功......");
                 }else{
                     MessageUtil.addError("签到失败。" + response);
@@ -90,8 +89,7 @@ public class AppMngAction implements Serializable {
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
                 String response = depService.process("1007001");
-                String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //成功
+                if (response.startsWith("0000")) { //成功
                     MessageUtil.addInfo("向国土局系统签退成功......");
                 }else{
                     MessageUtil.addError("签退失败。" + response);
@@ -117,9 +115,8 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
             try {
-                String response = depService.process("10007003");
-                String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //成功
+                String response = depService.process("1007003");
+                if (response.startsWith("0000")) { //成功
                     MessageUtil.addInfo("余额对帐处理完成，余额对帐成功。");
                 }else{
                     MessageUtil.addError("余额对帐处理未完成。" + response);
@@ -140,9 +137,8 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS) ||sysCtlSts.equals(SysCtlSts.HMB_BALCHK_SUCCESS)) {
             try {
-                String response = depService.process("10007004");
-                String[] fields = response.split("\\|");
-                if ("0000".endsWith(fields[1])) { //成功
+                String response = depService.process("1007004");
+                if (response.startsWith("0000")) { //成功
                     MessageUtil.addInfo("流水对帐处理完成，流水对帐成功。");
                 }else{
                     MessageUtil.addError("流水对帐处理未完成。" + response);
