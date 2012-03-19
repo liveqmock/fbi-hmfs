@@ -1,10 +1,13 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA4001;
 import dep.hmfs.online.service.cbs.CbsTxnVouchLogService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +22,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Component
 public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
+
+    private static Logger logger = LoggerFactory.getLogger(CmbTxn4001Processor.class);
 
     @Autowired
     private CbsTxnVouchLogService cbsTxnVouchLogService;
@@ -36,7 +41,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
         tia4001.body.billEndNo = new String(bytes, 13, 12).trim();
         if (bytes.length > 25) {
             if (bytes.length != 43) {
-                throw new RuntimeException("报文长度错误！");
+                throw new RuntimeException(CbsErrorCode.DATA_ANALYSIS_ERROR.getCode());
             } else {
                 tia4001.body.payApplyNo = new String(bytes, 25, 18);
             }
@@ -47,15 +52,23 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
         打印票据结束编号	12	    票据结束编号（单张销号该字段为空）
         缴款通知书编号	    18	    非必填项，凭证使用时填写
          */
-        long startNo = Long.parseLong(tia4001.body.billStartNo);
-        long endNo = Long.parseLong(tia4001.body.billEndNo);
+        long startNo = 0;
+        long endNo = 0;
+        try {
+            startNo = Long.parseLong(tia4001.body.billStartNo);
+            endNo = Long.parseLong(tia4001.body.billEndNo);
+        } catch (Exception e) {
+            logger.error("票据起止号码解析错误。", e);
+            throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+        }
         if (startNo > endNo) {
-            throw new RuntimeException("起止号输入有误！");
+            throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
         }
         String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
         cbsTxnVouchLogService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
-        if(!hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo, tia4001.body.billStatus)) {
-            throw new RuntimeException("票据状态发送至国土局出现异常");
+        if (!hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo, tia4001.body.billStatus)) {
+            logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
+            throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
         }
         return null;
     }

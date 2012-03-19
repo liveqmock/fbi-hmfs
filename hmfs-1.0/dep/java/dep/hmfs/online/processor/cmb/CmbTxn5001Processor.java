@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
@@ -51,9 +52,9 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
 
         HmActinfoCbs hmActinfoCbs = hmbActinfoService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
         if (hmActinfoCbs == null) {
-            throw new RuntimeException("该账户不存在！");
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
         } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActinfoCbs.getActBal()) != 0) {
-            throw new RuntimeException("账户余额不一致！");
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
         } else {
             // 获取明细，开始主机对账
             if (bytes.length > 54) {
@@ -72,7 +73,8 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
             }
             List<TxnCbsLog> txnCbsLogList = cbsTxnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
             if (txnCbsLogList.size() != tia5001.body.recordList.size()) {
-                throw new RuntimeException("账户交易明细数不一致！【本地】交易数：" + txnCbsLogList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
+                logger.error("账户交易明细数不一致！【本地】交易数：" + txnCbsLogList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
+                throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
             } else {
                 int index = 0;
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
@@ -81,7 +83,8 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     if (!r.txnSerialNo.equals(txnCbsLog.getTxnSn())
                             || txnCbsLog.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
                             || !r.txnType.equals(txnCbsLog.getDcFlag())) {
-                        throw new RuntimeException("账户交易明细内容不一致！");
+                        logger.error("账户交易明细内容不一致！");
+                        throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
                     }
                     index++;
                 }
@@ -91,7 +94,6 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                 // TODO 发起国土局明细对账【暂无此交易】
             }
         }
-
         return null;
     }
 }

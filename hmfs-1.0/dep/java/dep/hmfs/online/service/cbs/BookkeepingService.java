@@ -100,7 +100,7 @@ public class BookkeepingService {
         } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
             hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().subtract(amt));
             if (hmActinfoCbs.getActBal().compareTo(new BigDecimal(0)) < 0) {
-                throw new RuntimeException(CbsErrorCode.ACCOUNT_BAL_LESS.getCode());
+                throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_LESS.getCode());
             }
         }
         // 更新会计账号信息

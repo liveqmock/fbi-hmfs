@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
  */
 // TODO 支取冲正--待定
 @Component
+@Deprecated
 public class CmbTxn2003Processor extends CmbAbstractTxnProcessor {
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {

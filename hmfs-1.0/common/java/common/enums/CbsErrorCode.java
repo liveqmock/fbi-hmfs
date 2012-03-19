@@ -10,15 +10,22 @@ public enum CbsErrorCode implements EnumApp {
     DATA_ANALYSIS_ERROR("8000", "报文解析错误"),
 
     QRY_NO_RECORDS("1001", "没有查询到数据记录"),
-    TXN_NO_EXIST("1002", "该交易不存在"),
+    TXN_NOT_EXIST("1002", "该交易不存在"),
     TXN_NO_EQUAL("1003", "实际交易金额和应交易金额不一致"),
     TXN_CANCELED("1004", "该笔交易已撤销"),
     TXN_NOT_KNOWN("1005", "该笔交易处理状态不明"),
     TXN_HANDLING("1006", "该交易已进入处理流程，无法撤销"),
 
-    ACCOUNT_BAL_LESS("2001", "会计账户余额不足"),
+    CBS_ACT_BAL_LESS("2001", "会计账户余额不足"),
+    CBS_ACT_NOT_EXIST("2002", "该账户不存在"),
+    CBS_ACT_BAL_ERROR("2003", "账户余额不一致"),
+    CBS_ACT_TXNS_ERROR("2004", "账户交易明细不一致"),
 
     FUND_BAL_LESS("3001", "核算账户余额不足"),
+    FUND_NOT_EXIST("3002", "该核算户不存在"),
+
+    VOUCHER_NUM_ERROR("4001", "票据号码输入有误"),
+    VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),
 
     NET_COMMUNICATE_ERROR("7000", "网络连接异常"),
     NET_COMMUNICATE_TIMEOUT("7001", "网络连接超时"),

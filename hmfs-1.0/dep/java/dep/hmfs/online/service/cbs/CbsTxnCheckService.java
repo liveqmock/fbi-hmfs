@@ -21,7 +21,7 @@ public class CbsTxnCheckService {
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HisMsginLog totalInfo, List<HisMsginLog> detailInfoList, BigDecimal txnTotalAmt) {
         if (totalInfo == null || detailInfoList.size() < 1) {
-            throw new RuntimeException(CbsErrorCode.TXN_NO_EXIST.getCode());
+            throw new RuntimeException(CbsErrorCode.TXN_NOT_EXIST.getCode());
         } else if (!(totalInfo.getTxnAmt1().compareTo(txnTotalAmt) == 0)) {
             throw new RuntimeException(CbsErrorCode.TXN_NO_EQUAL.getCode());
         } else if (TxnCtlSts.CANCEL.getCode().equals(totalInfo.getTxnCtlSts())) {
