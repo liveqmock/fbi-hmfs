@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * 主控.
+ * 系统交易（） 主控.
  * User: zhanrui
  * Date: 12-3-12
  * Time: 上午11:47

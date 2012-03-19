@@ -141,7 +141,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             // 3001 退款查询
 //            String datagram = "123456789012345600003001120316004838523000";
             // 3002 退款
-             String datagram = "1234567890123488000030021203160048385230001000.00         ";
+             String datagram = "1234567890123489000030021203160048385230001000.00         ";
             /*
             票据状态	1	1:领用；2:使用；3:作废
             打印票据起始编号	12	票据起始编号

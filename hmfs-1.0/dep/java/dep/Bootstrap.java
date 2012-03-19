@@ -21,6 +21,7 @@ public class Bootstrap {
             logger.info("====== Dep Server 初始化结束==========");
         } catch (IOException e) {
             logger.error("====== Dep Server 初始化失败==========", e);
+            System.exit(1);
         }
     }
 }
