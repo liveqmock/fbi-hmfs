@@ -7,13 +7,15 @@ import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.dao.HmSctMapper;
 import common.repository.hmfs.dao.TmpMsginLogMapper;
-import common.repository.hmfs.model.*;
+import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HisMsginLogExample;
+import common.repository.hmfs.model.HisMsgoutLog;
+import common.repository.hmfs.model.HmSct;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -110,24 +112,6 @@ public class HmbBaseService {
         hmSctMapper.updateByPrimaryKey(hmSct);
     }
 
-    /**
-     * @param txnCode
-     * @param msg
-     * @param submsgNum
-     * @param isInitStart 是否是交易的第一个发起方
-     */
-    public void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
-        msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
-        msg.submsgNum = submsgNum;
-        msg.sendSysId = SEND_SYS_ID;
-        if (isInitStart) {
-            msg.origSysId = ORIG_SYS_ID;
-        } else {
-            msg.origSysId = "00";
-        }
-        msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
-        msg.msgEndDate = "#";
-    }
 
     public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
         byte[] hmfsDatagram;

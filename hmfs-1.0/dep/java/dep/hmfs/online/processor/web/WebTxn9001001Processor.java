@@ -33,7 +33,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class WebTxn9001Processor extends WebAbstractTxnProcessor {
+public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
     @Resource
     private HmbSysTxnService hmbSysTxnService;
 
@@ -49,7 +49,7 @@ public class WebTxn9001Processor extends WebAbstractTxnProcessor {
     protected TmpMsginLogMapper tmpMsginLogMapper;
 
     @Override
-    public String process(String request) throws InvocationTargetException, IllegalAccessException {
+    public String process(String request) {
         String[] fields = request.split("\\|");
         String txnCode = fields[1];
         String msgSn = fields[2];
@@ -69,7 +69,11 @@ public class WebTxn9001Processor extends WebAbstractTxnProcessor {
         if ("9999".equals(rtnTxnCode)) {
             rtnTxnCode = txnCode;
         }
-        deleteAndInsertMsginsByHmbMsgList(rtnTxnCode, msgList);
+        try {
+            deleteAndInsertMsginsByHmbMsgList(rtnTxnCode, msgList);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
         return "0000|完成交易，可查询交易结果。";
     }
 

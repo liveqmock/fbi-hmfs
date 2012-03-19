@@ -1,7 +1,10 @@
 package dep.hmfs.online.processor.web;
 
+import common.repository.hmfs.dao.HmChkActMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
+import common.repository.hmfs.model.HmChkAct;
+import common.repository.hmfs.model.HmChkActExample;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
@@ -19,9 +22,12 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class WebTxn7003Processor extends WebAbstractTxnProcessor{
+public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
     @Resource
     private HmbSysTxnService hmbSysTxnService;
+
+    @Resource
+    private HmChkActMapper hmChkActMapper;
 
     @Override
     public String process(String request)  {
@@ -41,12 +47,11 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         }else{
             //保存到本地数据库
-            hmbSysTxnService.processChkBalResponse(msgList);
+            processChkBalResponse(msgList);
             //数据核对处理
             //TODO
         }
-
-        return null;
+        return "0000|余额对帐交易成功";
     }
 
     private byte[] getRequestBuf(String txnCode){
@@ -54,7 +59,7 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
-        hmbSysTxnService.assembleSummaryMsg(txnCode, msg001, 1, false);
+        assembleSummaryMsg(txnCode, msg001, 1, false);
         msg001.txnType = "1";//单笔批量？
         msg001.bizType = "#"; //?
         msg001.origTxnCode = "#"; //TODO ????
@@ -85,4 +90,41 @@ public class WebTxn7003Processor extends WebAbstractTxnProcessor{
         }
         return  messageFactory.marshal(txnCode, hmbMsgList);
     }
+
+
+    /**
+     * 处理国土局返回的余额对帐信息
+     */
+    private void processChkBalResponse(List<HmbMsg> msgList){
+        Msg002 msg002 = (Msg002) msgList.get(0);
+        String txnDate = msg002.msgDt.substring(0,8);
+        for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setSendSysId("00");
+            if (hmbMsg instanceof Msg098) {
+                hmChkAct.setActno(((Msg098) hmbMsg).fundActno1);
+                hmChkAct.setActbal(((Msg098) hmbMsg).getActBal());
+            }else{
+                hmChkAct.setActno(((Msg094) hmbMsg).settleActno1);
+                hmChkAct.setActbal(((Msg094) hmbMsg).getActBal());
+            }
+            hmChkActMapper.insert(hmChkAct);
+        }
+    }
+
+    /**
+     * 校验余额对帐数据
+     * @return
+     */
+    private boolean verifyActBalData(String txnDate){
+        //SEND_SYS_ID
+        HmChkActExample example = new HmChkActExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        //List<HmChkAct> hmChkActMapper
+
+        //TODO  sql
+        return false;
+    }
+
 }

@@ -66,7 +66,7 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
-                String response = depService.process("1000|signon");
+                String response = depService.process("1007000");
                 String[] fields = response.split("\\|");
                 if ("0000".endsWith(fields[1])) { //签到成功
                      MessageUtil.addInfo("向国土局系统签到成功......");
@@ -89,7 +89,7 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                String response = depService.process("1000|signout");
+                String response = depService.process("1007001");
                 String[] fields = response.split("\\|");
                 if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("向国土局系统签退成功......");
@@ -117,7 +117,7 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
             try {
-                String response = depService.process("1000|chkbal");
+                String response = depService.process("10007003");
                 String[] fields = response.split("\\|");
                 if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("余额对帐处理完成，余额对帐成功。");
@@ -140,7 +140,7 @@ public class AppMngAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS) ||sysCtlSts.equals(SysCtlSts.HMB_BALCHK_SUCCESS)) {
             try {
-                String response = depService.process("1000|chkdetl");
+                String response = depService.process("10007004");
                 String[] fields = response.split("\\|");
                 if ("0000".endsWith(fields[1])) { //成功
                     MessageUtil.addInfo("流水对帐处理完成，流水对帐成功。");

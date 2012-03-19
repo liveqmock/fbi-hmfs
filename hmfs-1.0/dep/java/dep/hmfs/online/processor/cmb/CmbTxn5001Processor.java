@@ -4,7 +4,7 @@ import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.TxnCbsLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
-import dep.hmfs.online.processor.web.WebTxn7003Processor;
+import dep.hmfs.online.processor.web.WebTxn1007003Processor;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private CbsTxnCbsLogService cbsTxnCbsLogService;
     @Autowired
-    private WebTxn7003Processor webTxn7003Processor;
+    private WebTxn1007003Processor webTxn7003Processor;
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {

@@ -31,7 +31,7 @@ public class WebMsgHandleService implements IMessageHandler {
             String[] fields = request.split("\\|");
             txnCode = fields[0];
             WebAbstractTxnProcessor abstractTxnProcessor = (WebAbstractTxnProcessor) ContainerManager.getBean("webTxn" + txnCode + "Processor");
-            response = abstractTxnProcessor.process(request);
+            response = abstractTxnProcessor.run(request);
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             response = "9999|交易处理发生异常！" + e.getMessage();
