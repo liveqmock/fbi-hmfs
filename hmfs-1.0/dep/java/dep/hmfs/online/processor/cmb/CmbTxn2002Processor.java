@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
@@ -75,7 +76,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
                 hmbClientReqService.createMsg008ByTotalMsgin(totalMsginLog), hmbClientReqService.changeToMsg042ByMsginList(detailMsginLogs))) {
             return null;
         } else {
-            throw new RuntimeException("2002发送报文至房管局交易失败！");
+            throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
     }
 

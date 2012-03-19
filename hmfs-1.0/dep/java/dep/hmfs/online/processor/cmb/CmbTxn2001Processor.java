@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
@@ -35,6 +36,8 @@ public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
             // 更新汇总报文和子报文交易处理状态为：处理中
             String[] drawMsgTypes = {"01041"};
             hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.HANDLING);
+        } else {
+            throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }
 
         return toa2001;

@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.cbs;
 
+import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,11 @@ public class CbsTxnCheckService {
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HisMsginLog totalInfo, List<HisMsginLog> detailInfoList, BigDecimal txnTotalAmt) {
         if (totalInfo == null || detailInfoList.size() < 1) {
-            throw new RuntimeException("该笔交易不存在！");
+            throw new RuntimeException(CbsErrorCode.TXN_NO_EXIST.getCode());
         } else if (!(totalInfo.getTxnAmt1().compareTo(txnTotalAmt) == 0)) {
-            throw new RuntimeException("实际交易金额和应交易金额不一致！");
+            throw new RuntimeException(CbsErrorCode.TXN_NO_EQUAL.getCode());
         } else if (TxnCtlSts.CANCEL.getCode().equals(totalInfo.getTxnCtlSts())) {
-            throw new RuntimeException("该笔交易已撤销！");
+            throw new RuntimeException(CbsErrorCode.TXN_CANCELED.getCode());
         } else if (TxnCtlSts.INIT.getCode().equals(totalInfo.getTxnCtlSts()) ||
                 TxnCtlSts.HANDLING.getCode().equals(totalInfo.getTxnCtlSts())) {
             // 正常进行交易。
@@ -33,7 +34,7 @@ public class CbsTxnCheckService {
             // 交易已成功
             return false;
         } else {
-            throw new RuntimeException("该笔交易处理状态不明！");
+            throw new RuntimeException(CbsErrorCode.TXN_NOT_KNOWN.getCode());
         }
     }
 }

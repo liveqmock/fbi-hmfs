@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.SysCtlSts;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HisMsginLogMapper;
@@ -170,7 +171,7 @@ public class HmbBaseService {
                 if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
                     return msginLogList.size();
                 } else {
-                    throw new RuntimeException("该交易已进入处理流程，无法撤销");
+                    throw new RuntimeException(CbsErrorCode.TXN_HANDLING.getCode());
                 }
             }
         } else {

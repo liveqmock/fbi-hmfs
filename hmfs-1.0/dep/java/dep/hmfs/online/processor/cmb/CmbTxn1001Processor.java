@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
@@ -41,6 +42,8 @@ public class CmbTxn1001Processor extends CmbAbstractTxnProcessor {
             // 更新交款汇总信息和明细信息状态为：处理中 -- 更新完成后交款信息不可撤销
             String[] payMsgTypes = {"01035", "01045"};
             hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1001.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.HANDLING);
+        }else {
+            throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }
         return toa1001;
     }

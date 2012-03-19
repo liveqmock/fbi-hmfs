@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HisMsginLog;
@@ -123,7 +124,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
             }
             return toa1002;
         } else {
-            throw new RuntimeException("发送报文至房管局交易失败！");
+            throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
     }
 }

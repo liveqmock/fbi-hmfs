@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.cbs;
 
+import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.repository.hmfs.dao.HmActinfoCbsMapper;
 import common.repository.hmfs.dao.HmActinfoFundMapper;
@@ -99,7 +100,7 @@ public class BookkeepingService {
         } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
             hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().subtract(amt));
             if (hmActinfoCbs.getActBal().compareTo(new BigDecimal(0)) < 0) {
-                throw new RuntimeException("会计账号余额不足！");
+                throw new RuntimeException(CbsErrorCode.ACCOUNT_BAL_LESS.getCode());
             }
         }
         // 更新会计账号信息
@@ -146,7 +147,7 @@ public class BookkeepingService {
         } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
             hmActinfoFund.setActBal(hmActinfoFund.getActBal().subtract(amt));
             if (hmActinfoFund.getActBal().compareTo(new BigDecimal(0)) < 0) {
-                throw new RuntimeException("核算账户余额不足！");
+                throw new RuntimeException(CbsErrorCode.FUND_BAL_LESS.getCode());
             }
         }
         // 更新核算账户信息
