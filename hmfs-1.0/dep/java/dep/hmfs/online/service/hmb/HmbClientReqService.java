@@ -4,6 +4,7 @@ import common.enums.VouchStatus;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.service.SystemService;
+import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,11 @@ import java.util.Map;
  */
 @Service
 public class HmbClientReqService extends HmbBaseService {
+
+    protected XSocketBlockClient socketBlockClient;
+    protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
+    protected static int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
+    protected static int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
 
     @Autowired
     private HmbActinfoService hmbActinfoService;
@@ -128,6 +135,26 @@ public class HmbClientReqService extends HmbBaseService {
             throw new RuntimeException(((Msg100) rtnMsgList.get(0)).rtnInfo);
         }
         // 当且仅当首次发送交易信息时，返回9999报文
+    }
+
+    public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
+        byte[] hmfsDatagram;
+        try {
+            socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
+            hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
+            return messageFactory.unmarshal(hmfsDatagram);
+        } catch (Exception e) {
+            throw new RuntimeException("通讯或解包错误.", e);
+        } finally {
+            try {
+                if (socketBlockClient != null) {
+                    socketBlockClient.close();
+                    socketBlockClient = null;
+                }
+            } catch (IOException e) {
+                //
+            }
+        }
     }
 
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {

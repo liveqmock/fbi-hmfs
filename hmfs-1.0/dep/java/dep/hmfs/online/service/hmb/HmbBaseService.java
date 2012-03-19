@@ -13,7 +13,6 @@ import common.repository.hmfs.model.HisMsgoutLog;
 import common.repository.hmfs.model.HmSct;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.util.PropertyManager;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
@@ -55,10 +53,6 @@ public class HmbBaseService {
     @Resource
     protected TmpMsginLogMapper tmpMsginLogMapper;
 
-    protected XSocketBlockClient socketBlockClient;
-    protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
-    protected static int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
-    protected static int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
@@ -110,27 +104,6 @@ public class HmbBaseService {
 
         hmSct.setHostChkDt(new Date());
         hmSctMapper.updateByPrimaryKey(hmSct);
-    }
-
-
-    public Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
-        byte[] hmfsDatagram;
-        try {
-            socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
-            hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
-            return messageFactory.unmarshal(hmfsDatagram);
-        } catch (Exception e) {
-            throw new RuntimeException("通讯或解包错误.", e);
-        } finally {
-            try {
-                if (socketBlockClient != null) {
-                    socketBlockClient.close();
-                    socketBlockClient = null;
-                }
-            } catch (IOException e) {
-                //
-            }
-        }
     }
 
     /**
