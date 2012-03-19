@@ -18,12 +18,12 @@ import java.util.List;
 @Service
 public class Txn5110Processor extends AbstractTxnProcessor {
     @Override
-    public byte[] process(byte[] msgin) {
-        return handle(msgin);
+    public byte[] process() {
+        return handle();
     }
 
-    private byte[] handle(byte[] msgin){
-        System.out.println("5110报文:" + new String(msgin));
+    private byte[] handle(){
+        System.out.println("5110报文:" + new String(inBuf));
         Msg100 msg100 = new Msg100();
         msg100.msgSn = "111122223333444455";
         msg100.sendSysId = "00";

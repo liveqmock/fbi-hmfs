@@ -72,13 +72,9 @@ public class HmbServer implements Runnable {
                 log.info("Parsing incoming: '{}'", msgin);
                 String txncode = msgin.substring(0,4);
 
-//                String pkgname = TxnProcessor.class.getPackage().getName();
-//                Class clazz = Class.forName(pkgname + ".impl.Txn" + txncode + "Processor");
-//                TxnProcessor processor = (TxnProcessor) clazz.newInstance();
-
                 AbstractTxnProcessor processor = (AbstractTxnProcessor) context.getBean("txn" + txncode + "Processor");
-
-                byte[] gbks = processor.process(msg);
+                processor.init(msg);
+                byte[] gbks = processor.process();
                 socket.getOutputStream().write(gbks);
             } catch (Exception ex) {
                 log.error("œÏ”¶¥ÌŒÛ:", ex);

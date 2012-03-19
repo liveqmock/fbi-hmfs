@@ -12,7 +12,6 @@ import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -28,8 +27,8 @@ import java.util.UUID;
  * Time: 下午1:25
  * To change this template use File | Settings | File Templates.
  */
-@Service
-public abstract class AbstractTxnProcessor implements TxnProcessor{
+//@Service
+public abstract class AbstractTxnProcessor {
     protected  static String SEND_SYS_ID =  PropertyManager.getProperty("SEND_SYS_ID");
     protected  static String ORIG_SYS_ID =  PropertyManager.getProperty("ORIG_SYS_ID");
 
@@ -38,17 +37,29 @@ public abstract class AbstractTxnProcessor implements TxnProcessor{
     @Resource
     protected TmpMsginLogMapper tmpMsginLogMapper;
 
-    @Override
-    abstract public byte[] process(byte[] msgin);
+    protected   byte[] inBuf;
+    protected  Map<String, List<HmbMsg>> inmsgMap;
+    protected  String inTxnCode;
+    protected  String inMsgSn;
+    protected List<HmbMsg> inmsgList;
+    
+    abstract public byte[] process();
 
 
+    protected void init(byte[] buffer){
+        inmsgMap = getResponseMap(buffer);
+        inTxnCode = (String) inmsgMap.keySet().toArray()[0];
+        inmsgList = inmsgMap.get(inTxnCode);
+        inMsgSn = ((SummaryMsg) inmsgList.get(0)).msgSn;
+    }
+    
     /**
      * 处理汇总包
      * @param msg
      * @param submsgNum
      */
     protected void assembleSummaryMsg(SummaryMsg msg, int submsgNum) {
-        msg.msgSn = "1111";
+        msg.msgSn = inMsgSn;
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
         msg.origSysId = ORIG_SYS_ID;
@@ -61,13 +72,11 @@ public abstract class AbstractTxnProcessor implements TxnProcessor{
     }
 
     @Transactional
-    protected void deleteAndInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
-        String msgSn = ((SummaryMsg)hmbMsgList.get(0)).msgSn;
+    protected void deleteAndInsertMsginsByHmbMsgList() throws InvocationTargetException, IllegalAccessException {
         TmpMsginLogExample example = new TmpMsginLogExample();
-        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
-        //List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
+        example.createCriteria().andMsgSnEqualTo(inMsgSn).andMsgTypeLike("00%");
         tmpMsginLogMapper.deleteByExample(example);
-        insertMsginsByHmbMsgList(txnCode, hmbMsgList);
+        insertMsginsByHmbMsgList(inTxnCode, inmsgList);
     }
 
     private int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {

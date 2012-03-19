@@ -1,14 +1,12 @@
 package dep.mocktool.hmb.hmbserver.impl;
 
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import dep.mocktool.hmb.hmbserver.AbstractTxnProcessor;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,26 +18,21 @@ import java.util.Map;
 @Service
 public class Txn5210Processor extends AbstractTxnProcessor {
     @Override
-    public byte[] process(byte[] msgin) {
+    public byte[] process() {
         try {
-            return handleSignon(msgin);
+            return handleSignon();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        return msgin;
+        return inBuf;
     }
 
-    private byte[] handleSignon(byte[] msgin) throws InvocationTargetException, IllegalAccessException {
-        Map<String, List<HmbMsg>> responseMap = getResponseMap(msgin);
-
-        String rtnTxnCode = (String) responseMap.keySet().toArray()[0];
-        List<HmbMsg> msgList = responseMap.get(rtnTxnCode);
-
-        deleteAndInsertMsginsByHmbMsgList(rtnTxnCode, msgList);
+    private byte[] handleSignon() throws InvocationTargetException, IllegalAccessException {
+        deleteAndInsertMsginsByHmbMsgList();
 
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
-        hmbMsgList.add(createRtnMsg100(((SummaryMsg)msgList.get(0)).msgSn));
-        byte[] txnBuf = messageFactory.marshal(rtnTxnCode, hmbMsgList);
+        hmbMsgList.add(createRtnMsg100(inMsgSn));
+        byte[] txnBuf = messageFactory.marshal(inTxnCode, hmbMsgList);
         return txnBuf;
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class Txn7000Processor extends AbstractTxnProcessor {
+public class Txn7001Processor extends AbstractTxnProcessor {
     @Override
     public byte[] process() {
         return handleSignon();
@@ -30,7 +30,7 @@ public class Txn7000Processor extends AbstractTxnProcessor {
 
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(msg002);
-        byte[] txnBuf = messageFactory.marshal("7000", hmbMsgList);
+        byte[] txnBuf = messageFactory.marshal("7001", hmbMsgList);
         return txnBuf;
     }
 }
