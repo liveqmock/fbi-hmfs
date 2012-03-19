@@ -138,7 +138,10 @@ public class HmbBaseService {
             throw new RuntimeException("通讯或解包错误.", e);
         } finally {
             try {
-                socketBlockClient.close();
+                if (socketBlockClient != null) {
+                    socketBlockClient.close();
+                    socketBlockClient = null;
+                }
             } catch (IOException e) {
                 //
             }

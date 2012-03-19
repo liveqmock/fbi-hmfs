@@ -45,6 +45,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
+    @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
         TIA1002 tia1002 = new TIA1002();
         tia1002.body.payApplyNo = new String(bytes, 0, 18).trim();

@@ -7,6 +7,7 @@ import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,9 +71,14 @@ public class HmbClientReqService extends HmbBaseService {
             for (long i = startNo; i <= endNo; i++) {
                 Msg049 msg049 = new Msg049();
                 msg049.actionCode = "144";
-                msg049.receiptNo = String.valueOf(i);
+                //59:单位ID
+                msg049.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
+                //60:单位类型
+                msg049.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
+
+                msg049.receiptNo = StringUtils.leftPad(String.valueOf(i), 12, "0");
                 msg049.voucherSts = vouchStatus;
-                msg049.voucherType = "#";   // 00-商品住宅
+                msg049.voucherType = "00";   // 00-商品住宅
                 hmbMsgList.add(msg049);
             }
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
@@ -88,12 +94,14 @@ public class HmbClientReqService extends HmbBaseService {
 
                 msg037.actionCode = "141";
                 msg037.txnAmt1 = msginLog.getTxnAmt1();
-                msg037.receiptNo = String.valueOf(i);
+                msg037.receiptNo = StringUtils.leftPad(String.valueOf(i), 12, "0");
                 msg037.payinActno = actinfoFund.getCbsActno();
                 // TODO 房屋交存类型 1-商品房 ===== 票据类型 00-商品住宅
-                if ("1".equals(totalPayInfo.getHouseDepType())) {
-                    msg037.voucherType = "00";
-                }
+                msg037.voucherType = "00";
+                /*if ("1".equals(totalPayInfo.getHouseDepType())) {
+                                    msg037.voucherType = "00";
+                                }*/
+
                 msg037.depType = totalPayInfo.getHouseDepType();
                 //80:交存人       21 信息名称
                 msg037.depPerson = msginLog.getInfoName();
@@ -112,9 +120,14 @@ public class HmbClientReqService extends HmbBaseService {
         byte[] txnBuf = messageFactory.marshal("5610", hmbMsgList);
         Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
         List<HmbMsg> rtnMsgList = rtnMsgMap.get("5610");
+        if (rtnMsgList != null) {
+            SummaryResponseMsg msg006 = (SummaryResponseMsg) rtnMsgList.get(0);
+            return "00".equals(msg006.rtnInfoCode);
+        } else {
+            rtnMsgList = rtnMsgMap.get("9999");
+            throw new RuntimeException(((Msg100) rtnMsgList.get(0)).rtnInfo);
+        }
         // 当且仅当首次发送交易信息时，返回9999报文
-        SummaryResponseMsg msg006 = (SummaryResponseMsg) rtnMsgList.get(0);
-        return "00".equals(msg006.rtnInfoCode);
     }
 
     public Msg006 createMsg006ByTotalMsgin(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException {
@@ -141,5 +154,12 @@ public class HmbClientReqService extends HmbBaseService {
         msg008.setRtnInfoCode("00");
         msg008.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg008;
+    }
+
+    public List<HisMsginLog> changeToMsg042ByMsginList(List<HisMsginLog> detailMsginLogs) {
+        for (HisMsginLog msginLog : detailMsginLogs) {
+            msginLog.setMsgType("01042");
+        }
+        return detailMsginLogs;
     }
 }

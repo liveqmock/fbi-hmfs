@@ -75,6 +75,17 @@ public class HmbActinfoService {
         }
     }
 
+    public HmActinfoFund qryHmActinfoFundByInfoID(String infoID) {
+        HmActinfoFundExample example = new HmActinfoFundExample();
+        example.createCriteria().andInfoId1EqualTo(infoID);
+        List<HmActinfoFund> actinfoFundList = hmActinfoFundMapper.selectByExample(example);
+        if (actinfoFundList.size() != 1) {
+            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！【信息ID】：" + infoID);
+        } else {
+            return actinfoFundList.get(0);
+        }
+    }
+
     public boolean isExistFundActNo(String fundActno) {
         HmActinfoFundExample example = new HmActinfoFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActno);
@@ -115,34 +126,86 @@ public class HmbActinfoService {
         }
         return hmbMsgList.size();
     }
-    
+
     @Transactional
     public int updateActinfoFundsByMsginList(List<HisMsginLog> fundInfoList) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        for(HisMsginLog msginLog : fundInfoList) {
+        for (HisMsginLog msginLog : fundInfoList) {
             if ("01033".equals(msginLog.getMsgType())) {
-                 updateActinfosByMsginLog(msginLog);
-             } else if ("01051".equals(msginLog.getMsgType())) {
-                 HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
-                 hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
-                 hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
-             } else {
-                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + msginLog.getMsgType() + "！");
-             }  
+                updateActinfosByMsginLog(msginLog);
+            } else if ("01051".equals(msginLog.getMsgType())) {
+                HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+            } else {
+                throw new RuntimeException("报文体中含有非核算户更新子报文序号" + msginLog.getMsgType() + "！");
+            }
         }
         return fundInfoList.size();
     }
 
     private int updateActinfosByMsg(Msg033 msg033) throws InvocationTargetException, IllegalAccessException {
-        HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msg033.fundActno1);
-        BeanUtils.copyProperties(hmActinfoFund, msg033);
+        HmActinfoFund hmActinfoFund = qryHmActinfoFundByInfoID(msg033.infoId1);
+        // 信息类型60——分户核算户
+        // 可更新字段
+        /*
+        20:信息编码
+        21:信息名称
+        22:信息地址
+        23:分户数
+        24:建筑面积
+        	===
+        71:开发建设单位名称
+        76:房屋交存类型
+        78:交存标准1
+        83:交存标准2
+        99:是否出售
+        100:楼号
+        101:门号
+        102:室号
+        104:证件类型
+        105:证件编号
+        64:单位联系电话
+        82:购房合同号
+        88:购房人联系电话
+        93:有无电梯
+        106:购房款总额
+         */
+        hmActinfoFund.setInfoCode(msg033.infoCode);
+        hmActinfoFund.setInfoName(msg033.infoName);
+        hmActinfoFund.setInfoAddr(msg033.infoAddr);
+        hmActinfoFund.setCellNum(msg033.cellNum);
+        hmActinfoFund.setBuilderArea(msg033.builderArea);
+        if ("60".equals(msg033.infoIdType1)) {
+            hmActinfoFund.setDevOrgName(msg033.devOrgName);
+            hmActinfoFund.setHouseDepType(msg033.houseDepType);
+            hmActinfoFund.setDepStandard1(msg033.depStandard1);
+            hmActinfoFund.setDepStandard2(msg033.depStandard2);
+            hmActinfoFund.setSellFlag(msg033.sellFlag);
+            hmActinfoFund.setBuildingNo(msg033.buildingNo);
+            hmActinfoFund.setUnitNo(msg033.unitNo);
+            hmActinfoFund.setRoomNo(msg033.roomNo);
+            hmActinfoFund.setCertType(msg033.certType);
+            hmActinfoFund.setCertId(msg033.certId);
+            hmActinfoFund.setOrgPhone(msg033.orgPhone);
+            hmActinfoFund.setHouseContNo(msg033.houseContNo);
+            hmActinfoFund.setHouseCustPhone(msg033.houseCustPhone);
+            hmActinfoFund.setElevatorType(msg033.elevatorType);
+            hmActinfoFund.setHouseTotalAmt(msg033.houseTotalAmt);
+            // 信息类型30——项目核算户
+        } else if ("30".equals(msg033.infoIdType1)) {
+            // 无其他可更改字段
+        } else {
+            throw new RuntimeException("信息类型错误！【信息类型】：" + msg033.infoIdType1);
+        }
         return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
     }
 
+
     private int updateActinfosByMsginLog(HisMsginLog msginLog) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-            HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
-            PropertyUtils.copyProperties(hmActinfoFund, msginLog);
-            return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
-        }
+        HmActinfoFund hmActinfoFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+        PropertyUtils.copyProperties(hmActinfoFund, msginLog);
+        return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+    }
 
     public int createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
         HmActinfoFund actinfoFund = new HmActinfoFund();

@@ -68,10 +68,11 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
 
         hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2002.body.drawApplyNo, "00007", subMsgTypes, TxnCtlSts.SUCCESS);
 
-        String[] payMsgTypes = {"01042"};
+        String[] payMsgTypes = {"01041"};
         List<HisMsginLog> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
+
         if (hmbClientReqService.communicateWithHmb(totalMsginLog.getTxnCode(),
-                hmbClientReqService.createMsg008ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
+                hmbClientReqService.createMsg008ByTotalMsgin(totalMsginLog), hmbClientReqService.changeToMsg042ByMsginList(detailMsginLogs))) {
             return null;
         } else {
             throw new RuntimeException("2002发送报文至房管局交易失败！");

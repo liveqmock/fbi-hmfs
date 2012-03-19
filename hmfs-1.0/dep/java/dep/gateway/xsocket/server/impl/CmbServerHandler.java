@@ -119,7 +119,7 @@ class CmbContentHandler extends ContentHandler {
             logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
             nbc.write(resBytesMsg);
             nbc.flush();
-            //byteArrayOutStream.reset();
+            byteArrayOutStream.reset();
         }
         return false;
     }
