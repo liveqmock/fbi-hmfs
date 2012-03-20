@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
+ * »’÷’”‡∂Ó∂‘’ .
  * User: zhanrui
  * Date: 12-3-14
  * Time: œ¬ŒÁ1:22
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class Txn7000Processor extends AbstractTxnProcessor {
+public class Txn7003Processor extends AbstractTxnProcessor {
     @Override
     public byte[] process() {
         return handleSignon();

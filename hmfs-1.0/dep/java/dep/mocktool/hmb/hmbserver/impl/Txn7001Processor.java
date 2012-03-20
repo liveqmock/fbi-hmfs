@@ -30,7 +30,7 @@ public class Txn7001Processor extends AbstractTxnProcessor {
 
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(msg002);
-        byte[] txnBuf = messageFactory.marshal("7001", hmbMsgList);
+        byte[] txnBuf = messageFactory.marshal(inTxnCode, hmbMsgList);
         return txnBuf;
     }
 }
