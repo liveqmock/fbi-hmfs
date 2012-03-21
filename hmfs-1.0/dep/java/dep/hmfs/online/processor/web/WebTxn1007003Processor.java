@@ -128,12 +128,12 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
      */
     private void processChkBalResponse(List<HmbMsg> msgList){
         Msg002 msg002 = (Msg002) msgList.get(0);
-        String txnDate = msg002.msgDt.substring(0,8);
+        //TODO
+        // String txnDate = msg002.msgDt.substring(0,8);
         for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
             HmChkAct hmChkAct = new HmChkAct();
             hmChkAct.setPkid(UUID.randomUUID().toString());
-            //TODO 交易日期处理
-            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setTxnDate(this.txnDate);
             hmChkAct.setSendSysId("00");
             if (hmbMsg instanceof Msg098) {
                 hmChkAct.setActno(((Msg098) hmbMsg).fundActno1);
