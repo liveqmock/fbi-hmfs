@@ -42,7 +42,7 @@ public class HmbSysTxnService extends HmbBaseService {
      */
     public List<HmActinfoFund> selectFundActinfo(){
         HmActinfoFundExample example = new HmActinfoFundExample();
-        example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
+        example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode()).andFundActno1NotEqualTo("120000000003");
         return hmActinfoFundMapper.selectByExample(example);
     }
 

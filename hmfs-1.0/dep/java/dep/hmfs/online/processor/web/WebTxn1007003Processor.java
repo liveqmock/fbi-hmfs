@@ -38,15 +38,14 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
     public String process(String request)  {
 
         String txnCode = "7003";
+        txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode));
-
-        txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-
         //处理返回报文
         List<HmbMsg> msgList = responseMap.get(txnCode);
         if (msgList == null || msgList.size() == 0) {
-            throw new RuntimeException("接收国土局报文出错，报文为空");
+            Msg100 msg100 = (Msg100)responseMap.get("9999").get(0);
+            throw new RuntimeException(msg100.rtnInfo);
         }
 
         Msg002 msg002 = (Msg002) msgList.get(0);
@@ -108,6 +107,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             msg094.orgType = hmActinfoCbs.getOrgType();
             msg094.settleActno1 = hmActinfoCbs.getSettleActno1();
             msg094.settleActtype1 = hmActinfoCbs.getSettleActtype1();
+            msg094.actBal = hmActinfoCbs.getActBal();
             hmbMsgList.add(msg094);
 
             //保存发起对帐的数据到本地数据库
