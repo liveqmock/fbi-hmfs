@@ -1,10 +1,10 @@
 package dep.hmfs.online.processor.web;
 
 import common.repository.hmfs.dao.HmChkActMapper;
+import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
 import common.repository.hmfs.model.HmActinfoCbs;
 import common.repository.hmfs.model.HmActinfoFund;
 import common.repository.hmfs.model.HmChkAct;
-import common.repository.hmfs.model.HmChkActExample;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,13 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
     private HmbSysTxnService hmbSysTxnService;
 
     @Resource
+    private HmfsCmnMapper hmfsCmnMapper;
+
+    @Resource
     private HmChkActMapper hmChkActMapper;
+
+    private  String txnDate;
+
 
     @Override
     public String process(String request)  {
@@ -34,6 +40,8 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         String txnCode = "7003";
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode));
+
+        txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         //处理返回报文
         List<HmbMsg> msgList = responseMap.get(txnCode);
@@ -47,10 +55,15 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         }else{
             //保存到本地数据库
             processChkBalResponse(msgList);
-            //数据核对处理
-            //TODO
         }
-        return "0000|余额对帐交易成功";
+
+        //数据核对处理
+        if (verifyActBalData()) {
+            return "0000|余额对帐交易成功";
+        }else{
+            return "9999|余额对帐交易失败";
+        }
+
     }
 
     private byte[] getRequestBuf(String txnCode){
@@ -64,7 +77,6 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         msg001.origTxnCode = "#"; //TODO ????
         hmbMsgList.add(msg001);
 
-        String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         //子报文处理  098 094
         List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
         for (HmActinfoFund hmActinfoFund : actinfoFundList) {
@@ -138,14 +150,19 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
      * 校验余额对帐数据
      * @return
      */
-    private boolean verifyActBalData(String txnDate){
+    private boolean verifyActBalData(){
         //SEND_SYS_ID
-        HmChkActExample example = new HmChkActExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate);
-        //List<HmChkAct> hmChkActMapper
+        int successNumber = 0;
+        int failNumber = 0;
+        successNumber = hmfsCmnMapper.verifyChkaclResult_0(txnDate, SEND_SYS_ID);
+        logger.info(txnDate + "对帐成功笔数：" + successNumber);
 
-        //TODO  sql
-        return false;
+        failNumber = hmfsCmnMapper.verifyChkaclResult_11(txnDate, SEND_SYS_ID);
+        failNumber += hmfsCmnMapper.verifyChkaclResult_12(txnDate, SEND_SYS_ID);
+        failNumber += hmfsCmnMapper.verifyChkaclResult_2(txnDate, SEND_SYS_ID);
+        logger.info(txnDate + "对帐失败笔数：" + failNumber);
+
+        return failNumber == 0;
     }
 
 }
