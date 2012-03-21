@@ -32,11 +32,12 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
      * 向国土局签到
      */
     public void processSignon() {
+        String txnCode = "7000";
         HmSct hmSct = hmbSysTxnService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
-                doHmbSignTxn("7000", "301");
+                doHmbSignTxn(txnCode, "301");
                 hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
                 hmSct.setSignonDt(new Date());
                 hmSctMapper.updateByPrimaryKey(hmSct);

@@ -10,11 +10,9 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: zhangxiaobo
+ * 处理WEB APP发送的交易请求.
+ * User: zhanrui
  * Date: 11-8-18
- * Time: 上午2:27
- * To change this template use File | Settings | File Templates.
  */
 
 @Service
@@ -28,6 +26,7 @@ public class WebMsgHandleService implements IMessageHandler {
         String txnCode = "";
         try {
             String request = new String(bytes);
+            logger.info("DEP接收到WEB请求：" + request);
             String[] fields = request.split("\\|");
             txnCode = fields[0];
             WebAbstractTxnProcessor abstractTxnProcessor = (WebAbstractTxnProcessor) ContainerManager.getBean("webTxn" + txnCode + "Processor");
@@ -37,8 +36,7 @@ public class WebMsgHandleService implements IMessageHandler {
             response = "9999|交易处理发生异常！" + e.getMessage();
         }
 
-        //response = txnCode + "|" + response;
-        int len = 0;
+        int len;
         try {
             len = response.getBytes("GBK").length;
         } catch (UnsupportedEncodingException e) {
@@ -48,6 +46,8 @@ public class WebMsgHandleService implements IMessageHandler {
         }
 
         String totalLength = StringUtils.rightPad(String.valueOf(len + 6), 6, ' ');
-        return (totalLength + response).getBytes("GBK");
+        response = totalLength + response;
+        logger.info("DEP发送到WEB响应：" + response);
+        return response.getBytes("GBK");
     }
 }

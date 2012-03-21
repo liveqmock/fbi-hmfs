@@ -32,12 +32,12 @@ public class WebTxn1007001Processor extends WebAbstractHmbProductTxnProcessor{
      * Ç©ÍË
      */
     public void processSignout() {
-        //TODO
+        String txnCode = "7001";
         HmSct hmSct = hmbSysTxnService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                doHmbSignTxn("7001", "302");
+                doHmbSignTxn(txnCode, "302");
                 hmSct.setSysSts(SysCtlSts.SIGNOUT.getCode());
                 hmSct.setSignoutDt(new Date());
                 hmSctMapper.updateByPrimaryKey(hmSct);

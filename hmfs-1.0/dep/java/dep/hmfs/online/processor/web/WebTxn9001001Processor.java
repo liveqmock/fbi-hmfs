@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * MOCK 模拟房产局发送报文.
+ * MOCK 模拟房产局发送报文 （接收web层请求).
  * User: zhanrui
  * Date: 12-3-15
  * Time: 下午1:45
@@ -38,9 +38,6 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
     private HmbSysTxnService hmbSysTxnService;
 
     private XSocketBlockClient socketBlockClient;
-//    private String hmfsServerIP = PropertyManager.getProperty("");
-//    private int hmfsServerPort = PropertyManager.getIntProperty("");
-//    private int hmfsServerTimeout = PropertyManager.getIntProperty("");
 
     @Resource
     private TmpMsgoutLogMapper tmpMsgoutLogMapper;

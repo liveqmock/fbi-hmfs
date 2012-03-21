@@ -10,9 +10,8 @@ import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 余额对帐.
@@ -65,6 +64,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         msg001.origTxnCode = "#"; //TODO ????
         hmbMsgList.add(msg001);
 
+        String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         //子报文处理  098 094
         List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
         for (HmActinfoFund hmActinfoFund : actinfoFundList) {
@@ -76,7 +76,17 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             msg098.builderArea = hmActinfoFund.getBuilderArea();
             msg098.fundActno1 = hmActinfoFund.getFundActno1();
             msg098.fundActtype1 = hmActinfoFund.getFundActtype1();
+            msg098.actBal = hmActinfoFund.getActBal();
             hmbMsgList.add(msg098);
+
+            //保存发起对帐的数据到本地数据库
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setPkid(UUID.randomUUID().toString());
+            hmChkAct.setActno(msg098.fundActno1);
+            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setSendSysId(SEND_SYS_ID);
+            hmChkAct.setActbal(msg098.actBal);
+            hmChkActMapper.insert(hmChkAct);
         }
         List<HmActinfoCbs> actinfoCbsList = hmbSysTxnService.selectCbsActinfo();
         for (HmActinfoCbs hmActinfoCbs : actinfoCbsList) {
@@ -87,6 +97,15 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             msg094.settleActno1 = hmActinfoCbs.getSettleActno1();
             msg094.settleActtype1 = hmActinfoCbs.getSettleActtype1();
             hmbMsgList.add(msg094);
+
+            //保存发起对帐的数据到本地数据库
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setPkid(UUID.randomUUID().toString());
+            hmChkAct.setActno(msg094.settleActno1);
+            hmChkAct.setTxnDate(txnDate);
+            hmChkAct.setSendSysId(SEND_SYS_ID);
+            hmChkAct.setActbal(msg094.actBal);
+            hmChkActMapper.insert(hmChkAct);
         }
         return  messageFactory.marshal(txnCode, hmbMsgList);
     }
@@ -100,6 +119,8 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         String txnDate = msg002.msgDt.substring(0,8);
         for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
             HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setPkid(UUID.randomUUID().toString());
+            //TODO 交易日期处理
             hmChkAct.setTxnDate(txnDate);
             hmChkAct.setSendSysId("00");
             if (hmbMsg instanceof Msg098) {

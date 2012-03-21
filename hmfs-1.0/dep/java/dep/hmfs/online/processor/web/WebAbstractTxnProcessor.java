@@ -15,4 +15,8 @@ public abstract class WebAbstractTxnProcessor {
 
     public abstract String run(String request);
 
+    protected  String getRequestTxnCode(String request){
+        String[] fields = request.split("\\|");
+        return fields[0];
+    }
 }
