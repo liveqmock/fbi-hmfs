@@ -148,7 +148,9 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             打印票据结束编号	12	票据结束编号（单张销号该字段为空）
             缴款通知书编号	18	非必填项，凭证使用时填写
              */
-            String datagram = "1234567890888890000040012000000010002000000010057120319004843521000";
+            // String datagram = "1234567890888890000040012000000010058000000010113120319004843521000";
+            String datagram = "123456789088889100005001100000000000003               268945.33       201203191234567890123333|60.00|C\n1234567890654321|133716.39|D";
+
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
         } catch (IOException e) {
             e.printStackTrace();

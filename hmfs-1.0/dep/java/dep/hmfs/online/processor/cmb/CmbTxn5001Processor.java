@@ -78,8 +78,11 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
             } else {
                 int index = 0;
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
-                    logger.info("流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
+                    logger.info("【前端业务平台】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
                     TxnCbsLog txnCbsLog = txnCbsLogList.get(index);
+                    logger.info("【本地会计账户】流水号：" + txnCbsLog.getTxnSn() + " ==交易金额： " + txnCbsLog.getTxnAmt() +
+                            " ==记账方向： " + txnCbsLog.getDcFlag());
+
                     if (!r.txnSerialNo.equals(txnCbsLog.getTxnSn())
                             || txnCbsLog.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
                             || !r.txnType.equals(txnCbsLog.getDcFlag())) {
