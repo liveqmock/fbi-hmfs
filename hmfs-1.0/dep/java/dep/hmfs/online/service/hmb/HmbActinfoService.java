@@ -275,9 +275,9 @@ public class HmbActinfoService {
         hmActinfoFund.setActSts(FundActnoStatus.CANCEL.getCode());
         hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
         //取款帐务处理
-        bookkeepingService.fundActBookkeeping(msgSn, msg051.fundActno1, msg051.actBal, "D", "125", "125");
+        bookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno1, msg051.actBal, "D", "125", "125");
         if (!"#".equals(msg051.fundActno2.trim())) {
-            bookkeepingService.fundActBookkeeping(msgSn, msg051.fundActno2, msg051.actBal, "D", "125", "125");
+            bookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno2, msg051.actBal, "D", "125", "125");
         }
     }
 
@@ -290,9 +290,9 @@ public class HmbActinfoService {
                 msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115");
 
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeeping(msgSn, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
+        bookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
         if (!"#".equals(msg035.fundActno2.trim())) {
-            bookkeepingService.fundActBookkeeping(msgSn, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
+            bookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
         }
     }
 }

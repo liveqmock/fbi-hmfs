@@ -53,31 +53,32 @@ public class BookkeepingService {
     public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc, String cbsTxnCode) throws ParseException {
         int cnt = 0;
         for (HisMsginLog msginLog : msginLogList) {
-            cnt += fundActBookkeepingByMsgin(msginLog, dc, cbsTxnCode);
+            cnt++;
+            fundActBookkeepingByMsgin(msginLog, cnt, dc, cbsTxnCode);
         }
         return cnt;
     }
 
     // 根据子报文内容更新核算账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
-    private int fundActBookkeepingByMsgin(HisMsginLog msginLog, String dc, String cbsTxnCode) throws ParseException {
-        int fund1Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getFundActno1(), msginLog.getTxnAmt1(),
+    private int fundActBookkeepingByMsgin(HisMsginLog msginLog, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
+        int fund1Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno1(), msginLog.getTxnAmt1(),
                 dc, cbsTxnCode, msginLog.getActionCode());
-        int fund2Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getFundActno2(), msginLog.getTxnAmt1(),
+        int fund2Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno2(), msginLog.getTxnAmt1(),
                 dc, cbsTxnCode, msginLog.getActionCode());
-        int setl1Rlt = fundActBookkeeping(msginLog.getMsgSn(), msginLog.getSettleActno1(), msginLog.getTxnAmt1(),
+        int setl1Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getSettleActno1(), msginLog.getTxnAmt1(),
                 dc, cbsTxnCode, msginLog.getActionCode());
         return fund1Rlt + fund2Rlt + setl1Rlt;
     }
 
     //核算户记帐 处理余额及流水
     @Transactional
-    public int fundActBookkeeping(String msgSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
+    public int fundActBookkeeping(String msgSn, int txnSubSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
         HmActinfoFund hmActinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
         if (hmActinfoFund == null) {
             return 0;
         }
-        return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, hmActinfoFund, amt, dc, cbsTxnCode, actionCode);
+        return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, txnSubSn, hmActinfoFund, amt, dc, cbsTxnCode, actionCode);
     }
 
     @Transactional
@@ -156,14 +157,14 @@ public class BookkeepingService {
 
     // 新增核算账户交易明细记录
     @Transactional
-    private int addTxnFundLog(String msgSn, HmActinfoFund hmActinfoFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
+    private int addTxnFundLog(String msgSn, int txnSubSn, HmActinfoFund hmActinfoFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
 
         TxnFundLog txnFundLog = new TxnFundLog();
         txnFundLog.setPkid(UUID.randomUUID().toString());
         txnFundLog.setFundActno(hmActinfoFund.getFundActno1());
         txnFundLog.setFundActtype(hmActinfoFund.getFundActtype1());
         txnFundLog.setTxnSn(msgSn);
-        txnFundLog.setTxnSubSn("00001");
+        txnFundLog.setTxnSubSn(String.valueOf(txnSubSn));
         txnFundLog.setTxnAmt(amt);
         txnFundLog.setDcFlag(dc);
         txnFundLog.setLastActBal(hmActinfoFund.getLastActBal());
