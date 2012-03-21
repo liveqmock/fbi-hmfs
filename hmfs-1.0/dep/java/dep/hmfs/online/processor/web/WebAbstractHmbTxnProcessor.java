@@ -84,7 +84,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
             msg.origSysId = "00";
         }
         msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
-        msg.msgEndDate = "#";
+        msg.msgEndDate = SystemService.formatTodayByPattern("yyyyMMdd");
     }
 
 }

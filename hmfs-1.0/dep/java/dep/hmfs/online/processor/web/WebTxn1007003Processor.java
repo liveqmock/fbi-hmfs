@@ -68,17 +68,18 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
 
     private byte[] getRequestBuf(String txnCode){
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
+        List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
+        List<HmActinfoCbs> actinfoCbsList = hmbSysTxnService.selectCbsActinfo();
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
-        assembleSummaryMsg(txnCode, msg001, 1, false);
+        assembleSummaryMsg(txnCode, msg001, actinfoFundList.size() + actinfoCbsList.size(), true);
         msg001.txnType = "1";//单笔批量？
-        msg001.bizType = "#"; //?
-        msg001.origTxnCode = "#"; //TODO ????
+        msg001.bizType = "3"; //?
+        msg001.origTxnCode = "5110"; //TODO ????
         hmbMsgList.add(msg001);
 
         //子报文处理  098 094
-        List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
         for (HmActinfoFund hmActinfoFund : actinfoFundList) {
             Msg098 msg098 = new Msg098();
             msg098.actionCode = "304"; //304:日终对账
@@ -100,7 +101,6 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             hmChkAct.setActbal(msg098.actBal);
             hmChkActMapper.insert(hmChkAct);
         }
-        List<HmActinfoCbs> actinfoCbsList = hmbSysTxnService.selectCbsActinfo();
         for (HmActinfoCbs hmActinfoCbs : actinfoCbsList) {
             Msg094 msg094 = new Msg094();
             msg094.actionCode = "304"; //304:日终对账
