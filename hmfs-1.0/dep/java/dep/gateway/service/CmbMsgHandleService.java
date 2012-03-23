@@ -41,7 +41,7 @@ public class CmbMsgHandleService implements IMessageHandler {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
         // =======================================
-        strBuilder.append("0000");
+       /* strBuilder.append("0000");
         strBuilder.append(tiaHeader.txnCode);
         if ("1001".equals(tiaHeader.txnCode)) {
             strBuilder.append("12031900484352100001000.00         ");
@@ -51,16 +51,8 @@ public class CmbMsgHandleService implements IMessageHandler {
             strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
             String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
             return (totalLength + strBuilder.toString()).getBytes();
-        }
-        if ("2001".equals(tiaHeader.txnCode)) {
-            strBuilder.append("12031900484352100001000.00         ");
-            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
-            return (totalLength + strBuilder.toString()).getBytes();
-        } else if ("2002".equals(tiaHeader.txnCode)) {
-            strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
-            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
-            return (totalLength + strBuilder.toString()).getBytes();
-        }
+        }*/
+
         // ======================================
         try {
             CmbAbstractTxnProcessor txnProcessorCmb = (CmbAbstractTxnProcessor) ContainerManager.getBean("cmbTxn" + tiaHeader.txnCode + "Processor");
