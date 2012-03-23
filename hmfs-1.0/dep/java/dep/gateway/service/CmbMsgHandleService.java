@@ -34,13 +34,34 @@ public class CmbMsgHandleService implements IMessageHandler {
         TOA toa = null;
         TIAHeader tiaHeader = new TIAHeader();
         tiaHeader.initFields(bytes);
-        logger.info("【报文长度】：" + bytes.length);
-        logger.info("【流水号】：" + tiaHeader.serialNo + " 【错误码】：" + tiaHeader.errorCode);
+        logger.info("【报文长度】：" + bytes.length + "【流水号】：" + tiaHeader.serialNo + " 【错误码】：" + tiaHeader.errorCode);
         byte[] datagramBytes = new byte[bytes.length - 24];
         System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
+        // =======================================
+        strBuilder.append("0000");
+        strBuilder.append(tiaHeader.txnCode);
+        if ("1001".equals(tiaHeader.txnCode)) {
+            strBuilder.append("12031900484352100001000.00         ");
+            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+            return (totalLength + strBuilder.toString()).getBytes();
+        } else if ("1002".equals(tiaHeader.txnCode)) {
+            strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
+            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+            return (totalLength + strBuilder.toString()).getBytes();
+        }
+        if ("2001".equals(tiaHeader.txnCode)) {
+            strBuilder.append("12031900484352100001000.00         ");
+            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+            return (totalLength + strBuilder.toString()).getBytes();
+        } else if ("2002".equals(tiaHeader.txnCode)) {
+            strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
+            String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+            return (totalLength + strBuilder.toString()).getBytes();
+        }
+        // ======================================
         try {
             CmbAbstractTxnProcessor txnProcessorCmb = (CmbAbstractTxnProcessor) ContainerManager.getBean("cmbTxn" + tiaHeader.txnCode + "Processor");
             toa = txnProcessorCmb.process(tiaHeader.serialNo, datagramBytes);

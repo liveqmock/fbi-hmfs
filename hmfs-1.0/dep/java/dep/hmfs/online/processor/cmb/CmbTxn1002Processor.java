@@ -52,15 +52,22 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         tia1002.body.payApplyNo = new String(bytes, 0, 18).trim();
         tia1002.body.payAmt = new String(bytes, 18, 16).trim();
 
+        logger.info("【前端平台】申请单号：" + tia1002.body.payApplyNo + "  金额：" + tia1002.body.payAmt);
+
         String[] payMsgTypes = {"01035", "01045"};
 
         // 查询交易汇总报文记录
         HisMsginLog totalPayInfo = hmbBaseService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
+
+        logger.info("查询交款交易汇总报文记录");
         // 查询交易子报文记录
         List<HisMsginLog> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
+        logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
+
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (cbsTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
+            logger.info("检查数据是否正确：" + "true");
             return handlePayTxnAndsendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台

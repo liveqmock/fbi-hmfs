@@ -61,7 +61,7 @@ public class HmbMsgHandleService implements IMessageHandler {
         Msg100 msg100 = createRtnMsg100(msgSn);
         try {
             int cnt = processor.run(txnCode, msgSn, hmbMsgList);
-            msg100.rtnInfo = cnt + "笔子报文处理成功";
+            msg100.rtnInfo = cnt + "笔报文处理成功";
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";
@@ -85,7 +85,7 @@ public class HmbMsgHandleService implements IMessageHandler {
             summaryMsg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
             summaryMsg.rtnInfoCode = "00";
             int cnt = processor.run(txnCode, msgSn, hmbMsgList);
-            summaryMsg.rtnInfo = cnt + "笔" + txnCode + "交易子报文处理成功";
+            summaryMsg.rtnInfo = "共" + cnt + "笔" + txnCode + "交易报文处理成功";
         } catch (Exception e) {
             logger.error("交易失败.交易码:" + txnCode, e);
             summaryMsg.rtnInfoCode = "99";

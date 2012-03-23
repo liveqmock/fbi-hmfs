@@ -164,6 +164,7 @@ public class HmbClientReqService extends HmbBaseService {
         msg006.sendSysId = SEND_SYS_ID;
         msg006.origSysId = "00";
         msg006.msgEndDate = "#";
+        msg006.origMsgSn = msginLog.getMsgSn();
         msg006.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");

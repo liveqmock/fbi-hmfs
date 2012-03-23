@@ -2,10 +2,7 @@ package dep.hmfs.online.processor.web;
 
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.HmSct;
-import dep.hmfs.online.processor.hmb.domain.HmbMsg;
-import dep.hmfs.online.processor.hmb.domain.Msg001;
-import dep.hmfs.online.processor.hmb.domain.Msg002;
-import dep.hmfs.online.processor.hmb.domain.Msg096;
+import dep.hmfs.online.processor.hmb.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -69,7 +66,8 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
 
         List<HmbMsg> msgList = responseMap.get(txnCode);
         if (msgList == null || msgList.size() == 0) {
-            throw new RuntimeException("接收国土局报文出错，报文为空");
+            Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
+            throw new RuntimeException(msg100.rtnInfo);
         }
 
         Msg002 msg002 = (Msg002) msgList.get(0);
