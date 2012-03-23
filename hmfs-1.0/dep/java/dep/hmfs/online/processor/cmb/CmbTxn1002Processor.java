@@ -87,7 +87,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         // 批量核算户账户信息更新
         bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode(), "1002");
 
-        hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia1002.body.payApplyNo, "00005", payMsgTypes, TxnCtlSts.SUCCESS);
+        hmbBaseService.updatePayMsginsTxnCtlStsByMsgSn(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
 
         return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
     }

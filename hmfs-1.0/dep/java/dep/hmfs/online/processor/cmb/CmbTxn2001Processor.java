@@ -35,7 +35,7 @@ public class CmbTxn2001Processor extends CmbAbstractTxnProcessor {
 
             // 更新汇总报文和子报文交易处理状态为：处理中
             String[] drawMsgTypes = {"01041"};
-            hmbBaseService.updateMsginsTxnCtlStsByMsgSnAndTypes(tia2001.body.drawApplyNo, "00007", drawMsgTypes, TxnCtlSts.HANDLING);
+            hmbBaseService.updateDrawMsginsTxnCtlStsByMsgSn(tia2001.body.drawApplyNo, TxnCtlSts.HANDLING);
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }

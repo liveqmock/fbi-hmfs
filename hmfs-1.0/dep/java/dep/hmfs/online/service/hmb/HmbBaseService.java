@@ -7,6 +7,7 @@ import common.repository.hmfs.dao.HisMsginLogMapper;
 import common.repository.hmfs.dao.HisMsgoutLogMapper;
 import common.repository.hmfs.dao.HmSctMapper;
 import common.repository.hmfs.dao.TmpMsginLogMapper;
+import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
 import common.repository.hmfs.model.HisMsginLog;
 import common.repository.hmfs.model.HisMsginLogExample;
 import common.repository.hmfs.model.HisMsgoutLog;
@@ -52,6 +53,8 @@ public class HmbBaseService {
     protected HmbMessageFactory messageFactory;
     @Resource
     protected TmpMsginLogMapper tmpMsginLogMapper;
+    @Resource
+    protected HmfsCmnMapper hmfsCmnMapper;
 
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
@@ -61,12 +64,10 @@ public class HmbBaseService {
 
     // 根据申请单号查询汇总报文信息
     public HisMsginLog qryTotalMsgByMsgSn(String msgSn, String msgType) {
-
         HisMsginLogExample example = new HisMsginLogExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo(msgType)
                 .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
         List<HisMsginLog> hisMsginLogList = hisMsginLogMapper.selectByExample(example);
-
         return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
     }
 
@@ -83,14 +84,18 @@ public class HmbBaseService {
 
     // 更新汇总报文和子报文交易处理状态
     @Transactional
-    public int updateMsginsTxnCtlStsByMsgSnAndTypes(String msgSn, String totalMsgType, String[] subMsgTypes, TxnCtlSts txnCtlSts) {
-        List<HisMsginLog> msginLogList = qrySubMsgsByMsgSnAndTypes(msgSn, subMsgTypes);
-        msginLogList.add(qryTotalMsgByMsgSn(msgSn, totalMsgType));
-        for (HisMsginLog record : msginLogList) {
-            record.setTxnCtlSts(txnCtlSts.getCode());
-            hisMsginLogMapper.updateByPrimaryKey(record);
-        }
-        return msginLogList.size();
+    public int updatePayMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
+        return hmfsCmnMapper.updatePayMsginSts(msgSn, txnCtlSts.getCode());
+    }
+
+    @Transactional
+    public int updateDrawMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
+        return hmfsCmnMapper.updateDrawMsginSts(msgSn, txnCtlSts.getCode());
+    }
+
+    @Transactional
+    public int updateRefundMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
+        return hmfsCmnMapper.updateRefundMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     public HmSct getAppSysStatus() {
