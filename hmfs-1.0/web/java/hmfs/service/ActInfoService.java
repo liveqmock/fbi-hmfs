@@ -96,7 +96,7 @@ public class ActInfoService {
     public List<HmTxnStl> selectCbsActDetl(ActinfoQryParam param) {
         HmTxnStlExample exampleHm = new HmTxnStlExample();
         exampleHm.createCriteria()
-                .andCbsAcctnoEqualTo(param.getCbsActno())
+                .andCbsActnoEqualTo(param.getCbsActno())
                 .andTxnDateBetween(param.getStartDate(),param.getEndDate());
         return stlMapperHm.selectByExample(exampleHm);
     }

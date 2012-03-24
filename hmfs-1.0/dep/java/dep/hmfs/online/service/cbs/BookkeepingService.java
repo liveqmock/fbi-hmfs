@@ -118,7 +118,7 @@ public class BookkeepingService {
         hmTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         hmTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         hmTxnStl.setTxnCode(cbsTxnCode);
-        hmTxnStl.setCbsAcctno(hmActStl.getCbsActno());
+        hmTxnStl.setCbsActno(hmActStl.getCbsActno());
         hmTxnStl.setOpacBrid(hmActStl.getBranchId());
         hmTxnStl.setTxnAmt(amt);
         hmTxnStl.setDcFlag(dc);
