@@ -67,7 +67,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (cbsTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
-            logger.info("检查数据是否正确：" + "true");
+            logger.info("检查数据是否正确：true, 发送报文至房管局并等待响应...");
             return handlePayTxnAndsendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
