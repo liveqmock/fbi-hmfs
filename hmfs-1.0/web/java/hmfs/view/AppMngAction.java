@@ -1,7 +1,7 @@
 package hmfs.view;
 
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.HmSysCtl;
 import hmfs.service.AppMngService;
 import hmfs.service.DepService;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class AppMngAction implements Serializable {
     private String lastSignoutTime;
     private String hostChkTime;
     private String hmbChkTime;
-    private HmSct hmSct;
+    private HmSysCtl hmSysCtl;
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
@@ -51,19 +51,19 @@ public class AppMngAction implements Serializable {
         this.txnDate = this.sysDate;
         this.sysTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
 
-        this.lastSignonTime = sdf.format(hmSct.getSignonDt());
-        this.lastSignoutTime = sdf.format(hmSct.getSignoutDt());
-        this.hostChkTime = sdf.format(hmSct.getHostChkDt());
-        this.hmbChkTime = sdf.format(hmSct.getHmbChkDt());
+        this.lastSignonTime = sdf.format(hmSysCtl.getSignonDt());
+        this.lastSignoutTime = sdf.format(hmSysCtl.getSignoutDt());
+        this.hostChkTime = sdf.format(hmSysCtl.getHostChkDt());
+        this.hmbChkTime = sdf.format(hmSysCtl.getHmbChkDt());
     }
 
     public String onLogon() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
                 String response = depService.process("1007000");
@@ -84,8 +84,8 @@ public class AppMngAction implements Serializable {
     }
 
     public String onLogout() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
                 String response = depService.process("1007001");
@@ -111,8 +111,8 @@ public class AppMngAction implements Serializable {
      * @return
      */
     public String onCheckBal() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
             try {
                 String response = depService.process("1007003");
@@ -133,8 +133,8 @@ public class AppMngAction implements Serializable {
     }
 
     public String onCheckDetl() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS) ||sysCtlSts.equals(SysCtlSts.HMB_BALCHK_SUCCESS)) {
             try {
                 String response = depService.process("1007004");
@@ -196,12 +196,12 @@ public class AppMngAction implements Serializable {
         this.sysSts = sysSts;
     }
 
-    public HmSct getHmSct() {
-        return hmSct;
+    public HmSysCtl getHmSysCtl() {
+        return hmSysCtl;
     }
 
-    public void setHmSct(HmSct hmSct) {
-        this.hmSct = hmSct;
+    public void setHmSysCtl(HmSysCtl hmSysCtl) {
+        this.hmSysCtl = hmSysCtl;
     }
 
     public String getLastSignonTime() {

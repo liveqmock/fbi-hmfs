@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA2002;
 import dep.hmfs.online.service.cbs.BookkeepingService;
@@ -40,11 +40,11 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
         tia2002.body.drawAmt = new String(bytes, 18, 16).trim();
 
         // 查询交易汇总报文记录
-        HisMsginLog totalDrawInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2002.body.drawApplyNo, "00007");
+        HmMsgIn totalDrawInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2002.body.drawApplyNo, "00007");
 
         String[] drawSubMsgTypes = {"01041"};
         // 查询交易子报文记录
-        List<HisMsginLog> drawInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2002.body.drawApplyNo, drawSubMsgTypes);
+        List<HmMsgIn> drawInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2002.body.drawApplyNo, drawSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (cbsTxnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
             // 支取交易。
@@ -59,7 +59,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
       支取交易。
     */
     @Transactional
-    private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> payInfoList) throws Exception {
+    private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> payInfoList) throws Exception {
 
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia2002.body.drawAmt), DCFlagCode.TXN_OUT.getCode(), "2002");
@@ -70,7 +70,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
         hmbBaseService.updateDrawMsginsTxnCtlStsByMsgSn(tia2002.body.drawApplyNo, TxnCtlSts.SUCCESS);
 
         String[] payMsgTypes = {"01041"};
-        List<HisMsginLog> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
+        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
 
         if (hmbClientReqService.communicateWithHmb(totalMsginLog.getTxnCode(),
                 hmbClientReqService.createMsg008ByTotalMsgin(totalMsginLog), hmbClientReqService.changeToMsg042ByMsginList(detailMsginLogs))) {

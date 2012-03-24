@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.service.cbs.BookkeepingService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
@@ -44,9 +44,9 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
 
         String[] refundSubMsgTypes = {"01039", "01043"};
 
-        HisMsginLog totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3002.body.refundApplyNo, "00005");
+        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3002.body.refundApplyNo, "00005");
         // 查询交易子报文记录
-        List<HisMsginLog> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, refundSubMsgTypes);
+        List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, refundSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (cbsTxnCheckService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
             // 退款交易。
@@ -61,7 +61,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
       退款交易。
     */
     @Transactional
-    private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HisMsginLog totalMsginLog, String[] subMsgTypes, List<HisMsginLog> fundInfoList) throws Exception {
+    private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> fundInfoList) throws Exception {
 
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia3002.body.refundAmt), DCFlagCode.TXN_OUT.getCode(), "2002");
@@ -69,14 +69,14 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         bookkeepingService.fundActBookkeepingByMsgins(fundInfoList, DCFlagCode.TXN_OUT.getCode(), "3002");
 
         String[] updateFundMsgTypes = {"01033", "01051"};
-        List<HisMsginLog> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);
+        List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);
         hmbActinfoService.updateActinfoFundsByMsginList(updateFundInfoList);
 
         hmbBaseService.updateRefundMsginsTxnCtlStsByMsgSn(tia3002.body.refundApplyNo,TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
         String[] payMsgTypes = {"01039", "01043", "01033", "01051"};
-        List<HisMsginLog> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
+        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
         if (hmbClientReqService.communicateWithHmb(totalMsginLog.getTxnCode(),
                 hmbClientReqService.createMsg006ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;

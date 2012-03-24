@@ -22,82 +22,82 @@ public class ActInfoService {
     private static final Logger logger = LoggerFactory.getLogger(ActInfoService.class);
 
     @Resource
-    private HmSctMapper hmSctMapper;
+    private HmSysCtlMapper hmSysCtlMapper;
 
     @Resource
-    private HmActinfoFundMapper actinfoFundMapper;
+    private HmActFundMapper actFundMapper;
 
     @Resource
-    private HmActinfoCbsMapper actinfoCbsMapper;
+    private HmActStlMapper actStlMapper;
 
     @Resource
-    private TxnFundLogMapper fundLogMapper;
+    private HmTxnFundMapper fundMapperHm;
 
     @Resource
-    private TxnCbsLogMapper cbsLogMapper;
+    private HmTxnStlMapper stlMapperHm;
 
 
-    public HmSct getAppSysStatus() {
-        return hmSctMapper.selectByPrimaryKey("1");
+    public HmSysCtl getAppSysStatus() {
+        return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
     public String selectCbsActno() {
-        HmActinfoCbsExample example = new HmActinfoCbsExample();
+        HmActStlExample example = new HmActStlExample();
         example.createCriteria();
-        return actinfoCbsMapper.selectByExample(example).get(0).getCbsActno();
+        return actStlMapper.selectByExample(example).get(0).getCbsActno();
     }
-    public List<HmActinfoCbs> selectCbsActnoRecord(String actno) {
-        HmActinfoCbsExample example = new HmActinfoCbsExample();
+    public List<HmActStl> selectCbsActnoRecord(String actno) {
+        HmActStlExample example = new HmActStlExample();
         example.createCriteria().andCbsActnoEqualTo(actno);
-        List<HmActinfoCbs> actinfoCbsList = actinfoCbsMapper.selectByExample(example);
-        return actinfoCbsList;
+        List<HmActStl> actStlList = actStlMapper.selectByExample(example);
+        return actStlList;
     }
 
 
     //∫ÀÀ„ªß”‡∂Ó
-    public List<HmActinfoFund> selectAllFundActBal(ActinfoQryParam param) {
-        HmActinfoFundExample example = new HmActinfoFundExample();
+    public List<HmActFund> selectAllFundActBal(ActinfoQryParam param) {
+        HmActFundExample example = new HmActFundExample();
         example.createCriteria()
                 .andActStsEqualTo(param.getActnoStatus());
-        return actinfoFundMapper.selectByExample(example);
+        return actFundMapper.selectByExample(example);
     }
-    public List<HmActinfoFund> selectFundActBal(ActinfoQryParam param) {
-        HmActinfoFundExample example = new HmActinfoFundExample();
+    public List<HmActFund> selectFundActBal(ActinfoQryParam param) {
+        HmActFundExample example = new HmActFundExample();
         example.createCriteria()
                 .andFundActno1Between(param.getStartActno(), param.getEndActno())
                 .andActStsEqualTo(param.getActnoStatus());
-        return actinfoFundMapper.selectByExample(example);
+        return actFundMapper.selectByExample(example);
     }
 
     //Ω·À„ªß”‡∂Ó
-    public List<HmActinfoCbs> selectAllCbsActBal(ActinfoQryParam param) {
-        HmActinfoCbsExample example = new HmActinfoCbsExample();
+    public List<HmActStl> selectAllCbsActBal(ActinfoQryParam param) {
+        HmActStlExample example = new HmActStlExample();
         example.createCriteria()
                 .andActStsEqualTo(param.getActnoStatus());
-        return actinfoCbsMapper.selectByExample(example);
+        return actStlMapper.selectByExample(example);
     }
-    public List<HmActinfoCbs> selectCbsActBal(ActinfoQryParam param) {
-        HmActinfoCbsExample example = new HmActinfoCbsExample();
+    public List<HmActStl> selectCbsActBal(ActinfoQryParam param) {
+        HmActStlExample example = new HmActStlExample();
         example.createCriteria()
                 .andCbsActnoEqualTo(param.getCbsActno())
                 .andActStsEqualTo(param.getActnoStatus());
-        return actinfoCbsMapper.selectByExample(example);
+        return actStlMapper.selectByExample(example);
     }
 
     //∫ÀÀ„ªß√˜œ∏
-    public List<TxnFundLog> selectFundActDetl(ActinfoQryParam param) {
-        TxnFundLogExample example = new TxnFundLogExample();
-        example.createCriteria()
+    public List<HmTxnFund> selectFundActDetl(ActinfoQryParam param) {
+        HmTxnFundExample exampleHm = new HmTxnFundExample();
+        exampleHm.createCriteria()
                 .andFundActnoBetween(param.getStartActno(), param.getEndActno())
                 .andTxnDateBetween(param.getStartDate(),param.getEndDate());
-        return fundLogMapper.selectByExample(example);
+        return fundMapperHm.selectByExample(exampleHm);
     }
 
-    public List<TxnCbsLog> selectCbsActDetl(ActinfoQryParam param) {
-        TxnCbsLogExample example = new TxnCbsLogExample();
-        example.createCriteria()
+    public List<HmTxnStl> selectCbsActDetl(ActinfoQryParam param) {
+        HmTxnStlExample exampleHm = new HmTxnStlExample();
+        exampleHm.createCriteria()
                 .andCbsAcctnoEqualTo(param.getCbsActno())
                 .andTxnDateBetween(param.getStartDate(),param.getEndDate());
-        return cbsLogMapper.selectByExample(example);
+        return stlMapperHm.selectByExample(exampleHm);
     }
 }

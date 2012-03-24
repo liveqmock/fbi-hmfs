@@ -2,7 +2,7 @@ package dep.hmfs.online.processor.web;
 
 import common.enums.SysCtlSts;
 import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.HmSysCtl;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.springframework.stereotype.Component;
 
@@ -36,11 +36,11 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
      */
     public void processSignon() {
         String txnCode = "7000";
-        HmSct hmSct = hmbSysTxnService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
-                updateHmSctRecord(hmSct);
+                updateHmSctRecord(hmSysCtl);
                 doHmbSignTxn(txnCode, "301");
             } catch (Exception e) {
                 logger.error("Ç©µ½Ê§°Ü¡£", e);
@@ -80,16 +80,16 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         }
     }
 
-    private void updateHmSctRecord(HmSct hmSct){
+    private void updateHmSctRecord(HmSysCtl hmSysCtl){
         String date8 = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
-        if (!date8.equals(hmSct.getTxnDate())) {
-            hmSct.setTxnDate(date8);
-            hmSct.setTxnseq(1);
+        if (!date8.equals(hmSysCtl.getTxnDate())) {
+            hmSysCtl.setTxnDate(date8);
+            hmSysCtl.setTxnseq(1);
         }
 
-        hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
-        hmSct.setSignonDt(new Date());
-        hmSctMapper.updateByPrimaryKey(hmSct);
+        hmSysCtl.setSysSts(SysCtlSts.SIGNON.getCode());
+        hmSysCtl.setSignonDt(new Date());
+        hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
     }
 }

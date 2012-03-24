@@ -2,7 +2,7 @@ package dep.hmfs.online.service.cbs;
 
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmMsgIn;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CbsTxnCheckService {
 
     // 检查汇总报文和子报文信息
-    public boolean checkMsginTxnCtlSts(HisMsginLog totalInfo, List<HisMsginLog> detailInfoList, BigDecimal txnTotalAmt) {
+    public boolean checkMsginTxnCtlSts(HmMsgIn totalInfo, List<HmMsgIn> detailInfoList, BigDecimal txnTotalAmt) {
         if (totalInfo == null || detailInfoList.size() < 1) {
             throw new RuntimeException(CbsErrorCode.TXN_NOT_EXIST.getCode());
         } else if (!(totalInfo.getTxnAmt1().compareTo(txnTotalAmt) == 0)) {

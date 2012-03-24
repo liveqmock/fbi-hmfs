@@ -1,7 +1,7 @@
 package dep.hmfs.online.processor.web;
 
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.HmSysCtl;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg001;
 import dep.hmfs.online.processor.hmb.domain.Msg002;
@@ -33,13 +33,13 @@ public class WebTxn1007001Processor extends WebAbstractHmbProductTxnProcessor{
      */
     public void processSignout() {
         String txnCode = "7001";
-        HmSct hmSct = hmbSysTxnService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                hmSct.setSysSts(SysCtlSts.SIGNOUT.getCode());
-                hmSct.setSignoutDt(new Date());
-                hmSctMapper.updateByPrimaryKey(hmSct);
+                hmSysCtl.setSysSts(SysCtlSts.SIGNOUT.getCode());
+                hmSysCtl.setSignoutDt(new Date());
+                hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
                 doHmbSignTxn(txnCode, "302");
             } catch (Exception e) {
                 logger.error("Ç©ÍËÊ§°Ü¡£ÇëÖØÐÂ·¢ÆðÇ©ÍË¡£", e);

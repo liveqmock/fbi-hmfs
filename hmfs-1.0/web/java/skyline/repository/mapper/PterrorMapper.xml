@@ -54,7 +54,7 @@
       This element was generated on Fri Jul 22 13:16:43 CST 2011.
     -->
     <where >
-      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+      <foreach collection="exampleHm.oredCriteria" item="criteria" separator="or" >
         <if test="criteria.valid" >
           <trim prefix="(" suffix=")" prefixOverrides="and" >
             <foreach collection="criteria.criteria" item="criterion" >

@@ -1,7 +1,7 @@
 package hmfs.view;
 
 import common.enums.SysCtlSts;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.HmSysCtl;
 import hmfs.common.model.Msg031;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
@@ -51,8 +51,8 @@ public class OpenActInfoAction implements Serializable {
     }
 
     public String onCommit() {
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
                 String response = depService.process("1005110|" + getMsg031Str());

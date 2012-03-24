@@ -1,6 +1,6 @@
 package dep.hmfs.online.processor.web;
 
-import common.repository.hmfs.dao.HmSctMapper;
+import common.repository.hmfs.dao.HmSysCtlMapper;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
@@ -35,7 +35,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
     protected HmbTxnsnGenerator hmbTxnsnGenerator;
 
     @Resource
-    protected HmSctMapper hmSctMapper;
+    protected HmSysCtlMapper hmSysCtlMapper;
 
     @Resource
     protected HmbSysTxnService hmbSysTxnService;

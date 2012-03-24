@@ -36,15 +36,15 @@ public class TxMsgAction implements Serializable {
     private String txnCode;
     private String msgSn;
 
-    private List<HisMsgoutLog> hisMsgoutList;
-    private List<HisMsginLog> hisMsginList;
-    private HisMsginLog[] selectedHisMsginRecords;
-    private HisMsgoutLog[] selectedHisMsgoutRecords;
+    private List<HmMsgOut> hisMsgoutList;
+    private List<HmMsgIn> hisMsginList;
+    private HmMsgIn[] selectedHisMsginRecords;
+    private HmMsgOut[] selectedHisMsgoutRecords;
 
-    private List<TmpMsgoutLog> tmpMsgoutList;
-    private List<TmpMsginLog> tmpMsginList;
-    private TmpMsginLog[] selectedTmpMsginRecords;
-    private TmpMsgoutLog[] selectedTmpMsgoutRecords;
+    private List<TmpMsgOut> tmpMsgoutList;
+    private List<TmpMsgIn> tmpMsginList;
+    private TmpMsgIn[] selectedTmpMsginRecords;
+    private TmpMsgOut[] selectedTmpMsgoutRecords;
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
@@ -60,8 +60,8 @@ public class TxMsgAction implements Serializable {
 
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
 
         //initList();
@@ -130,9 +130,9 @@ public class TxMsgAction implements Serializable {
      * @return
      */
     public String onSaveTmpMsgoutData(RowEditEvent event) {
-        TmpMsgoutLog tmpMsgoutLog = (TmpMsgoutLog) event.getObject();
+        TmpMsgOut tmpMsgOut = (TmpMsgOut) event.getObject();
         try {
-            appMngService.updateTmpMsgoutRecord(tmpMsgoutLog);
+            appMngService.updateTmpMsgoutRecord(tmpMsgOut);
             MessageUtil.addInfo("记录处理成功");
         } catch (Exception e) {
             logger.error("修改记录时出现错误", e);
@@ -219,67 +219,67 @@ public class TxMsgAction implements Serializable {
         this.msgSn = msgSn;
     }
 
-    public List<HisMsgoutLog> getHisMsgoutList() {
+    public List<HmMsgOut> getHisMsgoutList() {
         return hisMsgoutList;
     }
 
-    public void setHisMsgoutList(List<HisMsgoutLog> hisMsgoutList) {
+    public void setHisMsgoutList(List<HmMsgOut> hisMsgoutList) {
         this.hisMsgoutList = hisMsgoutList;
     }
 
-    public List<HisMsginLog> getHisMsginList() {
+    public List<HmMsgIn> getHisMsginList() {
         return hisMsginList;
     }
 
-    public void setHisMsginList(List<HisMsginLog> hisMsginList) {
+    public void setHisMsginList(List<HmMsgIn> hisMsginList) {
         this.hisMsginList = hisMsginList;
     }
 
-    public HisMsginLog[] getSelectedHisMsginRecords() {
+    public HmMsgIn[] getSelectedHisMsginRecords() {
         return selectedHisMsginRecords;
     }
 
-    public void setSelectedHisMsginRecords(HisMsginLog[] selectedHisMsginRecords) {
+    public void setSelectedHisMsginRecords(HmMsgIn[] selectedHisMsginRecords) {
         this.selectedHisMsginRecords = selectedHisMsginRecords;
     }
 
-    public HisMsgoutLog[] getSelectedHisMsgoutRecords() {
+    public HmMsgOut[] getSelectedHisMsgoutRecords() {
         return selectedHisMsgoutRecords;
     }
 
-    public void setSelectedHisMsgoutRecords(HisMsgoutLog[] selectedHisMsgoutRecords) {
+    public void setSelectedHisMsgoutRecords(HmMsgOut[] selectedHisMsgoutRecords) {
         this.selectedHisMsgoutRecords = selectedHisMsgoutRecords;
     }
 
-    public List<TmpMsgoutLog> getTmpMsgoutList() {
+    public List<TmpMsgOut> getTmpMsgoutList() {
         return tmpMsgoutList;
     }
 
-    public void setTmpMsgoutList(List<TmpMsgoutLog> tmpMsgoutList) {
+    public void setTmpMsgoutList(List<TmpMsgOut> tmpMsgoutList) {
         this.tmpMsgoutList = tmpMsgoutList;
     }
 
-    public List<TmpMsginLog> getTmpMsginList() {
+    public List<TmpMsgIn> getTmpMsginList() {
         return tmpMsginList;
     }
 
-    public void setTmpMsginList(List<TmpMsginLog> tmpMsginList) {
+    public void setTmpMsginList(List<TmpMsgIn> tmpMsginList) {
         this.tmpMsginList = tmpMsginList;
     }
 
-    public TmpMsginLog[] getSelectedTmpMsginRecords() {
+    public TmpMsgIn[] getSelectedTmpMsginRecords() {
         return selectedTmpMsginRecords;
     }
 
-    public void setSelectedTmpMsginRecords(TmpMsginLog[] selectedTmpMsginRecords) {
+    public void setSelectedTmpMsginRecords(TmpMsgIn[] selectedTmpMsginRecords) {
         this.selectedTmpMsginRecords = selectedTmpMsginRecords;
     }
 
-    public TmpMsgoutLog[] getSelectedTmpMsgoutRecords() {
+    public TmpMsgOut[] getSelectedTmpMsgoutRecords() {
         return selectedTmpMsgoutRecords;
     }
 
-    public void setSelectedTmpMsgoutRecords(TmpMsgoutLog[] selectedTmpMsgoutRecords) {
+    public void setSelectedTmpMsgoutRecords(TmpMsgOut[] selectedTmpMsgoutRecords) {
         this.selectedTmpMsgoutRecords = selectedTmpMsgoutRecords;
     }
 

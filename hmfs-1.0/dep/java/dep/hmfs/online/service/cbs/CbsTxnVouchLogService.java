@@ -1,7 +1,7 @@
 package dep.hmfs.online.service.cbs;
 
-import common.repository.hmfs.dao.TxnVouchLogMapper;
-import common.repository.hmfs.model.TxnVouchLog;
+import common.repository.hmfs.dao.HmTxnVchMapper;
+import common.repository.hmfs.model.HmTxnVch;
 import common.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,22 +20,22 @@ import java.util.UUID;
 public class CbsTxnVouchLogService {
 
     @Autowired
-    private TxnVouchLogMapper txnVouchLogMapper;
+    private HmTxnVchMapper hmTxnVchMapper;
 
     @Transactional
     public long insertVouchsByNo(String msgSn, long startNo, long endNo, String cbsSerialNo, String txnApplyNo, String vouchStatus) {
         for (long i = startNo; i <= endNo; i++) {
-            TxnVouchLog txnVouchLog = new TxnVouchLog();
-            txnVouchLog.setPkid(UUID.randomUUID().toString());
-            txnVouchLog.setTxnSn(msgSn);
-            txnVouchLog.setTxnSubSn(String.valueOf(i - startNo));
-            txnVouchLog.setFundTxnSn(txnApplyNo);
-            txnVouchLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            txnVouchLog.setTxnCode("4001");
-            txnVouchLog.setVchSts(vouchStatus);
-            txnVouchLog.setCbsTxnSn(cbsSerialNo);
-            txnVouchLog.setVchNum(String.valueOf(i));
-            txnVouchLogMapper.insertSelective(txnVouchLog);
+            HmTxnVch hmTxnVch = new HmTxnVch();
+            hmTxnVch.setPkid(UUID.randomUUID().toString());
+            hmTxnVch.setTxnSn(msgSn);
+            hmTxnVch.setTxnSubSn(String.valueOf(i - startNo));
+            hmTxnVch.setFundTxnSn(txnApplyNo);
+            hmTxnVch.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+            hmTxnVch.setTxnCode("4001");
+            hmTxnVch.setVchSts(vouchStatus);
+            hmTxnVch.setCbsTxnSn(cbsSerialNo);
+            hmTxnVch.setVchNum(String.valueOf(i));
+            hmTxnVchMapper.insertSelective(hmTxnVch);
         }
         return endNo - startNo + 1;
     }

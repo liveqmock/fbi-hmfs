@@ -2,7 +2,7 @@ package dep.hmfs.online.processor.cmb;
 
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HisMsginLog;
+import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3001;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA3001;
@@ -25,7 +25,7 @@ public class CmbTxn3001Processor extends CmbAbstractTxnProcessor {
 
         TOA3001 toa3001 = null;
         // 查询汇总信息
-        HisMsginLog totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3001.body.refundApplyNo, "00005");
+        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3001.body.refundApplyNo, "00005");
 
         if (totalRefundInfo != null) {
             toa3001 = new TOA3001();

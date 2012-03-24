@@ -37,10 +37,10 @@ public class HmbMockAction implements Serializable {
     private String msgSn;
 
 
-    private List<TmpMsgoutLog> tmpMsgoutList;
-    private List<TmpMsginLog> tmpMsginList;
-    private TmpMsginLog[] selectedTmpMsginRecords;
-    private TmpMsgoutLog[] selectedTmpMsgoutRecords;
+    private List<TmpMsgOut> tmpMsgoutList;
+    private List<TmpMsgIn> tmpMsginList;
+    private TmpMsgIn[] selectedTmpMsginRecords;
+    private TmpMsgOut[] selectedTmpMsgoutRecords;
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
@@ -56,8 +56,8 @@ public class HmbMockAction implements Serializable {
 
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
-        HmSct hmSct = appMngService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
+        HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
 
         //initList();
@@ -86,9 +86,9 @@ public class HmbMockAction implements Serializable {
      * @return
      */
     public String onSaveTmpMsgoutData(RowEditEvent event) {
-        TmpMsgoutLog tmpMsgoutLog = (TmpMsgoutLog) event.getObject();
+        TmpMsgOut tmpMsgOut = (TmpMsgOut) event.getObject();
         try {
-            appMngService.updateTmpMsgoutRecord(tmpMsgoutLog);
+            appMngService.updateTmpMsgoutRecord(tmpMsgOut);
             MessageUtil.addInfo("记录处理成功");
         } catch (Exception e) {
             logger.error("修改记录时出现错误", e);
@@ -178,35 +178,35 @@ public class HmbMockAction implements Serializable {
         this.msgSn = msgSn;
     }
 
-    public List<TmpMsgoutLog> getTmpMsgoutList() {
+    public List<TmpMsgOut> getTmpMsgoutList() {
         return tmpMsgoutList;
     }
 
-    public void setTmpMsgoutList(List<TmpMsgoutLog> tmpMsgoutList) {
+    public void setTmpMsgoutList(List<TmpMsgOut> tmpMsgoutList) {
         this.tmpMsgoutList = tmpMsgoutList;
     }
 
-    public List<TmpMsginLog> getTmpMsginList() {
+    public List<TmpMsgIn> getTmpMsginList() {
         return tmpMsginList;
     }
 
-    public void setTmpMsginList(List<TmpMsginLog> tmpMsginList) {
+    public void setTmpMsginList(List<TmpMsgIn> tmpMsginList) {
         this.tmpMsginList = tmpMsginList;
     }
 
-    public TmpMsginLog[] getSelectedTmpMsginRecords() {
+    public TmpMsgIn[] getSelectedTmpMsginRecords() {
         return selectedTmpMsginRecords;
     }
 
-    public void setSelectedTmpMsginRecords(TmpMsginLog[] selectedTmpMsginRecords) {
+    public void setSelectedTmpMsginRecords(TmpMsgIn[] selectedTmpMsginRecords) {
         this.selectedTmpMsginRecords = selectedTmpMsginRecords;
     }
 
-    public TmpMsgoutLog[] getSelectedTmpMsgoutRecords() {
+    public TmpMsgOut[] getSelectedTmpMsgoutRecords() {
         return selectedTmpMsgoutRecords;
     }
 
-    public void setSelectedTmpMsgoutRecords(TmpMsgoutLog[] selectedTmpMsgoutRecords) {
+    public void setSelectedTmpMsgoutRecords(TmpMsgOut[] selectedTmpMsgoutRecords) {
         this.selectedTmpMsgoutRecords = selectedTmpMsgoutRecords;
     }
 

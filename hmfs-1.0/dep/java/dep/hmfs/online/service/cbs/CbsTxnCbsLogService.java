@@ -1,8 +1,8 @@
 package dep.hmfs.online.service.cbs;
 
-import common.repository.hmfs.dao.TxnCbsLogMapper;
-import common.repository.hmfs.model.TxnCbsLog;
-import common.repository.hmfs.model.TxnCbsLogExample;
+import common.repository.hmfs.dao.HmTxnStlMapper;
+import common.repository.hmfs.model.HmTxnStl;
+import common.repository.hmfs.model.HmTxnStlExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +19,13 @@ import java.util.List;
 public class CbsTxnCbsLogService {
     
     @Autowired
-    private TxnCbsLogMapper txnCbsLogMapper;
+    private HmTxnStlMapper hmTxnStlMapper;
     
-    public List<TxnCbsLog> qryTxnCbsLogsByDate(String txnDate) {
-        TxnCbsLogExample example = new TxnCbsLogExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate);
-        example.setOrderByClause("TXN_SN");
-        List<TxnCbsLog> txnCbsLogList = txnCbsLogMapper.selectByExample(example);
-        return txnCbsLogList;
+    public List<HmTxnStl> qryTxnCbsLogsByDate(String txnDate) {
+        HmTxnStlExample exampleHm = new HmTxnStlExample();
+        exampleHm.createCriteria().andTxnDateEqualTo(txnDate);
+        exampleHm.setOrderByClause("TXN_SN");
+        List<HmTxnStl> hmTxnStlList = hmTxnStlMapper.selectByExample(exampleHm);
+        return hmTxnStlList;
     }
 }

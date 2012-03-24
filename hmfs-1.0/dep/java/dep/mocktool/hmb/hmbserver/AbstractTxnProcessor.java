@@ -1,9 +1,9 @@
 package dep.mocktool.hmb.hmbserver;
 
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.TmpMsginLogMapper;
-import common.repository.hmfs.model.TmpMsginLog;
-import common.repository.hmfs.model.TmpMsginLogExample;
+import common.repository.hmfs.dao.TmpMsgInMapper;
+import common.repository.hmfs.model.TmpMsgIn;
+import common.repository.hmfs.model.TmpMsgInExample;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
@@ -35,7 +35,7 @@ public abstract class AbstractTxnProcessor {
     protected static HmbMessageFactory messageFactory = new HmbMessageFactory();
 
     @Resource
-    protected TmpMsginLogMapper tmpMsginLogMapper;
+    protected TmpMsgInMapper tmpMsgInMapper;
 
     protected   byte[] inBuf;
     protected  Map<String, List<HmbMsg>> inmsgMap;
@@ -73,9 +73,9 @@ public abstract class AbstractTxnProcessor {
 
     @Transactional
     protected void deleteAndInsertMsginsByHmbMsgList() throws InvocationTargetException, IllegalAccessException {
-        TmpMsginLogExample example = new TmpMsginLogExample();
+        TmpMsgInExample example = new TmpMsgInExample();
         example.createCriteria().andMsgSnEqualTo(inMsgSn).andMsgTypeLike("00%");
-        tmpMsginLogMapper.deleteByExample(example);
+        tmpMsgInMapper.deleteByExample(example);
         insertMsginsByHmbMsgList(inTxnCode, inmsgList);
     }
 
@@ -83,24 +83,24 @@ public abstract class AbstractTxnProcessor {
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : hmbMsgList) {
-            TmpMsginLog msginLog = new TmpMsginLog();
-            BeanUtils.copyProperties(msginLog, hmbMsg);
+            TmpMsgIn msgIn = new TmpMsgIn();
+            BeanUtils.copyProperties(msgIn, hmbMsg);
             String guid = UUID.randomUUID().toString();
-            msginLog.setPkid(guid);
-            msginLog.setTxnCode(txnCode);
-            msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
+            msgIn.setPkid(guid);
+            msgIn.setTxnCode(txnCode);
+            msgIn.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+            msgIn.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
 
             index++;
             if (index == 1) {
-                msgSn = msginLog.getMsgSn();
+                msgSn = msgIn.getMsgSn();
             } else {
-                msginLog.setMsgSn(msgSn);
+                msgIn.setMsgSn(msgSn);
             }
-            msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+            msgIn.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgIn.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
-            tmpMsginLogMapper.insert(msginLog);
+            tmpMsgInMapper.insert(msgIn);
         }
 
         return hmbMsgList.size();

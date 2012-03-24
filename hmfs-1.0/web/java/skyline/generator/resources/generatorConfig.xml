@@ -42,28 +42,28 @@
         -->
 
 <!--
-        <table schema="hmfs" tableName="hm_sct">
+        <table schema="hmfs" tableName="hm_sys_ctl">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="hm_actinfo_cbs">
+        <table schema="hmfs" tableName="hm_act_stl">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="hm_actinfo_fund">
+        <table schema="hmfs" tableName="hm_act_fund">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="txn_cbs_log">
+        <table schema="hmfs" tableName="hm_txn_stl">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="txn_fund_log">
+        <table schema="hmfs" tableName="hm_txn_fund">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="txn_vouch_log">
+        <table schema="hmfs" tableName="hm_txn_vch">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="his_msgin_log">
+        <table schema="hmfs" tableName="hm_msg_in">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="his_msgout_log">
+        <table schema="hmfs" tableName="hm_msg_out">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
         <table schema="hmfs" tableName="hm_joblog">
@@ -72,18 +72,59 @@
         <table schema="hmfs" tableName="hm_chk_act">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="hm_chk_log">
+        <table schema="hmfs" tableName="hm_chk_txn">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 
-        <table schema="hmfs" tableName="tmp_msgin_log">
+        <table schema="hmfs" tableName="tmp_msg_in">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 
-        <table schema="hmfs" tableName="tmp_msgout_log">
+        <table schema="hmfs" tableName="tmp_msg_out">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
 -->
+        <table schema="hmfs" tableName="hm_sys_ctl">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_act_stl">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_act_fund">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_txn_stl">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_txn_fund">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_txn_vch">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_msg_in">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_msg_out">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_job_log">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_chk_act">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_chk_txn">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+
+        <table schema="hmfs" tableName="tmp_msg_in">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+
+        <table schema="hmfs" tableName="tmp_msg_out">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
 
 
     </context>

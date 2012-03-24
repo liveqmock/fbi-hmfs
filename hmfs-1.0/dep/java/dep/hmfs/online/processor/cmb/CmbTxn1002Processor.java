@@ -3,8 +3,8 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HmActinfoFund;
+import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmActFund;
 import dep.hmfs.online.service.cbs.BookkeepingService;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
@@ -57,11 +57,11 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         String[] payMsgTypes = {"01035", "01045"};
 
         // 查询交易汇总报文记录
-        HisMsginLog totalPayInfo = hmbBaseService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
+        HmMsgIn totalPayInfo = hmbBaseService.qryTotalMsgByMsgSn(tia1002.body.payApplyNo, "00005");
 
         logger.info("查询交款交易汇总报文记录");
         // 查询交易子报文记录
-        List<HisMsginLog> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
+        List<HmMsgIn> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1002.body.payApplyNo, payMsgTypes);
         logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
 
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
@@ -79,7 +79,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
       交款交易。
     */
     @Transactional
-    private TOA1002 handlePayTxnAndsendToHmb(String cbsSerialNo, HisMsginLog totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HisMsginLog> payInfoList) throws Exception, IOException {
+    private TOA1002 handlePayTxnAndsendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HmMsgIn> payInfoList) throws Exception, IOException {
 
         // 会计账号记账
         bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode(), "1002");
@@ -92,28 +92,28 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
     }
 
-    private TOA1002 getPayInfoDatagram(String txnCode, HisMsginLog msginLog, TIA1002 tia1002, List<HisMsginLog> payInfoList) throws Exception {
+    private TOA1002 getPayInfoDatagram(String txnCode, HmMsgIn msginLog, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
 
         // 查询所有子报文
         String[] payMsgTypes = {"01033", "01035", "01045"};
-        List<HisMsginLog> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
+        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
         if (hmbClientReqService.communicateWithHmb(txnCode, hmbClientReqService.createMsg006ByTotalMsgin(msginLog), detailMsginLogs)) {
             TOA1002 toa1002 = new TOA1002();
             toa1002.body.payApplyNo = tia1002.body.payApplyNo;
             if (payInfoList.size() > 0) {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
-                for (HisMsginLog hisMsginLog : payInfoList) {
-                    HmActinfoFund actinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(hisMsginLog.getFundActno1());
+                for (HmMsgIn hmMsgIn : payInfoList) {
+                    HmActFund actFund = hmbActinfoService.qryHmActinfoFundByFundActNo(hmMsgIn.getFundActno1());
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    record.accountName = hisMsginLog.getInfoName();   //21
-                    record.txAmt = String.format("%.2f", hisMsginLog.getTxnAmt1());
-                    record.address = hisMsginLog.getInfoAddr();    //22
+                    record.accountName = hmMsgIn.getInfoName();   //21
+                    record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
+                    record.address = hmMsgIn.getInfoAddr();    //22
                     // 24
-                    record.houseArea = StringUtils.isEmpty(hisMsginLog.getBuilderArea()) ? "" : hisMsginLog.getBuilderArea();
+                    record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
 
-                    record.houseType = actinfoFund.getHouseDepType();
-                    record.phoneNo = actinfoFund.getHouseCustPhone();
-                    String field83 = actinfoFund.getDepStandard2();
+                    record.houseType = actFund.getHouseDepType();
+                    record.phoneNo = actFund.getHouseCustPhone();
+                    String field83 = actFund.getDepStandard2();
                     if (field83 == null) {
                         record.projAmt = "";
                         record.payPart = "";
@@ -125,7 +125,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
                         record.projAmt = fields83[0];
                         record.payPart = fields83[1];
                     }
-                    record.accountNo = hisMsginLog.getFundActno1();  // 业主核算户账号(维修资金账号)
+                    record.accountNo = hmMsgIn.getFundActno1();  // 业主核算户账号(维修资金账号)
                     toa1002.body.recordList.add(record);
                 }
             }

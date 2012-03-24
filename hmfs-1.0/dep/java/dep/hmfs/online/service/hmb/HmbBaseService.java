@@ -1,17 +1,16 @@
 package dep.hmfs.online.service.hmb;
 
 import common.enums.CbsErrorCode;
-import common.enums.SysCtlSts;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HisMsginLogMapper;
-import common.repository.hmfs.dao.HisMsgoutLogMapper;
-import common.repository.hmfs.dao.HmSctMapper;
-import common.repository.hmfs.dao.TmpMsginLogMapper;
+import common.repository.hmfs.dao.HmMsgInMapper;
+import common.repository.hmfs.dao.HmMsgOutMapper;
+import common.repository.hmfs.dao.HmSysCtlMapper;
+import common.repository.hmfs.dao.TmpMsgInMapper;
 import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HisMsginLogExample;
-import common.repository.hmfs.model.HisMsgoutLog;
-import common.repository.hmfs.model.HmSct;
+import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmMsgInExample;
+import common.repository.hmfs.model.HmMsgOut;
+import common.repository.hmfs.model.HmSysCtl;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.common.HmbTxnsnGenerator;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,15 +42,15 @@ public class HmbBaseService {
     private static final Logger logger = LoggerFactory.getLogger(HmbBaseService.class);
 
     @Resource
-    protected HmSctMapper hmSctMapper;
+    protected HmSysCtlMapper hmSysCtlMapper;
     @Resource
-    protected HisMsgoutLogMapper hisMsgoutLogMapper;
+    protected HmMsgOutMapper hmMsgOutMapper;
     @Resource
     protected HmbTxnsnGenerator hmbTxnsnGenerator;
     @Resource
     protected HmbMessageFactory messageFactory;
     @Resource
-    protected TmpMsginLogMapper tmpMsginLogMapper;
+    protected TmpMsgInMapper tmpMsgInMapper;
     @Resource
     protected HmfsCmnMapper hmfsCmnMapper;
 
@@ -60,26 +58,26 @@ public class HmbBaseService {
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
     @Autowired
-    protected HisMsginLogMapper hisMsginLogMapper;
+    protected HmMsgInMapper hmMsgInMapper;
 
     // 根据申请单号查询汇总报文信息
-    public HisMsginLog qryTotalMsgByMsgSn(String msgSn, String msgType) {
-        HisMsginLogExample example = new HisMsginLogExample();
+    public HmMsgIn qryTotalMsgByMsgSn(String msgSn, String msgType) {
+        HmMsgInExample example = new HmMsgInExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo(msgType)
                 .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
-        List<HisMsginLog> hisMsginLogList = hisMsginLogMapper.selectByExample(example);
-        return hisMsginLogList.size() > 0 ? hisMsginLogList.get(0) : null;
+        List<HmMsgIn> hmMsgInList = hmMsgInMapper.selectByExample(example);
+        return hmMsgInList.size() > 0 ? hmMsgInList.get(0) : null;
     }
 
     // 根据申请单号查询所有明细
-    public List<HisMsginLog> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
-        HisMsginLogExample example = new HisMsginLogExample();
+    public List<HmMsgIn> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
+        HmMsgInExample example = new HmMsgInExample();
         for (String msgType : msgTypes) {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
                     .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
         }
         example.setOrderByClause("MSG_SUB_SN");
-        return hisMsginLogMapper.selectByExample(example);
+        return hmMsgInMapper.selectByExample(example);
     }
 
     // 更新汇总报文和子报文交易处理状态
@@ -98,8 +96,8 @@ public class HmbBaseService {
         return hmfsCmnMapper.updateRefundMsginSts(msgSn, txnCtlSts.getCode());
     }
 
-    public HmSct getAppSysStatus() {
-        return hmSctMapper.selectByPrimaryKey("1");
+    public HmSysCtl getAppSysStatus() {
+        return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
 
@@ -117,11 +115,11 @@ public class HmbBaseService {
     @Transactional
     public int updateOrInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         String msgSn = "";
-        HisMsginLogExample example = new HisMsginLogExample();
+        HmMsgInExample example = new HmMsgInExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
-        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        List<HmMsgIn> msginLogList = hmMsgInMapper.selectByExample(example);
         if (msginLogList.size() > 0) {
-            for (HisMsginLog record : msginLogList) {
+            for (HmMsgIn record : msginLogList) {
                 if (TxnCtlSts.INIT.getCode().equals(record.getTxnCtlSts())) {
                     return msginLogList.size();
                 } else {
@@ -138,7 +136,7 @@ public class HmbBaseService {
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : hmbMsgList) {
-            HisMsginLog msginLog = new HisMsginLog();
+            HmMsgIn msginLog = new HmMsgIn();
             BeanUtils.copyProperties(msginLog, hmbMsg);
             String guid = UUID.randomUUID().toString();
             msginLog.setPkid(guid);
@@ -155,7 +153,7 @@ public class HmbBaseService {
             msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
             msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
-            hisMsginLogMapper.insert(msginLog);
+            hmMsgInMapper.insert(msginLog);
         }
 
         return hmbMsgList.size();
@@ -167,7 +165,7 @@ public class HmbBaseService {
         String msgSn = "";
         String txnCode = rtnMap.keySet().iterator().next();
         for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
-            HisMsgoutLog msgoutLog = new HisMsgoutLog();
+            HmMsgOut msgoutLog = new HmMsgOut();
             BeanUtils.copyProperties(msgoutLog, hmbMsg);
             String guid = UUID.randomUUID().toString();
             msgoutLog.setPkid(guid);
@@ -184,7 +182,7 @@ public class HmbBaseService {
             msgoutLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
             msgoutLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
-            hisMsgoutLogMapper.insert(msgoutLog);
+            hmMsgOutMapper.insert(msgoutLog);
         }
         return index;
     }

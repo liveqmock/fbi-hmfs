@@ -2,8 +2,8 @@ package dep.hmfs.online.processor.web;
 
 import common.repository.hmfs.dao.HmChkActMapper;
 import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
-import common.repository.hmfs.model.HmActinfoCbs;
-import common.repository.hmfs.model.HmActinfoFund;
+import common.repository.hmfs.model.HmActStl;
+import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmChkAct;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.hmfs.online.service.hmb.HmbSysTxnService;
@@ -67,28 +67,28 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
 
     private byte[] getRequestBuf(String txnCode){
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
-        List<HmActinfoFund> actinfoFundList = hmbSysTxnService.selectFundActinfo();
-        List<HmActinfoCbs> actinfoCbsList = hmbSysTxnService.selectCbsActinfo();
+        List<HmActFund> actFundList = hmbSysTxnService.selectFundActinfo();
+        List<HmActStl> actStlList = hmbSysTxnService.selectCbsActinfo();
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
-        assembleSummaryMsg(txnCode, msg001, actinfoFundList.size() + actinfoCbsList.size(), true);
+        assembleSummaryMsg(txnCode, msg001, actFundList.size() + actStlList.size(), true);
         msg001.txnType = "1";//单笔批量？
         msg001.bizType = "3"; //?
         msg001.origTxnCode = "5110"; //TODO ????
         hmbMsgList.add(msg001);
 
         //子报文处理  098 094
-        for (HmActinfoFund hmActinfoFund : actinfoFundList) {
+        for (HmActFund hmActFund : actFundList) {
             Msg098 msg098 = new Msg098();
             msg098.actionCode = "304"; //304:日终对账
-            msg098.infoId1 = hmActinfoFund.getInfoId1();
-            msg098.infoIdType1 = hmActinfoFund.getInfoIdType1();
-            msg098.cellNum = hmActinfoFund.getCellNum();
-            msg098.builderArea = hmActinfoFund.getBuilderArea();
-            msg098.fundActno1 = hmActinfoFund.getFundActno1();
-            msg098.fundActtype1 = hmActinfoFund.getFundActtype1();
-            msg098.actBal = hmActinfoFund.getActBal();
+            msg098.infoId1 = hmActFund.getInfoId1();
+            msg098.infoIdType1 = hmActFund.getInfoIdType1();
+            msg098.cellNum = hmActFund.getCellNum();
+            msg098.builderArea = hmActFund.getBuilderArea();
+            msg098.fundActno1 = hmActFund.getFundActno1();
+            msg098.fundActtype1 = hmActFund.getFundActtype1();
+            msg098.actBal = hmActFund.getActBal();
             hmbMsgList.add(msg098);
 
             //保存发起对帐的数据到本地数据库
@@ -100,14 +100,14 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             hmChkAct.setActbal(msg098.actBal);
             hmChkActMapper.insert(hmChkAct);
         }
-        for (HmActinfoCbs hmActinfoCbs : actinfoCbsList) {
+        for (HmActStl hmActStl : actStlList) {
             Msg094 msg094 = new Msg094();
             msg094.actionCode = "304"; //304:日终对账
-            msg094.orgId = hmActinfoCbs.getOrgId();
-            msg094.orgType = hmActinfoCbs.getOrgType();
-            msg094.settleActno1 = hmActinfoCbs.getSettleActno1();
-            msg094.settleActtype1 = hmActinfoCbs.getSettleActtype1();
-            msg094.actBal = hmActinfoCbs.getActBal();
+            msg094.orgId = hmActStl.getOrgId();
+            msg094.orgType = hmActStl.getOrgType();
+            msg094.settleActno1 = hmActStl.getSettleActno1();
+            msg094.settleActtype1 = hmActStl.getSettleActtype1();
+            msg094.actBal = hmActStl.getActBal();
             hmbMsgList.add(msg094);
 
             //保存发起对帐的数据到本地数据库

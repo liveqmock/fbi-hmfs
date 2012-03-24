@@ -1,12 +1,12 @@
 package dep.hmfs.online.processor.web;
 
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.TmpMsginLogMapper;
-import common.repository.hmfs.dao.TmpMsgoutLogMapper;
-import common.repository.hmfs.model.TmpMsginLog;
-import common.repository.hmfs.model.TmpMsginLogExample;
-import common.repository.hmfs.model.TmpMsgoutLog;
-import common.repository.hmfs.model.TmpMsgoutLogExample;
+import common.repository.hmfs.dao.TmpMsgInMapper;
+import common.repository.hmfs.dao.TmpMsgOutMapper;
+import common.repository.hmfs.model.TmpMsgIn;
+import common.repository.hmfs.model.TmpMsgInExample;
+import common.repository.hmfs.model.TmpMsgOut;
+import common.repository.hmfs.model.TmpMsgOutExample;
 import common.service.SystemService;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
@@ -40,10 +40,10 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
     private XSocketBlockClient socketBlockClient;
 
     @Resource
-    private TmpMsgoutLogMapper tmpMsgoutLogMapper;
+    private TmpMsgOutMapper tmpMsgOutMapper;
 
     @Resource
-    protected TmpMsginLogMapper tmpMsginLogMapper;
+    protected TmpMsgInMapper tmpMsgInMapper;
 
     @Override
     public String process(String request) {
@@ -95,18 +95,18 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
 
 
     private byte[] getTxnbuf(String txnCode, String msgSn) {
-        TmpMsgoutLogExample example = new TmpMsgoutLogExample();
+        TmpMsgOutExample example = new TmpMsgOutExample();
         example.createCriteria().andMsgSnEqualTo(msgSn);
         example.setOrderByClause("msg_type, submsg_num");
-        List<TmpMsgoutLog> msgoutLogList = tmpMsgoutLogMapper.selectByExample(example);
+        List<TmpMsgOut> msgOutList = tmpMsgOutMapper.selectByExample(example);
 
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         try {
             String pkgName = HmbMsg.class.getPackage().getName();
-            for (TmpMsgoutLog msgoutLog : msgoutLogList) {
-                String msgCode = msgoutLog.getMsgType().substring(2);
+            for (TmpMsgOut msgOut : msgOutList) {
+                String msgCode = msgOut.getMsgType().substring(2);
                 HmbMsg detailMsg = (HmbMsg) Class.forName(pkgName + ".Msg" + msgCode).newInstance();
-                PropertyUtils.copyProperties(detailMsg, msgoutLog);
+                PropertyUtils.copyProperties(detailMsg, msgOut);
                 hmbMsgList.add(detailMsg);
             }
             return messageFactory.marshal(txnCode, hmbMsgList);
@@ -118,10 +118,10 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
     @Transactional
     private void deleteAndInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         String msgSn = "";
-        TmpMsginLogExample example = new TmpMsginLogExample();
+        TmpMsgInExample example = new TmpMsgInExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
-        List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
-        tmpMsginLogMapper.deleteByExample(example);
+        List<TmpMsgIn> msgInList = tmpMsgInMapper.selectByExample(example);
+        tmpMsgInMapper.deleteByExample(example);
         insertMsginsByHmbMsgList(txnCode, hmbMsgList);
     }
 
@@ -129,24 +129,24 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : hmbMsgList) {
-            TmpMsginLog msginLog = new TmpMsginLog();
-            BeanUtils.copyProperties(msginLog, hmbMsg);
+            TmpMsgIn msgIn = new TmpMsgIn();
+            BeanUtils.copyProperties(msgIn, hmbMsg);
             String guid = UUID.randomUUID().toString();
-            msginLog.setPkid(guid);
-            msginLog.setTxnCode(txnCode);
-            msginLog.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-            msginLog.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
+            msgIn.setPkid(guid);
+            msgIn.setTxnCode(txnCode);
+            msgIn.setMsgProcDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+            msgIn.setMsgProcTime(SystemService.formatTodayByPattern("HHmmss"));
 
             index++;
             if (index == 1) {
-                msgSn = msginLog.getMsgSn();
+                msgSn = msgIn.getMsgSn();
             } else {
-                msginLog.setMsgSn(msgSn);
+                msgIn.setMsgSn(msgSn);
             }
-            msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+            msgIn.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgIn.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
-            tmpMsginLogMapper.insert(msginLog);
+            tmpMsgInMapper.insert(msgIn);
         }
 
         return hmbMsgList.size();

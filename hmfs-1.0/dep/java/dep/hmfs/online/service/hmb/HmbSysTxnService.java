@@ -22,47 +22,47 @@ public class HmbSysTxnService extends HmbBaseService {
     private static final Logger logger = LoggerFactory.getLogger(HmbSysTxnService.class);
 
     @Resource
-    private HmActinfoFundMapper  hmActinfoFundMapper;
+    private HmActFundMapper hmActFundMapper;
 
     @Resource
-    private HmActinfoCbsMapper hmActinfoCbsMapper;
+    private HmActStlMapper hmActStlMapper;
 
 
     @Resource
-    private HmChkLogMapper hmChkLogMapper;
+    private HmChkTxnMapper hmChkTxnMapper;
     @Resource
-    private TxnFundLogMapper txnFundLogMapper;
+    private HmTxnFundMapper hmTxnFundMapper;
     @Resource
-    private TxnCbsLogMapper txnCbsLogMapper;
+    private HmTxnStlMapper hmTxnStlMapper;
 
 
     /**
      * ∫ÀÀ„’Àªß”‡∂Ó
      * @return
      */
-    public List<HmActinfoFund> selectFundActinfo(){
-        HmActinfoFundExample example = new HmActinfoFundExample();
+    public List<HmActFund> selectFundActinfo(){
+        HmActFundExample example = new HmActFundExample();
         example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode()).andFundActno1NotEqualTo("120000000003");
-        return hmActinfoFundMapper.selectByExample(example);
+        return hmActFundMapper.selectByExample(example);
     }
 
     /**
      * Ω·À„’Àªß”‡∂Ó
      * @return
      */
-    public List<HmActinfoCbs> selectCbsActinfo(){
-        HmActinfoCbsExample example = new HmActinfoCbsExample();
+    public List<HmActStl> selectCbsActinfo(){
+        HmActStlExample example = new HmActStlExample();
         example.createCriteria().andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
-        return hmActinfoCbsMapper.selectByExample(example);
+        return hmActStlMapper.selectByExample(example);
     }
     /**
      * ∫ÀÀ„’Àªß¡˜ÀÆ
      * @return
      */
-    public List<TxnFundLog> selectFundTxnDetl(String yyyymmdd){
-        TxnFundLogExample example = new TxnFundLogExample();
-        example.createCriteria().andTxnDateEqualTo(yyyymmdd);
-        return txnFundLogMapper.selectByExample(example);
+    public List<HmTxnFund> selectFundTxnDetl(String yyyymmdd){
+        HmTxnFundExample exampleHm = new HmTxnFundExample();
+        exampleHm.createCriteria().andTxnDateEqualTo(yyyymmdd);
+        return hmTxnFundMapper.selectByExample(exampleHm);
     }
 
 }

@@ -1,8 +1,8 @@
 package dep.hmfs.online.processor.cmb;
 
 import common.enums.CbsErrorCode;
-import common.repository.hmfs.model.HmActinfoCbs;
-import common.repository.hmfs.model.TxnCbsLog;
+import common.repository.hmfs.model.HmActStl;
+import common.repository.hmfs.model.HmTxnStl;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
@@ -50,10 +50,10 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
         logger.info("【前台】余额：" + tia5001.body.accountBalance);
         logger.info("【前台】交易日期：" + tia5001.body.txnDate);
 
-        HmActinfoCbs hmActinfoCbs = hmbActinfoService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
-        if (hmActinfoCbs == null) {
+        HmActStl hmActStl = hmbActinfoService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
+        if (hmActStl == null) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
-        } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActinfoCbs.getActBal()) != 0) {
+        } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
         } else {
             // 获取明细，开始主机对账
@@ -71,21 +71,21 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     tia5001.body.recordList.add(record);
                 }
             }
-            List<TxnCbsLog> txnCbsLogList = cbsTxnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
-            if (txnCbsLogList.size() != tia5001.body.recordList.size()) {
-                logger.error("账户交易明细数不一致！【本地】交易数：" + txnCbsLogList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
+            List<HmTxnStl> hmTxnStlList = cbsTxnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
+            if (hmTxnStlList.size() != tia5001.body.recordList.size()) {
+                logger.error("账户交易明细数不一致！【本地】交易数：" + hmTxnStlList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
             } else {
                 int index = 0;
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
                     logger.info("【前端业务平台】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
-                    TxnCbsLog txnCbsLog = txnCbsLogList.get(index);
-                    logger.info("【本地会计账户】流水号：" + txnCbsLog.getTxnSn() + " ==交易金额： " + txnCbsLog.getTxnAmt() +
-                            " ==记账方向： " + txnCbsLog.getDcFlag());
+                    HmTxnStl hmTxnStl = hmTxnStlList.get(index);
+                    logger.info("【本地会计账户】流水号：" + hmTxnStl.getTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
+                            " ==记账方向： " + hmTxnStl.getDcFlag());
 
-                    if (!r.txnSerialNo.equals(txnCbsLog.getTxnSn())
-                            || txnCbsLog.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
-                            || !r.txnType.equals(txnCbsLog.getDcFlag())) {
+                    if (!r.txnSerialNo.equals(hmTxnStl.getTxnSn())
+                            || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
+                            || !r.txnType.equals(hmTxnStl.getDcFlag())) {
                         logger.error("账户交易明细内容不一致！");
                         throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
                     }

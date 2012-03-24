@@ -1,8 +1,8 @@
 package dep.mocktool.hmb.hmbclient;
 
-import common.repository.hmfs.dao.TmpMsginLogMapper;
-import common.repository.hmfs.model.TmpMsginLog;
-import common.repository.hmfs.model.TmpMsginLogExample;
+import common.repository.hmfs.dao.TmpMsgInMapper;
+import common.repository.hmfs.model.TmpMsgIn;
+import common.repository.hmfs.model.TmpMsgInExample;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -25,25 +25,25 @@ import java.util.Map;
 public class HmbClientService{
 
     @Resource
-    private TmpMsginLogMapper tmpMsginLogMapper;
+    private TmpMsgInMapper tmpMsgInMapper;
 
     protected HmbMessageFactory messageFactory = new HmbMessageFactory();
 
     public byte[] getTxnbuf_5210()  {
-        TmpMsginLogExample example =  new TmpMsginLogExample();
+        TmpMsgInExample example =  new TmpMsgInExample();
         example.or().andMsgSnEqualTo("120314000001521000").andMsgTypeEqualTo("00005");
         example.setOrderByClause("msg_type, submsg_num");
 
-        List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
-        //int subMsgNum = msginLogList.size();
+        List<TmpMsgIn> msgInList = tmpMsgInMapper.selectByExample(example);
+        //int subMsgNum = msgInList.size();
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         try {
             String pkgName = HmbMsg.class.getPackage().getName();
-            for (TmpMsginLog msginLog : msginLogList) {
-                String msgCode = msginLog.getMsgType().substring(2);
+            for (TmpMsgIn msgIn : msgInList) {
+                String msgCode = msgIn.getMsgType().substring(2);
                 HmbMsg detailMsg = (HmbMsg) Class.forName(pkgName + ".Msg" + msgCode).newInstance();
-//                BeanUtils.copyProperties(detailMsg, msginLog);
-                PropertyUtils.copyProperties(detailMsg, msginLog);
+//                BeanUtils.copyProperties(detailMsg, msgIn);
+                PropertyUtils.copyProperties(detailMsg, msgIn);
                 hmbMsgList.add(detailMsg);
             }
             Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();
@@ -56,22 +56,22 @@ public class HmbClientService{
     }
 
     public byte[] getTxnbuf(String txnCode, String msgSn)  {
-        TmpMsginLogExample example =  new TmpMsginLogExample();
+        TmpMsgInExample example =  new TmpMsgInExample();
         //example.or().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
         //example.or().andMsgSnEqualTo(msgSn).andMsgTypeEqualTo("01%");
         example.createCriteria().andMsgSnEqualTo(msgSn);
         example.setOrderByClause("msg_type, submsg_num");
 
-        List<TmpMsginLog> msginLogList = tmpMsginLogMapper.selectByExample(example);
-        //int subMsgNum = msginLogList.size();
+        List<TmpMsgIn> msgInList = tmpMsgInMapper.selectByExample(example);
+        //int subMsgNum = msgInList.size();
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         try {
             String pkgName = HmbMsg.class.getPackage().getName();
-            for (TmpMsginLog msginLog : msginLogList) {
-                String msgCode = msginLog.getMsgType().substring(2);
+            for (TmpMsgIn msgIn : msgInList) {
+                String msgCode = msgIn.getMsgType().substring(2);
                 HmbMsg detailMsg = (HmbMsg) Class.forName(pkgName + ".Msg" + msgCode).newInstance();
-//                BeanUtils.copyProperties(detailMsg, msginLog);
-                PropertyUtils.copyProperties(detailMsg, msginLog);
+//                BeanUtils.copyProperties(detailMsg, msgIn);
+                PropertyUtils.copyProperties(detailMsg, msgIn);
                 hmbMsgList.add(detailMsg);
             }
             //Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();

@@ -2,10 +2,10 @@ package dep.hmfs.online.service.cbs;
 
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
-import common.repository.hmfs.dao.HmActinfoCbsMapper;
-import common.repository.hmfs.dao.HmActinfoFundMapper;
-import common.repository.hmfs.dao.TxnCbsLogMapper;
-import common.repository.hmfs.dao.TxnFundLogMapper;
+import common.repository.hmfs.dao.HmActStlMapper;
+import common.repository.hmfs.dao.HmActFundMapper;
+import common.repository.hmfs.dao.HmTxnStlMapper;
+import common.repository.hmfs.dao.HmTxnFundMapper;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
@@ -31,28 +31,28 @@ import java.util.UUID;
 public class BookkeepingService {
 
     @Autowired
-    private HmActinfoCbsMapper hmActinfoCbsMapper;
+    private HmActStlMapper hmActStlMapper;
     @Autowired
-    private HmActinfoFundMapper hmActinfoFundMapper;
+    private HmActFundMapper hmActFundMapper;
     @Autowired
-    private TxnCbsLogMapper txnCbsLogMapper;
+    private HmTxnStlMapper hmTxnStlMapper;
     @Autowired
-    private TxnFundLogMapper txnFundLogMapper;
+    private HmTxnFundMapper hmTxnFundMapper;
     @Autowired
     private HmbActinfoService hmbActinfoService;
 
     // 更新会计账号信息
     @Transactional
     public int cbsActBookkeeping(String cbsSerialNo, BigDecimal amt, String dc, String cbsTxnCode) throws ParseException {
-        HmActinfoCbs hmActinfoCbs = hmbActinfoService.getFirstHmActinfoCbs();
-        return cbsActUpdate(hmActinfoCbs, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActinfoCbs, amt, dc, cbsTxnCode);
+        HmActStl hmActStl = hmbActinfoService.getFirstHmActinfoCbs();
+        return cbsActUpdate(hmActStl, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActStl, amt, dc, cbsTxnCode);
     }
 
     // [批量]根据子报文内容更新核算账户信息
     @Transactional
-    public int fundActBookkeepingByMsgins(List<HisMsginLog> msginLogList, String dc, String cbsTxnCode) throws ParseException {
+    public int fundActBookkeepingByMsgins(List<HmMsgIn> msginLogList, String dc, String cbsTxnCode) throws ParseException {
         int cnt = 0;
-        for (HisMsginLog msginLog : msginLogList) {
+        for (HmMsgIn msginLog : msginLogList) {
             cnt++;
             fundActBookkeepingByMsgin(msginLog, cnt, dc, cbsTxnCode);
         }
@@ -61,7 +61,7 @@ public class BookkeepingService {
 
     // 根据子报文内容更新核算账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
-    private int fundActBookkeepingByMsgin(HisMsginLog msginLog, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
+    private int fundActBookkeepingByMsgin(HmMsgIn msginLog, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
         int fund1Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno1(), msginLog.getTxnAmt1(),
                 dc, cbsTxnCode, msginLog.getActionCode());
         int fund2Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno2(), msginLog.getTxnAmt1(),
@@ -74,105 +74,105 @@ public class BookkeepingService {
     //核算户记帐 处理余额及流水
     @Transactional
     public int fundActBookkeeping(String msgSn, int txnSubSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
-        HmActinfoFund hmActinfoFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
-        if (hmActinfoFund == null) {
+        HmActFund hmActFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
+        if (hmActFund == null) {
             return 0;
         }
-        return fundActUpdate(hmActinfoFund, amt, dc) + addTxnFundLog(msgSn, txnSubSn, hmActinfoFund, amt, dc, cbsTxnCode, actionCode);
+        return fundActUpdate(hmActFund, amt, dc) + addTxnFundLog(msgSn, txnSubSn, hmActFund, amt, dc, cbsTxnCode, actionCode);
     }
 
     @Transactional
-    private int cbsActUpdate(HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc) throws ParseException {
+    private int cbsActUpdate(HmActStl hmActStl, BigDecimal amt, String dc) throws ParseException {
 
         String strToday = SystemService.formatTodayByPattern("yyyyMMdd");
-        if (!strToday.equals(hmActinfoCbs.getLastTxnDt())) {
-            if (!StringUtils.isEmpty(hmActinfoCbs.getLastTxnDt())) {
-                long days = SystemService.daysBetween(strToday, hmActinfoCbs.getLastTxnDt(), "yyyyMMdd");
-                hmActinfoCbs.setIntcPdt(hmActinfoCbs.getIntcPdt()
-                        .add(hmActinfoCbs.getLastActBal().multiply(new BigDecimal(days))));
+        if (!strToday.equals(hmActStl.getLastTxnDt())) {
+            if (!StringUtils.isEmpty(hmActStl.getLastTxnDt())) {
+                long days = SystemService.daysBetween(strToday, hmActStl.getLastTxnDt(), "yyyyMMdd");
+                hmActStl.setIntcPdt(hmActStl.getIntcPdt()
+                        .add(hmActStl.getLastActBal().multiply(new BigDecimal(days))));
             } else {
-                hmActinfoCbs.setIntcPdt(new BigDecimal(0));
+                hmActStl.setIntcPdt(new BigDecimal(0));
             }
-            hmActinfoCbs.setLastActBal(hmActinfoCbs.getActBal());
-            hmActinfoCbs.setLastTxnDt(strToday);
+            hmActStl.setLastActBal(hmActStl.getActBal());
+            hmActStl.setLastTxnDt(strToday);
         }
         if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
-            hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().add(amt));
+            hmActStl.setActBal(hmActStl.getActBal().add(amt));
         } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
-            hmActinfoCbs.setActBal(hmActinfoCbs.getActBal().subtract(amt));
-            if (hmActinfoCbs.getActBal().compareTo(new BigDecimal(0)) < 0) {
+            hmActStl.setActBal(hmActStl.getActBal().subtract(amt));
+            if (hmActStl.getActBal().compareTo(new BigDecimal(0)) < 0) {
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_LESS.getCode());
             }
         }
         // 更新会计账号信息
-        return hmActinfoCbsMapper.updateByPrimaryKey(hmActinfoCbs);
+        return hmActStlMapper.updateByPrimaryKey(hmActStl);
     }
 
     @Transactional
-    private int addTxnCbsLog(String cbsSerialNo, HmActinfoCbs hmActinfoCbs, BigDecimal amt, String dc, String cbsTxnCode) {
+    private int addTxnCbsLog(String cbsSerialNo, HmActStl hmActStl, BigDecimal amt, String dc, String cbsTxnCode) {
         // 新增CBS账户交易明细记录
-        TxnCbsLog txnCbsLog = new TxnCbsLog();
-        txnCbsLog.setPkid(UUID.randomUUID().toString());
-        txnCbsLog.setTxnSn(cbsSerialNo);
-        txnCbsLog.setTxnSubSn("00001");
-        txnCbsLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-        txnCbsLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
-        txnCbsLog.setTxnCode(cbsTxnCode);
-        txnCbsLog.setCbsAcctno(hmActinfoCbs.getCbsActno());
-        txnCbsLog.setOpacBrid(hmActinfoCbs.getBranchId());
-        txnCbsLog.setTxnAmt(amt);
-        txnCbsLog.setDcFlag(dc);
-        txnCbsLog.setReverseFlag("0");
-        txnCbsLog.setLastActBal(hmActinfoCbs.getLastActBal());
-        return txnCbsLogMapper.insertSelective(txnCbsLog);
+        HmTxnStl hmTxnStl = new HmTxnStl();
+        hmTxnStl.setPkid(UUID.randomUUID().toString());
+        hmTxnStl.setTxnSn(cbsSerialNo);
+        hmTxnStl.setTxnSubSn("00001");
+        hmTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        hmTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
+        hmTxnStl.setTxnCode(cbsTxnCode);
+        hmTxnStl.setCbsAcctno(hmActStl.getCbsActno());
+        hmTxnStl.setOpacBrid(hmActStl.getBranchId());
+        hmTxnStl.setTxnAmt(amt);
+        hmTxnStl.setDcFlag(dc);
+        hmTxnStl.setReverseFlag("0");
+        hmTxnStl.setLastActBal(hmActStl.getLastActBal());
+        return hmTxnStlMapper.insertSelective(hmTxnStl);
     }
 
     // 核算户信息变更
     @Transactional
-    private int fundActUpdate(HmActinfoFund hmActinfoFund, BigDecimal amt, String dc) throws ParseException {
+    private int fundActUpdate(HmActFund hmActFund, BigDecimal amt, String dc) throws ParseException {
 
         String strToday = SystemService.formatTodayByPattern("yyyyMMdd");
-        if (!strToday.equals(hmActinfoFund.getLastTxnDt())) {
-            if (!StringUtils.isEmpty(hmActinfoFund.getLastTxnDt())) {
-                long days = SystemService.daysBetween(strToday, hmActinfoFund.getLastTxnDt(), "yyyyMMdd");
-                hmActinfoFund.setIntcPdt(hmActinfoFund.getIntcPdt()
-                        .add(hmActinfoFund.getLastActBal().multiply(new BigDecimal(days))));
+        if (!strToday.equals(hmActFund.getLastTxnDt())) {
+            if (!StringUtils.isEmpty(hmActFund.getLastTxnDt())) {
+                long days = SystemService.daysBetween(strToday, hmActFund.getLastTxnDt(), "yyyyMMdd");
+                hmActFund.setIntcPdt(hmActFund.getIntcPdt()
+                        .add(hmActFund.getLastActBal().multiply(new BigDecimal(days))));
             } else {
-                hmActinfoFund.setIntcPdt(new BigDecimal(0));
+                hmActFund.setIntcPdt(new BigDecimal(0));
             }
-            hmActinfoFund.setLastActBal(hmActinfoFund.getActBal());
-            hmActinfoFund.setLastTxnDt(strToday);
+            hmActFund.setLastActBal(hmActFund.getActBal());
+            hmActFund.setLastTxnDt(strToday);
         }
         if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
-            hmActinfoFund.setActBal(hmActinfoFund.getActBal().add(amt));
+            hmActFund.setActBal(hmActFund.getActBal().add(amt));
         } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
-            hmActinfoFund.setActBal(hmActinfoFund.getActBal().subtract(amt));
-            if (hmActinfoFund.getActBal().compareTo(new BigDecimal(0)) < 0) {
+            hmActFund.setActBal(hmActFund.getActBal().subtract(amt));
+            if (hmActFund.getActBal().compareTo(new BigDecimal(0)) < 0) {
                 throw new RuntimeException(CbsErrorCode.FUND_ACT_BAL_LESS.getCode());
             }
         }
         // 更新核算账户信息
-        return hmActinfoFundMapper.updateByPrimaryKey(hmActinfoFund);
+        return hmActFundMapper.updateByPrimaryKey(hmActFund);
     }
 
     // 新增核算账户交易明细记录
     @Transactional
-    private int addTxnFundLog(String msgSn, int txnSubSn, HmActinfoFund hmActinfoFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
+    private int addTxnFundLog(String msgSn, int txnSubSn, HmActFund hmActFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
 
-        TxnFundLog txnFundLog = new TxnFundLog();
-        txnFundLog.setPkid(UUID.randomUUID().toString());
-        txnFundLog.setFundActno(hmActinfoFund.getFundActno1());
-        txnFundLog.setFundActtype(hmActinfoFund.getFundActtype1());
-        txnFundLog.setTxnSn(msgSn);
-        txnFundLog.setTxnSubSn(String.valueOf(txnSubSn));
-        txnFundLog.setTxnAmt(amt);
-        txnFundLog.setDcFlag(dc);
-        txnFundLog.setLastActBal(hmActinfoFund.getLastActBal());
-        txnFundLog.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-        txnFundLog.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
-        txnFundLog.setTxnCode(cbsTxnCode);
-        txnFundLog.setReverseFlag("0");
-        txnFundLog.setActionCode(actionCode);
-        return txnFundLogMapper.insertSelective(txnFundLog);
+        HmTxnFund hmTxnFund = new HmTxnFund();
+        hmTxnFund.setPkid(UUID.randomUUID().toString());
+        hmTxnFund.setFundActno(hmActFund.getFundActno1());
+        hmTxnFund.setFundActtype(hmActFund.getFundActtype1());
+        hmTxnFund.setTxnSn(msgSn);
+        hmTxnFund.setTxnSubSn(String.valueOf(txnSubSn));
+        hmTxnFund.setTxnAmt(amt);
+        hmTxnFund.setDcFlag(dc);
+        hmTxnFund.setLastActBal(hmActFund.getLastActBal());
+        hmTxnFund.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        hmTxnFund.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
+        hmTxnFund.setTxnCode(cbsTxnCode);
+        hmTxnFund.setReverseFlag("0");
+        hmTxnFund.setActionCode(actionCode);
+        return hmTxnFundMapper.insertSelective(hmTxnFund);
     }
 }

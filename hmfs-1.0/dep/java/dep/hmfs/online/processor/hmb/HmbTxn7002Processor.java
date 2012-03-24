@@ -1,11 +1,11 @@
 package dep.hmfs.online.processor.hmb;
 
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HisMsginLogMapper;
-import common.repository.hmfs.dao.TmpMsginLogMapper;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HisMsginLogExample;
-import common.repository.hmfs.model.TmpMsginLog;
+import common.repository.hmfs.dao.HmMsgInMapper;
+import common.repository.hmfs.dao.TmpMsgInMapper;
+import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmMsgInExample;
+import common.repository.hmfs.model.TmpMsgIn;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg099;
 import org.apache.commons.beanutils.BeanUtils;
@@ -24,28 +24,28 @@ public class HmbTxn7002Processor extends HmbSyncAbstractTxnProcessor {
     private static final String[] CAN_CANCEL_CODES = {"01035", "01039", "01041", "01043", "01045"};
 
     @Autowired
-    private HisMsginLogMapper hisMsginLogMapper;
+    private HmMsgInMapper hmMsgInMapper;
     @Autowired
-    private TmpMsginLogMapper tmpMsginLogMapper;
+    private TmpMsgInMapper tmpMsgInMapper;
 
     @Override
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         Msg099 msg099 = (Msg099) hmbMsgList.get(1);
-        HisMsginLogExample example = new HisMsginLogExample();
+        HmMsgInExample example = new HmMsgInExample();
         for (String msgType : CAN_CANCEL_CODES) {
             example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msg099.origMsgSn)
                     .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
         }
-        List<HisMsginLog> msginLogList = hisMsginLogMapper.selectByExample(example);
+        List<HmMsgIn> msginLogList = hmMsgInMapper.selectByExample(example);
         if (msginLogList.size() == 0) {
             throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
         }
-        for (HisMsginLog record : msginLogList) {
+        for (HmMsgIn record : msginLogList) {
             // TODO 撤销的交易报文表
-            TmpMsginLog tmpMsginLog = new TmpMsginLog();
-            BeanUtils.copyProperties(tmpMsginLog, record);
-            tmpMsginLogMapper.insert(tmpMsginLog);
-            hisMsginLogMapper.deleteByPrimaryKey(record.getPkid());
+            TmpMsgIn tmpMsgIn = new TmpMsgIn();
+            BeanUtils.copyProperties(tmpMsgIn, record);
+            tmpMsgInMapper.insert(tmpMsgIn);
+            hmMsgInMapper.deleteByPrimaryKey(record.getPkid());
         }
         return msginLogList.size();
     }

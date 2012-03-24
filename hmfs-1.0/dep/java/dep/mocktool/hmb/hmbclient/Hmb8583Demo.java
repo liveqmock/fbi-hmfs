@@ -1,10 +1,10 @@
 package dep.mocktool.hmb.hmbclient;
 
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HisMsginLogMapper;
-import common.repository.hmfs.dao.HisMsgoutLogMapper;
-import common.repository.hmfs.model.HisMsginLog;
-import common.repository.hmfs.model.HisMsgoutLog;
+import common.repository.hmfs.dao.HmMsgInMapper;
+import common.repository.hmfs.dao.HmMsgOutMapper;
+import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmMsgOut;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
@@ -113,12 +113,12 @@ public class Hmb8583Demo {
         logger.info((String) rtnMap.keySet().toArray()[0]);
 
         //Spring
-        HisMsginLogMapper msginLogMapper = context.getBean(HisMsginLogMapper.class);
+        HmMsgInMapper msginLogMapper = context.getBean(HmMsgInMapper.class);
         
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
-            HisMsginLog msginLog = new HisMsginLog();
+            HmMsgIn msginLog = new HmMsgIn();
             BeanUtils.copyProperties(msginLog, hmbMsg);
 //            PropertyUtils.copyProperties(msginLog, hmbMsg);
             String guid = UUID.randomUUID().toString();
@@ -155,12 +155,12 @@ public class Hmb8583Demo {
         logger.info((String) rtnMap.keySet().toArray()[0]);
 
         //Spring
-        HisMsgoutLogMapper msgLogMapper = context.getBean(HisMsgoutLogMapper.class);
+        HmMsgOutMapper msgLogMapper = context.getBean(HmMsgOutMapper.class);
 
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
-            HisMsgoutLog msgLog = new HisMsgoutLog();
+            HmMsgOut msgLog = new HmMsgOut();
             BeanUtils.copyProperties(msgLog, hmbMsg);
             String guid = UUID.randomUUID().toString();
             msgLog.setPkid(guid);
