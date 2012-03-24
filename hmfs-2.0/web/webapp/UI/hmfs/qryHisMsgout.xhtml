@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+
+    <ui:define name="head">
+        <script type="text/javascript">
+            function doPopupWindow(obj) {
+                var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
+                var popupwindow = window.open("common/actInfoForm.xhtml?pkid=" + pkid, "", "height=600,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
+                popupwindow.focus;
+            }
+        </script>
+        <style type="text/css">
+            .col-95 {
+                width: 95%;
+            }
+
+            .col-5 {
+                width: 5%;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <div style="margin:5px">
+            <p:tabView id="tabview"  dynamic="true" cache="false" style="font-weight:normal;font-style:normal;width:100%">
+                <p:tab title="已发送的报文流水查询">
+                    <h:form>
+                        <div id="qrytable">
+                            <p:growl id="msgs" showDetail="false"/>
+                            <p:panel style="margin-top:10px">
+                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                    <h:panelGrid columns="4" cellspacing="5">
+                                        <h:outputLabel value="交易码:"/>
+                                        <p:inputText  value="#{txMsgAction.txnCode}"/>
+                                        <h:outputLabel value="交易编号:"/>
+                                        <p:inputText  value="#{txMsgAction.msgSn}"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid>
+                                        <p:commandButton style="width:90px;" value="查询"
+                                                         action="#{txMsgAction.onQueryHisMsgin}"
+                                                         update="pdt,msgs">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:panel>
+                            <p:ajaxStatus style="height:18px;text-align:center">
+                                <f:facet name="start">
+                                    <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                                </f:facet>
+                                <f:facet name="complete">
+                                    <h:outputText value=""/>
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:dataTable id="pdt" dynamic="true" style="width:100%;"
+                                         value="#{txMsgAction.hisMsginList}" var="record"
+                                         rowKey="#{record.pkid}"
+                                         selection="#{txMsgAction.selectedHisMsginRecords}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         paginator="true" rows="15" paginatorPosition="bottom"
+                                         rowsPerPageTemplate="100,50,30,15,5"
+                                         emptyMessage="数据记录为空...">
+                                <p:column headerText="交易码"><h:outputText value="#{record.txnCode}"/></p:column>
+                                <p:column headerText="报文的子序号"><h:outputText value="#{record.msgSubSn}"/></p:column>
+                                <p:column headerText="报文类型"><h:outputText value="#{record.msgType}"/></p:column>
+                                <p:column headerText="报文编号"><h:outputText value="#{record.msgSn}"/></p:column>
+                                <p:column headerText="子报文数"><h:outputText value="#{record.submsgNum}"/></p:column>
+                                <p:column headerText="发送方编号"><h:outputText value="#{record.sendSysId}"/></p:column>
+                                <p:column headerText="发起方编号"><h:outputText value="#{record.origSysId}"/></p:column>
+                                <p:column headerText="报文产生时间"><h:outputText value="#{record.msgDt}"/></p:column>
+                                <p:column headerText="截止交易日期"><h:outputText value="#{record.msgEndDate}"/></p:column>
+                                <p:column headerText="动作代码"><h:outputText value="#{record.actionCode}"/></p:column>
+                                <p:column headerText="原始报文编号"><h:outputText value="#{record.origMsgSn}"/></p:column>
+                                <p:column headerText="报文处理代码"><h:outputText value="#{record.rtnInfoCode}"/></p:column>
+                                <p:column headerText="报文处理信息"><h:outputText value="#{record.rtnInfo}"/></p:column>
+                                <p:column headerText="交易方式"><h:outputText value="#{record.txnType}"/></p:column>
+                                <p:column headerText="业务种类"><h:outputText value="#{record.bizType}"/></p:column>
+                                <p:column headerText="发起方的交易类型"><h:outputText value="#{record.origTxnCode}"/></p:column>
+                                <p:column headerText="信息ID1"><h:outputText value="#{record.infoId1}"/></p:column>
+                                <p:column headerText="信息ID1类型"><h:outputText value="#{record.infoIdType1}"/></p:column>
+                                <p:column headerText="信息ID2"><h:outputText value="#{record.infoId2}"/></p:column>
+                                <p:column headerText="信息ID2类型"><h:outputText value="#{record.infoIdType2}"/></p:column>
+                                <p:column headerText="信息编码"><h:outputText value="#{record.infoCode}"/></p:column>
+                                <p:column headerText="信息名称"><h:outputText value="#{record.infoName}"/></p:column>
+                                <p:column headerText="信息地址"><h:outputText value="#{record.infoAddr}"/></p:column>
+                                <p:column headerText="分户数"><h:outputText value="#{record.cellNum}"/></p:column>
+                                <p:column headerText="建筑面积"><h:outputText value="#{record.builderArea}"/></p:column>
+                                <p:column headerText="归属区县ID"><h:outputText value="#{record.districtId}"/></p:column>
+                                <p:column headerText="核算户账号1"><h:outputText value="#{record.fundActno1}"/></p:column>
+                                <p:column headerText="核算户账号1类型"><h:outputText
+                                        value="#{record.fundActtype1}"/></p:column>
+                                <p:column headerText="核算户账号2"><h:outputText value="#{record.fundActno2}"/></p:column>
+                                <p:column headerText="核算户账号2类型"><h:outputText
+                                        value="#{record.fundActtype2}"/></p:column>
+                                <p:column headerText="结算户账号1"><h:outputText value="#{record.settleActno1}"/></p:column>
+                                <p:column headerText="结算户账号1类型"><h:outputText
+                                        value="#{record.settleActtype1}"/></p:column>
+                                <p:column headerText="结算户账号2"><h:outputText value="#{record.settleActno2}"/></p:column>
+                                <p:column headerText="结算户账号2类型"><h:outputText
+                                        value="#{record.settleActtype2}"/></p:column>
+                                <p:column headerText="基金帐户状态"><h:outputText value="#{record.actSts}"/></p:column>
+                                <p:column headerText="账户余额"><h:outputText value="#{record.actBal}"/></p:column>
+                                <p:column headerText="会计帐号"><h:outputText value="#{record.cbsActno}"/></p:column>
+                                <p:column headerText="会计帐号类型"><h:outputText value="#{record.cbsActtype}"/></p:column>
+                                <p:column headerText="会计帐户名称"><h:outputText value="#{record.cbsActname}"/></p:column>
+                                <p:column headerText="开户银行名称"><h:outputText value="#{record.bankName}"/></p:column>
+                                <p:column headerText="分支机构编号"><h:outputText value="#{record.branchId}"/></p:column>
+                                <p:column headerText="存款类型"><h:outputText value="#{record.depositType}"/></p:column>
+                                <p:column headerText="交易金额1"><h:outputText value="#{record.txnAmt1}"/></p:column>
+                                <p:column headerText="交易金额2"><h:outputText value="#{record.txnAmt2}"/></p:column>
+                                <p:column headerText="交易金额3"><h:outputText value="#{record.txnAmt3}"/></p:column>
+                                <p:column headerText="交易金额4"><h:outputText value="#{record.txnAmt4}"/></p:column>
+                                <p:column headerText="利息金额1"><h:outputText value="#{record.intrAmt1}"/></p:column>
+                                <p:column headerText="利息金额2"><h:outputText value="#{record.intrAmt2}"/></p:column>
+                                <p:column headerText="利息金额3"><h:outputText value="#{record.intrAmt3}"/></p:column>
+                                <p:column headerText="利息金额4"><h:outputText value="#{record.intrAmt4}"/></p:column>
+                                <p:column headerText="借贷标志"><h:outputText value="#{record.dcFlag}"/></p:column>
+                                <p:column headerText="交易时间"><h:outputText value="#{record.txnDt}"/></p:column>
+                                <p:column headerText="方案编号"><h:outputText value="#{record.schemeNo}"/></p:column>
+                                <p:column headerText="流水编号"><h:outputText value="#{record.streamNo}"/></p:column>
+                                <p:column headerText="单位ID"><h:outputText value="#{record.orgId}"/></p:column>
+                                <p:column headerText="单位类型"><h:outputText value="#{record.orgType}"/></p:column>
+                                <p:column headerText="单位名称"><h:outputText value="#{record.orgName}"/></p:column>
+                                <p:column headerText="单位地址"><h:outputText value="#{record.orgAddr}"/></p:column>
+                                <p:column headerText="单位邮编"><h:outputText value="#{record.orgZipcode}"/></p:column>
+                                <p:column headerText="单位联系电话"><h:outputText value="#{record.orgPhone}"/></p:column>
+                                <p:column headerText="单位联系人"><h:outputText value="#{record.orgLinkman}"/></p:column>
+                                <p:column headerText="组织机构代码"><h:outputText value="#{record.orgCodeNo}"/></p:column>
+                                <p:column headerText="营业执照编号"><h:outputText value="#{record.orgLicenseNo}"/></p:column>
+                                <p:column headerText="资质证书编号"><h:outputText value="#{record.orgCertNo}"/></p:column>
+                                <p:column headerText="法人代表"><h:outputText value="#{record.legalPerson}"/></p:column>
+                                <p:column headerText="开发单位名称"><h:outputText value="#{record.devOrgName}"/></p:column>
+                                <p:column headerText="房屋交存类型"><h:outputText value="#{record.houseDepType}"/></p:column>
+                                <p:column headerText="收据编号"><h:outputText value="#{record.receiptNo}"/></p:column>
+                                <p:column headerText="交存标准1"><h:outputText value="#{record.depStandard1}"/></p:column>
+                                <p:column headerText="缴款类型"><h:outputText value="#{record.depType}"/></p:column>
+                                <p:column headerText="缴存人"><h:outputText value="#{record.depPerson}"/></p:column>
+                                <p:column headerText="户卡号"><h:outputText value="#{record.houseCardNo}"/></p:column>
+                                <p:column headerText="购房合同号"><h:outputText value="#{record.houseContNo}"/></p:column>
+                                <p:column headerText="交存标准2"><h:outputText value="#{record.depStandard2}"/></p:column>
+                                <p:column headerText="资金付方账号"><h:outputText value="#{record.payoutActno}"/></p:column>
+                                <p:column headerText="付款方名称"><h:outputText value="#{record.payoutActName}"/></p:column>
+                                <p:column headerText="资金收方账号"><h:outputText value="#{record.payinActno}"/></p:column>
+                                <p:column headerText="收款方名称"><h:outputText value="#{record.payinActName}"/></p:column>
+                                <p:column headerText="购房人联系电话"><h:outputText
+                                        value="#{record.houseCustPhone}"/></p:column>
+                                <p:column headerText="凭证状态"><h:outputText value="#{record.voucherSts}"/></p:column>
+                                <p:column headerText="凭证类型"><h:outputText value="#{record.voucherType}"/></p:column>
+                                <p:column headerText="关联报文编号"><h:outputText value="#{record.linkMsgSn}"/></p:column>
+                                <p:column headerText="有无电梯"><h:outputText value="#{record.elevatorType}"/></p:column>
+                                <p:column headerText="划入资金帐号名称"><h:outputText
+                                        value="#{record.payinCbsActname}"/></p:column>
+                                <p:column headerText="划入资金帐号"><h:outputText value="#{record.payinCbsActno}"/></p:column>
+                                <p:column headerText="划入资金帐号类型"><h:outputText
+                                        value="#{record.payinCbsActtype}"/></p:column>
+                                <p:column headerText="是否出售"><h:outputText value="#{record.sellFlag}"/></p:column>
+                                <p:column headerText="楼号"><h:outputText value="#{record.buildingNo}"/></p:column>
+                                <p:column headerText="门号"><h:outputText value="#{record.unitNo}"/></p:column>
+                                <p:column headerText="室号"><h:outputText value="#{record.roomNo}"/></p:column>
+                                <p:column headerText="证件类型"><h:outputText value="#{record.certType}"/></p:column>
+                                <p:column headerText="证件编号"><h:outputText value="#{record.certId}"/></p:column>
+                                <p:column headerText="购房款总额"><h:outputText value="#{record.houseTotalAmt}"/></p:column>
+                                <p:column headerText="是否足额交存"><h:outputText value="#{record.payFullFlag}"/></p:column>
+                                <p:column headerText="后续报文标志"><h:outputText value="#{record.msgNextFlag}"/></p:column>
+                                <p:column headerText="交易处理状态"><h:outputText value="#{record.txnCtlSts}"/></p:column>
+                                <p:column headerText="报文最后处理日期"><h:outputText value="#{record.msgProcDate}"/></p:column>
+                                <p:column headerText="报文最后处理时间"><h:outputText value="#{record.msgProcTime}"/></p:column>
+                                <p:column headerText="备注"><h:outputText value="#{record.remark}"/></p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+        </div>
+    </ui:define>
+</ui:composition>

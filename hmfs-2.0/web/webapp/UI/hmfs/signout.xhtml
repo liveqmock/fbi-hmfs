@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .datalist-noborder .ui-widget-content {
+                border: none;
+                color: #999999;
+            }
+
+            .input-col-xl {
+                width: 120px;
+            }
+
+            .input-col-xxl {
+                width: 500px;
+                text-align: right
+            }
+
+            .datagrid-help td {
+                padding: 1;
+            }
+        </style>
+        <script language="JavaScript" type="text/JavaScript">
+            //<![CDATA[
+            window.onload = doOnLoad;
+            function isIE6() {
+                var Sys = {};
+                var ua = navigator.userAgent.toLowerCase();
+                var s;
+                (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+                        (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+                                (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+                                        (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+                                                (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+
+                if (Sys.ie) {
+                    if (Sys.ie == '6.0')
+                        return true;
+                    else
+                        return false;
+                } else {
+                    return false;
+                }
+            }
+
+            function doOnLoad() {
+                var w_width;
+                var w_height;
+                if (isIE6()) {
+                    w_height = document.body.clientHeight;
+                    w_width = document.body.clientWidth;
+                } else {
+                    w_height = document.documentElement.clientHeight;
+                    w_width = document.documentElement.clientWidth;
+                }
+                document.getElementById('top').style.marginTop = (w_height - 300) / 2 + 'px';
+                document.getElementById('top').style.marginLeft = (w_width - 600) / 2 + 'px';
+            }
+
+            //]]>
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <div style="margin:5px">
+            <div class="entry" id="top">
+                <p:growl id="growl"/>
+                <h:form id="form">
+                    <p:panel header="签退操作" id="input" style="width:550px;">
+                        <h:panelGrid columns="2" cellspacing="5" style="margin-top:15px;margin-left: 20px"
+                                     columnClasses="input-col-xl,input-col-xl">
+                            <h:outputLabel value="当前系统日期:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysDate}"/>
+                            <h:outputLabel value="当前系统时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysTime}"/>
+                            <h:outputLabel value="当前系统状态:"/>
+                            <p:inputText size="30" value="#{appMngAction.sysSts}"/>
+                            <h:outputLabel value="上次签到时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.lastSignonTime}"/>
+                            <h:outputLabel value="上次签退时间:"/>
+                            <p:inputText size="30" value="#{appMngAction.lastSignoutTime}"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <p:separator/>
+                        <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
+                            <h:commandButton id="nextButton" value=" 签  退 "
+                                             action="#{appMngAction.onLogout}"
+                                             ajax="false">
+                            </h:commandButton>
+                        </h:panelGrid>
+                    </p:panel>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
