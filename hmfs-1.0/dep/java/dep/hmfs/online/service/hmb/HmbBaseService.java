@@ -102,14 +102,6 @@ public class HmbBaseService {
         return hmSctMapper.selectByPrimaryKey("1");
     }
 
-    //TODO trans
-    public void setAppSysStatus(SysCtlSts sysCtlSts) {
-        HmSct hmSct = getAppSysStatus();
-        hmSct.setSysSts(sysCtlSts.getCode());
-
-        hmSct.setHostChkDt(new Date());
-        hmSctMapper.updateByPrimaryKey(hmSct);
-    }
 
     /**
      * 接收并保存交易报文

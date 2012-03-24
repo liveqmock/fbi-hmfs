@@ -1,10 +1,13 @@
 package dep.hmfs.online.processor.web;
 
 import common.enums.SysCtlSts;
+import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
 import common.repository.hmfs.model.HmSct;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +23,9 @@ import java.util.Map;
 @Component
 public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
 
+    @Resource
+    HmfsCmnMapper cmnMapper;
+
     public String process(String request)  {
         processSignon();
         return "0000|签到交易成功";
@@ -34,10 +40,8 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
             try {
+                updateHmSctRecord(hmSct);
                 doHmbSignTxn(txnCode, "301");
-                hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
-                hmSct.setSignonDt(new Date());
-                hmSctMapper.updateByPrimaryKey(hmSct);
             } catch (Exception e) {
                 logger.error("签到失败。", e);
                 throw new RuntimeException("签到失败。" + e.getMessage());
@@ -74,5 +78,18 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         if (!msg002.rtnInfoCode.equals("00")) {
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         }
+    }
+
+    private void updateHmSctRecord(HmSct hmSct){
+        String date8 = new SimpleDateFormat("yyyyMMdd").format(new Date());
+
+        if (!date8.equals(hmSct.getTxnDate())) {
+            hmSct.setTxnDate(date8);
+            hmSct.setTxnseq(1);
+        }
+
+        hmSct.setSysSts(SysCtlSts.SIGNON.getCode());
+        hmSct.setSignonDt(new Date());
+        hmSctMapper.updateByPrimaryKey(hmSct);
     }
 }

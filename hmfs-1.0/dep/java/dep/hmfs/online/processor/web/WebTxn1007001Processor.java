@@ -37,10 +37,10 @@ public class WebTxn1007001Processor extends WebAbstractHmbProductTxnProcessor{
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSct.getSysSts());
         if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
-                doHmbSignTxn(txnCode, "302");
                 hmSct.setSysSts(SysCtlSts.SIGNOUT.getCode());
                 hmSct.setSignoutDt(new Date());
                 hmSctMapper.updateByPrimaryKey(hmSct);
+                doHmbSignTxn(txnCode, "302");
             } catch (Exception e) {
                 logger.error("签退失败。请重新发起签退。", e);
                 throw new RuntimeException("签退失败。请重新发起签退。" + e.getMessage());
