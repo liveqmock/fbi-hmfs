@@ -2,6 +2,7 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
+import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.HmActFundMapper;
 import common.repository.hmfs.dao.HmActStlMapper;
 import common.repository.hmfs.dao.HmTxnFundMapper;
@@ -39,6 +40,26 @@ public class ActBookkeepingService {
     private HmTxnFundMapper hmTxnFundMapper;
     @Autowired
     private HmbActinfoService hmbActinfoService;
+
+    // 检查汇总报文和子报文信息
+    public boolean checkMsginTxnCtlSts(HmMsgIn totalInfo, List<HmMsgIn> detailInfoList, BigDecimal txnTotalAmt) {
+        if (totalInfo == null || detailInfoList.size() < 1) {
+            throw new RuntimeException(CbsErrorCode.TXN_NOT_EXIST.getCode());
+        } else if (!(totalInfo.getTxnAmt1().compareTo(txnTotalAmt) == 0)) {
+            throw new RuntimeException(CbsErrorCode.TXN_NO_EQUAL.getCode());
+        } else if (TxnCtlSts.CANCEL.getCode().equals(totalInfo.getTxnCtlSts())) {
+            throw new RuntimeException(CbsErrorCode.TXN_CANCELED.getCode());
+        } else if (TxnCtlSts.INIT.getCode().equals(totalInfo.getTxnCtlSts()) ||
+                TxnCtlSts.HANDLING.getCode().equals(totalInfo.getTxnCtlSts())) {
+            // 正常进行交易。
+            return true;
+        } else if (TxnCtlSts.SUCCESS.getCode().equals(totalInfo.getTxnCtlSts())) {
+            // 交易已成功
+            return false;
+        } else {
+            throw new RuntimeException(CbsErrorCode.TXN_NOT_KNOWN.getCode());
+        }
+    }
 
     // [批量]根据子报文内容更新核算账户信息
     @Transactional

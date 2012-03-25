@@ -9,7 +9,6 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
-import dep.hmfs.online.service.hmb.TxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +29,6 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private ActBookkeepingService actBookkeepingService;
     @Autowired
-    private TxnCheckService txnCheckService;
-    @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
     private HmbActinfoService hmbActinfoService;
@@ -48,7 +45,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         // 查询交易子报文记录
         List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, refundSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (txnCheckService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
+        if (actBookkeepingService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
             // 退款交易。
             return handleRefundTxn(txnSerialNo, tia3002, totalRefundInfo, refundSubMsgTypes, fundInfoList);
         } else {

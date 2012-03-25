@@ -10,7 +10,6 @@ import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
-import dep.hmfs.online.service.hmb.TxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -38,8 +37,6 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private ActBookkeepingService actBookkeepingService;
     @Autowired
-    private TxnCheckService txnCheckService;
-    @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
     private HmbActinfoService hmbActinfoService;
@@ -65,7 +62,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
 
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (txnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
+        if (actBookkeepingService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
             logger.info("数据检查正确, 发送报文至房管局并等待响应...");
             return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
