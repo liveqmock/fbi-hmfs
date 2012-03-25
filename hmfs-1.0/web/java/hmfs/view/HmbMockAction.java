@@ -103,7 +103,7 @@ public class HmbMockAction implements Serializable {
             return  null;
         }
         try {
-            String response = depService.process("9001|" + txnCode + "|" + msgSn);
+            String response = depService.process("9001001|" + txnCode + "|" + msgSn);
             String[] fields = response.split("\\|");
             if ("0000".endsWith(fields[1])) { //成功
                 MessageUtil.addInfo("发送成功, 国土局已受理, 稍等请查询返回信息...");
