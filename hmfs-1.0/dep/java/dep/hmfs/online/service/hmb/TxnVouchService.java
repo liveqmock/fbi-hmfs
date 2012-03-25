@@ -28,7 +28,7 @@ public class TxnVouchService {
             HmTxnVch hmTxnVch = new HmTxnVch();
             hmTxnVch.setPkid(UUID.randomUUID().toString());
             hmTxnVch.setTxnSn(msgSn);
-            hmTxnVch.setTxnSubSn(String.valueOf(i - startNo));
+            hmTxnVch.setTxnSubSn((int)(i - startNo));
             hmTxnVch.setFundTxnSn(txnApplyNo);
             hmTxnVch.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
             hmTxnVch.setTxnCode("4001");

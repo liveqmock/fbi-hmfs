@@ -205,21 +205,37 @@ public class HmbActinfoService {
 
     @Transactional
     private int updateActinfosByMsginLog(HmMsgIn msginLog) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        
+
         HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
         //PropertyUtils.copyProperties(hmActFund, msginLog);
-        /*
-        20:信息编码
-        21:信息名称
-        22:信息地址
-        23:分户数
-        24:建筑面积
-         */
+
         hmActFund.setInfoCode(msginLog.getInfoCode());
         hmActFund.setInfoName(msginLog.getInfoName());
         hmActFund.setInfoAddr(msginLog.getInfoAddr());
         hmActFund.setCellNum(msginLog.getCellNum());
         hmActFund.setBuilderArea(msginLog.getBuilderArea());
+        if ("60".equals(msginLog.getInfoIdType1())) {
+            hmActFund.setDevOrgName(msginLog.getDevOrgName());
+            hmActFund.setHouseDepType(msginLog.getHouseDepType());
+            hmActFund.setDepStandard1(msginLog.getDepStandard1());
+            hmActFund.setDepStandard2(msginLog.getDepStandard2());
+            hmActFund.setSellFlag(msginLog.getSellFlag());
+            hmActFund.setBuildingNo(msginLog.getBuildingNo());
+            hmActFund.setUnitNo(msginLog.getUnitNo());
+            hmActFund.setRoomNo(msginLog.getRoomNo());
+            hmActFund.setCertType(msginLog.getCertType());
+            hmActFund.setCertId(msginLog.getCertId());
+            hmActFund.setOrgPhone(msginLog.getOrgPhone());
+            hmActFund.setHouseContNo(msginLog.getHouseContNo());
+            hmActFund.setHouseCustPhone(msginLog.getHouseCustPhone());
+            hmActFund.setElevatorType(msginLog.getElevatorType());
+            hmActFund.setHouseTotalAmt(msginLog.getHouseTotalAmt());
+            // 信息类型30——项目核算户
+        } else if ("30".equals(msginLog.getInfoIdType1())) {
+            // 无其他可更改字段
+        } else {
+            throw new RuntimeException("信息类型错误！【信息类型】：" + msginLog.getInfoIdType1());
+        }
         int cnt = hmActFundMapper.updateByPrimaryKey(hmActFund);
         logger.info("【退款时核算户信息更新】:" + (cnt == 1));
 
