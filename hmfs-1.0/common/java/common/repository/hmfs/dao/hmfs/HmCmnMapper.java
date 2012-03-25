@@ -24,21 +24,8 @@ public interface HmCmnMapper {
     public int updateTxnseq(@Param("txnsn") int txnsn);
 
     @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
-            "(msg_type = '00005' and msg_sn = #{msgsn})" +
-            " or (msg_type = '01035' and msg_sn = #{msgsn})" +
-            " or (msg_type = '01045' and msg_sn = #{msgsn})")
-    public int updatePayMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
-
-    @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
-            "(msg_type = '00007' and msg_sn = #{msgsn})" +
-            " or (msg_type = '01041' and msg_sn = #{msgsn})")
-    public int updateDrawMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
-
-    @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
-            "(msg_type = '00005' and msg_sn = #{msgsn})" +
-            " or (msg_type = '01039' and msg_sn = #{msgsn})" +
-            " or (msg_type = '01043' and msg_sn = #{msgsn})")
-    public int updateRefundMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
+            " msg_sn = #{msgsn} ")
+    public int updateMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
 
     /**
      * 校验余额对帐结果

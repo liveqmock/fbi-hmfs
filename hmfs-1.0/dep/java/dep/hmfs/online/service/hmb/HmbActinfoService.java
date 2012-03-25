@@ -9,7 +9,8 @@ import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,8 @@ import java.util.UUID;
  */
 @Service
 public class HmbActinfoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(HmbActinfoService.class);
 
     @Autowired
     private HmActFundMapper hmActFundMapper;
@@ -200,10 +203,27 @@ public class HmbActinfoService {
     }
 
 
+    @Transactional
     private int updateActinfosByMsginLog(HmMsgIn msginLog) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        
         HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
-        PropertyUtils.copyProperties(hmActFund, msginLog);
-        return hmActFundMapper.updateByPrimaryKey(hmActFund);
+        //PropertyUtils.copyProperties(hmActFund, msginLog);
+        /*
+        20:信息编码
+        21:信息名称
+        22:信息地址
+        23:分户数
+        24:建筑面积
+         */
+        hmActFund.setInfoCode(msginLog.getInfoCode());
+        hmActFund.setInfoName(msginLog.getInfoName());
+        hmActFund.setInfoAddr(msginLog.getInfoAddr());
+        hmActFund.setCellNum(msginLog.getCellNum());
+        hmActFund.setBuilderArea(msginLog.getBuilderArea());
+        int cnt = hmActFundMapper.updateByPrimaryKey(hmActFund);
+        logger.info("【退款时核算户信息更新】:" + (cnt == 1));
+
+        return cnt;
     }
 
     public int createActinfoFundByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {

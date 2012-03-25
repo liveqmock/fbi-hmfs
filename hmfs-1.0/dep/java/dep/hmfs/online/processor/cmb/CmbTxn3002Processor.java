@@ -9,6 +9,8 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import java.util.List;
  */
 @Component
 public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(CmbTxn3002Processor.class);
 
     @Autowired
     private ActBookkeepingService actBookkeepingService;
@@ -70,8 +74,9 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         hmbBaseService.updateRefundMsginsTxnCtlStsByMsgSn(tia3002.body.refundApplyNo,TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
-        String[] payMsgTypes = {"01039", "01043", "01033", "01051"};
-        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), payMsgTypes);
+        String[] refundFundMsgTypes = {"01039", "01043", "01033", "01051"};
+
+        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalMsginLog.getMsgSn(), refundFundMsgTypes);
         if (hmbClientReqService.communicateWithHmb(totalMsginLog.getTxnCode(),
                 hmbClientReqService.createMsg006ByTotalMsgin(totalMsginLog), detailMsginLogs)) {
             return null;

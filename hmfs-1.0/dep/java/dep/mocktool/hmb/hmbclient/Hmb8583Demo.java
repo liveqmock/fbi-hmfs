@@ -1,12 +1,15 @@
 package dep.mocktool.hmb.hmbclient;
 
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HmMsgInMapper;
 import common.repository.hmfs.dao.HmMsgOutMapper;
-import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.dao.TmpMsgOutMapper;
 import common.repository.hmfs.model.HmMsgOut;
+import common.repository.hmfs.model.TmpMsgOut;
 import dep.gateway.hmb8583.HmbMessageFactory;
-import dep.hmfs.online.processor.hmb.domain.*;
+import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.Msg001;
+import dep.hmfs.online.processor.hmb.domain.Msg002;
+import dep.hmfs.online.processor.hmb.domain.Msg031;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,10 +43,10 @@ public class Hmb8583Demo {
 //        client.testMarshal();
 //        client.testUnmarshal();
 
-//        client.processMsgIn("5120");
-//        client.processMsgIn("5130");
-//        client.processMsgIn("5140");
-//        client.processMsgIn("5210");
+        client.processMsgIn("5120");
+        client.processMsgIn("5130");
+        client.processMsgIn("5140");
+        client.processMsgIn("5210");
         client.processMsgIn("5230");
 //        client.processMsgIn("5610");
 //        client.processMsgIn("7000");
@@ -113,31 +116,31 @@ public class Hmb8583Demo {
         logger.info((String) rtnMap.keySet().toArray()[0]);
 
         //Spring
-        HmMsgInMapper msginLogMapper = context.getBean(HmMsgInMapper.class);
+        TmpMsgOutMapper tmpMsgOutMapper = context.getBean(TmpMsgOutMapper.class);
         
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
-            HmMsgIn msginLog = new HmMsgIn();
-            BeanUtils.copyProperties(msginLog, hmbMsg);
+            TmpMsgOut tmpMsgOut = new TmpMsgOut();
+            BeanUtils.copyProperties(tmpMsgOut, hmbMsg);
 //            PropertyUtils.copyProperties(msginLog, hmbMsg);
             String guid = UUID.randomUUID().toString();
-            msginLog.setPkid(guid);
-            msginLog.setTxnCode(txnCode);
+            tmpMsgOut.setPkid(guid);
+            tmpMsgOut.setTxnCode(txnCode);
             Date date = new Date();
-            msginLog.setMsgProcDate(new SimpleDateFormat("yyyyMMdd").format(date));
-            msginLog.setMsgProcTime(new SimpleDateFormat("HHmmss").format(date));
+            tmpMsgOut.setMsgProcDate(new SimpleDateFormat("yyyyMMdd").format(date));
+            tmpMsgOut.setMsgProcTime(new SimpleDateFormat("HHmmss").format(date));
 
             index++;
             if (index == 1) {
-                msgSn = msginLog.getMsgSn();
+                msgSn = tmpMsgOut.getMsgSn();
             } else {
-                msginLog.setMsgSn(msgSn);
+                tmpMsgOut.setMsgSn(msgSn);
             }
-            msginLog.setMsgSubSn(StringUtils.leftPad(""+index, 6, '0'));
-            msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
+            tmpMsgOut.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            tmpMsgOut.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
-            msginLogMapper.insert(msginLog);
+            tmpMsgOutMapper.insert(tmpMsgOut);
         }
     }
     private  void processMsgOut(String txnCode) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {

@@ -74,7 +74,7 @@ public class HmbBaseService {
     public List<HmMsgIn> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
         HmMsgInExample example = new HmMsgInExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode())
-        .andMsgTypeIn(Arrays.asList(msgTypes));
+                .andMsgTypeIn(Arrays.asList(msgTypes));
         example.setOrderByClause("MSG_SUB_SN");
         return hmMsgInMapper.selectByExample(example);
     }
@@ -82,17 +82,17 @@ public class HmbBaseService {
     // 更新汇总报文和子报文交易处理状态
     @Transactional
     public int updatePayMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updatePayMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     @Transactional
     public int updateDrawMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updateDrawMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     @Transactional
     public int updateRefundMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updateRefundMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     public HmSysCtl getAppSysStatus() {
