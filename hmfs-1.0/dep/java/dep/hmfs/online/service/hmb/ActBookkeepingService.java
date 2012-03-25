@@ -1,14 +1,13 @@
-package dep.hmfs.online.service.cbs;
+package dep.hmfs.online.service.hmb;
 
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
-import common.repository.hmfs.dao.HmActStlMapper;
 import common.repository.hmfs.dao.HmActFundMapper;
-import common.repository.hmfs.dao.HmTxnStlMapper;
+import common.repository.hmfs.dao.HmActStlMapper;
 import common.repository.hmfs.dao.HmTxnFundMapper;
+import common.repository.hmfs.dao.HmTxnStlMapper;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
-import dep.hmfs.online.service.hmb.HmbActinfoService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ import java.util.UUID;
  */
 // 记账业务
 @Service
-public class BookkeepingService {
+public class ActBookkeepingService {
 
     @Autowired
     private HmActStlMapper hmActStlMapper;
@@ -41,48 +40,50 @@ public class BookkeepingService {
     @Autowired
     private HmbActinfoService hmbActinfoService;
 
-    // 更新会计账号信息
-    @Transactional
-    public int cbsActBookkeeping(String cbsSerialNo, BigDecimal amt, String dc, String cbsTxnCode) throws ParseException {
-        HmActStl hmActStl = hmbActinfoService.getFirstHmActinfoCbs();
-        return cbsActUpdate(hmActStl, amt, dc) + addTxnCbsLog(cbsSerialNo, hmActStl, amt, dc, cbsTxnCode);
-    }
-
     // [批量]根据子报文内容更新核算账户信息
     @Transactional
-    public int fundActBookkeepingByMsgins(List<HmMsgIn> msginLogList, String dc, String cbsTxnCode) throws ParseException {
+    public int actBookkeepingByMsgins(String cbsTxnSn, List<HmMsgIn> msginLogList, String dc, String cbsTxnCode) throws ParseException {
         int cnt = 0;
         for (HmMsgIn msginLog : msginLogList) {
             cnt++;
-            fundActBookkeepingByMsgin(msginLog, cnt, dc, cbsTxnCode);
+            actBookkeepingByMsgin(cbsTxnSn, msginLog, cnt, dc, cbsTxnCode);
         }
         return cnt;
     }
 
-    // 根据子报文内容更新核算账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
+    // 根据子报文内容更新账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
-    private int fundActBookkeepingByMsgin(HmMsgIn msginLog, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
-        int fund1Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno1(), msginLog.getTxnAmt1(),
-                dc, cbsTxnCode, msginLog.getActionCode());
-        int fund2Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getFundActno2(), msginLog.getTxnAmt1(),
-                dc, cbsTxnCode, msginLog.getActionCode());
-        int setl1Rlt = fundActBookkeeping(msginLog.getMsgSn(), txnSubSn, msginLog.getSettleActno1(), msginLog.getTxnAmt1(),
-                dc, cbsTxnCode, msginLog.getActionCode());
+    private int actBookkeepingByMsgin(String cbsTxnSn, HmMsgIn msgin, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
+        int fund1Rlt = fundActBookkeeping(msgin.getMsgSn(), txnSubSn, msgin.getFundActno1(), msgin.getTxnAmt1(),
+                dc, cbsTxnCode, msgin.getActionCode());
+        int fund2Rlt = fundActBookkeeping(msgin.getMsgSn(), txnSubSn, msgin.getFundActno2(), msgin.getTxnAmt1(),
+                dc, cbsTxnCode, msgin.getActionCode());
+        int setl1Rlt = stlActBookkeeping(cbsTxnSn, msgin.getMsgSn(), txnSubSn, msgin.getSettleActno1(), msgin.getTxnAmt1(),
+                dc, cbsTxnCode);
         return fund1Rlt + fund2Rlt + setl1Rlt;
     }
 
     //核算户记帐 处理余额及流水
     @Transactional
     public int fundActBookkeeping(String msgSn, int txnSubSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
-        HmActFund hmActFund = hmbActinfoService.qryHmActinfoFundByFundActNo(fundActno);
+        HmActFund hmActFund = hmbActinfoService.qryHmActfundByActNo(fundActno);
         if (hmActFund == null) {
             return 0;
         }
-        return fundActUpdate(hmActFund, amt, dc) + addTxnFundLog(msgSn, txnSubSn, hmActFund, amt, dc, cbsTxnCode, actionCode);
+        return fundActUpdate(hmActFund, amt, dc) + addTxnFund(msgSn, txnSubSn, hmActFund, amt, dc, cbsTxnCode, actionCode);
     }
 
     @Transactional
-    private int cbsActUpdate(HmActStl hmActStl, BigDecimal amt, String dc) throws ParseException {
+    public int stlActBookkeeping(String cbsTxnSn, String msgSn, int txnSubSn, String stlActno, BigDecimal amt, String dc, String cbsTxnCode) throws ParseException {
+        HmActStl hmActStl = hmbActinfoService.qryHmActstlBystlactNo(stlActno);
+        if (hmActStl == null) {
+            return 0;
+        }
+        return stlActUpdate(hmActStl, amt, dc) + addTxnStl(cbsTxnSn, msgSn, txnSubSn, hmActStl, amt, dc, cbsTxnCode);
+    }
+
+    @Transactional
+    private int stlActUpdate(HmActStl hmActStl, BigDecimal amt, String dc) throws ParseException {
 
         String strToday = SystemService.formatTodayByPattern("yyyyMMdd");
         if (!strToday.equals(hmActStl.getLastTxnDt())) {
@@ -104,17 +105,19 @@ public class BookkeepingService {
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_LESS.getCode());
             }
         }
-        // 更新会计账号信息
+        // 更新结算户账号信息
         return hmActStlMapper.updateByPrimaryKey(hmActStl);
     }
 
     @Transactional
-    private int addTxnCbsLog(String cbsSerialNo, HmActStl hmActStl, BigDecimal amt, String dc, String cbsTxnCode) {
-        // 新增CBS账户交易明细记录
+    private int addTxnStl(String cbsTxnSn, String msgSn, int subSn, HmActStl hmActStl, BigDecimal amt, String dc, String cbsTxnCode) {
+        // 新增结算户账户交易明细记录
+        // TODO 主机交易流水保存
         HmTxnStl hmTxnStl = new HmTxnStl();
         hmTxnStl.setPkid(UUID.randomUUID().toString());
-        hmTxnStl.setTxnSn(cbsSerialNo);
-        hmTxnStl.setTxnSubSn("00001");
+        hmTxnStl.setTxnSn(msgSn);
+        hmTxnStl.setStlActno(hmActStl.getSettleActno1());
+        hmTxnStl.setTxnSubSn(String.valueOf(subSn));
         hmTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         hmTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         hmTxnStl.setTxnCode(cbsTxnCode);
@@ -157,7 +160,7 @@ public class BookkeepingService {
 
     // 新增核算账户交易明细记录
     @Transactional
-    private int addTxnFundLog(String msgSn, int txnSubSn, HmActFund hmActFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
+    private int addTxnFund(String msgSn, int txnSubSn, HmActFund hmActFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
 
         HmTxnFund hmTxnFund = new HmTxnFund();
         hmTxnFund.setPkid(UUID.randomUUID().toString());

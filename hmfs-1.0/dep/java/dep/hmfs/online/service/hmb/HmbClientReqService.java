@@ -94,7 +94,7 @@ public class HmbClientReqService extends HmbBaseService {
             HmMsgIn totalPayInfo = qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
                 HmMsgIn msginLog = payInfoList.get((int) (i - startNo));
-                HmActFund actFund = hmbActinfoService.qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                HmActFund actFund = hmbActinfoService.qryHmActfundByActNo(msginLog.getFundActno1());
 
                 Msg037 msg037 = new Msg037();
                 BeanUtils.copyProperties(msg037, actFund);

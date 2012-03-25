@@ -4,12 +4,12 @@ import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
-import dep.hmfs.online.service.cbs.BookkeepingService;
+import dep.hmfs.online.service.hmb.ActBookkeepingService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA3002;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
-import dep.hmfs.online.service.cbs.CbsTxnCheckService;
+import dep.hmfs.online.service.hmb.TxnCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +28,9 @@ import java.util.List;
 public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
 
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private ActBookkeepingService actBookkeepingService;
     @Autowired
-    private CbsTxnCheckService cbsTxnCheckService;
+    private TxnCheckService txnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
@@ -48,7 +48,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         // 查询交易子报文记录
         List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, refundSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (cbsTxnCheckService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
+        if (txnCheckService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
             // 退款交易。
             return handleRefundTxn(txnSerialNo, tia3002, totalRefundInfo, refundSubMsgTypes, fundInfoList);
         } else {
@@ -63,10 +63,8 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
     @Transactional
     private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> fundInfoList) throws Exception {
 
-        // 会计账号记账
-        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia3002.body.refundAmt), DCFlagCode.TXN_OUT.getCode(), "2002");
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(fundInfoList, DCFlagCode.TXN_OUT.getCode(), "3002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, fundInfoList, DCFlagCode.TXN_OUT.getCode(), "3002");
 
         String[] updateFundMsgTypes = {"01033", "01051"};
         List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);

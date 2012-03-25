@@ -5,12 +5,12 @@ import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmActFund;
-import dep.hmfs.online.service.cbs.BookkeepingService;
+import dep.hmfs.online.service.hmb.ActBookkeepingService;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
-import dep.hmfs.online.service.cbs.CbsTxnCheckService;
+import dep.hmfs.online.service.hmb.TxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -36,9 +36,9 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(CmbTxn1002Processor.class);
 
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private ActBookkeepingService actBookkeepingService;
     @Autowired
-    private CbsTxnCheckService cbsTxnCheckService;
+    private TxnCheckService txnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
@@ -65,10 +65,10 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
 
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (cbsTxnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
+        if (txnCheckService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
-            logger.info("检查数据是否正确：true, 发送报文至房管局并等待响应...");
-            return handlePayTxnAndsendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
+            logger.info("数据检查正确, 发送报文至房管局并等待响应...");
+            return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
@@ -79,13 +79,10 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
       交款交易。
     */
     @Transactional
-    private TOA1002 handlePayTxnAndsendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HmMsgIn> payInfoList) throws Exception, IOException {
-
-        // 会计账号记账
-        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia1002.body.payAmt), DCFlagCode.TXN_IN.getCode(), "1002");
+    private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HmMsgIn> payInfoList) throws Exception, IOException {
 
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_IN.getCode(), "1002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.TXN_IN.getCode(), "1002");
 
         hmbBaseService.updatePayMsginsTxnCtlStsByMsgSn(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
 
@@ -103,12 +100,11 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
             if (payInfoList.size() > 0) {
                 toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
                 for (HmMsgIn hmMsgIn : payInfoList) {
-                    HmActFund actFund = hmbActinfoService.qryHmActinfoFundByFundActNo(hmMsgIn.getFundActno1());
+                    HmActFund actFund = hmbActinfoService.qryHmActfundByActNo(hmMsgIn.getFundActno1());
                     TOA1002.Body.Record record = new TOA1002.Body.Record();
                     record.accountName = hmMsgIn.getInfoName();   //21
                     record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
                     record.address = hmMsgIn.getInfoAddr();    //22
-                    // 24
                     record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
 
                     record.houseType = actFund.getHouseDepType();

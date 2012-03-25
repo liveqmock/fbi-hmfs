@@ -7,7 +7,6 @@ import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
-import dep.hmfs.online.service.cbs.CbsTxnCbsLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,6 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
     @Autowired
     private HmbActinfoService hmbActinfoService;
     @Autowired
-    private CbsTxnCbsLogService cbsTxnCbsLogService;
-    @Autowired
     private WebTxn1007003Processor webTxn7003Processor;
 
     @Override
@@ -50,7 +47,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
         logger.info("【前台】余额：" + tia5001.body.accountBalance);
         logger.info("【前台】交易日期：" + tia5001.body.txnDate);
 
-        HmActStl hmActStl = hmbActinfoService.qryHmActinfoCbsByNo(tia5001.body.cbsActNo);
+        HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
         if (hmActStl == null) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
         } else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
@@ -71,7 +68,7 @@ public class CmbTxn5001Processor extends CmbAbstractTxnProcessor {
                     tia5001.body.recordList.add(record);
                 }
             }
-            List<HmTxnStl> hmTxnStlList = cbsTxnCbsLogService.qryTxnCbsLogsByDate(tia5001.body.txnDate);
+            List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryTxnstlsByDate(tia5001.body.txnDate);
             if (hmTxnStlList.size() != tia5001.body.recordList.size()) {
                 logger.error("账户交易明细数不一致！【本地】交易数：" + hmTxnStlList.size() + "【前台】交易数：" + tia5001.body.recordList.size());
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());

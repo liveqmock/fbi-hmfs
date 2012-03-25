@@ -1,4 +1,4 @@
-package dep.hmfs.online.service.cbs;
+package dep.hmfs.online.service.hmb;
 
 import common.repository.hmfs.dao.HmTxnVchMapper;
 import common.repository.hmfs.model.HmTxnVch;
@@ -17,7 +17,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class CbsTxnVouchLogService {
+public class TxnVouchService {
 
     @Autowired
     private HmTxnVchMapper hmTxnVchMapper;

@@ -2,12 +2,12 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
-import common.repository.hmfs.dao.HmActStlMapper;
 import common.repository.hmfs.dao.HmActFundMapper;
+import common.repository.hmfs.dao.HmActStlMapper;
+import common.repository.hmfs.dao.HmTxnStlMapper;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
-import dep.hmfs.online.service.cbs.BookkeepingService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,37 +34,36 @@ public class HmbActinfoService {
     @Autowired
     private HmActFundMapper hmActFundMapper;
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private ActBookkeepingService actBookkeepingService;
 
     @Autowired
     private HmActStlMapper hmActStlMapper;
+    @Autowired
+    private HmTxnStlMapper hmTxnStlMapper;
 
-    public HmActStl getFirstHmActinfoCbs() {
-        return hmActStlMapper.selectByExample(new HmActStlExample()).get(0);
+    public List<HmTxnStl> qryTxnstlsByDate(String txnDate) {
+        HmTxnStlExample example = new HmTxnStlExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        example.setOrderByClause("TXN_SN");
+        List<HmTxnStl> hmTxnStlList = hmTxnStlMapper.selectByExample(example);
+        return hmTxnStlList;
     }
 
-    public HmActStl qryHmActinfoCbsByNo(String cbsActNo) {
+    public HmActStl qryHmActstlByCbsactNo(String cbsActNo) {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria().andCbsActnoEqualTo(cbsActNo);
         List<HmActStl> actStlList = hmActStlMapper.selectByExample(example);
         return actStlList.size() > 0 ? actStlList.get(0) : null;
     }
 
-    private int createActinfoCbsByHmbMsg(HmbMsg hmbMsg) throws InvocationTargetException, IllegalAccessException {
-
-        HmActStl actStl = new HmActStl();
-
-        actStl.setPkid(UUID.randomUUID().toString());
-        BeanUtils.copyProperties(actStl, hmbMsg);
-        actStl.setActSts("0");
-        actStl.setActBal(new BigDecimal(0));
-        actStl.setIntcPdt(new BigDecimal(0));
-        actStl.setOpenActDate(SystemService.formatTodayByPattern("yyyyMMdd"));
-        actStl.setRecversion(0);
-        return hmActStlMapper.insert(actStl);
+    public HmActStl qryHmActstlBystlactNo(String stlActNo) {
+        HmActStlExample example = new HmActStlExample();
+        example.createCriteria().andSettleActno1EqualTo(stlActNo);
+        List<HmActStl> actStlList = hmActStlMapper.selectByExample(example);
+        return actStlList.size() > 0 ? actStlList.get(0) : null;
     }
 
-    public HmActFund qryHmActinfoFundByFundActNo(String fundActNo) {
+    public HmActFund qryHmActfundByActNo(String fundActNo) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActNo);
         List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
@@ -75,7 +74,7 @@ public class HmbActinfoService {
         }
     }
 
-    public HmActFund qryHmActinfoFundByInfoID(String infoID) {
+    public HmActFund qryHmActfundByInfoID(String infoID) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andInfoId1EqualTo(infoID);
         List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
@@ -117,7 +116,7 @@ public class HmbActinfoService {
                 updateActinfosByMsg(msg033);
             } else if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
-                HmActFund hmActFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
+                HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
             } else {
@@ -133,7 +132,7 @@ public class HmbActinfoService {
             if ("01033".equals(msginLog.getMsgType())) {
                 updateActinfosByMsginLog(msginLog);
             } else if ("01051".equals(msginLog.getMsgType())) {
-                HmActFund hmActFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+                HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
             } else {
@@ -144,7 +143,7 @@ public class HmbActinfoService {
     }
 
     private int updateActinfosByMsg(Msg033 msg033) throws InvocationTargetException, IllegalAccessException {
-        HmActFund hmActFund = qryHmActinfoFundByInfoID(msg033.infoId1);
+        HmActFund hmActFund = qryHmActfundByInfoID(msg033.infoId1);
         // 信息类型60——分户核算户
         // 可更新字段
         /*
@@ -202,7 +201,7 @@ public class HmbActinfoService {
 
 
     private int updateActinfosByMsginLog(HmMsgIn msginLog) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        HmActFund hmActFund = qryHmActinfoFundByFundActNo(msginLog.getFundActno1());
+        HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
         PropertyUtils.copyProperties(hmActFund, msginLog);
         return hmActFundMapper.updateByPrimaryKey(hmActFund);
     }
@@ -231,7 +230,7 @@ public class HmbActinfoService {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
-                HmActFund hmActFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
+                HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
                 if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
                     throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                 }
@@ -271,13 +270,13 @@ public class HmbActinfoService {
     //125:取款销户
     public void op125cancelActinfoFunds(String msgSn, Msg051 msg051) throws ParseException {
         //销户
-        HmActFund hmActFund = qryHmActinfoFundByFundActNo(msg051.fundActno1);
+        HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
         hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
         hmActFundMapper.updateByPrimaryKey(hmActFund);
         //取款帐务处理
-        bookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno1, msg051.actBal, "D", "125", "125");
+        actBookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno1, msg051.actBal, "D", "125", "125");
         if (!"#".equals(msg051.fundActno2.trim())) {
-            bookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno2, msg051.actBal, "D", "125", "125");
+            actBookkeepingService.fundActBookkeeping(msgSn, 1, msg051.fundActno2, msg051.actBal, "D", "125", "125");
         }
     }
 
@@ -285,14 +284,11 @@ public class HmbActinfoService {
     //115:存款
     @Transactional
     public void op115deposite(String msgSn, Msg035 msg035) throws ParseException {
-        // 会计账号记账
-        bookkeepingService.cbsActBookkeeping("HMB" + SystemService.formatTodayByPattern("yyyyMMddHHmmss"),
-                msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115");
 
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
+        actBookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
         if (!"#".equals(msg035.fundActno2.trim())) {
-            bookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
+            actBookkeepingService.fundActBookkeeping(msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.TXN_IN.getCode(), "115", "115");
         }
     }
 }

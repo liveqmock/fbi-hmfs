@@ -4,7 +4,7 @@ import common.enums.CbsErrorCode;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA4001;
-import dep.hmfs.online.service.cbs.CbsTxnVouchLogService;
+import dep.hmfs.online.service.hmb.TxnVouchService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
     private static Logger logger = LoggerFactory.getLogger(CmbTxn4001Processor.class);
 
     @Autowired
-    private CbsTxnVouchLogService cbsTxnVouchLogService;
+    private TxnVouchService txnVouchService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
     @Autowired
@@ -65,7 +65,7 @@ public class CmbTxn4001Processor extends CmbAbstractTxnProcessor {
             throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
         }
         String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
-        cbsTxnVouchLogService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
+        txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
         if (!hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo, tia4001.body.billStatus)) {
             logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());

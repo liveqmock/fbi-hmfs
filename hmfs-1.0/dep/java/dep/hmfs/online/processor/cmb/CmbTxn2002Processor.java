@@ -6,8 +6,8 @@ import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA2002;
-import dep.hmfs.online.service.cbs.BookkeepingService;
-import dep.hmfs.online.service.cbs.CbsTxnCheckService;
+import dep.hmfs.online.service.hmb.ActBookkeepingService;
+import dep.hmfs.online.service.hmb.TxnCheckService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,9 +27,9 @@ import java.util.List;
 public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
 
     @Autowired
-    private BookkeepingService bookkeepingService;
+    private ActBookkeepingService actBookkeepingService;
     @Autowired
-    private CbsTxnCheckService cbsTxnCheckService;
+    private TxnCheckService txnCheckService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
 
@@ -46,7 +46,7 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
         // 查询交易子报文记录
         List<HmMsgIn> drawInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2002.body.drawApplyNo, drawSubMsgTypes);
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
-        if (cbsTxnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
+        if (txnCheckService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
             // 支取交易。
             return handleDrawTxn(txnSerialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
         } else {
@@ -61,11 +61,8 @@ public class CmbTxn2002Processor extends CmbAbstractTxnProcessor {
     @Transactional
     private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> payInfoList) throws Exception {
 
-        // 会计账号记账
-        bookkeepingService.cbsActBookkeeping(cbsSerialNo, new BigDecimal(tia2002.body.drawAmt), DCFlagCode.TXN_OUT.getCode(), "2002");
-
         // 批量核算户账户信息更新
-        bookkeepingService.fundActBookkeepingByMsgins(payInfoList, DCFlagCode.TXN_OUT.getCode(), "2002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.TXN_OUT.getCode(), "2002");
 
         hmbBaseService.updateDrawMsginsTxnCtlStsByMsgSn(tia2002.body.drawApplyNo, TxnCtlSts.SUCCESS);
 

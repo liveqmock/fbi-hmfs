@@ -61,7 +61,7 @@ public class HmbMsgHandleService implements IMessageHandler {
         Msg100 msg100 = createRtnMsg100(msgSn);
         try {
             int cnt = processor.run(txnCode, msgSn, hmbMsgList);
-            msg100.rtnInfo = cnt + "笔报文处理成功";
+            msg100.rtnInfo = "共" + cnt + "笔报文接收成功";
         } catch (Exception e) {
             logger.error("报文接收保存失败！", e);
             msg100.rtnInfoCode = "99";

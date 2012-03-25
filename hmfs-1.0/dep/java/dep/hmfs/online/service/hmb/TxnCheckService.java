@@ -1,4 +1,4 @@
-package dep.hmfs.online.service.cbs;
+package dep.hmfs.online.service.hmb;
 
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
@@ -16,7 +16,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class CbsTxnCheckService {
+public class TxnCheckService {
 
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HmMsgIn totalInfo, List<HmMsgIn> detailInfoList, BigDecimal txnTotalAmt) {

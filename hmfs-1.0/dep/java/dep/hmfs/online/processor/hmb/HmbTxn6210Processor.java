@@ -3,7 +3,7 @@ package dep.hmfs.online.processor.hmb;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg009;
 import dep.hmfs.online.processor.hmb.domain.Msg033;
-import dep.hmfs.online.service.cbs.BookkeepingService;
+import dep.hmfs.online.service.hmb.ActBookkeepingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class HmbTxn6210Processor extends HmbSyncAbstractTxnProcessor {
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn6210Processor.class);
 
     @Autowired
-    protected BookkeepingService bookkeepingService;
+    protected ActBookkeepingService actBookkeepingService;
 
     @Override
     @Transactional
@@ -50,8 +50,8 @@ public class HmbTxn6210Processor extends HmbSyncAbstractTxnProcessor {
         BigDecimal amt = msg009.txnAmt1;
 
         //余额、流水处理
-        bookkeepingService.fundActBookkeeping(msgSn, 1, payOutActno, amt, "D", "145", "145");
-        bookkeepingService.fundActBookkeeping(msgSn, 1, payInActno, amt, "C", "145", "145");
+        actBookkeepingService.fundActBookkeeping(msgSn, 1, payOutActno, amt, "D", "145", "145");
+        actBookkeepingService.fundActBookkeeping(msgSn, 1, payInActno, amt, "C", "145", "145");
         return hmbMsgList.size() - 1;
     }
 
