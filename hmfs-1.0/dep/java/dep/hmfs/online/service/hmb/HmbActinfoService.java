@@ -92,7 +92,7 @@ public class HmbActinfoService {
     }
 
     @Transactional
-    public int createActinfoFundsByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    public int createActFundsByMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01033".equals(hmbMsg.getMsgType())) {
                 Msg033 msg033 = (Msg033) hmbMsg;

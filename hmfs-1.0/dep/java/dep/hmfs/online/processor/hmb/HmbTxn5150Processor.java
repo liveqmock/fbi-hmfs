@@ -16,6 +16,6 @@ public class HmbTxn5150Processor extends HmbAsyncAbstractTxnProcessor {
 
     @Override
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
-        return hmbActinfoService.createActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+        return hmbActinfoService.createActFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
     }
 }

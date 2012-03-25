@@ -17,6 +17,6 @@ public class HmbTxn5120Processor extends HmbSyncAbstractTxnProcessor {
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
 
         List<HmbMsg> subMsgList = hmbMsgList.subList(1, hmbMsgList.size());
-        return hmbActinfoService.createActinfoFundsByMsgList(subMsgList);
+        return hmbActinfoService.createActFundsByMsgList(subMsgList);
     }
 }

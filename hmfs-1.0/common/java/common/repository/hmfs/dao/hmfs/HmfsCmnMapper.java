@@ -14,24 +14,24 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HmfsCmnMapper {
-    @Select("select txnseq from hm_sct where sct_seqno = '1' for update")
+    @Select("select txnseq from hm_sys_ctl where sct_seqno = '1' for update")
     public int selectTxnseq();
 
-    @Update("update hm_sct set txnseq = #{txnsn}  where sct_seqno = '1'")
+    @Update("update hm_sys_ctl set txnseq = #{txnsn}  where sct_seqno = '1'")
     public int updateTxnseq(@Param("txnsn") int txnsn);
 
-    @Update("update his_msgin_log set txn_ctl_sts = #{sts} where " +
+    @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
             "(msg_type = '00005' and msg_sn = #{msgsn})" +
             " or (msg_type = '01035' and msg_sn = #{msgsn})" +
             " or (msg_type = '01045' and msg_sn = #{msgsn})")
     public int updatePayMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
 
-    @Update("update his_msgin_log set txn_ctl_sts = #{sts} where " +
+    @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
             "(msg_type = '00007' and msg_sn = #{msgsn})" +
             " or (msg_type = '01041' and msg_sn = #{msgsn})")
     public int updateDrawMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
 
-    @Update("update his_msgin_log set txn_ctl_sts = #{sts} where " +
+    @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
             "(msg_type = '00005' and msg_sn = #{msgsn})" +
             " or (msg_type = '01039' and msg_sn = #{msgsn})" +
             " or (msg_type = '01043' and msg_sn = #{msgsn})")

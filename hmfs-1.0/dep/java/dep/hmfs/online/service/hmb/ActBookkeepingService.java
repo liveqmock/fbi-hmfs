@@ -108,6 +108,7 @@ public class ActBookkeepingService {
 
         String strToday = SystemService.formatTodayByPattern("yyyyMMdd");
         if (!strToday.equals(hmActStl.getLastTxnDt())) {
+            hmActStl.setLastActBal(hmActStl.getActBal());
             if (!StringUtils.isEmpty(hmActStl.getLastTxnDt())) {
                 long days = SystemService.daysBetween(strToday, hmActStl.getLastTxnDt(), "yyyyMMdd");
                 hmActStl.setIntcPdt(hmActStl.getIntcPdt()
@@ -115,7 +116,6 @@ public class ActBookkeepingService {
             } else {
                 hmActStl.setIntcPdt(new BigDecimal(0));
             }
-            hmActStl.setLastActBal(hmActStl.getActBal());
             hmActStl.setLastTxnDt(strToday);
         }
         if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
@@ -157,6 +157,7 @@ public class ActBookkeepingService {
 
         String strToday = SystemService.formatTodayByPattern("yyyyMMdd");
         if (!strToday.equals(hmActFund.getLastTxnDt())) {
+            hmActFund.setLastActBal(hmActFund.getActBal());
             if (!StringUtils.isEmpty(hmActFund.getLastTxnDt())) {
                 long days = SystemService.daysBetween(strToday, hmActFund.getLastTxnDt(), "yyyyMMdd");
                 hmActFund.setIntcPdt(hmActFund.getIntcPdt()
@@ -164,7 +165,6 @@ public class ActBookkeepingService {
             } else {
                 hmActFund.setIntcPdt(new BigDecimal(0));
             }
-            hmActFund.setLastActBal(hmActFund.getActBal());
             hmActFund.setLastTxnDt(strToday);
         }
         if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
