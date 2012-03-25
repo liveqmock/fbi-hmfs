@@ -8,6 +8,7 @@ import common.repository.hmfs.model.HmSysCtl;
 import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
+import hmfs.service.DepService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import skyline.common.utils.MessageUtil;
@@ -46,13 +47,17 @@ public class ActTxnAction implements Serializable {
     private HmMsgIn[] selectedRecords;
 
     private int totalCount;
-    
+    private BigDecimal totalAmt;
+
+    private boolean checkPassed = false;
+    private boolean deposited = false;
+
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
     @ManagedProperty(value = "#{actInfoService}")
     private ActInfoService actInfoService;
-    private boolean checkPass = false;
-
+    @ManagedProperty(value = "#{depService}")
+    private DepService depService;
 
     @PostConstruct
     public void init() {
@@ -74,7 +79,7 @@ public class ActTxnAction implements Serializable {
         //initList();
     }
 
-    private void initList(){
+    private void initList() {
     }
 
     public String onQueryDeposit() {
@@ -82,21 +87,31 @@ public class ActTxnAction implements Serializable {
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
             TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
             if (!txnCtlSts.equals(TxnCtlSts.INIT)) {
-                logger.error("交易处理状态错误。" +  this.summaryMsg.getTxnCtlSts());
+                this.checkPassed = false;
+                logger.error("交易处理状态错误。" + this.summaryMsg.getTxnCtlSts());
                 MessageUtil.addError("本笔申请单处理状态错误，当前状态为：" + txnCtlSts.getTitle());
+                return null;
             }
-            //this.subMsgList = assembleMsgInList(actInfoService.selectSubMsgList(msgSn));
             this.subMsgList = actInfoService.selectPendDepositSubMsgList(msgSn);
-
             this.totalCount = this.subMsgList.size();
-            //TODO 总分金额核对
-            
-            BigDecimal msgTxnAmt = this.summaryMsg.getTxnAmt1();
-            if (msgTxnAmt.compareTo(this.txnAmt) != 0) {
-                this.checkPass = false;
-                MessageUtil.addError("交易金额不符！此申请单金额为：" + msgTxnAmt.toString());
-            }else {
-                this.checkPass = true;
+
+            //总分金额核对
+            this.totalAmt = new BigDecimal(0.00);
+            for (HmMsgIn hmMsgIn : this.subMsgList) {
+                this.totalAmt = this.totalAmt.add(hmMsgIn.getTxnAmt1());
+            }
+            if (txnAmt.compareTo(this.totalAmt) != 0) {
+                this.checkPassed = false;
+                MessageUtil.addError("交易金额不符！此申请单明细金额合计为：" + this.totalAmt.toString());
+            } else {
+                //与界面输入的金额比对
+                BigDecimal msgTxnAmt = this.summaryMsg.getTxnAmt1();
+                if (msgTxnAmt.compareTo(this.txnAmt) != 0) {
+                    this.checkPassed = false;
+                    MessageUtil.addError("交易金额不符！此申请单金额为：" + msgTxnAmt.toString());
+                } else {
+                    this.checkPassed = true;
+                }
             }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
@@ -104,12 +119,20 @@ public class ActTxnAction implements Serializable {
         return null;
     }
 
-    private List<HmMsgIn> assembleMsgInList(List<HmMsgIn> hmMsgInList) {
-        for (HmMsgIn hmMsgIn : hmMsgInList) {
-
+    public String onDeposit() {
+        try {
+            String response = depService.process("1005210|" + this.msgSn);
+            if (response.startsWith("0000")) { //成功
+                this.deposited = true;
+                MessageUtil.addInfo("缴款交易处理成功。");
+            }else{
+                MessageUtil.addError("处理失败。" + response);
+            }
+        } catch (Exception e) {
+            logger.error("处理失败。", e);
+            MessageUtil.addError("处理失败。" + e.getMessage());
         }
-
-        return null;  //To change body of created methods use File | Settings | File Templates.
+        return null;
     }
 
     //=============================
@@ -226,12 +249,12 @@ public class ActTxnAction implements Serializable {
         this.actInfoService = actInfoService;
     }
 
-    public boolean isCheckPass() {
-        return checkPass;
+    public boolean isCheckPassed() {
+        return checkPassed;
     }
 
-    public void setCheckPass(boolean checkPass) {
-        this.checkPass = checkPass;
+    public void setCheckPassed(boolean checkPassed) {
+        this.checkPassed = checkPassed;
     }
 
     public int getTotalCount() {
@@ -240,5 +263,29 @@ public class ActTxnAction implements Serializable {
 
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public BigDecimal getTotalAmt() {
+        return totalAmt;
+    }
+
+    public void setTotalAmt(BigDecimal totalAmt) {
+        this.totalAmt = totalAmt;
+    }
+
+    public DepService getDepService() {
+        return depService;
+    }
+
+    public void setDepService(DepService depService) {
+        this.depService = depService;
+    }
+
+    public boolean isDeposited() {
+        return deposited;
+    }
+
+    public void setDeposited(boolean deposited) {
+        this.deposited = deposited;
     }
 }

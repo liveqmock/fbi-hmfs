@@ -19,7 +19,7 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="凭证打印处理">
+                <p:tab title="维修资金缴款">
                     <h:form>
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
@@ -28,26 +28,26 @@
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
-                                                     requiredMessage="申请单编号不能为空。"
+                                                     requiredMessage="申请单编号必须输入"
                                                      value="#{actTxnAction.msgSn}"/>
                                         <h:outputLabel value="交易金额:" style="font-weight: bold"/>
                                         <p:inputText id="amt" size="25"
                                                      autocomplete="false" required="true"
                                                      value="#{actTxnAction.txnAmt}"
-                                                     requiredMessage="交易金额不能为空。"
-                                                     validatorMessage="请输入正确的金额格式。">
+                                                     requiredMessage="金额必须输入。"
+                                                     validatorMessage="请输入正确的金额。">
                                             <f:convertNumber for="amt" maxFractionDigits="2" maxIntegerDigits="13"
                                                              pattern="###,###,###,###,##0.00"/>
                                         </p:inputText>
                                     </h:panelGrid>
                                     <h:panelGrid id="buttons">
-                                        <p:commandButton style="width:110px;" value="查询缴款信息" disabled="#{actTxnAction.checkPassed}"
+                                        <p:commandButton style="width:110px;" value="查询缴款信息"
                                                          action="#{actTxnAction.onQueryDeposit}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
                                         <p:commandButton style="width:110px;" value="确认缴款" rendered="#{actTxnAction.checkPassed}"
                                                          action="#{actTxnAction.onDeposit}"
-                                                         update="pdt,msgs,buttons">
+                                                         update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
                                 </h:panelGrid>

@@ -13,8 +13,8 @@
                b.dep_standard2,
                b.house_dep_type,
                b.house_cust_phone
-              from
-               (select * from hm_msg_in  where msg_sn = #{msgSn}) a,
+            from
+               (select * from hm_msg_in  where msg_sn = #{msgSn} and msg_type like '01%') a,
                 hm_act_fund b
          where a.fund_actno1 = b.fund_actno1
     </select>
