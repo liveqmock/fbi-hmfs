@@ -17,7 +17,6 @@ import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +148,7 @@ public class HmbBaseService {
             } else {
                 msginLog.setMsgSn(msgSn);
             }
-            msginLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msginLog.setMsgSubSn(index);
             msginLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             hmMsgInMapper.insert(msginLog);
@@ -178,7 +177,7 @@ public class HmbBaseService {
             } else {
                 msgoutLog.setMsgSn(msgSn);
             }
-            msgoutLog.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgoutLog.setMsgSubSn(index);
             msgoutLog.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             hmMsgOutMapper.insert(msgoutLog);

@@ -60,12 +60,6 @@
         <table schema="hmfs" tableName="hm_txn_vch">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
-        <table schema="hmfs" tableName="hm_msg_in">
-            <property name="ignoreQualifiersAtRuntime" value="true" />
-        </table>
-        <table schema="hmfs" tableName="hm_msg_out">
-            <property name="ignoreQualifiersAtRuntime" value="true" />
-        </table>
         <table schema="hmfs" tableName="hm_joblog">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
@@ -73,6 +67,12 @@
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
         <table schema="hmfs" tableName="hm_chk_txn">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_msg_in">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_msg_out">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>
         <table schema="hmfs" tableName="tmp_msg_in">

@@ -13,7 +13,6 @@ import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,7 +142,7 @@ public class WebTxn9001001Processor extends WebAbstractHmbDevelopTxnProcessor {
             } else {
                 msgIn.setMsgSn(msgSn);
             }
-            msgIn.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgIn.setMsgSubSn(index);
             msgIn.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             tmpMsgInMapper.insert(msgIn);

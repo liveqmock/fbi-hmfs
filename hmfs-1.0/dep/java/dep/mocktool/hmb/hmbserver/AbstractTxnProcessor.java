@@ -97,7 +97,7 @@ public abstract class AbstractTxnProcessor {
             } else {
                 msgIn.setMsgSn(msgSn);
             }
-            msgIn.setMsgSubSn(StringUtils.leftPad("" + index, 6, '0'));
+            msgIn.setMsgSubSn(index);
             msgIn.setTxnCtlSts(TxnCtlSts.INIT.getCode());
 
             tmpMsgInMapper.insert(msgIn);
