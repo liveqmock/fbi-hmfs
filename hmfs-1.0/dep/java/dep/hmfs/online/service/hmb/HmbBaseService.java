@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,10 +73,8 @@ public class HmbBaseService {
     // 根据申请单号查询所有明细
     public List<HmMsgIn> qrySubMsgsByMsgSnAndTypes(String msgSn, String[] msgTypes) {
         HmMsgInExample example = new HmMsgInExample();
-        for (String msgType : msgTypes) {
-            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msgSn)
-                    .andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
-        }
+        example.createCriteria().andMsgSnEqualTo(msgSn).andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode())
+        .andMsgTypeIn(Arrays.asList(msgTypes));
         example.setOrderByClause("MSG_SUB_SN");
         return hmMsgInMapper.selectByExample(example);
     }
