@@ -104,8 +104,7 @@ public class HmbMockAction implements Serializable {
         }
         try {
             String response = depService.process("9001001|" + txnCode + "|" + msgSn);
-            String[] fields = response.split("\\|");
-            if ("0000".endsWith(fields[1])) { //成功
+            if (response.startsWith("0000")) { //成功
                 MessageUtil.addInfo("发送成功, 国土局已受理, 稍等请查询返回信息...");
                 this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
                 this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
