@@ -54,9 +54,9 @@ public class ActBookkeepingService {
     // 根据子报文内容更新账户信息  【FundActno1-项目分户】 【FundActno2-项目核算户】 【SettleActno1-结算账户】
     @Transactional
     private int actBookkeepingByMsgin(String cbsTxnSn, HmMsgIn msgin, int txnSubSn, String dc, String cbsTxnCode) throws ParseException {
-        int fund1Rlt = fundActBookkeeping(msgin.getMsgSn(), txnSubSn, msgin.getFundActno1(), msgin.getTxnAmt1(),
+        int fund1Rlt = fundActBookkeeping(cbsTxnSn, msgin.getMsgSn(), txnSubSn, msgin.getFundActno1(), msgin.getTxnAmt1(),
                 dc, cbsTxnCode, msgin.getActionCode());
-        int fund2Rlt = fundActBookkeeping(msgin.getMsgSn(), txnSubSn, msgin.getFundActno2(), msgin.getTxnAmt1(),
+        int fund2Rlt = fundActBookkeeping(cbsTxnSn, msgin.getMsgSn(), txnSubSn, msgin.getFundActno2(), msgin.getTxnAmt1(),
                 dc, cbsTxnCode, msgin.getActionCode());
         int setl1Rlt = stlActBookkeeping(cbsTxnSn, msgin.getMsgSn(), txnSubSn, msgin.getSettleActno1(), msgin.getTxnAmt1(),
                 dc, cbsTxnCode);
@@ -65,12 +65,12 @@ public class ActBookkeepingService {
 
     //核算户记帐 处理余额及流水
     @Transactional
-    public int fundActBookkeeping(String msgSn, int txnSubSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
+    public int fundActBookkeeping(String cbsTxnSn, String msgSn, int txnSubSn, String fundActno, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) throws ParseException {
         HmActFund hmActFund = hmbActinfoService.qryHmActfundByActNo(fundActno);
         if (hmActFund == null) {
             return 0;
         }
-        return fundActUpdate(hmActFund, amt, dc) + addTxnFund(msgSn, txnSubSn, hmActFund, amt, dc, cbsTxnCode, actionCode);
+        return fundActUpdate(hmActFund, amt, dc) + addTxnFund(cbsTxnSn, msgSn, txnSubSn, hmActFund, amt, dc, cbsTxnCode, actionCode);
     }
 
     @Transactional
@@ -112,9 +112,9 @@ public class ActBookkeepingService {
     @Transactional
     private int addTxnStl(String cbsTxnSn, String msgSn, int subSn, HmActStl hmActStl, BigDecimal amt, String dc, String cbsTxnCode) {
         // 新增结算户账户交易明细记录
-        // TODO 主机交易流水保存
         HmTxnStl hmTxnStl = new HmTxnStl();
         hmTxnStl.setPkid(UUID.randomUUID().toString());
+        hmTxnStl.setCbsTxnSn(cbsTxnSn);
         hmTxnStl.setTxnSn(msgSn);
         hmTxnStl.setStlActno(hmActStl.getSettleActno1());
         hmTxnStl.setTxnSubSn(String.valueOf(subSn));
@@ -160,10 +160,11 @@ public class ActBookkeepingService {
 
     // 新增核算账户交易明细记录
     @Transactional
-    private int addTxnFund(String msgSn, int txnSubSn, HmActFund hmActFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
+    private int addTxnFund(String cbsTxnSn, String msgSn, int txnSubSn, HmActFund hmActFund, BigDecimal amt, String dc, String cbsTxnCode, String actionCode) {
 
         HmTxnFund hmTxnFund = new HmTxnFund();
         hmTxnFund.setPkid(UUID.randomUUID().toString());
+        hmTxnFund.setCbsTxnSn(cbsTxnSn);
         hmTxnFund.setFundActno(hmActFund.getFundActno1());
         hmTxnFund.setFundActtype(hmActFund.getFundActtype1());
         hmTxnFund.setTxnSn(msgSn);
