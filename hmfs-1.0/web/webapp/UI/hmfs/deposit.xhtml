@@ -41,12 +41,21 @@
                                         </p:inputText>
                                     </h:panelGrid>
                                     <h:panelGrid id="buttons">
-                                        <p:commandButton style="width:110px;" value="查询缴款信息" disabled="#{actTxnAction.checkPassed}"
+                                        <p:commandButton style="width:110px;" value="查询缴款信息"
+                                                         disabled="#{actTxnAction.checkPassed}"
+                                                         rendered="#{!actTxnAction.deposited}"
                                                          action="#{actTxnAction.onQueryDeposit}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
-                                        <p:commandButton style="width:110px;" value="确认缴款" rendered="#{actTxnAction.checkPassed}"
+                                        <p:commandButton style="width:110px;" value="确认缴款"
+                                                         rendered="#{actTxnAction.checkPassed}"
+                                                         disabled="#{actTxnAction.deposited}"
                                                          action="#{actTxnAction.onDeposit}"
+                                                         update="pdt,msgs,buttons">
+                                        </p:commandButton>
+                                        <p:commandButton style="width:110px;" value="凭证打印"
+                                                         rendered="#{actTxnAction.deposited}"
+                                                         action="#{actTxnAction.onVchPrt}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
                                     </h:panelGrid>
