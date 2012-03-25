@@ -135,6 +135,12 @@ public class ActTxnAction implements Serializable {
         return null;
     }
 
+
+    public String onVchPrt() {
+        return null;
+    }
+
+
     //=============================
 
     public static SimpleDateFormat getSdf() {
