@@ -1,6 +1,7 @@
 package hmfs.service;
 
 import common.repository.hmfs.dao.*;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.*;
 import hmfs.common.model.ActinfoQryParam;
 import org.slf4j.Logger;
@@ -31,22 +32,29 @@ public class ActInfoService {
     private HmActStlMapper actStlMapper;
 
     @Resource
-    private HmTxnFundMapper fundMapperHm;
+    private HmTxnFundMapper txnFundMapper;
 
     @Resource
-    private HmTxnStlMapper stlMapperHm;
+    private HmTxnStlMapper txnStlMapper;
+
+    @Resource
+    protected HmMsgInMapper hmMsgInMapper;
+
+    @Resource
+    protected HmCmnMapper hmCmnMapper;
 
 
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
-    public String selectCbsActno() {
+    public String selectStlActno() {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria();
         return actStlMapper.selectByExample(example).get(0).getCbsActno();
     }
-    public List<HmActStl> selectCbsActnoRecord(String actno) {
+
+    public List<HmActStl> selectStlActnoRecord(String actno) {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria().andCbsActnoEqualTo(actno);
         List<HmActStl> actStlList = actStlMapper.selectByExample(example);
@@ -54,14 +62,16 @@ public class ActInfoService {
     }
 
 
-    //核算户余额
-    public List<HmActFund> selectAllFundActBal(ActinfoQryParam param) {
+    //全部核算户余额
+    public List<HmActFund> selectAllFundActBalList(ActinfoQryParam param) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria()
                 .andActStsEqualTo(param.getActnoStatus());
         return actFundMapper.selectByExample(example);
     }
-    public List<HmActFund> selectFundActBal(ActinfoQryParam param) {
+
+    //核算户余额
+    public List<HmActFund> selectFundActBalList(ActinfoQryParam param) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria()
                 .andFundActno1Between(param.getStartActno(), param.getEndActno())
@@ -69,14 +79,16 @@ public class ActInfoService {
         return actFundMapper.selectByExample(example);
     }
 
-    //结算户余额
-    public List<HmActStl> selectAllCbsActBal(ActinfoQryParam param) {
+    //全部结算户余额
+    public List<HmActStl> selectAllStlActBalList(ActinfoQryParam param) {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria()
                 .andActStsEqualTo(param.getActnoStatus());
         return actStlMapper.selectByExample(example);
     }
-    public List<HmActStl> selectCbsActBal(ActinfoQryParam param) {
+
+    //结算户余额
+    public List<HmActStl> selectStlActBalList(ActinfoQryParam param) {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria()
                 .andCbsActnoEqualTo(param.getCbsActno())
@@ -84,20 +96,48 @@ public class ActInfoService {
         return actStlMapper.selectByExample(example);
     }
 
-    //核算户明细
-    public List<HmTxnFund> selectFundActDetl(ActinfoQryParam param) {
+    //核算户交易明细
+    public List<HmTxnFund> selectFundTxnDetlList(ActinfoQryParam param) {
         HmTxnFundExample exampleHm = new HmTxnFundExample();
         exampleHm.createCriteria()
                 .andFundActnoBetween(param.getStartActno(), param.getEndActno())
-                .andTxnDateBetween(param.getStartDate(),param.getEndDate());
-        return fundMapperHm.selectByExample(exampleHm);
+                .andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        return txnFundMapper.selectByExample(exampleHm);
     }
 
-    public List<HmTxnStl> selectCbsActDetl(ActinfoQryParam param) {
+    //结算户交易明细
+    public List<HmTxnStl> selectStlTxnDetl(ActinfoQryParam param) {
         HmTxnStlExample exampleHm = new HmTxnStlExample();
         exampleHm.createCriteria()
                 .andCbsActnoEqualTo(param.getCbsActno())
-                .andTxnDateBetween(param.getStartDate(),param.getEndDate());
-        return stlMapperHm.selectByExample(exampleHm);
+                .andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        return txnStlMapper.selectByExample(exampleHm);
     }
+
+    // 查询汇总报文信息  (不判断报文状态)
+    public HmMsgIn selectSummaryMsg(String msgSn) {
+        HmMsgInExample example = new HmMsgInExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
+        List<HmMsgIn> hmMsgInList = hmMsgInMapper.selectByExample(example);
+        if (hmMsgInList.size() > 1) {
+            throw new RuntimeException("汇总报文多于一条！");
+        }else if (hmMsgInList.size() == 0) {
+            throw new RuntimeException("汇总报文未找到！");
+        }
+        return hmMsgInList.get(0);
+    }
+
+    // 根据申请单号查询所有明细  (不判断报文状态)
+    public List<HmMsgIn> selectSubMsgList(String msgSn) {
+        HmMsgInExample example = new HmMsgInExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn)
+                .andMsgTypeLike("01%");
+        example.setOrderByClause("MSG_SUB_SN");
+        return hmMsgInMapper.selectByExample(example);
+    }
+    
+    public List<HmMsgIn> selectPendDepositSubMsgList(String msgSn){
+        return hmCmnMapper.selectPendDepositSubMsgList(msgSn);
+    }
+
 }

@@ -1,7 +1,7 @@
 package dep.hmfs.online.processor.web;
 
 import common.enums.SysCtlSts;
-import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.HmSysCtl;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
 
     @Resource
-    HmfsCmnMapper cmnMapper;
+    HmCmnMapper cmnMapper;
 
     public String process(String request)  {
         processSignon();

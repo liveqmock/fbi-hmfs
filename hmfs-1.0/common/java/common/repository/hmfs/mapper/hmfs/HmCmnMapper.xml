@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common.repository.hmfs.dao.hmfs.HmCmnMapper">
+    <!--查询待缴款记录 -->
+    <select id="selectPendDepositSubMsgList" parameterType="java.lang.String"
+            resultMap="common.repository.hmfs.dao.HmMsgInMapper.BaseResultMap">
+        select a.pkid,
+               a.info_name,
+               a.txn_amt1,
+               a.fund_actno1,
+               a.info_addr,
+               a.builder_area,
+               b.dep_standard2,
+               b.house_dep_type,
+               b.house_cust_phone
+              from
+               (select * from hm_msg_in  where msg_sn = #{msgSn}) a,
+                hm_act_fund b
+         where a.fund_actno1 = b.fund_actno1
+    </select>
+</mapper>

@@ -1,6 +1,6 @@
 package dep.hmfs.common;
 
-import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import dep.util.PropertyManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +25,7 @@ public class HmbTxnsnGenerator {
     private  static String SEND_SYS_ID =  PropertyManager.getProperty("SEND_SYS_ID");
 
     @Resource
-    HmfsCmnMapper cmnMapper;
+    HmCmnMapper cmnMapper;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String generateTxnsn(String txnCode) {

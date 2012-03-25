@@ -1,7 +1,7 @@
 package dep.hmfs.online.processor.web;
 
 import common.repository.hmfs.dao.HmChkActMapper;
-import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.HmActStl;
 import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmChkAct;
@@ -26,7 +26,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
     private HmbSysTxnService hmbSysTxnService;
 
     @Resource
-    private HmfsCmnMapper hmfsCmnMapper;
+    private HmCmnMapper hmCmnMapper;
 
     @Resource
     private HmChkActMapper hmChkActMapper;
@@ -154,12 +154,12 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         //SEND_SYS_ID
         int successNumber = 0;
         int failNumber = 0;
-        successNumber = hmfsCmnMapper.verifyChkaclResult_0(txnDate, SEND_SYS_ID);
+        successNumber = hmCmnMapper.verifyChkaclResult_0(txnDate, SEND_SYS_ID);
         logger.info(txnDate + "对帐成功笔数：" + successNumber);
 
-        failNumber = hmfsCmnMapper.verifyChkaclResult_11(txnDate, SEND_SYS_ID);
-        failNumber += hmfsCmnMapper.verifyChkaclResult_12(txnDate, SEND_SYS_ID);
-        failNumber += hmfsCmnMapper.verifyChkaclResult_2(txnDate, SEND_SYS_ID);
+        failNumber = hmCmnMapper.verifyChkaclResult_11(txnDate, SEND_SYS_ID);
+        failNumber += hmCmnMapper.verifyChkaclResult_12(txnDate, SEND_SYS_ID);
+        failNumber += hmCmnMapper.verifyChkaclResult_2(txnDate, SEND_SYS_ID);
         logger.info(txnDate + "对帐失败笔数：" + failNumber);
 
         return failNumber == 0;

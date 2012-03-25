@@ -76,16 +76,16 @@ public class ActInfoAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
 
-        this.cbsActno = actInfoService.selectCbsActno();
+        this.cbsActno = actInfoService.selectStlActno();
         this.qryParam.setCbsActno(this.cbsActno);
         initList();
     }
 
     private void initList(){
-        this.fundBalList = actInfoService.selectAllFundActBal(qryParam);
-        this.fundDetlListHm = actInfoService.selectFundActDetl(qryParam);
-        this.cbsBalList = actInfoService.selectAllCbsActBal(qryParam);
-        this.cbsDetlListHm = actInfoService.selectCbsActDetl(qryParam);
+        this.fundBalList = actInfoService.selectAllFundActBalList(qryParam);
+        this.fundDetlListHm = actInfoService.selectFundTxnDetlList(qryParam);
+        this.cbsBalList = actInfoService.selectAllStlActBalList(qryParam);
+        this.cbsDetlListHm = actInfoService.selectStlTxnDetl(qryParam);
     }
 
     public String onQueryFundBal() {
@@ -93,7 +93,7 @@ public class ActInfoAction implements Serializable {
             qryParam.setEndActno(qryParam.getStartActno());
         }
         try {
-            this.fundBalList = actInfoService.selectFundActBal(qryParam);
+            this.fundBalList = actInfoService.selectFundActBalList(qryParam);
             if (fundBalList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
@@ -109,7 +109,7 @@ public class ActInfoAction implements Serializable {
         }
 
         try {
-            this.fundDetlListHm = actInfoService.selectFundActDetl(qryParam);
+            this.fundDetlListHm = actInfoService.selectFundTxnDetlList(qryParam);
             if (fundDetlListHm.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
@@ -120,7 +120,7 @@ public class ActInfoAction implements Serializable {
     }
     public String onQueryCbsBal() {
         try {
-            this.cbsBalList = actInfoService.selectCbsActBal(qryParam);
+            this.cbsBalList = actInfoService.selectStlActBalList(qryParam);
             if (cbsBalList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
@@ -132,7 +132,7 @@ public class ActInfoAction implements Serializable {
 
     public String onQueryCbsDetl(){
         try {
-            this.cbsDetlListHm = actInfoService.selectCbsActDetl(qryParam);
+            this.cbsDetlListHm = actInfoService.selectStlTxnDetl(qryParam);
             if (cbsDetlListHm.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }

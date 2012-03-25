@@ -32,20 +32,28 @@
                             <p:growl id="msgs" showDetail="false"/>
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
-                                    <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="申请书编号:"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.startActno}"/>
-                                        <h:outputLabel value="名称/户名:"/>
-                                        <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
-                                        <h:outputLabel value="缴款金额:"/>
-                                        <h:selectOneMenu style="width:153px;"
-                                                         value="#{actInfoAction.qryParam.actnoStatus}">
-                                            <f:selectItems value="#{actInfoAction.actnoStatusList}"/>
-                                        </h:selectOneMenu>
+                                    <h:panelGrid columns="2" cellspacing="5">
+                                        <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
+                                        <p:inputText required="true" size="25"
+                                                     requiredMessage="申请单编号必须输入"
+                                                     value="#{actTxnAction.msgSn}"/>
+                                        <h:outputLabel value="交易金额:" style="font-weight: bold"/>
+                                        <p:inputText id="amt" size="25"
+                                                     autocomplete="false" required="true"
+                                                     value="#{actTxnAction.txnAmt}"
+                                                     requiredMessage="金额必须输入。"
+                                                     validatorMessage="请输入正确的金额。">
+                                            <f:convertNumber for="amt" maxFractionDigits="2" maxIntegerDigits="13"
+                                                             pattern="###,###,###,###,##0.00"/>
+                                        </p:inputText>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton  style="width:90px;" value="查询余额"
-                                                         action="#{actInfoAction.onQueryFundBal}"
+                                        <p:commandButton style="width:110px;" value="查询缴款信息"
+                                                         action="#{actTxnAction.onQueryDeposit}"
+                                                         update="pdt,msgs">
+                                        </p:commandButton>
+                                        <p:commandButton style="width:110px;" value="确认缴款"
+                                                         action="#{actTxnAction.onQueryDeposit}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -60,31 +68,42 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{actInfoAction.fundBalList}" var="record"
+                                         value="#{actTxnAction.subMsgList}" var="record"
                                          rowKey="#{record.pkid}"
-                                         selection="#{actInfoAction.selectedFundBalRecords}"
-                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         selection="#{actTxnAction.selectedRecords}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} 【总笔数:#{actTxnAction.totalCount}】"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="multiple" style="width:18px"/>
-                                <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.fundActno1}"/>
-                                </p:column>
-                                <p:column headerText="户名" style="text-align: center">
+                                <p:column headerText="业主姓名" style="text-align: center">
                                     <h:outputText value="#{record.infoName}"/>
                                 </p:column>
-                                <p:column headerText="地址" style="text-align: center">
-                                    <h:outputText value="#{record.infoAddr}"/>
-                                </p:column>
-                                <p:column headerText="余额">
-                                    <h:outputText value="#{record.actBal}" style="float: right">
+                                <p:column headerText="金额">
+                                    <h:outputText value="#{record.txnAmt1}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="帐户状态" style="text-align: center">
-                                    <h:outputText
-                                            value="#{actInfoAction.fundActnoStatus.valueOfAlias(record.actSts).title}"/>
+                                <p:column headerText="资金帐号" style="text-align: center">
+                                    <h:outputText value="#{record.fundActno1}"/>
+                                </p:column>
+                                <p:column headerText="住宅地址" style="text-align: center">
+                                    <h:outputText value="#{record.infoAddr}"/>
+                                </p:column>
+                                <p:column headerText="建筑面积" style="text-align: center">
+                                    <h:outputText value="#{record.builderArea}"/>
+                                </p:column>
+                                <p:column headerText="住宅类型" style="text-align: center">
+                                    <h:outputText value="#{record.houseDepType}"/>
+                                </p:column>
+                                <p:column headerText="工程造价" style="text-align: center">
+                                    <h:outputText value="#{record.infoAddr}"/>
+                                </p:column>
+                                <p:column headerText="缴存比例" style="text-align: center">
+                                    <h:outputText value="#{record.infoAddr}"/>
+                                </p:column>
+                                <p:column headerText="电话" style="text-align: center">
+                                    <h:outputText value="#{record.houseCustPhone}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

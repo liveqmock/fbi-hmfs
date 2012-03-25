@@ -1,9 +1,12 @@
 package common.repository.hmfs.dao.hmfs;
 
+import common.repository.hmfs.model.HmMsgIn;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +16,7 @@ import org.springframework.stereotype.Repository;
  * To change this template use File | Settings | File Templates.
  */
 @Repository
-public interface HmfsCmnMapper {
+public interface HmCmnMapper {
     @Select("select txnseq from hm_sys_ctl where sct_seqno = '1' for update")
     public int selectTxnseq();
 
@@ -92,4 +95,11 @@ public interface HmfsCmnMapper {
             "                  where t1.actno = t2.actno" +
             "                    and t1.actbal != t2.actbal)")
     public int verifyChkaclResult_2(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
+
+    /**
+     * 缴款交易：查询子报文信息
+     * @param msgSn
+     * @return
+     */
+    public List<HmMsgIn> selectPendDepositSubMsgList(@Param("msgSn") String msgSn);
 }

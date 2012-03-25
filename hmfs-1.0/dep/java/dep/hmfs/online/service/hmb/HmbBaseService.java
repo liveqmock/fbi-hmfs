@@ -6,7 +6,7 @@ import common.repository.hmfs.dao.HmMsgInMapper;
 import common.repository.hmfs.dao.HmMsgOutMapper;
 import common.repository.hmfs.dao.HmSysCtlMapper;
 import common.repository.hmfs.dao.TmpMsgInMapper;
-import common.repository.hmfs.dao.hmfs.HmfsCmnMapper;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmMsgInExample;
 import common.repository.hmfs.model.HmMsgOut;
@@ -53,7 +53,7 @@ public class HmbBaseService {
     @Resource
     protected TmpMsgInMapper tmpMsgInMapper;
     @Resource
-    protected HmfsCmnMapper hmfsCmnMapper;
+    protected HmCmnMapper hmCmnMapper;
 
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
@@ -82,17 +82,17 @@ public class HmbBaseService {
     // 更新汇总报文和子报文交易处理状态
     @Transactional
     public int updatePayMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmfsCmnMapper.updatePayMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updatePayMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     @Transactional
     public int updateDrawMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmfsCmnMapper.updateDrawMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updateDrawMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     @Transactional
     public int updateRefundMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmfsCmnMapper.updateRefundMsginSts(msgSn, txnCtlSts.getCode());
+        return hmCmnMapper.updateRefundMsginSts(msgSn, txnCtlSts.getCode());
     }
 
     public HmSysCtl getAppSysStatus() {
