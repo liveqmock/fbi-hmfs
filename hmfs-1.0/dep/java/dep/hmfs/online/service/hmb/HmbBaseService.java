@@ -39,6 +39,7 @@ import java.util.UUID;
  */
 @Service
 public class HmbBaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(HmbBaseService.class);
 
     @Resource
@@ -78,27 +79,14 @@ public class HmbBaseService {
         return hmMsgInMapper.selectByExample(example);
     }
 
-    // 更新汇总报文和子报文交易处理状态
-    @Transactional
-    public int updatePayMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
-    }
-
-    @Transactional
-    public int updateDrawMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
-    }
-
-    @Transactional
-    public int updateRefundMsginsTxnCtlStsByMsgSn(String msgSn, TxnCtlSts txnCtlSts) {
-        return hmCmnMapper.updateMsginSts(msgSn, txnCtlSts.getCode());
-    }
-
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
-
+    @Transactional
+    public int updateMsginSts(String msgSn, TxnCtlSts sts) {
+        return hmCmnMapper.updateMsginSts(msgSn, sts.getCode());
+    }
     /**
      * 接收并保存交易报文
      *

@@ -71,7 +71,7 @@ public class CmbTxn3002Processor extends CmbAbstractTxnProcessor {
         List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);
         hmbActinfoService.updateActinfoFundsByMsginList(updateFundInfoList);
 
-        hmbBaseService.updateRefundMsginsTxnCtlStsByMsgSn(tia3002.body.refundApplyNo,TxnCtlSts.SUCCESS);
+        hmbBaseService.updateMsginSts(tia3002.body.refundApplyNo,TxnCtlSts.SUCCESS);
 
         // 5230 退款子报文序号
         String[] refundFundMsgTypes = {"01039", "01043", "01033", "01051"};

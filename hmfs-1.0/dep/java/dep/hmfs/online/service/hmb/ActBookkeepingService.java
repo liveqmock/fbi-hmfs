@@ -41,6 +41,7 @@ public class ActBookkeepingService {
     @Autowired
     private HmbActinfoService hmbActinfoService;
 
+
     // 检查汇总报文和子报文信息
     public boolean checkMsginTxnCtlSts(HmMsgIn totalInfo, List<HmMsgIn> detailInfoList, BigDecimal txnTotalAmt) {
         if (totalInfo == null || detailInfoList.size() < 1) {

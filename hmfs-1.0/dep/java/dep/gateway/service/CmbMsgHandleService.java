@@ -48,27 +48,27 @@ public class CmbMsgHandleService implements IMessageHandler {
             strBuilder.append("0000");
             strBuilder.append(tiaHeader.txnCode);
             if ("1001".equals(tiaHeader.txnCode)) {
-                strBuilder.append("12031900484352100001000.00         ");
+                strBuilder.append("120319004843521000010.00           ");
             } else if ("1002".equals(tiaHeader.txnCode)) {
                 strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
             } else if ("2001".equals(tiaHeader.txnCode)) {
-                strBuilder.append("12031900484352100002000.00         ");
+                strBuilder.append("12031900484352100002.00            ");
             } else if ("3001".equals(tiaHeader.txnCode)) {
-                strBuilder.append("12031900484352100003000.00         ");
+                strBuilder.append("12031900484352100003.00            ");
             } else if ("5001".equals(tiaHeader.txnCode)) {
                 TIA5001 tia5001 = new TIA5001();
-                tia5001.body.cbsActNo = new String(bytes, 0, 30).trim();
-                tia5001.body.accountBalance = new String(bytes, 30, 16).trim();
-                tia5001.body.txnDate = new String(bytes, 46, 8).trim();
+                tia5001.body.cbsActNo = new String(datagramBytes, 0, 30).trim();
+                tia5001.body.accountBalance = new String(datagramBytes, 30, 16).trim();
+                tia5001.body.txnDate = new String(datagramBytes, 46, 8).trim();
 
                 logger.info("【前台】账号：" + tia5001.body.cbsActNo);
                 logger.info("【前台】余额：" + tia5001.body.accountBalance);
                 logger.info("【前台】交易日期：" + tia5001.body.txnDate);
 
                 // 获取明细，开始主机对账
-                if (bytes.length > 54) {
-                    byte[] detailBytes = new byte[bytes.length - 54];
-                    System.arraycopy(bytes, 54, detailBytes, 0, detailBytes.length);
+                if (datagramBytes.length > 54) {
+                    byte[] detailBytes = new byte[datagramBytes.length - 54];
+                    System.arraycopy(datagramBytes, 54, detailBytes, 0, detailBytes.length);
                     String detailStr = new String(detailBytes);
                     String[] details = detailStr.split("\n");
                     for (String detail : details) {

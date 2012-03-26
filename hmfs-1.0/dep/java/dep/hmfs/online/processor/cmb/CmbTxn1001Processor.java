@@ -41,7 +41,7 @@ public class CmbTxn1001Processor extends CmbAbstractTxnProcessor {
             // String[] payMsgTypes = {"01035", "01045"};
             if (!TxnCtlSts.SUCCESS.getCode().equals(totalPayInfo.getTxnCtlSts())) {
                 toa1001.body.payFlag = "0";
-                hmbBaseService.updatePayMsginsTxnCtlStsByMsgSn(tia1001.body.payApplyNo, TxnCtlSts.HANDLING);
+                hmbBaseService.updateMsginSts(tia1001.body.payApplyNo, TxnCtlSts.HANDLING);
             } else {
                 toa1001.body.payFlag = "1";
             }

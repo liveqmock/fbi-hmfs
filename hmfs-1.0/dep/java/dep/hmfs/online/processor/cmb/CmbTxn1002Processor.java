@@ -3,13 +3,13 @@ package dep.hmfs.online.processor.cmb;
 import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmActFund;
-import dep.hmfs.online.service.hmb.ActBookkeepingService;
-import dep.hmfs.online.service.hmb.HmbActinfoService;
+import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.processor.cmb.domain.base.TOA;
 import dep.hmfs.online.processor.cmb.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cmb.domain.txn.TOA1002;
+import dep.hmfs.online.service.hmb.ActBookkeepingService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -65,7 +64,7 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
         if (actBookkeepingService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
             logger.info("数据检查正确, 发送报文至房管局并等待响应...");
-            return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payMsgTypes, payInfoList);
+            return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
@@ -76,12 +75,12 @@ public class CmbTxn1002Processor extends CmbAbstractTxnProcessor {
       交款交易。
     */
     @Transactional
-    private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, String[] payMsgTypes, List<HmMsgIn> payInfoList) throws Exception, IOException {
+    private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
 
         // 批量核算户账户信息更新
         actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.TXN_IN.getCode(), "1002");
 
-        hmbBaseService.updatePayMsginsTxnCtlStsByMsgSn(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
+        hmbBaseService.updateMsginSts(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
 
         return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
     }
