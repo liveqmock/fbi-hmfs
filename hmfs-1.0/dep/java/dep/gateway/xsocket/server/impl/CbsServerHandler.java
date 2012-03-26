@@ -1,9 +1,9 @@
 package dep.gateway.xsocket.server.impl;
 
-import dep.gateway.service.IMessageHandler;
-import dep.gateway.service.WebMsgHandleService;
 import dep.gateway.xsocket.server.ContentHandler;
 import dep.gateway.xsocket.server.IServerHandler;
+import dep.gateway.service.CbsMsgHandleService;
+import dep.gateway.service.IMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +14,19 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 
 /**
- * 服务端数据处理类 监听维修资金监管系统管理界面发起的报文
+ * 服务端数据处理类 监听中间业务平台
  * 6位报文长度
+ *
  * @author zxb
  */
 @Component
-public class WebServerHandler implements IServerHandler {
+public class CbsServerHandler implements IServerHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(WebServerHandler.class);
     private static final int DATA_LENGTH_FIELD_LENGTH = 6;
     @Autowired
-    private WebMsgHandleService webMsgHandleService;
+    private CbsMsgHandleService cbsMsgHandleService;
+
     /**
      * 连接的成功时的操作
      */
@@ -48,16 +50,12 @@ public class WebServerHandler implements IServerHandler {
     public boolean onData(INonBlockingConnection connection) throws IOException {
 
         logger.info("【本地服务端】可接收报文长度：" + connection.available());
-
-        int dataLength = 0;
-
         // 报文长度
-        dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
+        int dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
         logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
 
-        connection.setHandler(new WebContentHandler(this, webMsgHandleService, dataLength));
-
-        return true;
+        connection.setHandler(new CbsContentHandler(this, cbsMsgHandleService, dataLength));
+        return false;
     }
 
     /**
@@ -84,24 +82,17 @@ public class WebServerHandler implements IServerHandler {
         return true;
     }
 
-    public WebMsgHandleService getWebMsgHandleService() {
-        return webMsgHandleService;
-    }
-
-    public void setWebMsgHandleService(WebMsgHandleService webMsgHandleService) {
-        this.webMsgHandleService = webMsgHandleService;
-    }
 }
 
 
-class WebContentHandler extends ContentHandler {
+class CbsContentHandler extends ContentHandler {
 
     private static Logger logger = LoggerFactory.getLogger(CbsContentHandler.class);
-    private WebMsgHandleService webMsgHandleService;
+    private CbsMsgHandleService cbsMsgHandleService;
 
-    WebContentHandler(IServerHandler hdl, IMessageHandler msgHandleService, int dataLength) {
+    CbsContentHandler(IServerHandler hdl, IMessageHandler msgHandleService, int dataLength) {
         super(hdl, msgHandleService, dataLength);
-        webMsgHandleService = (WebMsgHandleService) msgHandleService;
+        cbsMsgHandleService = (CbsMsgHandleService) msgHandleService;
     }
 
     public boolean onData(INonBlockingConnection nbc) throws IOException {
@@ -119,18 +110,18 @@ class WebContentHandler extends ContentHandler {
         if (remaining == 0) {
 
             byteArrayOutStream.flush();
-            nbc.setAttachment(hdl);
+            //nbc.setAttachment(null);
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
-
             // 处理接收到的报文，并生成响应报文
-            byte[] resBytesMsg = webMsgHandleService.handleMessage(bytesDatagram);
+            byte[] resBytesMsg = cbsMsgHandleService.handleMessage(bytesDatagram);
+            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
+            logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();
-            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
-            logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
         }
-        return true;
+        return false;
     }
 }
+

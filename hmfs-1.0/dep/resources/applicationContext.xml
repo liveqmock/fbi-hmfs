@@ -53,7 +53,7 @@
 
     <bean id="cmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
         <property name="port" value="${socket_watcher_port_cbs}"/>
-        <property name="serverHandler" ref="cmbServerHandler"/>
+        <property name="serverHandler" ref="cbsServerHandler"/>
     </bean>
 
     <bean id="webSocketServer" class="dep.gateway.xsocket.server.XSocketServer">

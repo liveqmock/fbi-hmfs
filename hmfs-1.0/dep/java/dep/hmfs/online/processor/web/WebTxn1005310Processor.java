@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 维修资金交款.
+ * 维修资金支取.
  * User: zhangxiaobo
  * Date: 12-3-26
- * Time: 21:01
+ * Time: 22:01
  */
 @Component
-public class WebTxn1005210Processor extends WebAbstractHmbProductTxnProcessor {
+public class WebTxn1005310Processor extends WebAbstractHmbProductTxnProcessor {
 
     @Autowired
     private HmbBaseService hmbBaseService;
@@ -35,10 +35,10 @@ public class WebTxn1005210Processor extends WebAbstractHmbProductTxnProcessor {
         try {
             processRequest(request);
         } catch (Exception e) {
-            logger.error("交款失败", e);
-            throw new RuntimeException("交款失败。", e);
+            logger.error("资金支取失败", e);
+            throw new RuntimeException("资金支取失败。", e);
         }
-        return "0000|缴款成功";
+        return "0000|支取成功";
     }
 
     @Transactional
@@ -49,20 +49,20 @@ public class WebTxn1005210Processor extends WebAbstractHmbProductTxnProcessor {
         String msgSn = fields[1];
 
         // 查询交易汇总报文记录
-        HmMsgIn totalPayInfo = hmbBaseService.qryTotalMsgByMsgSn(msgSn, "00005");
-        String[] payMsgTypes = {"01035", "01045"};
+        HmMsgIn totalDrawInfo = hmbBaseService.qryTotalMsgByMsgSn(msgSn, "00007");
+        String[] payMsgTypes = {"01041"};
         // 查询交易子报文记录
-        List<HmMsgIn> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msgSn, payMsgTypes);
-        logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
+        List<HmMsgIn> drawInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msgSn, payMsgTypes);
+        logger.info("查询支取交易子报文。查询到笔数：" + drawInfoList.size());
 
         // 批量核算户账户信息更新
         actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                payInfoList, DCFlagCode.TXN_IN.getCode(), "5210");
+                drawInfoList, DCFlagCode.TXN_OUT.getCode(), "5310");
 
         hmbBaseService.updateMsginSts(msgSn, TxnCtlSts.SUCCESS);
 
-        List<HmbMsg> rtnMsgList = hmbClientReqService.communicateWithHmbRtnMsgList(totalPayInfo.getTxnCode(),
-                hmbClientReqService.createMsg006ByTotalMsgin(totalPayInfo), payInfoList).get("9999");
+        List<HmbMsg> rtnMsgList = hmbClientReqService.communicateWithHmbRtnMsgList(totalDrawInfo.getTxnCode(),
+                hmbClientReqService.createMsg008ByTotalMsgin(totalDrawInfo), hmbClientReqService.changeToMsg042ByMsginList(drawInfoList)).get("9999");
 
         // 重复发送时，返回发送的报文 rtnMsgList应为null 交易成功
         if (rtnMsgList != null) {

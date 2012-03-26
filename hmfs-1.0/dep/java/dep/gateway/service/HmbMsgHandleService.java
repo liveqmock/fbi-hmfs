@@ -29,7 +29,7 @@ import java.util.Map;
 @Service
 public class HmbMsgHandleService implements IMessageHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(CmbMsgHandleService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CbsMsgHandleService.class);
     @Autowired
     private HmbMessageFactory mf;
 

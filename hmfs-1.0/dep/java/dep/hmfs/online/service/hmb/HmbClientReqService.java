@@ -40,6 +40,18 @@ public class HmbClientReqService extends HmbBaseService {
     // 与房管局通信
     public boolean communicateWithHmb(String txnCode, HmbMsg totalHmbMsg, List<HmMsgIn> msginLogList) throws Exception {
 
+        List<HmbMsg> rtnMsgList = communicateWithHmbRtnMsgList(txnCode, totalHmbMsg, msginLogList).get("9999");
+        // 重复发送时，返回发送的报文 rtnMsgList应为null
+        if (rtnMsgList == null) {
+            return true;
+        } else {
+            // 当且仅当首次发送交易信息时，返回9999报文
+            Msg100 msg100 = (Msg100) rtnMsgList.get(0);
+            return "00".equals(msg100.getRtnInfoCode());
+        }
+    }
+
+    public Map<String, List<HmbMsg>> communicateWithHmbRtnMsgList(String txnCode, HmbMsg totalHmbMsg, List<HmMsgIn> msginLogList) throws Exception{
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(totalHmbMsg);
         for (HmMsgIn msginLog : msginLogList) {
@@ -52,16 +64,7 @@ public class HmbClientReqService extends HmbBaseService {
         outMap.put(txnCode, hmbMsgList);
         saveMsgoutLogByMap(outMap);
         byte[] txnBuf = messageFactory.marshal(txnCode, hmbMsgList);
-        Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
-        List<HmbMsg> rtnMsgList = rtnMsgMap.get("9999");
-        // 重复发送时，返回发送的报文 rtnMsgList应为null
-        if (rtnMsgList == null) {
-            return true;
-        } else {
-            // 当且仅当首次发送交易信息时，返回9999报文
-            Msg100 msg100 = (Msg100) rtnMsgList.get(0);
-            return "00".equals(msg100.getRtnInfoCode());
-        }
+        return sendDataUntilRcv(txnBuf);
     }
 
     public boolean sendVouchsToHmb(String msgSn, long startNo, long endNo, String txnApplyNo, String vouchStatus) throws InvocationTargetException, IllegalAccessException {
