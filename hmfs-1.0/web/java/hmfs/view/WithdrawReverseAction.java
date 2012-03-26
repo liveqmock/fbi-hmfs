@@ -24,14 +24,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 缴款交易处理
+ * 支取冲正交易处理
  * zhanrui
  * 2012/3/24
  */
 @ManagedBean
 @ViewScoped
-public class DepositAction implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(DepositAction.class);
+public class WithdrawReverseAction implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(WithdrawReverseAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
@@ -121,10 +121,10 @@ public class DepositAction implements Serializable {
     //缴款处理
     public String onConfirm() {
         try {
-            String response = depService.process("1005210|" + this.msgSn);
+            String response = depService.process("1005331|" + this.msgSn);
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
-                MessageUtil.addInfo("缴款交易处理成功。");
+                MessageUtil.addInfo("支取冲正交易处理成功。");
             }else{
                 MessageUtil.addError("处理失败。" + response);
             }
@@ -142,7 +142,7 @@ public class DepositAction implements Serializable {
     }
 
     public static void setSdf(SimpleDateFormat sdf) {
-        DepositAction.sdf = sdf;
+        WithdrawReverseAction.sdf = sdf;
     }
 
     public ActinfoQryParam getQryParam() {

@@ -53,7 +53,7 @@ public class RefundAction implements Serializable {
     private BigDecimal totalAmt;
 
     private boolean checkPassed = false;
-    private boolean deposited = false;
+    private boolean confirmed = false;
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
@@ -124,7 +124,7 @@ public class RefundAction implements Serializable {
         try {
             String response = depService.process("1005230|" + this.msgSn);
             if (response.startsWith("0000")) { //成功
-                this.deposited = true;
+                this.confirmed = true;
                 MessageUtil.addInfo("退款交易处理成功。");
             }else{
                 MessageUtil.addError("处理失败。" + response);
@@ -294,11 +294,11 @@ public class RefundAction implements Serializable {
         this.depService = depService;
     }
 
-    public boolean isDeposited() {
-        return deposited;
+    public boolean isConfirmed() {
+        return confirmed;
     }
 
-    public void setDeposited(boolean deposited) {
-        this.deposited = deposited;
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
     }
 }

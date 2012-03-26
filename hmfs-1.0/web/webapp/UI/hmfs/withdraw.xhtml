@@ -43,14 +43,14 @@
                                     <h:panelGrid id="buttons">
                                         <p:commandButton style="width:110px;" value="查询缴款信息"
                                                          disabled="#{withdrawAction.checkPassed}"
-                                                         rendered="#{!withdrawAction.deposited}"
+                                                         rendered="#{!withdrawAction.confirmed}"
                                                          action="#{withdrawAction.onQuery}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
                                         <p:commandButton style="width:110px;" value="确认支取"
                                                          rendered="#{withdrawAction.checkPassed}"
-                                                         disabled="#{withdrawAction.deposited}"
-                                                         action="#{withdrawAction.onWithdraw}"
+                                                         disabled="#{withdrawAction.confirmed}"
+                                                         action="#{withdrawAction.onConfirm}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
                                     </h:panelGrid>
