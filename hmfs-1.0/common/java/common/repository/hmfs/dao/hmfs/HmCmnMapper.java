@@ -1,15 +1,12 @@
 package common.repository.hmfs.dao.hmfs;
 
-import common.repository.hmfs.model.HmMsgIn;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 /**
- * Created by IntelliJ IDEA.
+ * DEP通用处理.
  * User: zhanrui
  * Date: 12-3-14
  * Time: 下午2:05
@@ -83,10 +80,4 @@ public interface HmCmnMapper {
             "                    and t1.actbal != t2.actbal)")
     public int verifyChkaclResult_2(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
 
-    /**
-     * 缴款交易：查询子报文信息
-     * @param msgSn
-     * @return
-     */
-    public List<HmMsgIn> selectPendDepositSubMsgList(@Param("msgSn") String msgSn);
 }

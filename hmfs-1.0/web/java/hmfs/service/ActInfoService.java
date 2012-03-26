@@ -2,6 +2,7 @@ package hmfs.service;
 
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
+import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
 import common.repository.hmfs.model.*;
 import hmfs.common.model.ActinfoQryParam;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ public class ActInfoService {
 
     @Resource
     protected HmCmnMapper hmCmnMapper;
+
+    @Resource
+    protected HmWebTxnMapper hmWebTxnMapper;
 
 
     public HmSysCtl getAppSysStatus() {
@@ -136,8 +140,8 @@ public class ActInfoService {
         return hmMsgInMapper.selectByExample(example);
     }
     
-    public List<HmMsgIn> selectPendDepositSubMsgList(String msgSn){
-        return hmCmnMapper.selectPendDepositSubMsgList(msgSn);
+    public List<HmMsgIn> selectSubMsgListByMsgSn(String msgSn){
+        return hmWebTxnMapper.selectSubMsgListByMsgSn(msgSn);
     }
 
 }

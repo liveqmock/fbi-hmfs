@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="common.repository.hmfs.dao.hmfs.HmCmnMapper">
-    <!--查询待缴款记录 -->
-    <select id="selectPendDepositSubMsgList" parameterType="java.lang.String"
+<mapper namespace="common.repository.hmfs.dao.hmfs.HmWebTxnMapper">
+    <!--查询子Msg记录   -->
+    <select id="selectSubMsgListByMsgSn" parameterType="java.lang.String"
             resultMap="common.repository.hmfs.dao.HmMsgInMapper.BaseResultMap">
         select a.pkid,
                a.info_name,

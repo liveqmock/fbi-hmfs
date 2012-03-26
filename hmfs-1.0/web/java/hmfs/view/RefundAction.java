@@ -20,16 +20,19 @@ import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 帐务类交易处理
+ * 退款交易处理
+ * zhanrui
+ * 2012/3/24
  */
 @ManagedBean
 @ViewScoped
-public class ActTxnAction implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(ActTxnAction.class);
+public class RefundAction implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(RefundAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
@@ -76,13 +79,10 @@ public class ActTxnAction implements Serializable {
 
         this.cbsActno = actInfoService.selectStlActno();
         this.qryParam.setCbsActno(this.cbsActno);
-        //initList();
     }
 
-    private void initList() {
-    }
-
-    public String onQueryDeposit() {
+    //退款查询
+    public String onQuery() {
         try {
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
             TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
@@ -92,7 +92,7 @@ public class ActTxnAction implements Serializable {
                 MessageUtil.addError("本笔申请单处理状态错误，当前状态为：" + txnCtlSts.getTitle());
                 return null;
             }
-            this.subMsgList = actInfoService.selectPendDepositSubMsgList(msgSn);
+            initSubMsgList();
             this.totalCount = this.subMsgList.size();
 
             //总分金额核对
@@ -119,12 +119,13 @@ public class ActTxnAction implements Serializable {
         return null;
     }
 
-    public String onDeposit() {
+    //退款处理
+    public String onConfirm() {
         try {
-            String response = depService.process("1005210|" + this.msgSn);
+            String response = depService.process("1005230|" + this.msgSn);
             if (response.startsWith("0000")) { //成功
                 this.deposited = true;
-                MessageUtil.addInfo("缴款交易处理成功。");
+                MessageUtil.addInfo("退款交易处理成功。");
             }else{
                 MessageUtil.addError("处理失败。" + response);
             }
@@ -135,11 +136,17 @@ public class ActTxnAction implements Serializable {
         return null;
     }
 
+    private void initSubMsgList() {
+        this.subMsgList = new ArrayList<HmMsgIn>();
 
-    public String onVchPrt() {
-        return null;
+        List<HmMsgIn> allSubMsgList = actInfoService.selectSubMsgList(msgSn);
+        for (HmMsgIn hmMsgIn : allSubMsgList) {
+            String msgType = hmMsgIn.getMsgType();
+            if (msgType.equals("01039")||msgType.equals("01043")) {
+                this.subMsgList.add(hmMsgIn);
+            }
+        }
     }
-
 
     //=============================
 
@@ -148,7 +155,7 @@ public class ActTxnAction implements Serializable {
     }
 
     public static void setSdf(SimpleDateFormat sdf) {
-        ActTxnAction.sdf = sdf;
+        RefundAction.sdf = sdf;
     }
 
     public ActinfoQryParam getQryParam() {
