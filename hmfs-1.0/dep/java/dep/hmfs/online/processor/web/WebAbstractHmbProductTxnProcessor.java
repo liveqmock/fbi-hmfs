@@ -15,6 +15,7 @@ public abstract class WebAbstractHmbProductTxnProcessor extends  WebAbstractHmbT
 
     @Override
     public String run(String request){
+        //TODO ¼ì²éÏµÍ³×´Ì¬
          return process(request);
     }
 

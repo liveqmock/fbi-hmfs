@@ -39,7 +39,7 @@ public class WebTxn1005230Processor extends WebAbstractHmbProductTxnProcessor {
             processRequest(request);
         } catch (Exception e) {
             logger.error("退款失败", e);
-            throw new RuntimeException("退款失败。", e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         return "0000|退款成功";
     }
