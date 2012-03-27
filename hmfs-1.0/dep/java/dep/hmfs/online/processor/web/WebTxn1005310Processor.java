@@ -22,7 +22,7 @@ import java.util.List;
  * Time: 22:01
  */
 @Component
-public class WebTxn1005310Processor extends WebAbstractHmbProductChkTxnProcessor {
+public class WebTxn1005310Processor extends WebAbstractHmbProductBizTxnProcessor {
 
     @Autowired
     private HmbBaseService hmbBaseService;

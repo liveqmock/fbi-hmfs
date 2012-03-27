@@ -12,8 +12,8 @@ import javax.annotation.Resource;
 /**
  * 状态检查：非签到状态不可进行交易。
  */
-public abstract class WebAbstractHmbProductChkTxnProcessor extends WebAbstractHmbProductTxnProcessor {
-    protected static final Logger logger = LoggerFactory.getLogger(WebAbstractHmbProductChkTxnProcessor.class);
+public abstract class WebAbstractHmbProductBizTxnProcessor extends WebAbstractHmbProductTxnProcessor {
+    protected static final Logger logger = LoggerFactory.getLogger(WebAbstractHmbProductBizTxnProcessor.class);
 
     @Resource
     protected HmSysCtlMapper hmSysCtlMapper;
