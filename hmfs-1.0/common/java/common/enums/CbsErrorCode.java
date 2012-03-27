@@ -7,8 +7,6 @@ import java.util.Hashtable;
  */
 public enum CbsErrorCode implements EnumApp {
 
-    DATA_ANALYSIS_ERROR("8000", "报文解析错误"),
-
     QRY_NO_RECORDS("1001", "没有查询到数据记录"),
     TXN_NOT_EXIST("1002", "该交易不存在"),
     TXN_NO_EQUAL("1003", "实际交易金额和应交易金额不一致"),
@@ -28,8 +26,11 @@ public enum CbsErrorCode implements EnumApp {
     VOUCHER_NUM_ERROR("4001", "票据号码输入有误"),
     VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),
 
+    SYS_NOT_SIGN_ON("5001", "系统未签到"),
     NET_COMMUNICATE_ERROR("7000", "网络连接异常"),
     NET_COMMUNICATE_TIMEOUT("7001", "网络连接超时"),
+    DATA_ANALYSIS_ERROR("8000", "报文解析错误"),
+
     SYSTEM_ERROR("9000","系统异常,请联系管理员");
 
     private String code = null;

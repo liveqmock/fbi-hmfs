@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @Component
+@Deprecated
 public class HmbTxn5110Processor extends HmbAsyncAbstractTxnProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(HmbTxn5110Processor.class);

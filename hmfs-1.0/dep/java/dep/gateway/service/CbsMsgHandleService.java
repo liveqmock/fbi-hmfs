@@ -89,17 +89,11 @@ public class CbsMsgHandleService implements IMessageHandler {
         }
 
         // ======================================
-        try
-
-        {
+        try {
             CbsAbstractTxnProcessor txnProcessorCbs = (CbsAbstractTxnProcessor) ContainerManager.getBean("cbsTxn" + tiaHeader.txnCode + "Processor");
-            toa = txnProcessorCbs.process(tiaHeader.serialNo, datagramBytes);
+            toa = txnProcessorCbs.run(tiaHeader.serialNo, datagramBytes);
             strBuilder.append("0000");
-        } catch (
-                Exception e
-                )
-
-        {
+        } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
             if (e.getMessage() == null || e.getMessage().getBytes().length != 4) {
                 strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());
