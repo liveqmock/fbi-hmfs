@@ -57,7 +57,7 @@ public class WebTxn1005310Processor extends WebAbstractHmbProductBizTxnProcessor
 
         // 批量核算户账户信息更新
         actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                drawInfoList, DCFlagCode.TXN_OUT.getCode(), "5310");
+                drawInfoList, DCFlagCode.WITHDRAW.getCode(), "5310");
 
         hmbBaseService.updateMsginSts(msgSn, TxnCtlSts.SUCCESS);
 

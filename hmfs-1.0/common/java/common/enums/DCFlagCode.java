@@ -7,8 +7,8 @@ import java.util.Hashtable;
  */
 public enum DCFlagCode implements EnumApp {
 
-    TXN_OUT("C", "支取或退款"),
-    TXN_IN("D", "缴费");
+    WITHDRAW("C", "取款"),
+    DEPOSIT("D", "缴款");
 
     private String code = null;
     private String title = null;

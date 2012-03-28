@@ -77,7 +77,7 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
     private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
 
         // 批量核算户账户信息更新
-        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.TXN_IN.getCode(), "1002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1002");
 
         hmbBaseService.updateMsginSts(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
 

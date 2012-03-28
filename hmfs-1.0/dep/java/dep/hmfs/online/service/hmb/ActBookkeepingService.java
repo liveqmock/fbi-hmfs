@@ -119,9 +119,9 @@ public class ActBookkeepingService {
             }
             hmActStl.setLastTxnDt(strToday);
         }
-        if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
+        if (DCFlagCode.DEPOSIT.getCode().equalsIgnoreCase(dc)) {
             hmActStl.setActBal(hmActStl.getActBal().add(amt));
-        } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
+        } else if (DCFlagCode.WITHDRAW.getCode().equalsIgnoreCase(dc)) {
             hmActStl.setActBal(hmActStl.getActBal().subtract(amt));
             if (hmActStl.getActBal().compareTo(new BigDecimal(0)) < 0) {
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_LESS.getCode());
@@ -168,9 +168,9 @@ public class ActBookkeepingService {
             }
             hmActFund.setLastTxnDt(strToday);
         }
-        if (DCFlagCode.TXN_IN.getCode().equalsIgnoreCase(dc)) {
+        if (DCFlagCode.DEPOSIT.getCode().equalsIgnoreCase(dc)) {
             hmActFund.setActBal(hmActFund.getActBal().add(amt));
-        } else if (DCFlagCode.TXN_OUT.getCode().equalsIgnoreCase(dc)) {
+        } else if (DCFlagCode.WITHDRAW.getCode().equalsIgnoreCase(dc)) {
             hmActFund.setActBal(hmActFund.getActBal().subtract(amt));
             if (hmActFund.getActBal().compareTo(new BigDecimal(0)) < 0) {
                 throw new RuntimeException(CbsErrorCode.FUND_ACT_BAL_LESS.getCode());

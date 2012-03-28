@@ -65,7 +65,7 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
     private TOA handleRefundTxn(String cbsSerialNo, TIA3002 tia3002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> fundInfoList) throws Exception {
 
         // 批量核算户账户信息更新
-        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, fundInfoList, DCFlagCode.TXN_OUT.getCode(), "3002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "3002");
 
         String[] updateFundMsgTypes = {"01033", "01051"};
         List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);

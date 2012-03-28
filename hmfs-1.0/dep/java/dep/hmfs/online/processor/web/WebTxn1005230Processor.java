@@ -60,7 +60,7 @@ public class WebTxn1005230Processor extends WebAbstractHmbProductBizTxnProcessor
 
         // 批量核算户账户信息更新
         actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                refundInfoList, DCFlagCode.TXN_OUT.getCode(), "5230");
+                refundInfoList, DCFlagCode.WITHDRAW.getCode(), "5230");
 
         String[] updateFundMsgTypes = {"01033", "01051"};
         List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msgSn, updateFundMsgTypes);

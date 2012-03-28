@@ -59,7 +59,7 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
     private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> drawInfoList) throws Exception {
 
         // 批量核算户账户信息更新
-        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, drawInfoList, DCFlagCode.TXN_OUT.getCode(), "2002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, drawInfoList, DCFlagCode.WITHDRAW.getCode(), "2002");
 
         hmbBaseService.updateMsginSts(tia2002.body.drawApplyNo, TxnCtlSts.SUCCESS);
 
