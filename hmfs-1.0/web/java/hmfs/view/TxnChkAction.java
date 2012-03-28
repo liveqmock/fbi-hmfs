@@ -45,6 +45,7 @@ public class TxnChkAction implements Serializable {
     private HmChkTxnVO[] selectedRecords;
 
     private int totalCount;
+    private int totalErrorCount;
     private BigDecimal totalAmt;
 
     @ManagedProperty(value = "#{appMngService}")
@@ -73,7 +74,13 @@ public class TxnChkAction implements Serializable {
 
     public String onQueryHmb() {
         try {
+            this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
+            if (totalCount == 0) {
+                MessageUtil.addError("本日无对帐数据。");
+                return null;
+            }
             this.detlList = actInfoService.selectChkTxnResult("00", this.qryParam.getStartDate());
+            this.totalErrorCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -82,7 +89,13 @@ public class TxnChkAction implements Serializable {
 
     public String onQueryCbs() {
         try {
+            this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
             this.detlList = actInfoService.selectChkTxnResult("05", this.qryParam.getStartDate());
+            if (totalCount == 0) {
+                MessageUtil.addError("本日无对帐数据。");
+                return null;
+            }
+            this.totalErrorCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -193,5 +206,13 @@ public class TxnChkAction implements Serializable {
 
     public void setQryParam(ActinfoQryParam qryParam) {
         this.qryParam = qryParam;
+    }
+
+    public int getTotalErrorCount() {
+        return totalErrorCount;
+    }
+
+    public void setTotalErrorCount(int totalErrorCount) {
+        this.totalErrorCount = totalErrorCount;
     }
 }

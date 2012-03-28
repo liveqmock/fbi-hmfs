@@ -41,13 +41,19 @@ public class ActInfoService {
     private HmTxnStlMapper txnStlMapper;
 
     @Resource
-    protected HmMsgInMapper hmMsgInMapper;
+    private HmMsgInMapper hmMsgInMapper;
 
     @Resource
-    protected HmCmnMapper hmCmnMapper;
+    private HmCmnMapper hmCmnMapper;
 
     @Resource
-    protected HmWebTxnMapper hmWebTxnMapper;
+    private HmWebTxnMapper hmWebTxnMapper;
+
+    @Resource
+    private  HmChkTxnMapper hmChkTxnMapper;
+
+    @Resource
+    private  HmChkActMapper hmChkActMapper;
 
 
     public HmSysCtl getAppSysStatus() {
@@ -152,11 +158,24 @@ public class ActInfoService {
     }
 
     //余额对帐结果查询
-    public List<HmChkActVO> selectChkActResult(String sendSysId, String startDate){
-        return  hmWebTxnMapper.selectChkActResult(sendSysId, startDate);
+    public List<HmChkActVO> selectChkActResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectChkActResult(sendSysId, txnDate);
     }
     //流水对帐结果查询
-    public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String startDate){
-        return  hmWebTxnMapper.selectChkTxnResult(sendSysId, startDate);
+    public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectChkTxnResult(sendSysId, txnDate);
+    }
+
+    //按日期统计余额对帐表数据
+    public int countChkActRecordNumber(String txnDate){
+        HmChkActExample example = new HmChkActExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        return  hmChkActMapper.countByExample(example);
+    }
+    //按日期统计流水对帐表数据
+    public int countChkTxnRecordNumber(String txnDate){
+        HmChkTxnExample example = new HmChkTxnExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        return  hmChkTxnMapper.countByExample(example);
     }
 }
