@@ -33,12 +33,12 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="起始帐号:"/>
+                                        <h:outputLabel value="起始帐号:"  style="font-weight: bold"/>
                                         <p:inputText required="true"   requiredMessage="起始帐号必须输入。"
                                                      value="#{actInfoAction.qryParam.startActno}"/>
-                                        <h:outputLabel value="结束帐号:"/>
+                                        <h:outputLabel value="结束帐号:"  style="font-weight: bold"/>
                                         <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
-                                        <h:outputLabel value="帐号状态:"/>
+                                        <h:outputLabel value="帐号状态:"  style="font-weight: bold"/>
                                         <h:selectOneMenu style="width:153px;"
                                                          value="#{actInfoAction.qryParam.actnoStatus}">
                                             <f:selectItems value="#{actInfoAction.actnoStatusList}"/>

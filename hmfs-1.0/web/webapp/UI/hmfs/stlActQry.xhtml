@@ -6,13 +6,6 @@
                 template="/templates/ui.xhtml">
 
     <ui:define name="head">
-        <script type="text/javascript">
-            function doPopupWindow(obj) {
-                var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
-                var popupwindow = window.open("common/actInfoForm.xhtml?pkid=" + pkid, "", "height=600,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
-                popupwindow.focus;
-            }
-        </script>
         <style type="text/css">
             .col-95 {
                 width: 95%;
@@ -26,16 +19,16 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="会计帐号余额信息">
+                <p:tab title="结算帐户余额信息">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
-                                    <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="会计帐号:"/>
+                                    <h:panelGrid columns="2" cellspacing="5">
+                                        <h:outputLabel value="结算帐号:"  style="font-weight: bold"/>
                                         <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
-                                        <h:outputLabel value="帐号状态:"/>
+                                        <h:outputLabel value="帐号状态:"  style="font-weight: bold"/>
                                         <h:selectOneMenu style="width:153px;"
                                                          value="#{actInfoAction.qryParam.actnoStatus}">
                                             <f:selectItems value="#{actInfoAction.actnoStatusList}"/>
@@ -88,4 +81,4 @@
             </p:tabView>
         </div>
     </ui:define>
-</ui:composition>
+   </ui:composition>

@@ -72,6 +72,7 @@ public class ActInfoService {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria()
                 .andActStsEqualTo(param.getActnoStatus());
+        example.setOrderByClause("fund_actno1");
         return actFundMapper.selectByExample(example);
     }
 
@@ -81,6 +82,7 @@ public class ActInfoService {
         example.createCriteria()
                 .andFundActno1Between(param.getStartActno(), param.getEndActno())
                 .andActStsEqualTo(param.getActnoStatus());
+        example.setOrderByClause("fund_actno1");
         return actFundMapper.selectByExample(example);
     }
 
@@ -117,6 +119,7 @@ public class ActInfoService {
         example.createCriteria()
                 .andCbsActnoEqualTo(param.getCbsActno())
                 .andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        example.setOrderByClause("stl_actno, txn_date, txn_time");
         return txnStlMapper.selectByExample(example);
     }
 

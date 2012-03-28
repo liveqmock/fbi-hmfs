@@ -6,13 +6,6 @@
                 template="/templates/ui.xhtml">
 
     <ui:define name="head">
-        <script type="text/javascript">
-            function doPopupWindow(obj) {
-                var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
-                var popupwindow = window.open("common/actInfoForm.xhtml?pkid=" + pkid, "", "height=600,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
-                popupwindow.focus;
-            }
-        </script>
         <style type="text/css">
             .col-95 {
                 width: 95%;
@@ -32,13 +25,13 @@
                             <p:growl id="msgs" showDetail="false"/>
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
-                                    <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="结算帐号:"/>
+                                    <h:panelGrid columns="2" cellspacing="5">
+                                        <h:outputLabel value="结算帐号:"  style="font-weight: bold"/>
                                         <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
-                                        <h:outputLabel value="起始日期:" for="startDate"/>
+                                        <h:outputLabel value="起始日期:" for="startDate"  style="font-weight: bold"/>
                                         <p:inputText id="startDate" required="true" value="#{actInfoAction.qryParam.startDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
-                                        <h:outputLabel value="结束日期:" for="endDate"/>
+                                        <h:outputLabel value="结束日期:" for="endDate"  style="font-weight: bold"/>
                                         <p:inputText id="endDate" required="true" value="#{actInfoAction.qryParam.endDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
                                     </h:panelGrid>
@@ -68,7 +61,7 @@
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="multiple" style="width:18px"/>
                                 <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.cbsAcctno}"/>
+                                    <h:outputText value="#{record.stlActno}"/>
                                 </p:column>
                                 <p:column headerText="交易流水号" style="text-align: center">
                                     <h:outputText value="#{record.txnSn}"/>
