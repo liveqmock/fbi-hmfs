@@ -154,12 +154,12 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
         //SEND_SYS_ID
         int successNumber = 0;
         int failNumber = 0;
-        successNumber = hmCmnMapper.verifyChkaclResult_0(txnDate, SEND_SYS_ID);
+        successNumber = hmCmnMapper.verifyChkaclResult_0(txnDate, SEND_SYS_ID, "00");
         logger.info(txnDate + "对帐成功笔数：" + successNumber);
 
-        failNumber = hmCmnMapper.verifyChkaclResult_11(txnDate, SEND_SYS_ID);
-        failNumber += hmCmnMapper.verifyChkaclResult_12(txnDate, SEND_SYS_ID);
-        failNumber += hmCmnMapper.verifyChkaclResult_2(txnDate, SEND_SYS_ID);
+        failNumber = hmCmnMapper.verifyChkaclResult_11(txnDate, SEND_SYS_ID,"00");
+        failNumber += hmCmnMapper.verifyChkaclResult_12(txnDate, SEND_SYS_ID,"00");
+        failNumber += hmCmnMapper.verifyChkaclResult_2(txnDate, SEND_SYS_ID,"00");
         logger.info(txnDate + "对帐失败笔数：" + failNumber);
 
         return failNumber == 0;

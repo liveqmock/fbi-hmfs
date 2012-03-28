@@ -39,13 +39,13 @@ public class ActInfoAction implements Serializable {
     private String cbsActno;
 
     private List<HmActFund> fundBalList;
-    private List<HmActStl> cbsBalList;
-    private List<HmTxnFund> fundDetlListHm;
-    private List<HmTxnStl> cbsDetlListHm;
+    private List<HmActStl> stlBalList;
+    private List<HmTxnFund> fundDetlList;
+    private List<HmTxnStl> stlDetlList;
     private HmActFund[] selectedFundBalRecords;
-    private HmActStl[] selectedCbsBalRecords;
-    private HmTxnFund[] selectedFundDetlRecordHms;
-    private HmTxnStl[] selectedCbsDetlRecordHms;
+    private HmActStl[] selectedStlBalRecords;
+    private HmTxnFund[] selectedFundDetlRecord;
+    private HmTxnStl[] selectedStlDetlRecord;
 
     private FundActnoStatus fundActnoStatus = FundActnoStatus.NORMAL;
 
@@ -83,9 +83,13 @@ public class ActInfoAction implements Serializable {
 
     private void initList(){
         this.fundBalList = actInfoService.selectAllFundActBalList(qryParam);
-        this.fundDetlListHm = actInfoService.selectFundTxnDetlList(qryParam);
-        this.cbsBalList = actInfoService.selectAllStlActBalList(qryParam);
-        this.cbsDetlListHm = actInfoService.selectStlTxnDetl(qryParam);
+        if (this.fundBalList.size() > 0) {
+            this.qryParam.setStartActno(this.fundBalList.get(0).getFundActno1());
+            this.qryParam.setEndActno(this.fundBalList.get(this.fundBalList.size()-1).getFundActno1());
+        }
+        this.fundDetlList = actInfoService.selectFundTxnDetlList(qryParam);
+        this.stlBalList = actInfoService.selectAllStlActBalList(qryParam);
+        this.stlDetlList = actInfoService.selectStlTxnDetl(qryParam);
     }
 
     public String onQueryFundBal() {
@@ -109,8 +113,8 @@ public class ActInfoAction implements Serializable {
         }
 
         try {
-            this.fundDetlListHm = actInfoService.selectFundTxnDetlList(qryParam);
-            if (fundDetlListHm.isEmpty()) {
+            this.fundDetlList = actInfoService.selectFundTxnDetlList(qryParam);
+            if (fundDetlList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
         } catch (Exception e) {
@@ -120,8 +124,8 @@ public class ActInfoAction implements Serializable {
     }
     public String onQueryCbsBal() {
         try {
-            this.cbsBalList = actInfoService.selectStlActBalList(qryParam);
-            if (cbsBalList.isEmpty()) {
+            this.stlBalList = actInfoService.selectStlActBalList(qryParam);
+            if (stlBalList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
         } catch (Exception e) {
@@ -132,8 +136,8 @@ public class ActInfoAction implements Serializable {
 
     public String onQueryCbsDetl(){
         try {
-            this.cbsDetlListHm = actInfoService.selectStlTxnDetl(qryParam);
-            if (cbsDetlListHm.isEmpty()) {
+            this.stlDetlList = actInfoService.selectStlTxnDetl(qryParam);
+            if (stlDetlList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
         } catch (Exception e) {
@@ -224,12 +228,12 @@ public class ActInfoAction implements Serializable {
         this.fundBalList = fundBalList;
     }
 
-    public List<HmTxnFund> getFundDetlListHm() {
-        return fundDetlListHm;
+    public List<HmTxnFund> getFundDetlList() {
+        return fundDetlList;
     }
 
-    public void setFundDetlListHm(List<HmTxnFund> fundDetlListHm) {
-        this.fundDetlListHm = fundDetlListHm;
+    public void setFundDetlList(List<HmTxnFund> fundDetlList) {
+        this.fundDetlList = fundDetlList;
     }
 
     public HmActFund[] getSelectedFundBalRecords() {
@@ -240,12 +244,12 @@ public class ActInfoAction implements Serializable {
         this.selectedFundBalRecords = selectedFundBalRecords;
     }
 
-    public HmTxnFund[] getSelectedFundDetlRecordHms() {
-        return selectedFundDetlRecordHms;
+    public HmTxnFund[] getSelectedFundDetlRecord() {
+        return selectedFundDetlRecord;
     }
 
-    public void setSelectedFundDetlRecordHms(HmTxnFund[] selectedFundDetlRecordHms) {
-        this.selectedFundDetlRecordHms = selectedFundDetlRecordHms;
+    public void setSelectedFundDetlRecord(HmTxnFund[] selectedFundDetlRecord) {
+        this.selectedFundDetlRecord = selectedFundDetlRecord;
     }
 
     public FundActnoStatus getFundActnoStatus() {
@@ -256,36 +260,36 @@ public class ActInfoAction implements Serializable {
         this.fundActnoStatus = fundActnoStatus;
     }
 
-    public List<HmActStl> getCbsBalList() {
-        return cbsBalList;
+    public List<HmActStl> getStlBalList() {
+        return stlBalList;
     }
 
-    public void setCbsBalList(List<HmActStl> cbsBalList) {
-        this.cbsBalList = cbsBalList;
+    public void setStlBalList(List<HmActStl> stlBalList) {
+        this.stlBalList = stlBalList;
     }
 
-    public List<HmTxnStl> getCbsDetlListHm() {
-        return cbsDetlListHm;
+    public List<HmTxnStl> getStlDetlList() {
+        return stlDetlList;
     }
 
-    public void setCbsDetlListHm(List<HmTxnStl> cbsDetlListHm) {
-        this.cbsDetlListHm = cbsDetlListHm;
+    public void setStlDetlList(List<HmTxnStl> stlDetlList) {
+        this.stlDetlList = stlDetlList;
     }
 
-    public HmActStl[] getSelectedCbsBalRecords() {
-        return selectedCbsBalRecords;
+    public HmActStl[] getSelectedStlBalRecords() {
+        return selectedStlBalRecords;
     }
 
-    public void setSelectedCbsBalRecords(HmActStl[] selectedCbsBalRecords) {
-        this.selectedCbsBalRecords = selectedCbsBalRecords;
+    public void setSelectedStlBalRecords(HmActStl[] selectedStlBalRecords) {
+        this.selectedStlBalRecords = selectedStlBalRecords;
     }
 
-    public HmTxnStl[] getSelectedCbsDetlRecordHms() {
-        return selectedCbsDetlRecordHms;
+    public HmTxnStl[] getSelectedStlDetlRecord() {
+        return selectedStlDetlRecord;
     }
 
-    public void setSelectedCbsDetlRecordHms(HmTxnStl[] selectedCbsDetlRecordHms) {
-        this.selectedCbsDetlRecordHms = selectedCbsDetlRecordHms;
+    public void setSelectedStlDetlRecord(HmTxnStl[] selectedStlDetlRecord) {
+        this.selectedStlDetlRecord = selectedStlDetlRecord;
     }
 
     public String getCbsActno() {

@@ -4,6 +4,7 @@ import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
 import common.repository.hmfs.model.*;
+import common.repository.hmfs.model.hmfs.HmChkActVO;
 import hmfs.common.model.ActinfoQryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,20 +103,21 @@ public class ActInfoService {
 
     //核算户交易明细
     public List<HmTxnFund> selectFundTxnDetlList(ActinfoQryParam param) {
-        HmTxnFundExample exampleHm = new HmTxnFundExample();
-        exampleHm.createCriteria()
+        HmTxnFundExample example = new HmTxnFundExample();
+        example.createCriteria()
                 .andFundActnoBetween(param.getStartActno(), param.getEndActno())
                 .andTxnDateBetween(param.getStartDate(), param.getEndDate());
-        return txnFundMapper.selectByExample(exampleHm);
+        example.setOrderByClause("fund_actno, txn_date, txn_time");
+        return txnFundMapper.selectByExample(example);
     }
 
     //结算户交易明细
     public List<HmTxnStl> selectStlTxnDetl(ActinfoQryParam param) {
-        HmTxnStlExample exampleHm = new HmTxnStlExample();
-        exampleHm.createCriteria()
+        HmTxnStlExample example = new HmTxnStlExample();
+        example.createCriteria()
                 .andCbsActnoEqualTo(param.getCbsActno())
                 .andTxnDateBetween(param.getStartDate(), param.getEndDate());
-        return txnStlMapper.selectByExample(exampleHm);
+        return txnStlMapper.selectByExample(example);
     }
 
     // 查询汇总报文信息  (不判断报文状态)
@@ -139,9 +141,14 @@ public class ActInfoService {
         example.setOrderByClause("MSG_SUB_SN");
         return hmMsgInMapper.selectByExample(example);
     }
-    
+
+    //缴款交易：查询子报文信息
     public List<HmMsgIn> selectSubMsgListByMsgSn(String msgSn){
         return hmWebTxnMapper.selectSubMsgListByMsgSn(msgSn);
     }
 
+    //余额对帐结果查询
+    public List<HmChkActVO> selectChkActResult(String sendSysId1,String sendSysId2, String startDate){
+        return  hmWebTxnMapper.selectChkActResult(sendSysId1,sendSysId2, startDate);
+    }
 }

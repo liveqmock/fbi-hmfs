@@ -34,7 +34,8 @@
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
                                         <h:outputLabel value="起始帐号:"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.startActno}"/>
+                                        <p:inputText required="true" requiredMessage="起始帐号必须输入。"
+                                                     value="#{actInfoAction.qryParam.startActno}"/>
                                         <h:outputLabel value="结束帐号:"/>
                                         <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
                                         <h:outputLabel value="起始日期:" for="startDate"/>
@@ -61,9 +62,9 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{actInfoAction.fundDetlListHm}" var="record"
+                                         value="#{actInfoAction.fundDetlList}" var="record"
                                          rowKey="#{record.pkid}"
-                                         selection="#{actInfoAction.selectedFundDetlRecordHms}"
+                                         selection="#{actInfoAction.selectedFundDetlRecord}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
@@ -83,10 +84,16 @@
                                 <p:column headerText="借贷别" style="text-align: center">
                                     <h:outputText value="#{record.dcFlag}"/>
                                 </p:column>
+                                <p:column headerText="交易时间" style="text-align: center">
+                                    <h:outputText value="#{record.txnDate} #{record.txnTime}"/>
+                                </p:column>
                                 <p:column headerText="上日余额">
                                     <h:outputText value="#{record.lastActBal}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
+                                </p:column>
+                                <p:column headerText="主机交易流水号" style="text-align: center">
+                                    <h:outputText value="#{record.cbsTxnSn}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

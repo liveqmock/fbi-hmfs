@@ -34,35 +34,41 @@ public interface HmCmnMapper {
             "   and actno in (select t1.actno" +
             "                   from (select actno, actbal" +
             "                           from HM_CHK_ACT" +
-            "                          where send_sys_id = #{sendSysId}" +
+            "                          where send_sys_id = #{sendSysId1}" +
             "                            and txn_date = #{txnDate}) t1," +
             "                        (select actno, actbal" +
             "                           from HM_CHK_ACT" +
-            "                          where send_sys_id = '00'" +
+            "                          where send_sys_id = #{sendSysId2}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
             "                    and t1.actbal = t2.actbal)")
-    public int verifyChkaclResult_0(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
+    public int verifyChkaclResult_0(@Param("txnDate") String txnDate,
+                                    @Param("sendSysId1") String sendSysId1,
+                                    @Param("sendSysId2") String sendSysId2);
 
     @Update("update HM_CHK_ACT" +
             "   set chksts = '1'" +
             " where txn_date = #{txnDate}" +
-            "   and send_sys_id = #{sendSysId}" +
+            "   and send_sys_id = #{sendSysId1}" +
             "   and actno not in (select actno" +
             "                       from HM_CHK_ACT" +
-            "                      where send_sys_id = '00'" +
+            "                      where send_sys_id = #{sendSysId2}" +
             "                        and txn_date = #{txnDate})")
-    public int verifyChkaclResult_11(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
+    public int verifyChkaclResult_11(@Param("txnDate") String txnDate,
+                                     @Param("sendSysId1") String sendSysId1,
+                                     @Param("sendSysId2") String sendSysId2);
 
     @Update("update HM_CHK_ACT" +
             "   set chksts = '1'" +
             " where txn_date = #{txnDate}" +
-            "   and send_sys_id = '00'" +
+            "   and send_sys_id = #{sendSysId2}" +
             "   and actno not in (select actno" +
             "                       from HM_CHK_ACT" +
-            "                      where send_sys_id = #{sendSysId}" +
+            "                      where send_sys_id = #{sendSysId1}" +
             "                        and txn_date = #{txnDate})")
-    public int verifyChkaclResult_12(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
+    public int verifyChkaclResult_12(@Param("txnDate") String txnDate,
+                                     @Param("sendSysId1") String sendSysId1,
+                                     @Param("sendSysId2") String sendSysId2);
 
     @Update("update HM_CHK_ACT" +
             "   set chksts = '2'" +
@@ -70,14 +76,16 @@ public interface HmCmnMapper {
             "   and actno in (select t1.actno" +
             "                   from (select actno, actbal" +
             "                           from HM_CHK_ACT" +
-            "                          where send_sys_id = #{sendSysId}" +
+            "                          where send_sys_id = #{sendSysId1}" +
             "                            and txn_date = #{txnDate}) t1," +
             "                        (select actno, actbal" +
             "                           from HM_CHK_ACT" +
-            "                          where send_sys_id = '00'" +
+            "                          where send_sys_id = #{sendSysId2}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
             "                    and t1.actbal != t2.actbal)")
-    public int verifyChkaclResult_2(@Param("txnDate") String txnDate, @Param("sendSysId") String sendSysId);
+    public int verifyChkaclResult_2(@Param("txnDate") String txnDate,
+                                    @Param("sendSysId1") String sendSysId1,
+                                    @Param("sendSysId2") String sendSysId2);
 
 }

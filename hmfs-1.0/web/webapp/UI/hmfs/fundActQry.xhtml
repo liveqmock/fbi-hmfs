@@ -34,7 +34,8 @@
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
                                         <h:outputLabel value="起始帐号:"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.startActno}"/>
+                                        <p:inputText required="true"   requiredMessage="起始帐号必须输入。"
+                                                     value="#{actInfoAction.qryParam.startActno}"/>
                                         <h:outputLabel value="结束帐号:"/>
                                         <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
                                         <h:outputLabel value="帐号状态:"/>
@@ -74,6 +75,9 @@
                                 <p:column headerText="户名" style="text-align: center">
                                     <h:outputText value="#{record.infoName}"/>
                                 </p:column>
+                                <p:column headerText="归属上级帐号" style="text-align: center">
+                                    <h:outputText value="#{record.fundActno2}"/>
+                                </p:column>
                                 <p:column headerText="地址" style="text-align: center">
                                     <h:outputText value="#{record.infoAddr}"/>
                                 </p:column>
@@ -81,6 +85,12 @@
                                     <h:outputText value="#{record.actBal}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
+                                </p:column>
+                                <p:column headerText="分户数/建筑面积" style="text-align: center">
+                                    <h:outputText value="#{record.cellNum}/#{record.builderArea}"/>
+                                </p:column>
+                                <p:column headerText="信息ID/IDTYPE" style="text-align: center">
+                                    <h:outputText value="#{record.infoId1}/#{record.infoIdType1}"/>
                                 </p:column>
                                 <p:column headerText="帐户状态" style="text-align: center">
                                     <h:outputText
