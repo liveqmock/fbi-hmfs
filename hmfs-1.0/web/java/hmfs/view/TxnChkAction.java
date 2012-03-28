@@ -3,7 +3,7 @@ package hmfs.view;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.HmSysCtl;
-import common.repository.hmfs.model.hmfs.HmChkActVO;
+import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
@@ -23,14 +23,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 余额对帐处理
+ * 流水对帐处理
  * zhanrui
  * 2012/3/24
  */
 @ManagedBean
 @ViewScoped
-public class ActChkAction implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(ActChkAction.class);
+public class TxnChkAction implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(TxnChkAction.class);
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
@@ -41,8 +41,8 @@ public class ActChkAction implements Serializable {
     private String sendSysId;
 
 
-    private List<HmChkActVO> detlList;
-    private HmChkActVO[] selectedRecords;
+    private List<HmChkTxnVO> detlList;
+    private HmChkTxnVO[] selectedRecords;
 
     private int totalCount;
     private BigDecimal totalAmt;
@@ -69,12 +69,11 @@ public class ActChkAction implements Serializable {
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
         this.sendSysId = hmSysCtl.getSendSysId();
-        //this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
     }
 
     public String onQueryHmb() {
         try {
-            this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectChkTxnResult("00", this.qryParam.getStartDate());
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -83,7 +82,7 @@ public class ActChkAction implements Serializable {
 
     public String onQueryCbs() {
         try {
-            this.detlList = actInfoService.selectChkActResult("05", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectChkTxnResult("05", this.qryParam.getStartDate());
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -132,19 +131,19 @@ public class ActChkAction implements Serializable {
         this.sendSysId = sendSysId;
     }
 
-    public List<HmChkActVO> getDetlList() {
+    public List<HmChkTxnVO> getDetlList() {
         return detlList;
     }
 
-    public void setDetlList(List<HmChkActVO> detlList) {
+    public void setDetlList(List<HmChkTxnVO> detlList) {
         this.detlList = detlList;
     }
 
-    public HmChkActVO[] getSelectedRecords() {
+    public HmChkTxnVO[] getSelectedRecords() {
         return selectedRecords;
     }
 
-    public void setSelectedRecords(HmChkActVO[] selectedRecords) {
+    public void setSelectedRecords(HmChkTxnVO[] selectedRecords) {
         this.selectedRecords = selectedRecords;
     }
 

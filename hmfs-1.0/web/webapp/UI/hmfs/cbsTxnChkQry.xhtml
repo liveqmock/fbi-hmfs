@@ -6,11 +6,98 @@
                 template="/templates/ui.xhtml">
 
     <ui:define name="head">
+        <style type="text/css">
+            .col-95 {
+                width: 95%;
+            }
+            .col-5 {
+                width: 5%;
+            }
+        </style>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="...">
+                <p:tab title=" 主机流水对帐结果查询">
+                    <h:form>
+                        <div id="qrytable">
+                            <p:messages id="msgs" showDetail="false"/>
+                            <p:panel style="margin-top:10px">
+                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                    <h:panelGrid columns="2" cellspacing="5">
+                                        <h:outputLabel value="业务日期:" style="font-weight: bold"/>
+                                        <p:inputText required="true" size="25"
+                                                     requiredMessage="起始日期不能为空。"
+                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"
+                                                     value="#{txnChkAction.qryParam.startDate}"/>
+                                    </h:panelGrid>
+                                    <h:panelGrid id="buttons">
+                                        <p:commandButton style="width:110px;" value=" 查  询 "
+                                                         action="#{txnChkAction.onQueryCbs}"
+                                                         update="pdt,msgs">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:panel>
+                            <p:ajaxStatus style="height:18px;text-align:center">
+                                <f:facet name="start">
+                                    <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                                </f:facet>
+                                <f:facet name="complete">
+                                    <h:outputText value=""/>
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:dataTable id="pdt" dynamic="true" style="width:100%;"
+                                         value="#{txnChkAction.detlList}" var="record"
+                                         rowKey="#{record.pkid1}"
+                                         selection="#{txnChkAction.selectedRecords}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
+                                         paginator="true" rows="15" paginatorPosition="bottom"
+                                         rowsPerPageTemplate="100,50,30,15,5"
+                                         emptyMessage="数据记录为空...">
+                                <p:columnGroup type="header">
+                                    <p:row>
+                                        <p:column rowspan="2" headerText="交易日期" />
+                                        <p:column colspan="3" headerText="维修资金管理平台数据" />
+                                        <p:column colspan="3" headerText="主机端数据" />
+                                    </p:row>
+                                    <p:row>
+                                        <p:column headerText="帐号" />
+                                        <p:column headerText="流水号" />
+                                        <p:column headerText="交易发生额" />
+                                        <p:column headerText="帐号" />
+                                        <p:column headerText="流水号" />
+                                        <p:column headerText="交易发生额" />
+                                    </p:row>
+                                </p:columnGroup>
+                                <p:column headerText="交易日期" style="text-align: center">
+                                    <h:outputText value="#{txnChkAction.qryParam.startDate}"/>
+                                </p:column>
+                                <p:column headerText="帐号" style="text-align: center">
+                                    <h:outputText value="#{record.actno1}"/>
+                                </p:column>
+                                <p:column headerText="流水号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSn1}"/>
+                                </p:column>
+                                <p:column headerText="交易发生额">
+                                    <h:outputText value="#{record.txnamt1==0? '':record.txnamt1}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="帐号" style="text-align: center">
+                                    <h:outputText value="#{record.actno2}"/>
+                                </p:column>
+                                <p:column headerText="流水号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSn2}"/>
+                                </p:column>
+                                <p:column headerText="交易发生额">
+                                    <h:outputText value="#{record.txnamt2==0? '':record.txnamt2}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
                 </p:tab>
             </p:tabView>
         </div>

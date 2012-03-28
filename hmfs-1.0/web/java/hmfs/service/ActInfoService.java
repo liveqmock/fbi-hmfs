@@ -5,6 +5,7 @@ import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
 import common.repository.hmfs.model.*;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
+import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import hmfs.common.model.ActinfoQryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,11 @@ public class ActInfoService {
     }
 
     //余额对帐结果查询
-    public List<HmChkActVO> selectChkActResult(String sendSysId1,String sendSysId2, String startDate){
-        return  hmWebTxnMapper.selectChkActResult(sendSysId1,sendSysId2, startDate);
+    public List<HmChkActVO> selectChkActResult(String sendSysId, String startDate){
+        return  hmWebTxnMapper.selectChkActResult(sendSysId, startDate);
+    }
+    //流水对帐结果查询
+    public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String startDate){
+        return  hmWebTxnMapper.selectChkTxnResult(sendSysId, startDate);
     }
 }
