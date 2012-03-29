@@ -106,14 +106,15 @@ public class AppMngAction implements Serializable {
     }
 
     /**
-     * 日终余额对帐
+     * 日终国土局对帐
      *
      * @return
      */
-    public String onCheckBal() {
+    public String onHmbDailyChk() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)) {
+        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)
+                ||sysCtlSts.equals(SysCtlSts.SIGNOUT)) {
             try {
                 String response = depService.process("1007003");
                 if (response.startsWith("0000")) { //成功
@@ -126,29 +127,31 @@ public class AppMngAction implements Serializable {
                 MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
-            MessageUtil.addError("主机对帐成功后方可进行国土局对帐。");
+            MessageUtil.addError("签退后或主机对帐后方可进行国土局对帐。");
         }
         init();
         return null;
     }
 
-    public String onCheckDetl() {
+    //每日主机对帐(供非联机模式使用)
+    public String onCbsDailyChk() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS) ||sysCtlSts.equals(SysCtlSts.HMB_BALCHK_SUCCESS)) {
+        if (sysCtlSts.equals(SysCtlSts.SIGNOUT)) {
             try {
-                String response = depService.process("1007004");
+                //TODO  需重新定义交易号
+                String response = depService.process("---");
                 if (response.startsWith("0000")) { //成功
-                    MessageUtil.addInfo("流水对帐处理完成，流水对帐成功。");
+                    MessageUtil.addInfo("对帐处理完成，主机对帐成功。");
                 }else{
-                    MessageUtil.addError("流水对帐处理未完成。" + response);
+                    MessageUtil.addError("主机对帐处理未完成。" + response);
                 }
             } catch (Exception e) {
-              logger.error("对帐处理失败， 请重新发起对帐。" ,e);
-               MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
+              logger.error("处理失败， 请重新发起对帐。" ,e);
+               MessageUtil.addError("处理失败， 请重新发起对帐。" + e.getMessage());
             }
         } else {
-            MessageUtil.addError("主机对帐成功或国土局余额对帐完成后方可进行国土局流水对帐。");
+            MessageUtil.addError("签退后方可与主机对帐。");
         }
         init();
         return null;

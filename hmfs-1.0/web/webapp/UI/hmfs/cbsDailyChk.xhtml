@@ -70,7 +70,7 @@
             <div class="entry" id="top">
                 <p:growl id="growl"/>
                 <h:form id="form">
-                    <p:panel header="国土局流水对帐操作" id="input" style="width:550px;">
+                    <p:panel header="与银行核心业务主机对帐操作" id="input" style="width:550px;">
                         <h:panelGrid columns="2" cellspacing="5" style="margin-top:15px;margin-left: 20px"
                                      columnClasses="input-col-xl,input-col-xl">
                             <h:outputLabel value="当前系统日期:"/>
@@ -85,8 +85,8 @@
                         </h:panelGrid>
                         <p:separator/>
                         <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
-                            <h:commandButton id="nextButton" value=" 流水对帐 "
-                                             action="#{appMngAction.onCheckDetl}"
+                            <h:commandButton id="nextButton" value="发起对帐 "
+                                             action="#{appMngAction.onCbsDailyChk}"
                                              ajax="false">
                             </h:commandButton>
                         </h:panelGrid>
