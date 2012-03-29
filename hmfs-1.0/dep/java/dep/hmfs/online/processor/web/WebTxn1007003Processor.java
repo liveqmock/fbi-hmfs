@@ -111,6 +111,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor{
             hmbMsgList.add(msg094);
 
             //保存发起对帐的数据到本地数据库
+            //TODO 当日数据清理
             HmChkAct hmChkAct = new HmChkAct();
             hmChkAct.setPkid(UUID.randomUUID().toString());
             hmChkAct.setActno(msg094.settleActno1);

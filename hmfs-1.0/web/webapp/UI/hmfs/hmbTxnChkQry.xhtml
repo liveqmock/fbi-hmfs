@@ -58,16 +58,18 @@
                                 <p:columnGroup type="header">
                                     <p:row>
                                         <p:column rowspan="2" headerText="交易日期" />
-                                        <p:column colspan="3" headerText="维修资金管理平台数据" />
-                                        <p:column colspan="3" headerText="主机端数据" />
+                                        <p:column colspan="4" headerText="维修资金管理平台数据" />
+                                        <p:column colspan="4" headerText="主机端数据" />
                                     </p:row>
                                     <p:row>
                                         <p:column headerText="帐号" />
                                         <p:column headerText="流水号" />
                                         <p:column headerText="交易发生额" />
+                                        <p:column headerText="借贷别" />
                                         <p:column headerText="帐号" />
                                         <p:column headerText="流水号" />
                                         <p:column headerText="交易发生额" />
+                                        <p:column headerText="借贷别" />
                                     </p:row>
                                 </p:columnGroup>
                                 <p:column headerText="交易日期" style="text-align: center">
@@ -84,6 +86,9 @@
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="借贷别" style="text-align: center">
+                                    <h:outputText value="#{record.dcFlag1}"/>
+                                </p:column>
                                 <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.actno2}"/>
                                 </p:column>
@@ -94,6 +99,9 @@
                                     <h:outputText value="#{record.txnamt2==0? '':record.txnamt2}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
+                                </p:column>
+                                <p:column headerText="借贷别" style="text-align: center">
+                                    <h:outputText value="#{record.dcFlag2}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

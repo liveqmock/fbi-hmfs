@@ -99,9 +99,9 @@
                                     <h:outputText value="#{record.txnamt2==0? '':record.txnamt2}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
-                                    <p:column headerText="借贷别" style="text-align: center">
-                                        <h:outputText value="#{record.dcFlag2}"/>
-                                    </p:column>
+                                </p:column>
+                                <p:column headerText="借贷别" style="text-align: center">
+                                    <h:outputText value="#{record.dcFlag2}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

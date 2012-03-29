@@ -80,11 +80,11 @@
             resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
             select * from (
              select t1.pkid as pkid1,
-                    t1.txn_date as txn_date1,
+                    t1.txn_date as txnDate1,
                     t1.actno as actno1,
                     t1.actbal as actbal1,
                     t2.pkid as pkid2,
-                    t2.txn_date as txn_date2,
+                    t2.txn_date as txnDate2,
                     t2.actno as actno2,
                     t2.actbal as actbal2
                from HM_CHK_ACT t1, HM_CHK_ACT t2
@@ -96,11 +96,11 @@
                 and t1.actbal != t2.actbal
             union all
              select t1.pkid as pkid1,
-                    t1.txn_date as txn_date1,
+                    t1.txn_date as txnDate1,
                     t1.actno as actno1,
                     t1.actbal as actbal1,
                     '' as pkid2,
-                    '' as txn_date2,
+                    '' as txnDate2,
                     '' as actno2,
                     0 as actbal2
                from HM_CHK_ACT t1
@@ -112,11 +112,11 @@
                                         and t2.txn_date = #{txnDate})
             union all
              select '' as pkid1,
-                    '' as txn_date1,
+                    '' as txnDate1,
                     '' as actno1,
                     0 as actbal1,
                     t2.pkid as pkid2,
-                    t2.txn_date as txn_date2,
+                    t2.txn_date as txnDate2,
                     t2.actno as actno2,
                     t2.actbal as actbal2
                from HM_CHK_ACT t2
@@ -135,15 +135,17 @@
             resultType="common.repository.hmfs.model.hmfs.HmChkTxnVO">
             select * from (
                  select t1.pkid     as pkid1,
-                        t1.txn_date as txn_date1,
+                        t1.txn_date as txnDate1,
                         t1.actno    as actno1,
                         t1.txnamt   as txnamt1,
-                        t1.msg_sn   as msg_sn1,
+                        t1.msg_sn   as msgSn1,
+                        t1.dc_flag   as dcFlag1,
                         t2.pkid     as pkid2,
-                        t2.txn_date as txn_date2,
+                        t2.txn_date as txnDate2,
                         t2.actno    as actno2,
                         t2.txnamt   as txnamt2,
-                        t2.msg_sn   as msg_sn2
+                        t2.msg_sn   as msgSn2,
+                        t2.dc_flag   as dcFlag2
                    from HM_CHK_TXN t1, HM_CHK_TXN t2
                   where t1.txn_date = #{txnDate}
                     and t1.txn_date = t2.txn_date
@@ -153,15 +155,17 @@
                     and (t1.txnamt != t2.txnamt or t1.dc_flag != t2.dc_flag)
                 union all
                    select   t1.pkid     as pkid1,
-                            t1.txn_date as txn_date1,
+                            t1.txn_date as txnDate1,
                             t1.actno    as actno1,
                             t1.txnamt   as txnamt1,
-                            t1.msg_sn   as msg_sn1,
+                            t1.msg_sn   as msgSn1,
+                            t1.dc_flag   as dcFlag1,
                             ''     as pkid2,
                             '' as txn_date2,
                             ''    as actno2,
                             0   as txnamt2,
-                            ''   as msg_sn2
+                            ''   as msgSn2,
+                            ''   as dcFlag2
                       from HM_CHK_TXN t1
                      where t1.txn_date = #{txnDate}
                        and t1.send_sys_id = #{sendSysId}
@@ -170,16 +174,18 @@
                                               where t2.send_sys_id = '99'
                                                 and t2.txn_date = #{txnDate})
             union all
-                 select t2.pkid     as pkid1,
-                        '' as txn_date1,
+                 select t2.pkid  as pkid1,
+                        '' as txnDate1,
                         ''    as actno1,
                         0   as txnamt1,
-                        ''   as msg_sn1,
+                        ''   as msgSn1,
+                        ''   as dcFlag1,
                         t2.pkid     as pkid2,
-                        t2.txn_date as txn_date2,
+                        t2.txn_date as txnDate2,
                         t2.actno    as actno2,
                         t2.txnamt   as txnamt2,
-                        t2.msg_sn   as msg_sn2
+                        t2.msg_sn   as msgSn2,
+                        t2.dc_flag   as dcFlag2
                   from HM_CHK_TXN t2
                  where t2.txn_date = #{txnDate}
                    and t2.send_sys_id = '99'
