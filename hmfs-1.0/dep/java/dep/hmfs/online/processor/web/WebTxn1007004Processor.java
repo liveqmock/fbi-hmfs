@@ -1,13 +1,12 @@
 package dep.hmfs.online.processor.web;
 
-import common.repository.hmfs.dao.HmChkActMapper;
 import common.repository.hmfs.model.HmChkAct;
 import dep.hmfs.online.processor.hmb.domain.*;
-import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +19,17 @@ import java.util.Map;
  */
 @Component
 public class WebTxn1007004Processor extends WebAbstractHmbProductTxnProcessor {
-    @Resource
-    private HmbSysTxnService hmbSysTxnService;
-    @Resource
-    private HmChkActMapper hmChkActMapper;
 
     @Override
     public String process(String request) {
         String txnCode = "7004";
+
+        String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+
+        //清理本日旧数据
+        deleteOldTxnChkDataByTxnDate(txnDate, "99");
+        deleteOldTxnChkDataByTxnDate(txnDate, "00");
+
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode));
 
@@ -59,6 +61,8 @@ public class WebTxn1007004Processor extends WebAbstractHmbProductTxnProcessor {
         msg001.bizType = "#"; //?
         msg001.origTxnCode = "#"; //TODO ????
         hmbMsgList.add(msg001);
+
+        //TODO 处理本地数据
 
         //子报文处理  095-核算户 092-结算户
         return messageFactory.marshal(txnCode, hmbMsgList);
