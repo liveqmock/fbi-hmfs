@@ -42,6 +42,7 @@ public class ActChkAction implements Serializable {
 
 
     private List<HmChkActVO> detlList;
+    private HmChkActVO selectedRecord;
     private HmChkActVO[] selectedRecords;
 
     private int totalCount;
@@ -216,5 +217,13 @@ public class ActChkAction implements Serializable {
 
     public void setTotalErrorCount(int totalErrorCount) {
         this.totalErrorCount = totalErrorCount;
+    }
+
+    public HmChkActVO getSelectedRecord() {
+        return selectedRecord;
+    }
+
+    public void setSelectedRecord(HmChkActVO selectedRecord) {
+        this.selectedRecord = selectedRecord;
     }
 }

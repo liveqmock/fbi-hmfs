@@ -42,6 +42,7 @@ public class TxnChkAction implements Serializable {
 
 
     private List<HmChkTxnVO> detlList;
+    private HmChkTxnVO selectedRecord;
     private HmChkTxnVO[] selectedRecords;
 
     private int totalCount;
@@ -214,5 +215,13 @@ public class TxnChkAction implements Serializable {
 
     public void setTotalErrorCount(int totalErrorCount) {
         this.totalErrorCount = totalErrorCount;
+    }
+
+    public HmChkTxnVO getSelectedRecord() {
+        return selectedRecord;
+    }
+
+    public void setSelectedRecord(HmChkTxnVO selectedRecord) {
+        this.selectedRecord = selectedRecord;
     }
 }

@@ -111,7 +111,7 @@
                                       where t2.send_sys_id = '99'
                                         and t2.txn_date = #{txnDate})
             union all
-             select '' as pkid1,
+             select t2.pkid as pkid1,
                     '' as txnDate1,
                     '' as actno1,
                     0 as actbal1,
