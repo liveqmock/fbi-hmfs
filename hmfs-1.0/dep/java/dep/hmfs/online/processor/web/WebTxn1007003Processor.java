@@ -29,6 +29,8 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         //清理本日旧数据
         deleteOldActChkDataByTxnDate(txnDate, "99");
         deleteOldActChkDataByTxnDate(txnDate, "00");
+        deleteOldTxnChkDataByTxnDate(txnDate, "99");
+        deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode, txnDate));
@@ -47,7 +49,6 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             //保存国土局到本地数据库
             processChkBalResponse(msgList, txnDate);
         }
-
 
         //数据核对处理
         if (verifyActBalData(txnDate)) {

@@ -18,6 +18,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@Deprecated
 public class WebTxn1007004Processor extends WebAbstractHmbProductTxnProcessor {
 
     @Override
