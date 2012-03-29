@@ -21,17 +21,6 @@ import javax.annotation.Resource;
 public abstract class WebAbstractHmbProductTxnProcessor extends  WebAbstractHmbTxnProcessor{
     protected static final Logger logger = LoggerFactory.getLogger(WebAbstractHmbProductTxnProcessor.class);
 
-    @Resource
-    protected HmbSysTxnService hmbSysTxnService;
-
-    @Resource
-    protected HmCmnMapper hmCmnMapper;
-
-    @Resource
-    protected HmChkActMapper hmChkActMapper;
-
-    @Resource
-    protected HmChkTxnMapper hmChkTxnMapper;
 
     @Override
     public String run(String request){

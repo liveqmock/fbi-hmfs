@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.web;
 
+import common.enums.SysCtlSts;
 import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmActStl;
 import common.repository.hmfs.model.HmChkAct;
@@ -18,7 +19,6 @@ import java.util.*;
  */
 @Component
 public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
-
 
     @Override
     public String process(String request) {
@@ -48,8 +48,11 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             processChkBalResponse(msgList, txnDate);
         }
 
+
         //数据核对处理
         if (verifyActBalData(txnDate)) {
+            //置系统控制表状态
+            updateSysCtlStatus(SysCtlSts.HMB_CHK_SUCCESS);
             return "0000|余额对帐交易成功";
         } else {
             return "9999|余额对帐交易失败";

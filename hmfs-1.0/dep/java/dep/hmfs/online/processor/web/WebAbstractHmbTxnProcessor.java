@@ -1,6 +1,11 @@
 package dep.hmfs.online.processor.web;
 
+import common.enums.SysCtlSts;
+import common.repository.hmfs.dao.HmChkActMapper;
+import common.repository.hmfs.dao.HmChkTxnMapper;
 import common.repository.hmfs.dao.HmSysCtlMapper;
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
+import common.repository.hmfs.model.HmSysCtl;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
@@ -40,6 +45,16 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
     @Resource
     protected HmbSysTxnService hmbSysTxnService;
 
+    @Resource
+    protected HmCmnMapper hmCmnMapper;
+
+    @Resource
+    protected HmChkActMapper hmChkActMapper;
+
+    @Resource
+    protected HmChkTxnMapper hmChkTxnMapper;
+
+
     protected XSocketBlockClient socketBlockClient;
     protected String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
     protected int hmfsServerPort = PropertyManager.getIntProperty("socket_server_port_hmfs");
@@ -74,17 +89,24 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
      * @param submsgNum
      * @param isInitStart 是否是交易的第一个发起方
      */
-    public void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
+    protected void assembleSummaryMsg(String txnCode, SummaryMsg msg, int submsgNum, boolean isInitStart) {
         msg.msgSn = hmbTxnsnGenerator.generateTxnsn(txnCode);
         msg.submsgNum = submsgNum;
         msg.sendSysId = SEND_SYS_ID;
         if (isInitStart) {
             msg.origSysId = ORIG_SYS_ID;
         } else {
-            msg.origSysId = "00";
+            //msg.origSysId = "00";
+            //20120329 zhanrui   TODO 需正式确认！
+            msg.origSysId = ORIG_SYS_ID;
         }
         msg.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         msg.msgEndDate = SystemService.formatTodayByPattern("yyyyMMdd");
     }
 
+    protected void updateSysCtlStatus(SysCtlSts sysCtlSts){
+        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+        hmSysCtl.setSysSts(sysCtlSts.getCode());
+        hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
+    }
 }
