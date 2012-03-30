@@ -60,7 +60,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         logger.info("【前台】交易日期：" + tia5001.body.txnDate);
 
         // 删除日期为txnDate的会计账户余额对账记录
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo);
+        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, PropertyManager.getProperty("SEND_SYS_ID"));
         // 新增 日期为txnDate的会计账户余额对账记录
         HmChkAct hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
@@ -70,6 +70,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         hmChkAct.setActbal(new BigDecimal(tia5001.body.accountBalance));
         hmbActinfoService.insertChkAct(hmChkAct);
 
+        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
         // DEP 会计(结算)账户余额
         HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
         hmChkAct = new HmChkAct();
@@ -82,7 +83,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
 
         // 获取明细，开始主机对账
         // 删除会计账号交易明细对账记录
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo);
+        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, PropertyManager.getProperty("SEND_SYS_ID"));
 
         if (bytes.length > 54) {
             byte[] detailBytes = new byte[bytes.length - 54];
@@ -117,6 +118,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         }
 
         List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryTxnstlsByDate(tia5001.body.txnDate);
+        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
         for (HmTxnStl txnStl : hmTxnStlList) {
             HmChkTxn hmChkTxn = new HmChkTxn();
             hmChkTxn.setPkid(UUID.randomUUID().toString());

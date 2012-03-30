@@ -47,9 +47,9 @@ public class HmbActinfoService {
     private HmChkTxnMapper hmChkTxnMapper;
     
     @Transactional
-    public int deleteCbsChkActByDate(String date8, String cbsActno) {
+    public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {
         HmChkActExample example = new HmChkActExample();
-        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno);
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
         return hmChkActMapper.deleteByExample(example);
     }
 
@@ -59,9 +59,9 @@ public class HmbActinfoService {
     }
     
     @Transactional
-    public int deleteCbsChkTxnByDate(String date8, String cbsActno) {
+    public int deleteCbsChkTxnByDate(String date8, String cbsActno, String sendSysId) {
         HmChkTxnExample example = new HmChkTxnExample();
-        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno);
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
         return hmChkTxnMapper.deleteByExample(example);
     }
 
