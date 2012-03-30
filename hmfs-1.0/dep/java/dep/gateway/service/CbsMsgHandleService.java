@@ -49,6 +49,9 @@ public class CbsMsgHandleService implements IMessageHandler {
             strBuilder.append(tiaHeader.txnCode);
             if ("1001".equals(tiaHeader.txnCode)) {
                 strBuilder.append("120319004843521000010.00           ");
+                if("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                    strBuilder.append("120319004843521000010.00           2   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
+                }
             } else if ("1002".equals(tiaHeader.txnCode)) {
                 strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
             } else if ("2001".equals(tiaHeader.txnCode)) {

@@ -2,9 +2,7 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
-import common.repository.hmfs.dao.HmActFundMapper;
-import common.repository.hmfs.dao.HmActStlMapper;
-import common.repository.hmfs.dao.HmTxnStlMapper;
+import common.repository.hmfs.dao.*;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
@@ -43,6 +41,34 @@ public class HmbActinfoService {
     private HmActStlMapper hmActStlMapper;
     @Autowired
     private HmTxnStlMapper hmTxnStlMapper;
+    @Autowired
+    private HmChkActMapper hmChkActMapper;
+    @Autowired
+    private HmChkTxnMapper hmChkTxnMapper;
+    
+    @Transactional
+    public int deleteCbsChkActByDate(String date8, String cbsActno) {
+        HmChkActExample example = new HmChkActExample();
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno);
+        return hmChkActMapper.deleteByExample(example);
+    }
+
+    @Transactional
+    public int insertChkAct(HmChkAct hmChkAct) {
+        return hmChkActMapper.insert(hmChkAct);
+    }
+    
+    @Transactional
+    public int deleteCbsChkTxnByDate(String date8, String cbsActno) {
+        HmChkTxnExample example = new HmChkTxnExample();
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno);
+        return hmChkTxnMapper.deleteByExample(example);
+    }
+
+    @Transactional
+    public int insertChkTxn(HmChkTxn hmChkTxn) {
+        return hmChkTxnMapper.insert(hmChkTxn);
+    }
 
     public List<HmTxnStl> qryTxnstlsByDate(String txnDate) {
         HmTxnStlExample example = new HmTxnStlExample();
