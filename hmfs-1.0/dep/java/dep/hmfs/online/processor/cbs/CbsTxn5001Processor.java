@@ -149,7 +149,6 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                     logger.info("【本地会计账户】流水号：" + hmTxnStl.getTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
                             " ==记账方向： " + hmTxnStl.getDcFlag());
 
-
                     if (!r.txnSerialNo.equals(hmTxnStl.getTxnSn())
                             || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
                             || !r.txnType.equals(hmTxnStl.getDcFlag())) {
