@@ -18,6 +18,7 @@ public enum CbsErrorCode implements EnumApp {
     CBS_ACT_NOT_EXIST("2002", "该账户不存在"),
     CBS_ACT_BAL_ERROR("2003", "账户余额不一致"),
     CBS_ACT_TXNS_ERROR("2004", "账户交易明细不一致"),
+    CBS_ACT_CHK_DATE_ERROR("2005", "对账日期错误"),
 
     FUND_ACT_BAL_LESS("3001", "核算账户余额不足"),
     FUND_ACT_NOT_EXIST("3002", "该核算户不存在"),
