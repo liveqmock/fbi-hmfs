@@ -1,5 +1,6 @@
 package dep;
 
+import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,8 @@ public class Bootstrap {
     public static void main(String[] args) {
         try {
             ContainerManager.init();
+            logger.info("【当前系统状态】【"+ PropertyManager.getProperty("hmfs_sys_status_flag") + "】");
+
             logger.info("====== Dep Server 初始化结束==========");
         } catch (IOException e) {
             logger.error("====== Dep Server 初始化失败==========", e);

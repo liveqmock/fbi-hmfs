@@ -12,13 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by IntelliJ IDEA.
- * User: zhangxiaobo
- * Date: 11-8-18
- * Time: 上午2:27
- * To change this template use File | Settings | File Templates.
- */
 /*
 A2流水号	（16位）
 A3错误码	（4位）
@@ -42,18 +35,53 @@ public class CbsMsgHandleService implements IMessageHandler {
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
+
         // =======================================
+
         if ("debug".equalsIgnoreCase(PropertyManager.getProperty("hmfs_sys_status_flag"))) {
-            logger.info("【当前系统状态】【Debug】");
+            logger.info("【当前系统状态】【debug】");
             strBuilder.append("0000");
             strBuilder.append(tiaHeader.txnCode);
             if ("1001".equals(tiaHeader.txnCode)) {
-                strBuilder.append("120319004843521000010.00           ");
-                if("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
-                    strBuilder.append("120319004843521000010.00           2   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
+                if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                    strBuilder.append("120319004843521000010.00           2   " +
+                            StringUtils.rightPad("张三", 180, " ") +
+                            StringUtils.rightPad("500.00", 16, " ") +
+                            StringUtils.rightPad("深圳路", 256, " ") +
+                            StringUtils.rightPad("98.88", 16, " ") +
+                            StringUtils.rightPad("89901111", 40, " ") +
+                            StringUtils.rightPad("10000", 20, " ") +
+                            StringUtils.rightPad("30", 20, " ") +
+                            StringUtils.rightPad("119090909090", 12, " ") +
+                            StringUtils.rightPad("李四", 180, " ") +
+                            StringUtils.rightPad("500.00", 16, " ") +
+                            StringUtils.rightPad("深圳路", 256, " ") +
+                            StringUtils.rightPad("98.78", 16, " ") +
+                            StringUtils.rightPad("89901110", 40, " ") +
+                            StringUtils.rightPad("13000", 20, " ") +
+                            StringUtils.rightPad("30", 20, " ") +
+                            StringUtils.rightPad("119090909091", 12, " "));
+                } else {
+                    strBuilder.append("120319004843521000010.00           ");
                 }
             } else if ("1002".equals(tiaHeader.txnCode)) {
-                strBuilder.append("1203190048435210002   张三|500.00|深圳路|98.88|110|0|100|30|11111111\n李四|500.00|深圳路|98.88|110|0|100|30|11111110");
+                strBuilder.append("1203190048435210002   " +
+                        StringUtils.rightPad("张三", 180, " ") +
+                        StringUtils.rightPad("500.00", 16, " ") +
+                        StringUtils.rightPad("深圳路", 256, " ") +
+                        StringUtils.rightPad("98.88", 16, " ") +
+                        StringUtils.rightPad("89901111", 40, " ") +
+                        StringUtils.rightPad("10000", 20, " ") +
+                        StringUtils.rightPad("30", 20, " ") +
+                        StringUtils.rightPad("119090909090", 12, " ") +
+                        StringUtils.rightPad("李四", 180, " ") +
+                        StringUtils.rightPad("500.00", 16, " ") +
+                        StringUtils.rightPad("深圳路", 256, " ") +
+                        StringUtils.rightPad("98.78", 16, " ") +
+                        StringUtils.rightPad("89901110", 40, " ") +
+                        StringUtils.rightPad("13000", 20, " ") +
+                        StringUtils.rightPad("30", 20, " ") +
+                        StringUtils.rightPad("119090909091", 12, " "));
             } else if ("2001".equals(tiaHeader.txnCode)) {
                 strBuilder.append("12031900484352100002.00            ");
             } else if ("3001".equals(tiaHeader.txnCode)) {
@@ -91,10 +119,11 @@ public class CbsMsgHandleService implements IMessageHandler {
             }
         }
 
-        // ======================================
+        // =========================================================
+
         try {
-            CbsAbstractTxnProcessor txnProcessorCbs = (CbsAbstractTxnProcessor) ContainerManager.getBean("cbsTxn" + tiaHeader.txnCode + "Processor");
-            toa = txnProcessorCbs.run(tiaHeader.serialNo, datagramBytes);
+            CbsAbstractTxnProcessor cbsTxnProcessor = (CbsAbstractTxnProcessor) ContainerManager.getBean("cbsTxn" + tiaHeader.txnCode + "Processor");
+            toa = cbsTxnProcessor.run(tiaHeader.serialNo, datagramBytes);
             strBuilder.append("0000");
         } catch (Exception e) {
             logger.error("交易处理发生异常！", e);
@@ -106,16 +135,10 @@ public class CbsMsgHandleService implements IMessageHandler {
         }
 
         strBuilder.append(tiaHeader.txnCode);
-        if (toa != null)
-
-        {
+        if (toa != null) {
             strBuilder.append(toa.toString());
         }
-
         String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
-
-        return (totalLength + strBuilder.toString()).
-
-                getBytes();
+        return (totalLength + strBuilder.toString()).getBytes();
     }
 }

@@ -50,17 +50,15 @@ public class TOA1002 extends TOA implements Serializable {
                     delimiter = "|";
                 }
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountName)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(txAmt)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(address)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseArea)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(phoneNo)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseType)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(projAmt)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(payPart)).append("|");
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountName)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(txAmt)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(address)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseArea)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(phoneNo)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseType)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(projAmt)).append(delimiter);
+                stringBuilder.append(emptyToUnderlineAndWipeVertical(payPart)).append(delimiter);
                 stringBuilder.append(emptyToUnderlineAndWipeVertical(accountNo));
-
-                System.out.println(stringBuilder.toString());
                 return stringBuilder.toString();
             }
         }

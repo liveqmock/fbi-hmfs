@@ -3,6 +3,7 @@ package dep.hmfs.online.processor.cbs.domain.txn;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.base.TOABody;
 import dep.hmfs.online.processor.cbs.domain.base.TOAHeader;
+import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -54,22 +55,17 @@ public class TOA1001 extends TOA implements Serializable {
             public String payPart = "";
             public String accountNo = "";
 
-            public String toStringByDelimiter(String delimiter) {
-                if (delimiter == null) {
-                    delimiter = "|";
-                }
+            public String toFixedLengthString() {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountName)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(txAmt)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(address)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseArea)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(phoneNo)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseType)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(projAmt)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(payPart)).append("|");
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountNo));
-
-                System.out.println(stringBuilder.toString());
+                stringBuilder.append(StringUtils.rightPad(accountName, 180, " "));
+                stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
+                stringBuilder.append(StringUtils.rightPad(address, 256, " "));
+                stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
+                stringBuilder.append(StringUtils.rightPad(phoneNo, 40, " "));
+                stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
+                stringBuilder.append(StringUtils.rightPad(projAmt, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(payPart, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(accountNo, 12, " "));
                 return stringBuilder.toString();
             }
         }
@@ -83,20 +79,18 @@ public class TOA1001 extends TOA implements Serializable {
         stringBuilder.append(body.payFlag);
         stringBuilder.append(StringUtils.rightPad(body.payAmt, 16, " "));
 
-        if (!StringUtils.isEmpty(body.payDetailNum)) {
-            stringBuilder.append(StringUtils.rightPad(body.payDetailNum, 4, " "));
-        }
-        if (body.recordList.size() > 0) {
-            for (Body.Record record : body.recordList) {
-                stringBuilder.append(record.toStringByDelimiter("|"));
-                stringBuilder.append("\n");
+        if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+            if (!StringUtils.isEmpty(body.payDetailNum)) {
+                stringBuilder.append(StringUtils.rightPad(body.payDetailNum, 4, " "));
+                if (body.recordList.size() > 0) {
+                    for (Body.Record record : body.recordList) {
+                        stringBuilder.append(record.toFixedLengthString());
+                    }
+                }
             }
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         }
+
         return stringBuilder.toString();
     }
 
-    private static String emptyToUnderlineAndWipeVertical(String field) {
-        return StringUtils.isEmpty(field) ? "" : field.replaceAll("\\|", "");
-    }
 }
