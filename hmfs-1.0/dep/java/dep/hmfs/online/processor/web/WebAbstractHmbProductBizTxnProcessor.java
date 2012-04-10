@@ -6,6 +6,7 @@ import common.repository.hmfs.dao.HmSysCtlMapper;
 import common.repository.hmfs.model.HmSysCtl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -19,6 +20,7 @@ public abstract class WebAbstractHmbProductBizTxnProcessor extends WebAbstractHm
     protected HmSysCtlMapper hmSysCtlMapper;
 
     @Override
+    @Transactional
     public String run(String request) {
         HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
         if (!SysCtlSts.SIGNON.getCode().equals(hmSysCtl.getSysSts())) {

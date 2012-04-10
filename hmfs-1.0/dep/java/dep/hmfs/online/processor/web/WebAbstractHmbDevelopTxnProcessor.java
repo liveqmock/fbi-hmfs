@@ -4,6 +4,7 @@ import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,6 +22,7 @@ public abstract class WebAbstractHmbDevelopTxnProcessor extends WebAbstractHmbTx
     protected int hmfsServerTimeout = PropertyManager.getIntProperty("socket_server_timeout");
 
     @Override
+    @Transactional
     public String run(String request){
         return process(request);
     }

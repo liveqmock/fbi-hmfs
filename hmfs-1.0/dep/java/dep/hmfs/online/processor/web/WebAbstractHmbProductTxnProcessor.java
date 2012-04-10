@@ -1,15 +1,10 @@
 package dep.hmfs.online.processor.web;
 
-import common.repository.hmfs.dao.HmChkActMapper;
-import common.repository.hmfs.dao.HmChkTxnMapper;
-import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.HmChkActExample;
 import common.repository.hmfs.model.HmChkTxnExample;
-import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Resource;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +18,7 @@ public abstract class WebAbstractHmbProductTxnProcessor extends  WebAbstractHmbT
 
 
     @Override
+    @Transactional
     public String run(String request){
         //TODO ¼ì²éÏµÍ³×´Ì¬
          return process(request);

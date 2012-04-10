@@ -16,7 +16,6 @@ import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -63,7 +62,6 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
 
-    @Transactional
     public abstract String run(String request);
 
     protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
