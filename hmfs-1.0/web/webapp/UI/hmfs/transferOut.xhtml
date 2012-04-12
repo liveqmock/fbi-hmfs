@@ -15,38 +15,11 @@
                 width: 5%;
             }
         </style>
-        <script language="JavaScript" type="text/JavaScript">
-            //<![CDATA[
-            function KeyDown() {
-                if (event.keyCode == 13) {
-                    if (event.srcElement.id == 'inputform:tellerid') {
-                        checktellerid();
-                        event.keyCode = 9;
-                    } else {
-                        event.keyCode = 9;
-                    }
-                }
-            }
-
-            function printAllVch() {
-                alert(pdtvar.toString());
-                //var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
-                //var rows = pdtvar.getElementsByTagName("tr");
-//                for (var i=1;i<rows.length;++i)
-//                    rows[i].className = 'rowClassSelected';
-
-                if (confirm("确认开始打印吗?")){
-                    alert("aabbcc");
-                }
-            }
-
-            //]]>
-        </script>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="维修资金缴款处理">
+                <p:tab title="跨行维修资金转出">
                     <h:form>
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
@@ -56,11 +29,11 @@
                                         <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
                                                      requiredMessage="申请单编号不能为空。"
-                                                     value="#{depositAction.msgSn}"/>
+                                                     value="#{transferAction.msgSn}"/>
                                         <h:outputLabel value="交易金额:" style="font-weight: bold"/>
                                         <p:inputText id="amt" size="25"
                                                      autocomplete="false" required="true"
-                                                     value="#{depositAction.txnAmt}"
+                                                     value="#{transferAction.txnAmt}"
                                                      requiredMessage="交易金额不能为空。"
                                                      validatorMessage="请输入正确的金额格式。">
                                             <f:convertNumber for="amt" maxFractionDigits="2" maxIntegerDigits="13"
@@ -68,21 +41,16 @@
                                         </p:inputText>
                                     </h:panelGrid>
                                     <h:panelGrid id="buttons">
-                                        <p:commandButton style="width:110px;" value="查询缴款信息"
-                                                         disabled="#{depositAction.checkPassed}"
-                                                         rendered="#{!depositAction.confirmed}"
-                                                         action="#{depositAction.onQuery}"
+                                        <p:commandButton style="width:110px;" value="查询转出信息"
+                                                         disabled="#{transferAction.checkPassed}"
+                                                         rendered="#{!transferAction.confirmed}"
+                                                         action="#{transferAction.onQuery}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
-                                        <p:commandButton style="width:110px;" value="确认缴款"
-                                                         rendered="#{depositAction.checkPassed}"
-                                                         disabled="#{depositAction.confirmed}"
-                                                         action="#{depositAction.onConfirm}"
-                                                         update="pdt,msgs,buttons">
-                                        </p:commandButton>
-                                        <p:commandButton style="width:110px;" value="凭证打印"
-                                                         rendered="#{depositAction.confirmed}"
-                                                         action="#{depositAction.onVchPrt}"
+                                        <p:commandButton style="width:110px;" value="确认转出"
+                                                         rendered="#{transferAction.checkPassed}"
+                                                         disabled="#{transferAction.confirmed}"
+                                                         action="#{transferAction.onConfirmTransOut}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -96,23 +64,13 @@
                                     <h:outputText value=""/>
                                 </f:facet>
                             </p:ajaxStatus>
-                            <p:menubar style="margin-bottom:3px;">
-                                <p:menuitem type="push" value="打印列表中全部凭证" icon="ui-icon ui-icon-print"
-                                            process="@this"
-                                            onclick="printAllVch();"
-                                            update="msgs, pdt"
-                                            ajax="true"/>
-                                <p:menuitem type="push" value="打印已选择记录凭证" icon="ui-icon ui-icon-disk"
-                                            action="#{depositAction.onVchPrtSelected}" update="msgs, pdt"/>
-                            </p:menubar>
-                            <p:dataTable id="pdt" dynamic="true" style="width:100%;margin-bottom:8px;"
-                                         value="#{depositAction.subMsgList}" var="record"
+                            <p:dataTable id="pdt" dynamic="true" style="width:100%;"
+                                         value="#{transferAction.subMsgList}" var="record"
                                          rowKey="#{record.pkid}"
-                                         selection="#{depositAction.selectedRecords}"
-                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} 【总笔数:#{depositAction.totalCount}】"
+                                         selection="#{transferAction.selectedRecords}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} 【总笔数:#{transferAction.totalCount}】"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
-                                         widgetVar="pdtvar"
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="multiple" style="width:18px"/>
                                 <p:column headerText="业主姓名" style="text-align: center">
@@ -143,17 +101,8 @@
                                 </p:column>
                             </p:dataTable>
                         </div>
-                        <p:remoteCommand name="checktellerid" id="checktellerid" async="false"
-                                         actionListener="#{depositAction.onCheckTellerID}"
-                                         update="msgs" process="@this"
-                                         oncomplete="handleInputComplete(xhr, status, args, 'tellerid')"/>
                     </h:form>
                 </p:tab>
-                <p:tab title="已打印票据清单">
-                    <h:form>
-                    </h:form>
-                </p:tab>
-
             </p:tabView>
         </div>
     </ui:define>
