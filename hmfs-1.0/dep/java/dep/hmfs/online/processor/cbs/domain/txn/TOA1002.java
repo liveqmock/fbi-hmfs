@@ -4,6 +4,7 @@ import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.base.TOABody;
 import dep.hmfs.online.processor.cbs.domain.base.TOAHeader;
 import dep.util.PropertyManager;
+import dep.util.StringPad;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -52,13 +53,13 @@ public class TOA1002 extends TOA implements Serializable {
                 if ((!StringUtils.isEmpty(accountName)) && accountName.length() >= 60) {
                     stringBuilder.append(accountName.substring(0, 60));
                 } else {
-                    stringBuilder.append(StringUtils.rightPad(accountName, 60, " "));
+                    stringBuilder.append(StringPad.rightPad4ChineseToByteLength(accountName, 60, " "));
                 }
                 stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
                 if ((!StringUtils.isEmpty(address)) && address.length() >= 80) {
                     stringBuilder.append(address.substring(0, 80));
                 } else {
-                    stringBuilder.append(StringUtils.rightPad(address, 80, " "));
+                    stringBuilder.append(StringPad.rightPad4ChineseToByteLength(address, 80, " "));
                 }
                 stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
                 if ((!StringUtils.isEmpty(phoneNo)) && phoneNo.length() >= 20) {

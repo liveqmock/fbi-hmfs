@@ -7,7 +7,7 @@ import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.util.PropertyManager;
-import org.apache.commons.lang.StringUtils;
+import dep.util.StringPad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class CbsMsgHandleService implements IMessageHandler {
         System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
+        strBuilder.append(StringPad.rightPad4ChineseToByteLength(tiaHeader.serialNo, 16, " "));
 
         // =======================================
 
@@ -45,43 +45,47 @@ public class CbsMsgHandleService implements IMessageHandler {
             if ("1001".equals(tiaHeader.txnCode)) {
                 if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
                     strBuilder.append("120319004843521000010.00           2   " +
-                            StringUtils.rightPad("张三", 60, " ") +
-                            StringUtils.rightPad("500.00", 16, " ") +
-                            StringUtils.rightPad("深圳路", 80, " ") +
-                            StringUtils.rightPad("98.88", 16, " ") +
-                            StringUtils.rightPad("89901111", 20, " ") +
-                            StringUtils.rightPad("10000", 20, " ") +
-                            StringUtils.rightPad("30", 20, " ") +
-                            StringUtils.rightPad("119090909090", 12, " ") +
-                            StringUtils.rightPad("李四", 60, " ") +
-                            StringUtils.rightPad("500.00", 16, " ") +
-                            StringUtils.rightPad("深圳路", 80, " ") +
-                            StringUtils.rightPad("98.78", 16, " ") +
-                            StringUtils.rightPad("89901110", 20, " ") +
-                            StringUtils.rightPad("13000", 20, " ") +
-                            StringUtils.rightPad("30", 20, " ") +
-                            StringUtils.rightPad("119090909091", 12, " "));
+                            StringPad.rightPad4ChineseToByteLength("张三", 60, " ") +
+                            StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                            StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                            StringPad.rightPad4ChineseToByteLength("98.88", 16, " ") +
+                            StringPad.rightPad4ChineseToByteLength("89901111", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("1", 2, " ") +
+                            StringPad.rightPad4ChineseToByteLength("10000", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("119090909090", 12, " ") +
+                            StringPad.rightPad4ChineseToByteLength("李四", 60, " ") +
+                            StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                            StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                            StringPad.rightPad4ChineseToByteLength("98.78", 16, " ") +
+                            StringPad.rightPad4ChineseToByteLength("89901110", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("4", 2, " ") +
+                            StringPad.rightPad4ChineseToByteLength("13000", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                            StringPad.rightPad4ChineseToByteLength("119090909091", 12, " "));
                 } else {
                     strBuilder.append("120319004843521000010.00           ");
                 }
             } else if ("1002".equals(tiaHeader.txnCode)) {
                 strBuilder.append("1203190048435210002   " +
-                        StringUtils.rightPad("张三", 60, " ") +
-                        StringUtils.rightPad("500.00", 16, " ") +
-                        StringUtils.rightPad("深圳路", 80, " ") +
-                        StringUtils.rightPad("98.88", 16, " ") +
-                        StringUtils.rightPad("89901111", 20, " ") +
-                        StringUtils.rightPad("10000", 20, " ") +
-                        StringUtils.rightPad("30", 20, " ") +
-                        StringUtils.rightPad("119090909090", 12, " ") +
-                        StringUtils.rightPad("李四", 180, " ") +
-                        StringUtils.rightPad("500.00", 16, " ") +
-                        StringUtils.rightPad("深圳路", 256, " ") +
-                        StringUtils.rightPad("98.78", 16, " ") +
-                        StringUtils.rightPad("89901110", 40, " ") +
-                        StringUtils.rightPad("13000", 20, " ") +
-                        StringUtils.rightPad("30", 20, " ") +
-                        StringUtils.rightPad("119090909091", 12, " "));
+                        StringPad.rightPad4ChineseToByteLength("张三", 60, " ") +
+                        StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                        StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                        StringPad.rightPad4ChineseToByteLength("98.88", 16, " ") +
+                        StringPad.rightPad4ChineseToByteLength("89901111", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("1", 2, " ") +
+                        StringPad.rightPad4ChineseToByteLength("10000", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("119090909090", 12, " ") +
+                        StringPad.rightPad4ChineseToByteLength("李四", 60, " ") +
+                        StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                        StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                        StringPad.rightPad4ChineseToByteLength("98.78", 16, " ") +
+                        StringPad.rightPad4ChineseToByteLength("89901110", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("4", 2, " ") +
+                        StringPad.rightPad4ChineseToByteLength("13000", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                        StringPad.rightPad4ChineseToByteLength("119090909091", 12, " "));
             } else if ("2001".equals(tiaHeader.txnCode)) {
                 strBuilder.append("12031900484352100002.00            ");
             } else if ("3001".equals(tiaHeader.txnCode)) {
@@ -114,7 +118,7 @@ public class CbsMsgHandleService implements IMessageHandler {
                 logger.error("账户交易明细【前台】交易数：" + tia5001.body.recordList.size());
             }
             if (true) {
-                String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+                String totalLength = StringPad.rightPad4ChineseToByteLength(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
                 return (totalLength + strBuilder.toString()).getBytes();
             }
         }
@@ -138,7 +142,7 @@ public class CbsMsgHandleService implements IMessageHandler {
         if (toa != null) {
             strBuilder.append(toa.toString());
         }
-        String totalLength = StringUtils.rightPad(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
+        String totalLength = StringPad.rightPad4ChineseToByteLength(String.valueOf(strBuilder.toString().getBytes().length + 6), 6, " ");
         return (totalLength + strBuilder.toString()).getBytes();
     }
 }
