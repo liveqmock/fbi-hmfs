@@ -57,11 +57,24 @@ public class TOA1001 extends TOA implements Serializable {
 
             public String toFixedLengthString() {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(StringUtils.rightPad(accountName, 180, " "));
+
+                if ((!StringUtils.isEmpty(accountName)) && accountName.length() >= 60) {
+                    stringBuilder.append(accountName.substring(0, 60));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(accountName, 60, " "));
+                }
                 stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
-                stringBuilder.append(StringUtils.rightPad(address, 256, " "));
+                if ((!StringUtils.isEmpty(address)) && address.length() >= 80) {
+                    stringBuilder.append(address.substring(0, 80));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(address, 80, " "));
+                }
                 stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
-                stringBuilder.append(StringUtils.rightPad(phoneNo, 40, " "));
+                if ((!StringUtils.isEmpty(phoneNo)) && phoneNo.length() >= 20) {
+                    stringBuilder.append(phoneNo.substring(0, 20));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(phoneNo, 20, " "));
+                }
                 stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
                 stringBuilder.append(StringUtils.rightPad(projAmt, 20, " "));
                 stringBuilder.append(StringUtils.rightPad(payPart, 20, " "));
@@ -79,6 +92,7 @@ public class TOA1001 extends TOA implements Serializable {
         stringBuilder.append(body.payFlag);
         stringBuilder.append(StringUtils.rightPad(body.payAmt, 16, " "));
 
+        // 建行 返回明细记录
         if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
             if (!StringUtils.isEmpty(body.payDetailNum)) {
                 stringBuilder.append(StringUtils.rightPad(body.payDetailNum, 4, " "));

@@ -45,19 +45,19 @@ public class CbsMsgHandleService implements IMessageHandler {
             if ("1001".equals(tiaHeader.txnCode)) {
                 if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
                     strBuilder.append("120319004843521000010.00           2   " +
-                            StringUtils.rightPad("张三", 180, " ") +
+                            StringUtils.rightPad("张三", 60, " ") +
                             StringUtils.rightPad("500.00", 16, " ") +
-                            StringUtils.rightPad("深圳路", 256, " ") +
+                            StringUtils.rightPad("深圳路", 80, " ") +
                             StringUtils.rightPad("98.88", 16, " ") +
-                            StringUtils.rightPad("89901111", 40, " ") +
+                            StringUtils.rightPad("89901111", 20, " ") +
                             StringUtils.rightPad("10000", 20, " ") +
                             StringUtils.rightPad("30", 20, " ") +
                             StringUtils.rightPad("119090909090", 12, " ") +
-                            StringUtils.rightPad("李四", 180, " ") +
+                            StringUtils.rightPad("李四", 60, " ") +
                             StringUtils.rightPad("500.00", 16, " ") +
-                            StringUtils.rightPad("深圳路", 256, " ") +
+                            StringUtils.rightPad("深圳路", 80, " ") +
                             StringUtils.rightPad("98.78", 16, " ") +
-                            StringUtils.rightPad("89901110", 40, " ") +
+                            StringUtils.rightPad("89901110", 20, " ") +
                             StringUtils.rightPad("13000", 20, " ") +
                             StringUtils.rightPad("30", 20, " ") +
                             StringUtils.rightPad("119090909091", 12, " "));
@@ -66,11 +66,11 @@ public class CbsMsgHandleService implements IMessageHandler {
                 }
             } else if ("1002".equals(tiaHeader.txnCode)) {
                 strBuilder.append("1203190048435210002   " +
-                        StringUtils.rightPad("张三", 180, " ") +
+                        StringUtils.rightPad("张三", 60, " ") +
                         StringUtils.rightPad("500.00", 16, " ") +
-                        StringUtils.rightPad("深圳路", 256, " ") +
+                        StringUtils.rightPad("深圳路", 80, " ") +
                         StringUtils.rightPad("98.88", 16, " ") +
-                        StringUtils.rightPad("89901111", 40, " ") +
+                        StringUtils.rightPad("89901111", 20, " ") +
                         StringUtils.rightPad("10000", 20, " ") +
                         StringUtils.rightPad("30", 20, " ") +
                         StringUtils.rightPad("119090909090", 12, " ") +

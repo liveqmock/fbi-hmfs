@@ -3,6 +3,7 @@ package dep.hmfs.online.processor.cbs.domain.txn;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.base.TOABody;
 import dep.hmfs.online.processor.cbs.domain.base.TOAHeader;
+import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -45,20 +46,47 @@ public class TOA1002 extends TOA implements Serializable {
             public String payPart = "";
             public String accountNo = "";
 
+            public String toFixedLengthString() {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                if ((!StringUtils.isEmpty(accountName)) && accountName.length() >= 60) {
+                    stringBuilder.append(accountName.substring(0, 60));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(accountName, 60, " "));
+                }
+                stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
+                if ((!StringUtils.isEmpty(address)) && address.length() >= 80) {
+                    stringBuilder.append(address.substring(0, 80));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(address, 80, " "));
+                }
+                stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
+                if ((!StringUtils.isEmpty(phoneNo)) && phoneNo.length() >= 20) {
+                    stringBuilder.append(phoneNo.substring(0, 20));
+                } else {
+                    stringBuilder.append(StringUtils.rightPad(phoneNo, 20, " "));
+                }
+                stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
+                stringBuilder.append(StringUtils.rightPad(projAmt, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(payPart, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(accountNo, 12, " "));
+                return stringBuilder.toString();
+            }
+
             public String toStringByDelimiter(String delimiter) {
                 if (delimiter == null) {
                     delimiter = "|";
                 }
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountName)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(txAmt)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(address)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseArea)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(phoneNo)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(houseType)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(projAmt)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(payPart)).append(delimiter);
-                stringBuilder.append(emptyToUnderlineAndWipeVertical(accountNo));
+                stringBuilder.append(wipeVertical(accountName)).append(delimiter);
+                stringBuilder.append(wipeVertical(txAmt)).append(delimiter);
+                stringBuilder.append(wipeVertical(address)).append(delimiter);
+                stringBuilder.append(wipeVertical(houseArea)).append(delimiter);
+                stringBuilder.append(wipeVertical(phoneNo)).append(delimiter);
+                stringBuilder.append(wipeVertical(houseType)).append(delimiter);
+                stringBuilder.append(wipeVertical(projAmt)).append(delimiter);
+                stringBuilder.append(wipeVertical(payPart)).append(delimiter);
+                stringBuilder.append(wipeVertical(accountNo));
                 return stringBuilder.toString();
             }
         }
@@ -71,16 +99,22 @@ public class TOA1002 extends TOA implements Serializable {
             stringBuilder.append(StringUtils.rightPad(body.payDetailNum, 4, " "));
         }
         if (body.recordList.size() > 0) {
-            for (Body.Record record : body.recordList) {
-                stringBuilder.append(record.toStringByDelimiter("|"));
-                stringBuilder.append("\n");
+            if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                for (Body.Record record : body.recordList) {
+                    stringBuilder.append(record.toFixedLengthString());
+                }
+            } else {
+                for (Body.Record record : body.recordList) {
+                    stringBuilder.append(record.toStringByDelimiter("|"));
+                    stringBuilder.append("\n");
+                }
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             }
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         }
         return stringBuilder.toString();
     }
 
-    private static String emptyToUnderlineAndWipeVertical(String field) {
+    private static String wipeVertical(String field) {
         return StringUtils.isEmpty(field) ? "" : field.replaceAll("\\|", "");
     }
 }

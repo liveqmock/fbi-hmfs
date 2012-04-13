@@ -11,6 +11,7 @@ import dep.hmfs.online.processor.cbs.domain.txn.TOA1002;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
+import dep.util.PropertyManager;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,12 +77,14 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
     @Transactional
     private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
 
-        // 批量核算户账户信息更新
-        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1002");
-
-        hmbBaseService.updateMsginSts(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
-
-        return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
+        if (!"debug".equalsIgnoreCase(PropertyManager.getProperty("hmfs_sys_status_flag"))) {
+            // 批量核算户账户信息更新
+            actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1002");
+            hmbBaseService.updateMsginSts(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
+            return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
+        } else {
+            return getTOA1002(tia1002, payInfoList);
+        }
     }
 
     private TOA1002 getPayInfoDatagram(String txnCode, HmMsgIn msginLog, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
@@ -89,41 +92,44 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
         // 查询所有子报文  5150-开户交款 5210-交款
         // 如果有5150交易，则需 String[] payMsgTypes = {"01033", "01035", "01045"};
         //List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msginLog.getMsgSn(), payMsgTypes);
-
         if (hmbClientReqService.communicateWithHmb(txnCode, hmbClientReqService.createMsg006ByTotalMsgin(msginLog), payInfoList)) {
-            TOA1002 toa1002 = new TOA1002();
-            toa1002.body.payApplyNo = tia1002.body.payApplyNo;
-            if (payInfoList.size() > 0) {
-                toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
-                for (HmMsgIn hmMsgIn : payInfoList) {
-                    HmActFund actFund = hmbActinfoService.qryHmActfundByActNo(hmMsgIn.getFundActno1());
-                    TOA1002.Body.Record record = new TOA1002.Body.Record();
-                    record.accountName = hmMsgIn.getInfoName();   //21
-                    record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
-                    record.address = hmMsgIn.getInfoAddr();    //22
-                    record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
-
-                    record.houseType = actFund.getHouseDepType();
-                    record.phoneNo = actFund.getHouseCustPhone();
-                    String field83 = actFund.getDepStandard2();
-                    if (field83 == null) {
-                        record.projAmt = "";
-                        record.payPart = "";
-                    } else if (field83.endsWith("|") || !field83.contains("|")) {
-                        record.projAmt = new StringBuilder(field83).deleteCharAt(field83.length() - 1).toString();
-                        record.payPart = "";
-                    } else {
-                        String[] fields83 = field83.split("\\|");
-                        record.projAmt = fields83[0];
-                        record.payPart = fields83[1];
-                    }
-                    record.accountNo = hmMsgIn.getFundActno1();  // 业主核算户账号(维修资金账号)
-                    toa1002.body.recordList.add(record);
-                }
-            }
-            return toa1002;
+            return getTOA1002(tia1002, payInfoList);
         } else {
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
+    }
+
+    private TOA1002 getTOA1002(TIA1002 tia1002, List<HmMsgIn> payInfoList) {
+        TOA1002 toa1002 = new TOA1002();
+        toa1002.body.payApplyNo = tia1002.body.payApplyNo;
+        if (payInfoList.size() > 0) {
+            toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
+            for (HmMsgIn hmMsgIn : payInfoList) {
+                HmActFund actFund = hmbActinfoService.qryHmActfundByActNo(hmMsgIn.getFundActno1());
+                TOA1002.Body.Record record = new TOA1002.Body.Record();
+                record.accountName = hmMsgIn.getInfoName();   //21
+                record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
+                record.address = hmMsgIn.getInfoAddr();    //22
+                record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
+
+                record.houseType = actFund.getHouseDepType();
+                record.phoneNo = actFund.getHouseCustPhone();
+                String field83 = actFund.getDepStandard2();
+                if (field83 == null) {
+                    record.projAmt = "";
+                    record.payPart = "";
+                } else if (field83.endsWith("|") || !field83.contains("|")) {
+                    record.projAmt = new StringBuilder(field83).deleteCharAt(field83.length() - 1).toString();
+                    record.payPart = "";
+                } else {
+                    String[] fields83 = field83.split("\\|");
+                    record.projAmt = fields83[0];
+                    record.payPart = fields83[1];
+                }
+                record.accountNo = hmMsgIn.getFundActno1();  // 业主核算户账号(维修资金账号)
+                toa1002.body.recordList.add(record);
+            }
+        }
+        return toa1002;
     }
 }
