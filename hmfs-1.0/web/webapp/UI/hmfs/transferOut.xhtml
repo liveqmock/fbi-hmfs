@@ -73,14 +73,7 @@
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="multiple" style="width:18px"/>
-                                <p:column headerText="业主姓名" style="text-align: center">
-                                    <h:outputText value="#{record.infoName}"/>
-                                </p:column>
-                                <p:column headerText="金额">
-                                    <h:outputText value="#{record.txnAmt1}" style="float: right">
-                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
-                                    </h:outputText>
-                                </p:column>
+
                                 <p:column headerText="资金帐号" style="text-align: center">
                                     <h:outputText value="#{record.fundActno1}"/>
                                 </p:column>
@@ -100,6 +93,22 @@
                                     <h:outputText value="#{record.houseCustPhone}"/>
                                 </p:column>
                             </p:dataTable>
+                            <p:separator style="margin-top:25px" />
+                            <p:panel id="panel2" style="margin-top:10px">
+                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                    <h:panelGrid columns="4" cellspacing="5">
+                                        <h:outputLabel value="划出方项目ID:" style="font-weight: bold"/>
+                                        <p:inputText size="25" readonly="true" value="#{transferAction.summaryMsg.infoId1}"/>
+                                        <h:outputLabel value="划出方项目项目类型:" style="font-weight: bold"/>
+                                        <p:inputText size="25" readonly="true" value="#{transferAction.summaryMsg.infoIdType1}"/>
+                                        <h:outputLabel value="划入方项目ID:" style="font-weight: bold"/>
+                                        <p:inputText size="25" readonly="true" value="#{transferAction.summaryMsg.infoId2}"/>
+                                        <h:outputLabel value="划入方项目类型:" style="font-weight: bold"/>
+                                        <p:inputText size="25" readonly="true" value="#{transferAction.summaryMsg.infoIdType2}"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:panel>
+
                         </div>
                     </h:form>
                 </p:tab>
