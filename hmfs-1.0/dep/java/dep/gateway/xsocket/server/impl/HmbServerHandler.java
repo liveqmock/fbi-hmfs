@@ -98,13 +98,16 @@ class HmbContentHandler extends ContentHandler {
 
     public boolean onData(INonBlockingConnection nbc) throws IOException {
         int available = nbc.available();
+        logger.info("【本地服务端:onData()】接收报文长度:" + available);
 
         int lengthToRead = remaining;
         if (available < remaining) {
             lengthToRead = available;
         }
+        byte[] newBytes = nbc.readBytesByLength(lengthToRead);
+        logger.info("【本地服务端:onData()】接收报文内容:" + new String(newBytes));
 
-        byteArrayOutStream.write(nbc.readBytesByLength(lengthToRead));
+        byteArrayOutStream.write(newBytes);
         remaining -= lengthToRead;
 
         if (remaining == 0) {

@@ -43,10 +43,10 @@ public class Hmb8583Demo {
 //        client.testUnmarshal();
 
         client.processMsgIn("5120");
-        client.processMsgIn("5130");
-        client.processMsgIn("5140");
-        client.processMsgIn("5210");
-        client.processMsgIn("5230");
+        //client.processMsgIn("5130");
+        //client.processMsgIn("5140");
+//        client.processMsgIn("5210");
+        //client.processMsgIn("5230");
 //        client.processMsgIn("5610");
 //        client.processMsgIn("7000");
 //        client.processMsgIn("7001");
