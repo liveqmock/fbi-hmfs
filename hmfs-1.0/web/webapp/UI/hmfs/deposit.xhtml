@@ -97,13 +97,13 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:menubar style="margin-bottom:3px;">
+                                <p:menuitem type="push" value="打印所选记录凭证" icon="ui-icon ui-icon-checked"
+                                            action="#{depositAction.onVchPrtSelected}" update="msgs, pdt"/>
                                 <p:menuitem type="push" value="打印列表中全部凭证" icon="ui-icon ui-icon-print"
                                             process="@this"
                                             onclick="printAllVch();"
                                             update="msgs, pdt"
                                             ajax="true"/>
-                                <p:menuitem type="push" value="打印已选择记录凭证" icon="ui-icon ui-icon-disk"
-                                            action="#{depositAction.onVchPrtSelected}" update="msgs, pdt"/>
                             </p:menubar>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;margin-bottom:8px;"
                                          value="#{depositAction.subMsgList}" var="record"
@@ -143,10 +143,10 @@
                                 </p:column>
                             </p:dataTable>
                         </div>
-                        <p:remoteCommand name="checktellerid" id="checktellerid" async="false"
-                                         actionListener="#{depositAction.onCheckTellerID}"
+                        <p:remoteCommand name="printall" id="printall" async="false"
+                                         actionListener="#{depositAction.onPrintAll}"
                                          update="msgs" process="@this"
-                                         oncomplete="handleInputComplete(xhr, status, args, 'tellerid')"/>
+                                         />
                     </h:form>
                 </p:tab>
                 <p:tab title="已打印票据清单">

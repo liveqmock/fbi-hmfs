@@ -135,6 +135,10 @@ public class DepositAction implements Serializable {
         return null;
     }
 
+    public String onPrintAll(){
+
+        return null;
+    }
     //=============================
 
     public static SimpleDateFormat getSdf() {
