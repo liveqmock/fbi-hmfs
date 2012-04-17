@@ -33,7 +33,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
         //发送报文
-        Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode, txnDate));
+        Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getFirstChkReqBuf(txnCode, txnDate));
 
         //处理返回报文
         List<HmbMsg> msgList = responseMap.get(txnCode);
@@ -48,23 +48,39 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         } else {
             //保存国土局到本地数据库
             processChkBalResponse(msgList, txnDate);
-        }
 
-        //数据核对处理
-        if (verifyActBalData(txnDate)) {
-            //置系统控制表状态
-            updateSysCtlStatus(SysCtlSts.HMB_CHK_SUCCESS);
-            return "0000|余额对帐交易成功";
-        } else {
-            return "9999|余额对帐交易失败";
-        }
+            //置系统控制表状态 : 余额对帐完成  TODO:处理时机需探讨
+            updateSysCtlStatus(SysCtlSts.HMB_CHK_OVER);
 
+            //数据核对处理
+            if (verifyActBalData(txnDate)) {
+                return "0000|余额对帐成功";
+            } else {
+                //发送二次核对报文
+                responseMap = sendDataUntilRcv(getSecondChkReqBuf(txnCode, txnDate));
+                //处理返回报文
+                msgList = responseMap.get(txnCode);
+                if (msgList == null || msgList.size() == 0) {
+                    Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
+                    throw new RuntimeException(msg100.rtnInfo);
+                }
+                msg002 = (Msg002) msgList.get(0);
+                if (!msg002.rtnInfoCode.equals("00")) {
+                    throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
+                } else {
+                    //数据核对处理
+                    verifyActBalData(txnDate);
+                    return "9999|余额对帐失败";
+                }
+            }
+        }
     }
 
-    private byte[] getRequestBuf(String txnCode, String txnDate) {
+    //第一轮余额对帐报文：核对结算户和项目核算户
+    private byte[] getFirstChkReqBuf(String txnCode, String txnDate) {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
-        List<HmActFund> actFundList = hmbSysTxnService.selectFundActinfo();
-        List<HmActStl> actStlList = hmbSysTxnService.selectCbsActinfo();
+        List<HmActFund> actFundList = hmbSysTxnService.selectProjectFundActinfo();
+        List<HmActStl> actStlList = hmbSysTxnService.selectStlActinfo();
 
         //汇总报文处理
         Msg001 msg001 = new Msg001();
@@ -116,6 +132,51 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             //hmChkAct.setSendSysId(SEND_SYS_ID);
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(msg094.actBal);
+            hmChkActMapper.insert(hmChkAct);
+        }
+
+        return messageFactory.marshal(txnCode, hmbMsgList);
+    }
+
+    //第二轮余额对帐报文：第一轮核对不上的项目核算户中的分户核算户
+    private byte[] getSecondChkReqBuf(String txnCode, String txnDate) {
+        List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
+        List<String> chkFailedActnoList = new ArrayList<String>();
+        for (HmChkAct hmChkAct : chkActList) {
+            chkFailedActnoList.add(hmChkAct.getActno());
+        }
+        List<HmActFund> actFundList = hmbSysTxnService.selectIndividFundActinfo(chkFailedActnoList);
+        List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
+
+        //汇总报文处理
+        Msg001 msg001 = new Msg001();
+        assembleSummaryMsg(txnCode, msg001, actFundList.size(), true);
+        msg001.txnType = "1";//单笔批量？
+        msg001.bizType = "3"; //?
+        msg001.origTxnCode = "5110"; //TODO ????
+        hmbMsgList.add(msg001);
+
+        //子报文处理  098 094
+        for (HmActFund hmActFund : actFundList) {
+            Msg098 msg098 = new Msg098();
+            msg098.actionCode = "304"; //304:日终对账
+            msg098.infoId1 = hmActFund.getInfoId1();
+            msg098.infoIdType1 = hmActFund.getInfoIdType1();
+            msg098.cellNum = hmActFund.getCellNum();
+            msg098.builderArea = hmActFund.getBuilderArea();
+            msg098.fundActno1 = hmActFund.getFundActno1();
+            msg098.fundActtype1 = hmActFund.getFundActtype1();
+            msg098.actBal = hmActFund.getActBal();
+            hmbMsgList.add(msg098);
+
+            //保存发起对帐的数据到本地数据库
+            HmChkAct hmChkAct = new HmChkAct();
+            hmChkAct.setPkid(UUID.randomUUID().toString());
+            hmChkAct.setActno(msg098.fundActno1);
+            hmChkAct.setTxnDate(txnDate);
+            //hmChkAct.setSendSysId(SEND_SYS_ID);
+            hmChkAct.setSendSysId("99");
+            hmChkAct.setActbal(msg098.actBal);
             hmChkActMapper.insert(hmChkAct);
         }
 

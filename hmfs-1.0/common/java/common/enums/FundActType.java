@@ -3,25 +3,18 @@ package common.enums;
 import java.util.Hashtable;
 
 /**
- 系统状态
+ * 核算帐户类型
  */
-public enum SysCtlSts implements EnumApp {
+public enum FundActType implements EnumApp {
 
-    INIT("0", "系统初始化"),
-    SIGNON("1", "已签到"),
-    SIGNOUT("2", "已签退"),
-    //HOST_BALCHK_SUCCESS("3", "主机余额对账成功"),
-    //HOST_DETLCHK_SUCCESS("4", "主机流水对账成功"),
-    HOST_CHK_OVER("3", "主机对账完成"),
-    //HMB_BALCHK_SUCCESS("6", "国土局余额对账成功"),
-    //HMB_DETLCHK_SUCCESS("7", "国土局流水对账成功"),
-    HMB_CHK_OVER("4", "国土局对账完成");
+    PROJECT("511", "项目帐户"),
+    INDIVID("570", "分户帐户");
 
     private String code = null;
     private String title = null;
-    private static Hashtable<String, SysCtlSts> aliasEnums;
+    private static Hashtable<String, FundActType> aliasEnums;
 
-    SysCtlSts(String code, String title) {
+    FundActType(String code, String title) {
         this.init(code, title);
     }
 
@@ -38,7 +31,7 @@ public enum SysCtlSts implements EnumApp {
         aliasEnums.put(title, this);
     }
 
-    public static SysCtlSts valueOfAlias(String alias) {
+    public static FundActType valueOfAlias(String alias) {
         return aliasEnums.get(alias);
     }
 

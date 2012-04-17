@@ -64,7 +64,7 @@ public class AppMngAction implements Serializable {
     public String onLogon() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
+        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
             try {
                 String response = depService.process("1007000");
                 if (response.startsWith("0000")) { //³É¹¦
@@ -113,7 +113,7 @@ public class AppMngAction implements Serializable {
     public String onHmbDailyChk() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_SUCCESS)
+        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_OVER)
                 ||sysCtlSts.equals(SysCtlSts.SIGNOUT)) {
             try {
                 String response = depService.process("1007003");

@@ -38,7 +38,7 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         String txnCode = "7000";
         HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_SUCCESS)) {
+        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
             try {
                 updateHmSctRecord(hmSysCtl);
                 doHmbSignTxn(txnCode, "301");
