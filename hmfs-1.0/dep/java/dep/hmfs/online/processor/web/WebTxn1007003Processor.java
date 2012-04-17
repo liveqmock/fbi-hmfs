@@ -69,6 +69,8 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
                     throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
                 } else {
                     //数据核对处理
+                    //保存国土局到本地数据库
+                    processChkBalResponse(msgList, txnDate);
                     verifyActBalData(txnDate);
                     return "9999|余额对帐失败";
                 }

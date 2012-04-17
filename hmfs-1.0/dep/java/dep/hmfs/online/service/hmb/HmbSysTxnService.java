@@ -92,7 +92,7 @@ public class HmbSysTxnService extends HmbBaseService {
     public List<HmChkAct> selectChkFailedFundActList(String txnDate){
         HmChkActExample example = new HmChkActExample();
         //TODO 是否会查找到结算户？
-        example.createCriteria().andChkstsNotEqualTo("0").andTxnDateEqualTo(txnDate);
+        example.createCriteria().andChkstsNotEqualTo("0").andTxnDateEqualTo(txnDate).andSendSysIdEqualTo("99");
         return hmChkActMapper.selectByExample(example);
     }
 

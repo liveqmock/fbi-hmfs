@@ -153,7 +153,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
            // String datagram = "123456789088889100005001100000000000003               268945.33       201203191234567890123333|60.00|C\n1234567890654321|133716.39|D";
 
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
-            socketBlockClient.close();
+            //socketBlockClient.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
