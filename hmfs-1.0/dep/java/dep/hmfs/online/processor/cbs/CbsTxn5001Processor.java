@@ -60,6 +60,24 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
 
         // 删除日期为txnDate的会计账户余额对账记录
         hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "05");
+        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
+        // 删除会计账号交易明细对账记录
+        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "05");
+        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
+
+        // 发起国土局余额对账
+        // TODO 发起国土局明细对账【暂无此交易】
+        String res = null;
+        try {
+            res = webTxn7003Processor.process(null);
+            if (res == null || !res.startsWith("0000")) {
+                throw new RuntimeException("与国土局对账异常不平！");
+            }
+        } catch (Exception e) {
+            logger.error("对账异常", e);
+            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
+        }
+        // 与国土局对账完成
         // 新增 日期为txnDate的会计账户余额对账记录
         HmChkAct hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
@@ -68,19 +86,12 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         hmChkAct.setActno(tia5001.body.cbsActNo);
         hmChkAct.setActbal(new BigDecimal(tia5001.body.accountBalance));
         hmbActinfoService.insertChkAct(hmChkAct);
-
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
         // DEP 会计(结算)账户余额
         HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
 
         if (hmActStl == null) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
         }
-
-        // TODO 因存在利息问题，余额对账终将不平，需求待定
-        /*else if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
-        }*/
 
         hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
@@ -89,11 +100,6 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         hmChkAct.setActno(hmActStl.getCbsActno());
         hmChkAct.setActbal(hmActStl.getActBal());
         hmbActinfoService.insertChkAct(hmChkAct);
-
-        // 获取明细，开始主机对账
-        // 删除会计账号交易明细对账记录
-        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "05");
-        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
 
         // 有明细数据
         if (bytes.length > 54) {
@@ -157,23 +163,9 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
             }
             // 主机-本地对账结束
         }
-
-        // 发起国土局余额对账
-        // TODO 发起国土局明细对账【暂无此交易】
-        if (true) {
-            return null;
+        if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
         }
-        String res = null;
-        try {
-            res = webTxn7003Processor.process(null);
-        } catch (Exception e) {
-            logger.error("对账异常", e);
-            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
-        }
-        if (res != null && res.startsWith("0000")) {
-            return null;
-        } else {
-            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
-        }
+        return null;
     }
 }
