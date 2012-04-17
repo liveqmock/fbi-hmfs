@@ -22,7 +22,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
 
     @Override
     public String process(String request) {
-
+        String txnResult = "";
         String txnCode = "7003";
         String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
@@ -48,13 +48,9 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         } else {
             //保存国土局到本地数据库
             processChkBalResponse(msgList, txnDate);
-
-            //置系统控制表状态 : 余额对帐完成  TODO:处理时机需探讨
-            updateSysCtlStatus(SysCtlSts.HMB_CHK_OVER);
-
             //数据核对处理
             if (verifyActBalData(txnDate)) {
-                return "0000|余额对帐成功";
+                txnResult = "0000|余额对帐成功";
             } else {
                 //发送二次核对报文
                 responseMap = sendDataUntilRcv(getSecondChkReqBuf(txnCode, txnDate));
@@ -72,10 +68,14 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
                     //保存国土局到本地数据库
                     processChkBalResponse(msgList, txnDate);
                     verifyActBalData(txnDate);
-                    return "9999|余额对帐失败";
+                    txnResult =  "9999|余额对帐失败";
                 }
             }
+
         }
+        //置系统控制表状态 : 余额对帐完成  TODO:处理时机需探讨
+        updateSysCtlStatus(SysCtlSts.HMB_CHK_OVER);
+        return txnResult;
     }
 
     //第一轮余额对帐报文：核对结算户和项目核算户

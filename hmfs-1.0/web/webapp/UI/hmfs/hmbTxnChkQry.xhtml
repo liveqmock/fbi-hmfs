@@ -77,20 +77,6 @@
                                     <h:outputText value="#{txnChkAction.qryParam.startDate}"/>
                                 </p:column>
                                 <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.actno1}"/>
-                                </p:column>
-                                <p:column headerText="流水号" style="text-align: center">
-                                    <h:outputText value="#{record.msgSn1}"/>
-                                </p:column>
-                                <p:column headerText="交易发生额">
-                                    <h:outputText value="#{record.txnamt1==0? '':record.txnamt1}" style="float: right">
-                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="借贷别" style="text-align: center">
-                                    <h:outputText value="#{record.dcFlag1}"/>
-                                </p:column>
-                                <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.actno2}"/>
                                 </p:column>
                                 <p:column headerText="流水号" style="text-align: center">
@@ -103,6 +89,20 @@
                                 </p:column>
                                 <p:column headerText="借贷别" style="text-align: center">
                                     <h:outputText value="#{record.dcFlag2}"/>
+                                </p:column>
+                                <p:column headerText="帐号" style="text-align: center">
+                                    <h:outputText value="#{record.actno1}"/>
+                                </p:column>
+                                <p:column headerText="流水号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSn1}"/>
+                                </p:column>
+                                <p:column headerText="交易发生额">
+                                    <h:outputText value="#{record.txnamt1==0? '':record.txnamt1}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="借贷别" style="text-align: center">
+                                    <h:outputText value="#{record.dcFlag1}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

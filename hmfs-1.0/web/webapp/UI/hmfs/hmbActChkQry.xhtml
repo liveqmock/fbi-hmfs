@@ -73,18 +73,18 @@
                                     <h:outputText value="#{actChkAction.qryParam.startDate}"/>
                                 </p:column>
                                 <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.actno1}"/>
-                                </p:column>
-                                <p:column headerText="帐户余额">
-                                    <h:outputText value="#{record.actbal1==0? '':record.actbal1}" style="float: right">
-                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.actno2}"/>
                                 </p:column>
                                 <p:column headerText="帐户余额">
                                     <h:outputText value="#{record.actbal2==0? '':record.actbal2}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="帐号" style="text-align: center">
+                                    <h:outputText value="#{record.actno1}"/>
+                                </p:column>
+                                <p:column headerText="帐户余额">
+                                    <h:outputText value="#{record.actbal1==0? '':record.actbal1}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>

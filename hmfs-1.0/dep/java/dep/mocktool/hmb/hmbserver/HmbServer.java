@@ -46,8 +46,9 @@ public class HmbServer implements Runnable {
                     count++;
                     threadPool.schedule(new Processor(buf, socket), 400, TimeUnit.MILLISECONDS);
                 }
+                Thread.sleep(500);
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.error("err", ex);
         }
         log.debug("已处理请求数量：", count);

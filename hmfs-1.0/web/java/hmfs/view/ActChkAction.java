@@ -77,7 +77,7 @@ public class ActChkAction implements Serializable {
 
     public String onQueryHmb() {
         try {
-            this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
+            this.totalCount = actInfoService.countChkActRecordNumber(this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
@@ -92,7 +92,7 @@ public class ActChkAction implements Serializable {
 
     public String onQueryCbs() {
         try {
-            this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
+            this.totalCount = actInfoService.countChkActRecordNumber(this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
