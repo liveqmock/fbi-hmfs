@@ -70,12 +70,12 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         String res = null;
         try {
             res = webTxn7003Processor.process(null);
-            if (res == null || !res.startsWith("0000")) {
+            /*if (res == null || !res.startsWith("0000")) {
                 throw new RuntimeException("与国土局对账异常不平！");
-            }
+            }*/
         } catch (Exception e) {
+            res = "9999|与国土局对账不平！";
             logger.error("对账异常", e);
-            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
         }
         // 与国土局对账完成
         // 新增 日期为txnDate的会计账户余额对账记录
@@ -89,10 +89,6 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         // DEP 会计(结算)账户余额
         HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
 
-        if (hmActStl == null) {
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
-        }
-
         hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
         hmChkAct.setTxnDate(tia5001.body.txnDate);
@@ -102,6 +98,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         hmbActinfoService.insertChkAct(hmChkAct);
 
         // 有明细数据
+        int txnErrCnt = 0;
         if (bytes.length > 54) {
             byte[] detailBytes = new byte[bytes.length - 54];
             System.arraycopy(bytes, 54, detailBytes, 0, detailBytes.length);
@@ -139,32 +136,40 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 hmChkTxn.setDcFlag(txnStl.getDcFlag());
                 hmbActinfoService.insertChkTxn(hmChkTxn);
             }
-
             // 明细对账
-            if (hmTxnStlList.size() != tia5001.body.recordList.size()) {
-                logger.error("账户交易明细数不一致！【本地】交易数：" + hmTxnStlList.size() + "【主机】交易数：" + tia5001.body.recordList.size());
-                throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
-            }
-
             int index = 0;
-            for (TIA5001.Body.Record r : tia5001.body.recordList) {
-                logger.info("【主机端】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
-                HmTxnStl hmTxnStl = hmTxnStlList.get(index);
-                logger.info("【本地会计账户】流水号：" + hmTxnStl.getTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
-                        " ==记账方向： " + hmTxnStl.getDcFlag());
+            if (tia5001.body.recordList.size() != hmTxnStlList.size()) {
+                txnErrCnt = 1;
+            } else {
+                for (TIA5001.Body.Record r : tia5001.body.recordList) {
+                    logger.info("【主机端】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
+                    HmTxnStl hmTxnStl = hmTxnStlList.get(index);
+                    logger.info("【本地会计账户】流水号：" + hmTxnStl.getTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
+                            " ==记账方向： " + hmTxnStl.getDcFlag());
 
-                if (!r.txnSerialNo.equals(hmTxnStl.getTxnSn())
-                        || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
-                        || !r.txnType.equals(hmTxnStl.getDcFlag())) {
-                    logger.error("账户交易明细内容不一致！");
-                    throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
+                    if (!r.txnSerialNo.equals(hmTxnStl.getTxnSn())
+                            || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
+                            || !r.txnType.equals(hmTxnStl.getDcFlag())) {
+                        logger.error("账户交易明细内容不一致！");
+                        txnErrCnt++;
+                    }
+                    index++;
                 }
-                index++;
             }
-            // 主机-本地对账结束
+
         }
+        if (hmActStl == null) {
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
+        }
+        // 余额对账
         if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
+        }
+        if (res == null || !res.startsWith("0000")) {
+            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
+        }
+        if (txnErrCnt != 0) {
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
         }
         return null;
     }
