@@ -50,6 +50,8 @@ public class ActChkAction implements Serializable {
 
     private BigDecimal totalAmt;
 
+    private String bankId;
+
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
     @ManagedProperty(value = "#{actInfoService}")
@@ -69,6 +71,7 @@ public class ActChkAction implements Serializable {
         this.qryParam.setActnoStatus(FundActnoStatus.NORMAL.getCode());
 
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        this.bankId = hmSysCtl.getBankId();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
         this.sendSysId = hmSysCtl.getSendSysId();
@@ -97,7 +100,7 @@ public class ActChkAction implements Serializable {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
-            this.detlList = actInfoService.selectChkActResult("05", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectChkActResult(this.bankId, this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());

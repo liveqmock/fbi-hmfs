@@ -40,6 +40,7 @@ public class TxnChkAction implements Serializable {
     private String sysSts;
     private String sendSysId;
 
+    private String bankId;
 
     private List<HmChkTxnVO> detlList;
     private HmChkTxnVO selectedRecord;
@@ -68,6 +69,7 @@ public class TxnChkAction implements Serializable {
         this.qryParam.setActnoStatus(FundActnoStatus.NORMAL.getCode());
 
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
+        this.bankId = hmSysCtl.getBankId();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
         this.sendSysId = hmSysCtl.getSendSysId();
@@ -91,7 +93,7 @@ public class TxnChkAction implements Serializable {
     public String onQueryCbs() {
         try {
             this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
-            this.detlList = actInfoService.selectChkTxnResult("05", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectChkTxnResult(this.bankId, this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
