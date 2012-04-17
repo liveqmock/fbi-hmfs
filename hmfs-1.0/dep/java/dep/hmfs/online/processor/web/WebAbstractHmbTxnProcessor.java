@@ -65,6 +65,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
     public abstract String run(String request);
 
     protected Map<String, List<HmbMsg>> sendDataUntilRcv(byte[] bytes) {
+        logger.info("向国土局发送报文内容：" + new String(bytes));
         byte[] hmfsDatagram;
         try {
             socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);

@@ -42,6 +42,9 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
             try {
                 updateHmSctRecord(hmSysCtl);
                 doHmbSignTxn(txnCode, "301");
+                hmSysCtl.setSysSts(SysCtlSts.SIGNON.getCode());
+                hmSysCtl.setSignonDt(new Date());
+                hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
             } catch (Exception e) {
                 logger.error("Ç©µ½Ê§°Ü¡£", e);
                 throw new RuntimeException("Ç©µ½Ê§°Ü¡£" + e.getMessage());
@@ -88,8 +91,5 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
             hmSysCtl.setTxnseq(1);
         }
 
-        hmSysCtl.setSysSts(SysCtlSts.SIGNON.getCode());
-        hmSysCtl.setSignonDt(new Date());
-        hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
     }
 }
