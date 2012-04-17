@@ -88,7 +88,6 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         hmbActinfoService.insertChkAct(hmChkAct);
         // DEP 会计(结算)账户余额
         HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
-
         hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
         hmChkAct.setTxnDate(tia5001.body.txnDate);
@@ -156,7 +155,6 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                     index++;
                 }
             }
-
         }
         if (hmActStl == null) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
