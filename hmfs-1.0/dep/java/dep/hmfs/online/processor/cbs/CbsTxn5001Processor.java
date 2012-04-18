@@ -1,10 +1,7 @@
 package dep.hmfs.online.processor.cbs;
 
 import common.enums.CbsErrorCode;
-import common.repository.hmfs.model.HmActStl;
-import common.repository.hmfs.model.HmChkAct;
-import common.repository.hmfs.model.HmChkTxn;
-import common.repository.hmfs.model.HmTxnStl;
+import common.repository.hmfs.model.*;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
@@ -57,11 +54,13 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         logger.info("【主机】余额：" + tia5001.body.accountBalance);
         logger.info("【主机】交易日期：" + tia5001.body.txnDate);
 
+        HmSysCtl hmSysCtl = hmbActinfoService.getSysCtl();
+
         // 删除日期为txnDate的会计账户余额对账记录
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "05");
+        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, hmSysCtl.getBankId());
         hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
         // 删除会计账号交易明细对账记录
-        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "05");
+        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, hmSysCtl.getBankId());
         hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
 
         // 发起国土局余额对账
@@ -81,7 +80,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         HmChkAct hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
         hmChkAct.setTxnDate(tia5001.body.txnDate);
-        hmChkAct.setSendSysId("05");
+        hmChkAct.setSendSysId(hmSysCtl.getBankId());
         hmChkAct.setActno(tia5001.body.cbsActNo);
         hmChkAct.setActbal(new BigDecimal(tia5001.body.accountBalance));
         hmbActinfoService.insertChkAct(hmChkAct);
@@ -114,7 +113,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 HmChkTxn hmChkTxn = new HmChkTxn();
                 hmChkTxn.setPkid(UUID.randomUUID().toString());
                 hmChkTxn.setTxnDate(tia5001.body.txnDate);
-                hmChkTxn.setSendSysId("05");
+                hmChkTxn.setSendSysId(hmSysCtl.getBankId());
                 hmChkTxn.setActno(tia5001.body.cbsActNo);
                 hmChkTxn.setTxnamt(new BigDecimal(record.txnAmt));
                 hmChkTxn.setMsgSn(record.txnSerialNo);

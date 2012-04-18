@@ -45,6 +45,12 @@ public class HmbActinfoService {
     private HmChkActMapper hmChkActMapper;
     @Autowired
     private HmChkTxnMapper hmChkTxnMapper;
+    @Autowired
+    private HmSysCtlMapper hmSysCtlMapper;
+
+    public HmSysCtl getSysCtl() {
+        return hmSysCtlMapper.selectByPrimaryKey("1");
+    }
     
     @Transactional
     public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {

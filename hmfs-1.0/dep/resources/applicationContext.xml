@@ -87,7 +87,7 @@
     </bean>
     <bean id="signonCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
         <property name="jobDetail" ref="signonJobDetailBean"/>
-        <property name="cronExpression" value="0 43 9 * * ?"/>
+        <property name="cronExpression" value="0 0 6 * * ?"/>
     </bean>
     <bean id="signoutJobDetailBean"
           class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -97,7 +97,7 @@
     </bean>
     <bean id="signoutCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
         <property name="jobDetail" ref="signoutJobDetailBean"/>
-        <property name="cronExpression" value="0 1 16 * * ?"/>
+        <property name="cronExpression" value="0 30 9 * * ?"/>
     </bean>
 
     <!-- 设置调度 -->
