@@ -5,7 +5,6 @@ import common.repository.hmfs.model.HmActStl;
 import common.repository.hmfs.model.HmChkAct;
 import common.repository.hmfs.model.HmChkTxn;
 import common.repository.hmfs.model.HmTxnStl;
-import common.service.SystemService;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
@@ -50,9 +49,9 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         tia5001.body.txnDate = new String(bytes, 46, 8).trim();
 
         // 如果对账日期不是系统当前日期，则返回错误。
-        if (!SystemService.formatTodayByPattern("yyyyMMdd").equals(tia5001.body.txnDate)) {
+       /* if (!SystemService.formatTodayByPattern("yyyyMMdd").equals(tia5001.body.txnDate)) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_CHK_DATE_ERROR.getCode());
-        }
+        }*/
 
         logger.info("【主机】账号：" + tia5001.body.cbsActNo);
         logger.info("【主机】余额：" + tia5001.body.accountBalance);
