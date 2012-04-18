@@ -46,8 +46,7 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
                 hmSysCtl.setSignonDt(new Date());
                 hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
             } catch (Exception e) {
-                logger.error("签到失败。", e);
-                throw new RuntimeException("签到失败。" + e.getMessage());
+                throw new RuntimeException(e);
             }
         } else {
             throw new RuntimeException("系统初始或与国土局对帐完成后方可签到。");

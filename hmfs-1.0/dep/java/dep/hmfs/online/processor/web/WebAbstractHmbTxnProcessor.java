@@ -29,7 +29,7 @@ import java.util.Map;
  * Time: 下午7:23
  * To change this template use File | Settings | File Templates.
  */
-public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor{
+public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor {
     protected static final Logger logger = LoggerFactory.getLogger(WebAbstractHmbTxnProcessor.class);
 
     @Resource
@@ -71,11 +71,17 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
             socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
             hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
             return messageFactory.unmarshal(hmfsDatagram);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("通讯或解包错误.", e);
+            RuntimeException re = new RuntimeException("通讯或解包错误." + e.getMessage());
+            re.initCause(e);
+            throw re;
         } finally {
             try {
-                socketBlockClient.close();
+                if (socketBlockClient != null) {
+                    socketBlockClient.close();
+                }
             } catch (IOException e) {
                 //
             }
@@ -103,7 +109,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
         msg.msgEndDate = SystemService.formatTodayByPattern("yyyyMMdd");
     }
 
-    protected void updateSysCtlStatus(SysCtlSts sysCtlSts){
+    protected void updateSysCtlStatus(SysCtlSts sysCtlSts) {
         HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
         hmSysCtl.setSysSts(sysCtlSts.getCode());
         hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);

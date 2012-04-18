@@ -66,10 +66,9 @@
         </script>
     </ui:define>
     <ui:define name="content">
-        <div style="margin:5px">
-            <div class="entry" id="top">
-                <p:growl id="growl"/>
-                <h:form id="form">
+        <h:form id="form">
+            <div style="margin:5px">
+                <div class="entry" id="top">
                     <p:panel header="签到操作" id="input" style="width:550px;">
                         <h:panelGrid columns="2" cellspacing="5" style="margin-top:15px;margin-left: 20px"
                                      columnClasses="input-col-xl,input-col-xl">
@@ -86,15 +85,24 @@
                             <h:outputLabel/>
                         </h:panelGrid>
                         <p:separator/>
-                        <h:panelGrid columns="1" cellspacing="5" columnClasses="input-col-xxl">
-                            <h:commandButton id="nextButton" value=" 签  到 "
+                        <h:panelGrid columns="2" cellspacing="5" columnClasses="input-col-xxl">
+                            <p:ajaxStatus style="height:18px;text-align:center">
+                                <f:facet name="start">
+                                    <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                                </f:facet>
+                                <f:facet name="complete">
+                                    <h:outputText value=""/>
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:commandButton id="nextButton" value=" 签  到 " style="width:90px;"
                                              action="#{appMngAction.onLogon}"
-                                             ajax="false">
-                            </h:commandButton>
+                                             ajax="true" update="msgs">
+                            </p:commandButton>
                         </h:panelGrid>
                     </p:panel>
-                </h:form>
+                </div>
             </div>
-        </div>
+            <p:messages id="msgs"/>
+        </h:form>
     </ui:define>
 </ui:composition>

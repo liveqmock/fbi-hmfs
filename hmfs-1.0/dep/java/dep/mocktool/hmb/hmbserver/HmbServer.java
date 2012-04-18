@@ -75,6 +75,9 @@ public class HmbServer implements Runnable {
 
                 AbstractTxnProcessor processor = (AbstractTxnProcessor) context.getBean("txn" + txncode + "Processor");
                 processor.init(msg);
+
+//                Thread.sleep(60000);
+
                 byte[] gbks = processor.process();
                 socket.getOutputStream().write(gbks);
             } catch (Exception ex) {

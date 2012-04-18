@@ -77,4 +77,42 @@
                   value="common.repository.hmfs.dao"/>
     </bean>
 
+    <!-- 自动签到签退 cronTrigger -->
+    <bean id="autoSignHandler" class="dep.hmfs.batch.AutoSignHandler"/>
+    <bean id="signonJobDetailBean"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="autoSignHandler"/>
+        <property name="targetMethod" value="signon"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="signonCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="signonJobDetailBean"/>
+        <property name="cronExpression" value="0 43 9 * * ?"/>
+    </bean>
+    <bean id="signoutJobDetailBean"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="autoSignHandler"/>
+        <property name="targetMethod" value="signout"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="signoutCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="signoutJobDetailBean"/>
+        <property name="cronExpression" value="0 1 16 * * ?"/>
+    </bean>
+
+    <!-- 设置调度 -->
+    <bean id="myScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="signonCronTriggerBean"/>
+                <ref bean="signoutCronTriggerBean"/>
+            </list>
+        </property>
+        <property name="quartzProperties">
+            <props>
+                <prop key="org.quartz.threadPool.threadCount">1</prop>
+                <prop key="org.quartz.scheduler.instanceId">AUTO</prop>
+            </props>
+        </property>
+    </bean>
 </beans>
