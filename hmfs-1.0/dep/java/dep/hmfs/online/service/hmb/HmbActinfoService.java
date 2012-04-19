@@ -76,11 +76,8 @@ public class HmbActinfoService {
         return hmChkTxnMapper.insert(hmChkTxn);
     }
 
-    public List<HmTxnStl> qryTxnstlsByDate(String txnDate) {
-        HmTxnStlExample example = new HmTxnStlExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate);
-        example.setOrderByClause("TXN_SN");
-        List<HmTxnStl> hmTxnStlList = hmTxnStlMapper.selectByExample(example);
+    public List<HmTxnStl> qryHmTxnStlForChkAct(String txnDate) {
+        List<HmTxnStl> hmTxnStlList = hmTxnStlMapper.qryHmTxnStlForChkAct(txnDate);
         return hmTxnStlList;
     }
 

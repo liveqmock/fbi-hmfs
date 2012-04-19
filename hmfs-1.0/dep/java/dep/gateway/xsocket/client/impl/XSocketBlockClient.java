@@ -128,11 +128,11 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     public static void main(String[] args) {
         try {
-//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
-            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
+            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
+//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
             //String datagram = "1234567890      00005001123456789123456789            10000.00        201203090000001|300|C\n21122000012|9090900|C\n000000455|300|D";
             // 1001 交款查询
-           String datagram = "123456789012345600001001120415005264521000";
+//           String datagram = "123456789012345600001001120415005264521000";
             // 1002 交款  133716.39
 //           String datagram = "12345678901234560000100212031600483352100010.00           ";
             // 2001 支取查询
@@ -150,7 +150,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             缴款通知书编号	18	非必填项，凭证使用时填写
              */
             //String datagram = "1234567890888891000040012000000010114000000010115120319004843521000";
-           // String datagram = "123456789088889100005001100000000000003               268945.33       201203191234567890123333|60.00|C\n1234567890654321|133716.39|D";
+            String datagram = "123456789088889100005001100000000000003               268945.33       201204171234567890123333|60.00|C\n1234567890654321|133716.39|D";
 
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
             //socketBlockClient.close();

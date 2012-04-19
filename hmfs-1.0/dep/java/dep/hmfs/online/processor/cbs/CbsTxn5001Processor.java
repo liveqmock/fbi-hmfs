@@ -120,8 +120,9 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 hmChkTxn.setDcFlag(record.txnType);
                 hmbActinfoService.insertChkTxn(hmChkTxn);
             }
-            // 查询结算户交易明细到明细对账表
-            List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryTxnstlsByDate(tia5001.body.txnDate);
+            // TODO 查询结算户交易明细到明细对账表
+            List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryHmTxnStlForChkAct(tia5001.body.txnDate);
+
             for (HmTxnStl txnStl : hmTxnStlList) {
                 HmChkTxn hmChkTxn = new HmChkTxn();
                 hmChkTxn.setPkid(UUID.randomUUID().toString());
@@ -139,12 +140,11 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 txnErrCnt = 1;
             } else {
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
-                    logger.info("【主机端】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
+                    logger.info("【主机】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
                     HmTxnStl hmTxnStl = hmTxnStlList.get(index);
-                    logger.info("【本地会计账户】流水号：" + hmTxnStl.getTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
+                    logger.info("【本地】流水号：" + hmTxnStl.getCbsTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
                             " ==记账方向： " + hmTxnStl.getDcFlag());
-
-                    if (!r.txnSerialNo.equals(hmTxnStl.getTxnSn())
+                    if (!r.txnSerialNo.equals(hmTxnStl.getCbsTxnSn())
                             || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
                             || !r.txnType.equals(hmTxnStl.getDcFlag())) {
                         logger.error("账户交易明细内容不一致！");
