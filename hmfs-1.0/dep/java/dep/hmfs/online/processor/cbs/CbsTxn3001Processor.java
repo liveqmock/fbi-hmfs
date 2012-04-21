@@ -31,11 +31,12 @@ public class CbsTxn3001Processor extends CbsAbstractTxnProcessor {
             toa3001 = new TOA3001();
             toa3001.body.refundApplyNo = tia3001.body.refundApplyNo;
             toa3001.body.refundAmt = String.format("%.2f", totalRefundInfo.getTxnAmt1());
-            toa3001.body.refundFlag = TxnCtlSts.SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts()) ? "1" : "0";
-
-            // 更新退款汇总报文和子报文交易处理状态为：处理中
-            //String[] refundSubMsgTypes = {"01039", "01043"};
-            hmbBaseService.updateMsginSts(tia3001.body.refundApplyNo, TxnCtlSts.HANDLING);
+            if (TxnCtlSts.SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts())) {
+                toa3001.body.refundFlag = "1";
+            } else {
+                toa3001.body.refundFlag = "0";
+                hmbBaseService.updateMsginSts(tia3001.body.refundApplyNo, TxnCtlSts.HANDLING);
+            }
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }

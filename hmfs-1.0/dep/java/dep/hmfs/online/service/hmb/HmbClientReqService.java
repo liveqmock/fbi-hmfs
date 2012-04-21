@@ -51,7 +51,7 @@ public class HmbClientReqService extends HmbBaseService {
         }
     }
 
-    public Map<String, List<HmbMsg>> communicateWithHmbRtnMsgList(String txnCode, HmbMsg totalHmbMsg, List<HmMsgIn> msginLogList) throws Exception{
+    public Map<String, List<HmbMsg>> communicateWithHmbRtnMsgList(String txnCode, HmbMsg totalHmbMsg, List<HmMsgIn> msginLogList) throws Exception {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(totalHmbMsg);
         for (HmMsgIn msginLog : msginLogList) {
@@ -172,6 +172,20 @@ public class HmbClientReqService extends HmbBaseService {
         msg006.setRtnInfoCode("00");
         msg006.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
         return msg006;
+    }
+
+    public Msg012 createMsg012ByTotalMsgin(HmMsgIn msginLog) throws InvocationTargetException, IllegalAccessException {
+        Msg012 msg012 = new Msg012();
+        BeanUtils.copyProperties(msg012, msginLog);
+        msg012.submsgNum = 0;
+        msg012.sendSysId = SEND_SYS_ID;
+        msg012.origSysId = "00";
+        msg012.msgEndDate = "#";
+        msg012.origMsgSn = msginLog.getMsgSn();
+        msg012.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
+        msg012.setRtnInfoCode("00");
+        msg012.setRtnInfo("申请编号【" + msginLog.getMsgSn() + "】交易成功");
+        return msg012;
     }
 
     public Msg008 createMsg008ByTotalMsgin(HmMsgIn msginLog) throws InvocationTargetException, IllegalAccessException {

@@ -31,11 +31,12 @@ public class CbsTxn2001Processor extends CbsAbstractTxnProcessor {
             toa2001 = new TOA2001();
             toa2001.body.drawApplyNo = tia2001.body.drawApplyNo;
             toa2001.body.drawAmt = String.format("%.2f", totalDrawInfo.getTxnAmt1());
-            toa2001.body.drawFlag = TxnCtlSts.SUCCESS.getCode().equals(totalDrawInfo.getTxnCtlSts()) ? "1" : "0";
-
-            // 更新汇总报文和子报文交易处理状态为：处理中
-            String[] drawMsgTypes = {"01041"};
-            hmbBaseService.updateMsginSts(tia2001.body.drawApplyNo, TxnCtlSts.HANDLING);
+            if (TxnCtlSts.SUCCESS.getCode().equals(totalDrawInfo.getTxnCtlSts())) {
+                toa2001.body.drawFlag = "1";
+            } else {
+                hmbBaseService.updateMsginSts(tia2001.body.drawApplyNo, TxnCtlSts.HANDLING);
+                toa2001.body.drawFlag = "0";
+            }
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }

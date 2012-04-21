@@ -4,8 +4,8 @@ import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
-import dep.hmfs.online.processor.cbs.domain.txn.TIA3001;
-import dep.hmfs.online.processor.cbs.domain.txn.TOA3001;
+import dep.hmfs.online.processor.cbs.domain.txn.TIA2011;
+import dep.hmfs.online.processor.cbs.domain.txn.TOA2011;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,26 +20,29 @@ public class CbsTxn2011Processor extends CbsAbstractTxnProcessor {
 
     @Override
     public TOA process(String txnSerialNo, byte[] bytes) {
-        TIA3001 tia3001 = new TIA3001();
-        tia3001.body.refundApplyNo = new String(bytes, 0, 18).trim();
+        TIA2011 tia2011 = new TIA2011();
+        tia2011.body.refundApplyNo = new String(bytes, 0, 18).trim();
 
-        TOA3001 toa3001 = null;
+        TOA2011 toa2011 = null;
         // 查询汇总信息
-        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia3001.body.refundApplyNo, "00005");
+        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2011.body.refundApplyNo, "00005");
 
         if (totalRefundInfo != null) {
-            toa3001 = new TOA3001();
-            toa3001.body.refundApplyNo = tia3001.body.refundApplyNo;
-            toa3001.body.refundAmt = String.format("%.2f", totalRefundInfo.getTxnAmt1());
-            toa3001.body.refundFlag = TxnCtlSts.SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts()) ? "1" : "0";
+            toa2011 = new TOA2011();
+            toa2011.body.txnApplyNo = tia2011.body.refundApplyNo;
+            toa2011.body.txnAmt = String.format("%.2f", totalRefundInfo.getTxnAmt1());
 
-            // 更新退款汇总报文和子报文交易处理状态为：处理中
+            if(TxnCtlSts.SUCCESS.getCode().equals(totalRefundInfo.getTxnCtlSts())) {
+                toa2011.body.txnFlag = "1";
+            } else {
+                toa2011.body.txnFlag = "0";
+                hmbBaseService.updateMsginSts(tia2011.body.refundApplyNo, TxnCtlSts.HANDLING);
+            }
             //String[] refundSubMsgTypes = {"01039", "01043"};
-            hmbBaseService.updateMsginSts(tia3001.body.refundApplyNo, TxnCtlSts.HANDLING);
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }
 
-        return toa3001;
+        return toa2011;
     }
 }

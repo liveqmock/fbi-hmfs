@@ -17,23 +17,20 @@ public class StringPad {
 
         if (padStr == null || "".equals(padStr)) {
             padStr = " ";
-        } else if (padStr.getBytes().length > 1 || totalByteLength <= 0 || totalByteLength < srcByteLength) {
+        } else if (padStr.getBytes().length > 1 || totalByteLength <= 0) {
             throw new RuntimeException("参数错误");
         }
-        StringBuilder rtnStrBuilder = new StringBuilder(srcStr);
-        for (int i = 0; i < totalByteLength - srcByteLength; i ++) {
-            rtnStrBuilder.append(padStr);
+        StringBuilder rtnStrBuilder = new StringBuilder();
+        if (totalByteLength >= srcByteLength) {
+            rtnStrBuilder.append(srcStr);
+            for (int i = 0; i < totalByteLength - srcByteLength; i++) {
+                rtnStrBuilder.append(padStr);
+            }
+        } else {
+            byte[] rtnBytes = new byte[totalByteLength];
+            System.arraycopy(srcStr.getBytes(), 0, rtnBytes, 0, totalByteLength);
+            rtnStrBuilder.append(rtnBytes);
         }
         return rtnStrBuilder.toString();
-    }
-
-    public static void main(String[] args) {
-        String str = "张三";
-        System.out.println(str.length());           // 2
-        System.out.println(str.getBytes().length);  // 4
-
-        str = "张三aa";
-        System.out.println(str.length());          // 4
-        System.out.println(str.getBytes().length);  // 6
     }
 }

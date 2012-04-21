@@ -58,24 +58,13 @@ public class TOA1001 extends TOA implements Serializable {
 
             public String toFixedLengthString() {
                 StringBuilder stringBuilder = new StringBuilder();
-
-                if ((!StringUtils.isEmpty(accountName)) && accountName.length() >= 60) {
-                    stringBuilder.append(accountName.substring(0, 60));
-                } else {
-                    stringBuilder.append(StringPad.rightPad4ChineseToByteLength(accountName, 60, " "));
-                }
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(accountName) ? "" : accountName,
+                        60, " "));
                 stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
-                if ((!StringUtils.isEmpty(address)) && address.length() >= 80) {
-                    stringBuilder.append(address.substring(0, 80));
-                } else {
-                    stringBuilder.append(StringPad.rightPad4ChineseToByteLength(address, 80, " "));
-                }
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(address) ? "" : address,
+                        80, " "));
                 stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
-                if ((!StringUtils.isEmpty(phoneNo)) && phoneNo.length() >= 20) {
-                    stringBuilder.append(phoneNo.substring(0, 20));
-                } else {
-                    stringBuilder.append(StringUtils.rightPad(phoneNo, 20, " "));
-                }
+                stringBuilder.append(StringUtils.rightPad(StringUtils.isEmpty(phoneNo) ? "" : phoneNo, 20, " "));
                 stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
                 stringBuilder.append(StringUtils.rightPad(projAmt, 20, " "));
                 stringBuilder.append(StringUtils.rightPad(payPart, 20, " "));
