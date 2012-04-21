@@ -5,6 +5,7 @@ import dep.ContainerManager;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.online.processor.hmb.HmbAbstractTxnProcessor;
 import dep.hmfs.online.processor.hmb.HmbAsyncAbstractTxnProcessor;
+import dep.hmfs.online.processor.hmb.HmbSyncSubAbstractTxnProcessor;
 import dep.hmfs.online.processor.hmb.domain.*;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
@@ -91,8 +92,24 @@ public class HmbMsgHandleService implements IMessageHandler {
             summaryMsg.rtnInfoCode = "99";
             summaryMsg.rtnInfo = "交易失败,原因：" + e.getMessage();
         }
+        // 同步报文响应时 有子报文
         List<HmbMsg> rtnHmbMsgList = new ArrayList<HmbMsg>();
         rtnHmbMsgList.add(summaryMsg);
+        try {
+            if (processor instanceof HmbSyncSubAbstractTxnProcessor) {
+                for (HmbMsg msg : hmbMsgList.subList(1, hmbMsgList.size())) {
+                    SubMsg subMsg = null;
+                    String rtnSubMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msg.getMsgType()) + 1), 3, "0");
+                    subMsg = (SubMsg) Class.forName(SubMsg.class.getPackage().getName() + ".Msg" + rtnSubMsgType).newInstance();
+                    HmbMsg hmbMsg = hmbMsgList.get(0);
+                    BeanUtils.copyProperties(subMsg, hmbMsg);
+                    rtnHmbMsgList.add(subMsg);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("交易失败.交易码:" + txnCode, e);
+            throw new RuntimeException(e);
+        }
         return mf.marshal(txnCode, rtnHmbMsgList);
     }
 
