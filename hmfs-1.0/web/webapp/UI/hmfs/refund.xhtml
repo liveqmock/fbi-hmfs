@@ -15,6 +15,15 @@
                 width: 5%;
             }
         </style>
+        <script language="JavaScript" type="text/JavaScript">
+            //<![CDATA[
+            function KeyDown() {
+                if (event.keyCode == 13) {
+                    event.keyCode = 9;
+                }
+            }
+            //]]>
+        </script>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
@@ -23,12 +32,14 @@
                     <h:form>
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
+                            <p:focus for="msgsn" />
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
                                                      requiredMessage="申请单编号不能为空。"
+                                                     id="msgsn" onkeydown="KeyDown()"
                                                      value="#{refundAction.msgSn}"/>
                                         <h:outputLabel value="交易金额:" style="font-weight: bold"/>
                                         <p:inputText id="amt" size="25"

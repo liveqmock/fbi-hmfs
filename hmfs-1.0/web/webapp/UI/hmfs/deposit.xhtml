@@ -19,12 +19,7 @@
             //<![CDATA[
             function KeyDown() {
                 if (event.keyCode == 13) {
-                    if (event.srcElement.id == 'inputform:tellerid') {
-                        checktellerid();
                         event.keyCode = 9;
-                    } else {
-                        event.keyCode = 9;
-                    }
                 }
             }
 
@@ -37,6 +32,7 @@
 
                 if (confirm("确认开始打印吗?")){
                     alert("aabbcc");
+                    printall();
                 }
             }
 
@@ -47,15 +43,17 @@
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
                 <p:tab title="维修资金缴款处理">
-                    <h:form>
+                    <h:form >
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
+                            <p:focus for="msgsn" />
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
                                                      requiredMessage="申请单编号不能为空。"
+                                                     id="msgsn" onkeydown="KeyDown()"
                                                      value="#{depositAction.msgSn}"/>
                                         <h:outputLabel value="交易金额:" style="font-weight: bold"/>
                                         <p:inputText id="amt" size="25"
@@ -98,7 +96,7 @@
                             </p:ajaxStatus>
                             <p:menubar style="margin-bottom:3px;">
                                 <p:menuitem type="push" value="打印所选记录凭证" icon="ui-icon ui-icon-checked"
-                                            action="#{depositAction.onVchPrtSelected}" update="msgs, pdt"/>
+                                            action="#{depositAction.onPrintAll}" ajax="false" />
                                 <p:menuitem type="push" value="打印列表中全部凭证" icon="ui-icon ui-icon-print"
                                             process="@this"
                                             onclick="printAllVch();"
@@ -145,7 +143,7 @@
                         </div>
                         <p:remoteCommand name="printall" id="printall" async="false"
                                          actionListener="#{depositAction.onPrintAll}"
-                                         update="msgs" process="@this"
+                                         update="msgs" process="@none"
                                          />
                     </h:form>
                 </p:tab>

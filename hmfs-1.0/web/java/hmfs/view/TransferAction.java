@@ -94,10 +94,10 @@ public class TransferAction implements Serializable {
             this.subMsgList = actInfoService.selectSubMsgList(msgSn);
             this.totalCount = this.subMsgList.size();
 
-            //总分金额核对
+            //总分金额核对  注意：此处明细记录的交易金额为 F35：账户余额
             this.totalAmt = new BigDecimal(0.00);
             for (HmMsgIn hmMsgIn : this.subMsgList) {
-                this.totalAmt = this.totalAmt.add(hmMsgIn.getTxnAmt1());
+                this.totalAmt = this.totalAmt.add(hmMsgIn.getActBal());
             }
             if (txnAmt.compareTo(this.totalAmt) != 0) {
                 this.checkPassed = false;

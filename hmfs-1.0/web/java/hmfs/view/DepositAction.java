@@ -1,5 +1,9 @@
 package hmfs.view;
 
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.enums.TxnCtlSts;
@@ -17,6 +21,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -137,7 +145,44 @@ public class DepositAction implements Serializable {
 
     public String onPrintAll(){
 
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+
+        //通过Response把数据以Excel格式保存
+        response.reset();
+        response.setContentType("application/pdf;charset=UTF-8");
+        try {
+            response.addHeader("Content-Disposition", "attachment;filename=\""
+                    + new String(("用户意见信息表" + ".pdf").getBytes("GBK"),
+                    "ISO8859_1") + "\"");
+//            response.setHeader("Content-Disposition", "inline; attachment");
+            ServletOutputStream out = response.getOutputStream();
+            writePdf(out);
+            out.flush();
+            out.close();
+            FacesContext.getCurrentInstance().responseComplete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
+    }
+
+    private void writePdf(OutputStream outputStream) throws Exception {
+        Document document = new Document();
+        PdfWriter.getInstance(document, outputStream);
+
+        document.open();
+
+        document.addTitle("Test PDF");
+        document.addSubject("Testing email PDF");
+        document.addKeywords("iText, email");
+        document.addAuthor("Jee Vang");
+        document.addCreator("Jee Vang");
+
+        Paragraph paragraph = new Paragraph();
+        paragraph.add(new Chunk("hello!"));
+        document.add(paragraph);
+
+        document.close();
     }
     //=============================
 
