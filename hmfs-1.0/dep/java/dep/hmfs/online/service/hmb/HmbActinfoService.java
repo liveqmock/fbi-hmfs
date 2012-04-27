@@ -132,9 +132,9 @@ public class HmbActinfoService {
             } else if ("01034".equals(hmbMsg.getMsgType())) {
                 Msg034 msg034 = (Msg034) hmbMsg;
                 createActinfoFundByHmbMsg(msg034);
-            } else {
+            } /*else {
                 throw new RuntimeException("报文体中含有非核算户开户子报文序号" + hmbMsg.getMsgType() + "！");
-            }
+            }*/
         }
         return hmbMsgList.size();
     }
@@ -151,9 +151,9 @@ public class HmbActinfoService {
                 HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
-            } else {
+            } /*else {
                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + hmbMsg.getMsgType() + "！");
-            }
+            }*/
         }
         return hmbMsgList.size();
     }

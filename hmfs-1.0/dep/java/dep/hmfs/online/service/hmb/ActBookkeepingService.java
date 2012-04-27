@@ -10,6 +10,8 @@ import common.repository.hmfs.dao.HmTxnStlMapper;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,8 @@ import java.util.UUID;
 // 记账业务
 @Service
 public class ActBookkeepingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ActBookkeepingService.class);
 
     @Autowired
     private HmActStlMapper hmActStlMapper;
@@ -123,7 +127,7 @@ public class ActBookkeepingService {
             hmActStl.setActBal(hmActStl.getActBal().add(amt));
         } else if (DCFlagCode.WITHDRAW.getCode().equalsIgnoreCase(dc)) {
             hmActStl.setActBal(hmActStl.getActBal().subtract(amt));
-            if (hmActStl.getActBal().compareTo(new BigDecimal(0)) < 0) {
+            if (hmActStl.getActBal().compareTo(new BigDecimal("0.00")) < 0) {
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_LESS.getCode());
             }
         }
@@ -169,12 +173,17 @@ public class ActBookkeepingService {
             hmActFund.setLastTxnDt(strToday);
         }
         if (DCFlagCode.DEPOSIT.getCode().equalsIgnoreCase(dc)) {
-            hmActFund.setActBal(hmActFund.getActBal().add(amt));
+            hmActFund.setActBal(amt.add(hmActFund.getActBal()));
         } else if (DCFlagCode.WITHDRAW.getCode().equalsIgnoreCase(dc)) {
-            hmActFund.setActBal(hmActFund.getActBal().subtract(amt));
-            if (hmActFund.getActBal().compareTo(new BigDecimal(0)) < 0) {
+            logger.info("核算账户【" + hmActFund.getFundActno1() + "】余额：" + String.format("%.2f", hmActFund.getActBal()) + " 支取金额：" +
+                                    String.format("%.2f", amt));
+            if (hmActFund.getActBal().compareTo(amt) < 0) {
                 throw new RuntimeException(CbsErrorCode.FUND_ACT_BAL_LESS.getCode());
             }
+            hmActFund.setActBal(hmActFund.getActBal().subtract(amt));
+            /*if (hmActFund.getActBal().compareTo(new BigDecimal("0.00")) < 0) {
+                throw new RuntimeException(CbsErrorCode.FUND_ACT_BAL_LESS.getCode());
+            }*/
         }
         // 更新核算账户信息
         return hmActFundMapper.updateByPrimaryKey(hmActFund);

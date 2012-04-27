@@ -55,8 +55,15 @@ public class HmbClientReqService extends HmbBaseService {
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(totalHmbMsg);
         for (HmMsgIn msginLog : msginLogList) {
-            HmbMsg detailMsg = (HmbMsg) Class.forName(HmbMsg.class.getPackage().getName()
-                    + ".Msg" + msginLog.getMsgType().substring(2)).newInstance();
+            HmbMsg detailMsg = null;
+            if ("6302".equals(txnCode) && "01033".equals(msginLog.getMsgType())) {
+                detailMsg = new Msg034();
+            } else if ("6301".equals(txnCode) && "01051".equals(msginLog.getMsgType())) {
+                detailMsg = new Msg052();
+            } else {
+                detailMsg = (HmbMsg) Class.forName(HmbMsg.class.getPackage().getName()
+                        + ".Msg" + msginLog.getMsgType().substring(2)).newInstance();
+            }
             BeanUtils.copyProperties(detailMsg, msginLog);
             hmbMsgList.add(detailMsg);
         }
@@ -94,6 +101,8 @@ public class HmbClientReqService extends HmbBaseService {
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
             String[] payMsgTypes = {"01035", "01045"};
             List<HmMsgIn> payInfoList = qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);
+
+
             HmMsgIn totalPayInfo = qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
                 HmMsgIn msginLog = payInfoList.get((int) (i - startNo));

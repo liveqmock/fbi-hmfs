@@ -19,11 +19,12 @@ public class HmbTxn6302Processor extends HmbAsyncAbstractTxnProcessor {
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         List<HmbMsg> msg033List = new ArrayList<HmbMsg>();
         for(HmbMsg msg : hmbMsgList) {
-            if(msg instanceof Msg033) {
+            if("01033".equals(msg.getMsgType())) {
                 Msg033 msg033 = (Msg033)msg;
                 msg033List.add(msg033);
             }
         }
+        logger.info("跨行划入核算账户数：" + msg033List.size());
         return hmbActinfoService.createActFundsByMsgList(msg033List);
     }
 }

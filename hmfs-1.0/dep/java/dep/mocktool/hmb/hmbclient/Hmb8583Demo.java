@@ -42,7 +42,7 @@ public class Hmb8583Demo {
 //        client.testMarshal();
 //        client.testUnmarshal();
 
-        client.processMsgIn("5120");
+        client.processMsgIn("6301");
         //client.processMsgIn("5130");
         //client.processMsgIn("5140");
 //        client.processMsgIn("5210");

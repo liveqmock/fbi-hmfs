@@ -49,7 +49,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         /*
         票据状态	         1	    1:领用；2:使用；3:作废
         打印票据起始编号	12	    票据起始编号
-        打印票据结束编号	12	    票据结束编号（单张销号该字段为空）
+        打印票据结束编号	12	    票据结束编号
         缴款通知书编号	    18	    非必填项，凭证使用时填写
          */
         long startNo = 0;

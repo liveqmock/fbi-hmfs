@@ -42,7 +42,7 @@ public class CbsTxn2012Processor extends CbsAbstractTxnProcessor {
         tia2012.body.txnApplyNo = new String(bytes, 0, 18).trim();
         tia2012.body.txnAmt = new String(bytes, 18, 16).trim();
 
-        String[] refundSubMsgTypes = {"01039", "01051"};
+        String[] refundSubMsgTypes = {"01039"};
 
         HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2012.body.txnApplyNo, "00011");
         // 查询交易子报文记录
@@ -50,12 +50,15 @@ public class CbsTxn2012Processor extends CbsAbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (actBookkeepingService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia2012.body.txnAmt))) {
             // 退款交易。
-            actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "3002");
-            hmbActinfoService.updateActinfoFundsByMsginList(fundInfoList);
+            actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "2012");
+            List<HmMsgIn> cancelDetailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2012.body.txnApplyNo, new String[]{"01051"});
+            hmbActinfoService.updateActinfoFundsByMsginList(cancelDetailMsginLogs);
             hmbBaseService.updateMsginSts(tia2012.body.txnApplyNo, TxnCtlSts.SUCCESS);
         }
+        String[] payRtnMsgTypes = {"01039", "01051"};
+        List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2012.body.txnApplyNo, payRtnMsgTypes);
         if (hmbClientReqService.communicateWithHmb(totalRefundInfo.getTxnCode(),
-                hmbClientReqService.createMsg012ByTotalMsgin(totalRefundInfo), fundInfoList)) {
+                hmbClientReqService.createMsg012ByTotalMsgin(totalRefundInfo), detailMsginLogs)) {
             return null;
         } else {
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());

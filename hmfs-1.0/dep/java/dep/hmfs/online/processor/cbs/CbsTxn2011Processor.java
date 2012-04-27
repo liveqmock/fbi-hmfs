@@ -25,7 +25,7 @@ public class CbsTxn2011Processor extends CbsAbstractTxnProcessor {
 
         TOA2011 toa2011 = null;
         // 查询汇总信息
-        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2011.body.refundApplyNo, "00005");
+        HmMsgIn totalRefundInfo = hmbBaseService.qryTotalMsgByMsgSn(tia2011.body.refundApplyNo, "00011");
 
         if (totalRefundInfo != null) {
             toa2011 = new TOA2011();

@@ -67,7 +67,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         return datagramBytes;
     }
 
-    public byte[] sendDataUntilRcvToDep(byte[] dataBytes) throws Exception {
+    /*  public byte[] sendDataUntilRcvToDep(byte[] dataBytes) throws Exception {
         logger.info("【本地客户端】发送报文：" + new String(dataBytes));
         byte[] datagramBytes = null;
         if (sendData(dataBytes)) {
@@ -78,7 +78,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
         logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
         return datagramBytes;
-    }
+    }*/
 
     private boolean sendData(byte[] dataBytes) throws IOException {
         if (blockingConnection == null || !blockingConnection.isOpen()) {
@@ -128,13 +128,36 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     public static void main(String[] args) {
         try {
-            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
-//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
+//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
+            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
+            /*
+            120426090967521000	3689.85
+            120426090968521000	3080.91
+            120426090969521000	3086.52
+            120426090970521000	2962.08
+            120426090971521000	3172.71
+            120426090972521000	3589.89
+            120426090973521000	1867.62
+            120426090974521000	4568.07
+            120426090975521000	3189.54
+            120426090976521000	3362.94
+            120426090977521000	3994.83
+            120426090978521000	2126.70
+            120426090979521000	4566.03
+            120426090980521000	3080.91
+            120426090981521000	3362.94
+            120426090982521000	51.00
+            120426090983521000	3197.70
+            120426090984521000	3240.03
+            120426090985521000	3190.05
+            120426090986521000	3362.94
+            120426090987521000	3987.69
+             */
             //String datagram = "1234567890      00005001123456789123456789            10000.00        201203090000001|300|C\n21122000012|9090900|C\n000000455|300|D";
             // 1001 交款查询
-//           String datagram = "123456789012345600001001120415005264521000";
+//          String datagram = "123456789012345600001001120427091098521000";
             // 1002 交款  133716.39
-//           String datagram = "12345678901234560000100212031600483352100010.00           ";
+//           String datagram = "123456789012345600001002" + "120427091098521000" + StringUtils.rightPad("2832.54", 16, ' ');
             // 2001 支取查询
             //String datagram = "123456789012345600002001120319004846531000";
             // 2002 支取
@@ -150,7 +173,15 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             缴款通知书编号	18	非必填项，凭证使用时填写
              */
             //String datagram = "1234567890888891000040012000000010114000000010115120319004843521000";
-            String datagram = "123456789088889100005001100000000000003               268945.33       201204171234567890123333|60.00|C\n1234567890654321|133716.39|D";
+//            String datagram = "123456789088889100005001100000000000003               268945.33       201204171234567890123333|60.00|C\n1234567890654321|133716.39|D";
+            // 1011 划入查询
+//            String datagram = "123456789012345600001011120427091101630200";
+            // 1012 划入确认
+//         String datagram = "123456789012345600001012" + "120427091101630200" + StringUtils.rightPad("2832.54", 16, ' ');
+            // 2011 划出查询
+//               String datagram = "123456789012345600002011120427091101630100";
+            // 2012 划入确认
+            String datagram = "123456789012345600002012" + "120427091101630100" + StringUtils.rightPad("2832.54", 16, ' ');
 
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
             //socketBlockClient.close();

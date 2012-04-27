@@ -15,12 +15,12 @@ public class HmbTxn5210Processor extends HmbAsyncAbstractTxnProcessor {
     @Override
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         Msg005 msg005 = (Msg005) hmbMsgList.get(0);
-        BigDecimal subTxnamtSum = new BigDecimal(0);
+        BigDecimal subTxnamtSum = new BigDecimal("0.00");
         for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
             if (hmbMsg instanceof Msg035) {
-                subTxnamtSum.add(((Msg035) hmbMsg).txnAmt1);
+                subTxnamtSum = subTxnamtSum.add(((Msg035) hmbMsg).txnAmt1);
             } else if (hmbMsg instanceof Msg045) {
-                subTxnamtSum.add(((Msg045) hmbMsg).txnAmt1);
+                subTxnamtSum = subTxnamtSum.add(((Msg045) hmbMsg).txnAmt1);
             } else {
                 throw new RuntimeException("5210交易子报文还有非法子报文序号[" + hmbMsg.msgType + "]");
             }
