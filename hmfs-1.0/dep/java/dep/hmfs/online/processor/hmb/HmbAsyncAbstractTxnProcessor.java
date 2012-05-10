@@ -22,6 +22,7 @@ public abstract class HmbAsyncAbstractTxnProcessor extends HmbAbstractTxnProcess
     @Override
     @Transactional
     public int run(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+        process(txnCode, msgSn, hmbMsgList);
         return hmbBaseService.updateOrInsertMsginsByHmbMsgList(txnCode, hmbMsgList);
     }
 }
