@@ -17,6 +17,7 @@ import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +153,14 @@ public class HmbBaseService {
         String txnCode = rtnMap.keySet().iterator().next();
         for (HmbMsg hmbMsg : rtnMap.get(txnCode)) {
             HmMsgOut msgoutLog = new HmMsgOut();
-            BeanUtils.copyProperties(msgoutLog, hmbMsg);
+            //TODO 2012-05-22
+//            BeanUtils.copyProperties(msgoutLog, hmbMsg);
+            try {
+                PropertyUtils.copyProperties(msgoutLog, hmbMsg);
+            } catch (NoSuchMethodException e) {
+                logger.error("PropertyUtils.copyProperties(msgoutLog, hmbMsg);", e);
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             String guid = UUID.randomUUID().toString();
             msgoutLog.setPkid(guid);
             msgoutLog.setTxnCode(txnCode);

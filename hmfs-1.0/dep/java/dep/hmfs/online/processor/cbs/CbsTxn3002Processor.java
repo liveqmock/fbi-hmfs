@@ -64,10 +64,10 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
 
         List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(totalRefundInfo.getMsgSn(), refundFundMsgTypes);
         if (hmbClientReqService.communicateWithHmb(totalRefundInfo.getTxnCode(),
-                hmbClientReqService.createMsg012ByTotalMsgin(totalRefundInfo), detailMsginLogs)) {
+                hmbClientReqService.createMsg006ByTotalMsgin(totalRefundInfo), detailMsginLogs)) {
             return null;
         } else {
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
-        }
+    }
     }
 }

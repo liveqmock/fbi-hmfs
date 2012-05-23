@@ -9,6 +9,7 @@ import common.repository.hmfs.model.TmpMsgIn;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg099;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,12 @@ public class HmbTxn7002Processor extends HmbSyncAbstractTxnProcessor {
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         Msg099 msg099 = (Msg099) hmbMsgList.get(1);
         HmMsgInExample example = new HmMsgInExample();
-        for (String msgType : CAN_CANCEL_CODES) {
-            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msg099.origMsgSn)
+//        for (String msgType : CAN_CANCEL_CODES) {
+//            example.or().andMsgTypeEqualTo(msgType).andMsgSnEqualTo(msg099.origMsgSn)
+//                    .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
+//        }
+        example.createCriteria().andMsgSnEqualTo(msg099.origMsgSn)
                     .andTxnCtlStsEqualTo(TxnCtlSts.INIT.getCode());
-        }
         List<HmMsgIn> msginLogList = hmMsgInMapper.selectByExample(example);
         if (msginLogList.size() == 0) {
             throw new RuntimeException("该交易报文不存在，或已进入业务处理流程。");
@@ -43,7 +46,14 @@ public class HmbTxn7002Processor extends HmbSyncAbstractTxnProcessor {
         for (HmMsgIn record : msginLogList) {
             // TODO 撤销的交易报文表
             TmpMsgIn tmpMsgIn = new TmpMsgIn();
-            BeanUtils.copyProperties(tmpMsgIn, record);
+            //TODO 2012-05-22
+            //BeanUtils.copyProperties(tmpMsgIn, record);
+            try {
+                PropertyUtils.copyProperties(tmpMsgIn, record);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                logger.error("PropertyUtils.copyProperties(tmpMsgIn, record)", e);
+            }
             tmpMsgInMapper.insert(tmpMsgIn);
             hmMsgInMapper.deleteByPrimaryKey(record.getPkid());
         }
