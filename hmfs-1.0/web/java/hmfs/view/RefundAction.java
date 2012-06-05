@@ -33,7 +33,6 @@ import java.util.List;
 @ViewScoped
 public class RefundAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(RefundAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;
@@ -149,14 +148,6 @@ public class RefundAction implements Serializable {
     }
 
     //=============================
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        RefundAction.sdf = sdf;
-    }
 
     public ActinfoQryParam getQryParam() {
         return qryParam;

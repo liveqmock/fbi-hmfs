@@ -31,7 +31,6 @@ import java.util.List;
 @ViewScoped
 public class ActChkAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ActChkAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;

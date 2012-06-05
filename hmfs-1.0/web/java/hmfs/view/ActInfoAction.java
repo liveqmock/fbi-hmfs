@@ -28,7 +28,6 @@ import java.util.List;
 @ViewScoped
 public class ActInfoAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ActInfoAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;
@@ -186,15 +185,6 @@ public class ActInfoAction implements Serializable {
     public void setSysSts(String sysSts) {
         this.sysSts = sysSts;
     }
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        ActInfoAction.sdf = sdf;
-    }
-
 
     public ActInfoService getActInfoService() {
         return actInfoService;

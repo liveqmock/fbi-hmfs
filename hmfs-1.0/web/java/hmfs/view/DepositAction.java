@@ -13,6 +13,7 @@ import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
 import hmfs.service.DepService;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import skyline.common.utils.MessageUtil;
@@ -22,6 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -40,7 +42,6 @@ import java.util.List;
 @ViewScoped
 public class DepositAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(DepositAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;
@@ -175,8 +176,8 @@ public class DepositAction implements Serializable {
         document.addTitle("Test PDF");
         document.addSubject("Testing email PDF");
         document.addKeywords("iText, email");
-        document.addAuthor("Jee Vang");
-        document.addCreator("Jee Vang");
+        document.addAuthor("FBI");
+        document.addCreator("FBI");
 
         Paragraph paragraph = new Paragraph();
         paragraph.add(new Chunk("hello!"));
@@ -184,15 +185,28 @@ public class DepositAction implements Serializable {
 
         document.close();
     }
+
+    public void  searchFirstOneRecordForPrint(ActionEvent actionEvent){
+//        for (HmMsgIn hmMsgIn : this.subMsgList) {
+//
+//        }
+
+
+        RequestContext context = RequestContext.getCurrentInstance();
+        context.addCallbackParam("acctno", "123456");    //basic parameter
+//        context.addCallbackParam("user", user);     //pojo as json
+
+        //execute javascript oncomplete
+        context.execute("PrimeFaces.info('Hello from the Backing Bean');");
+
+        //update panel
+//        context.update("form:panel");
+        //scroll to panel
+//        context.scrollTo("form:panel");
+
+
+    }
     //=============================
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        DepositAction.sdf = sdf;
-    }
 
     public ActinfoQryParam getQryParam() {
         return qryParam;

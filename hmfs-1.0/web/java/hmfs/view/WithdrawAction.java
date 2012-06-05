@@ -32,7 +32,6 @@ import java.util.List;
 @ViewScoped
 public class WithdrawAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;
@@ -136,14 +135,6 @@ public class WithdrawAction implements Serializable {
     }
 
     //=============================
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        WithdrawAction.sdf = sdf;
-    }
 
     public ActinfoQryParam getQryParam() {
         return qryParam;

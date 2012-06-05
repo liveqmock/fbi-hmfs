@@ -23,27 +23,99 @@
                 }
             }
 
+            var nextPrtId;
             function printAllVch() {
-                alert(pdtvar.toString());
+                //alert(pdtvar.toString());
                 //var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
                 //var rows = pdtvar.getElementsByTagName("tr");
 //                for (var i=1;i<rows.length;++i)
 //                    rows[i].className = 'rowClassSelected';
 
+                //document.getElementById('printFrame').location.reload();
                 if (confirm("确认开始打印吗?")){
-                    alert("aabbcc");
-                    printall();
+                    //printall();
+                    //printTure();
+
+                    nextPrtId = '';
+                    //while (confirm("确认开始打印吗??")){
+                        getPrintRecord();
+                    //}
+                    //alert("====" + nextPrtId);
+
+                    //printHidden("common/qryWaitPrtVch.xhtml");
                 }
+            }
+
+            //查询
+            function handleGetPrintRecordComplete(xhr, status, args) {
+                if(args.validationFailed) {
+                    alert("交易返回结果异常！");
+                }
+                else {
+                    nextprtId = args.acctno;
+                    //printHidden("common/qryWaitPrtVch.xhtml")
+                    //document.frames["printFrame"].src = "common/qryWaitPrtVch.xhtml?id=" + nextprtId;
+//                    document.getElementById('printFrame').location.reload();
+//                    document.frames["printFrame"].location.reload();
+                    setTimeout(function(){
+                        document.frames['printFrame'].location.reload();
+                    },0);
+                    alert("acctno:" + args.acctno);
+                }
+            }
+
+            //
+            function printHidden(url) {
+                var mainform = document.getElementById("printDiv");
+                alert(mainform.innerHTML);
+                mainform.insertAdjacentHTML("beforeEnd",
+                        "<iframe name=printHiddenFrame width=20 height=20></iframe>");
+                var doc = printHiddenFrame.document;
+                doc.open();
+                //doc.write("<body onload=\"parent.printTure()\">");
+                doc.write("<body>");
+                doc.write("12121221212211212121212");
+                doc.write("<iframe name=printMe width=20 height=20 src=\"" +
+                        url + "\"></iframe>");
+                doc.write("</body>");
+                alert("111");
+                doc.close();
+            }
+
+
+            //用于设置打印参数
+            function printBase() {
+                factory.printing.header = "" //页眉
+                factory.printing.footer = "" //页脚
+                factory.printing.portrait = true //true为纵向打印，false为横向打印
+                factory.printing.leftMargin = 0.5
+                factory.printing.topMargin = 1.5
+                factory.printing.rightMargin = 0.5
+                factory.printing.bottomMargin = 1.5
+            }
+
+            function printTure()
+            {
+                alert("开始。。。");
+                printBase();
+//                document.getElementById("btnPrint").style.display = "none";//隐藏按钮
+                //factory.printing.Preview();
+//                factory.printing.Print(false);
+                factory.printing.Print(false, 'printFrame');
+//                document.getElementById("btnPrint").style.display = "inline";//显示按钮
             }
 
             //]]>
         </script>
     </ui:define>
     <ui:define name="content">
+        <OBJECT id="factory" codeBase="smsx.cab#Version=6,6,440,20"
+                height="0" width="0" classid="clsid:1663ed61-23eb-11d2-b92f-008048fdd814" viewastext="true">
+        </OBJECT>
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
                 <p:tab title="维修资金缴款处理">
-                    <h:form >
+                    <h:form id="mainform">
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
                             <p:focus for="msgsn" />
@@ -141,10 +213,17 @@
                                 </p:column>
                             </p:dataTable>
                         </div>
-                        <p:remoteCommand name="printall" id="printall" async="false"
+                        <p:remoteCommand name="printall" id="printall" async="true"
                                          actionListener="#{depositAction.onPrintAll}"
+                                         update="msgs" process="@none"/>
+                        <p:remoteCommand name="getPrintRecord" id="getPrintRecord" async="true"
+                                         actionListener="#{depositAction.searchFirstOneRecordForPrint}"
                                          update="msgs" process="@none"
-                                         />
+                                         oncomplete="handleGetPrintRecordComplete(xhr, status, args)"/>
+                        <div id="printDiv">
+                             qqqqqq
+                        </div>
+                        <iframe id="printFrame" width="100%" height="200" src="common/qryWaitPrtVch.xhtml"></iframe>
                     </h:form>
                 </p:tab>
                 <p:tab title="已打印票据清单">

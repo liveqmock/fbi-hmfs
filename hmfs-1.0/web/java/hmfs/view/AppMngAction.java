@@ -27,7 +27,6 @@ import java.util.Date;
 @ViewScoped
 public class AppMngAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(AppMngAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private String sysDate;
     private String sysTime;
@@ -54,6 +53,8 @@ public class AppMngAction implements Serializable {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         this.sysSts = sysCtlSts.getTitle();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         this.lastSignonTime = sdf.format(hmSysCtl.getSignonDt());
         this.lastSignoutTime = sdf.format(hmSysCtl.getSignoutDt());
@@ -221,14 +222,6 @@ public class AppMngAction implements Serializable {
 
     public void setLastSignoutTime(String lastSignoutTime) {
         this.lastSignoutTime = lastSignoutTime;
-    }
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        AppMngAction.sdf = sdf;
     }
 
     public String getHostChkTime() {

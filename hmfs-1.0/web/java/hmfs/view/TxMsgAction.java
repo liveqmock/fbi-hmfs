@@ -26,7 +26,6 @@ import java.util.List;
 @ViewScoped
 public class TxMsgAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(TxMsgAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private String sysDate;
     private String sysTime;
@@ -162,14 +161,6 @@ public class TxMsgAction implements Serializable {
     }
 
     //=============================
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        TxMsgAction.sdf = sdf;
-    }
 
     public String getSysDate() {
         return sysDate;

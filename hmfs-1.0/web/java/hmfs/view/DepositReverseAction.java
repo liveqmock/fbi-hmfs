@@ -32,7 +32,6 @@ import java.util.List;
 @ViewScoped
 public class DepositReverseAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(DepositReverseAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private ActinfoQryParam qryParam = new ActinfoQryParam();
     private String sysDate;
@@ -136,14 +135,6 @@ public class DepositReverseAction implements Serializable {
     }
 
     //=============================
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        DepositReverseAction.sdf = sdf;
-    }
 
     public ActinfoQryParam getQryParam() {
         return qryParam;

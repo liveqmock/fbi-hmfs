@@ -15,7 +15,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +27,6 @@ import java.text.SimpleDateFormat;
 @ViewScoped
 public class OpenActInfoAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(OpenActInfoAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private Msg031 msg031= new Msg031();
 
@@ -92,15 +90,6 @@ public class OpenActInfoAction implements Serializable {
 
     public void setAppMngService(AppMngService appMngService) {
         this.appMngService = appMngService;
-    }
-
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        OpenActInfoAction.sdf = sdf;
     }
 
 

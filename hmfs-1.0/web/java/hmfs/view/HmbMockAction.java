@@ -26,7 +26,6 @@ import java.util.List;
 @ViewScoped
 public class HmbMockAction implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(HmbMockAction.class);
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private String sysDate;
     private String sysTime;
@@ -120,14 +119,6 @@ public class HmbMockAction implements Serializable {
 
     //=============================
 
-
-    public static SimpleDateFormat getSdf() {
-        return sdf;
-    }
-
-    public static void setSdf(SimpleDateFormat sdf) {
-        HmbMockAction.sdf = sdf;
-    }
 
     public String getSysDate() {
         return sysDate;
