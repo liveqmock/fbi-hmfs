@@ -51,7 +51,7 @@ public class HmbActinfoService {
     public HmSysCtl getSysCtl() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
-    
+
     @Transactional
     public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {
         HmChkActExample example = new HmChkActExample();
@@ -63,7 +63,7 @@ public class HmbActinfoService {
     public int insertChkAct(HmChkAct hmChkAct) {
         return hmChkActMapper.insert(hmChkAct);
     }
-    
+
     @Transactional
     public int deleteCbsChkTxnByDate(String date8, String cbsActno, String sendSysId) {
         HmChkTxnExample example = new HmChkTxnExample();
@@ -291,7 +291,7 @@ public class HmbActinfoService {
     }
 
     @Transactional
-    public int cancelActinfoFundsByMsgList(List<HmbMsg> hmbMsgList) {
+    public int cancelActinfoIdFundsByMsgList(List<HmbMsg> hmbMsgList) {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
@@ -302,6 +302,24 @@ public class HmbActinfoService {
                     //throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                     //2012-05-31 linyong
                     throw new RuntimeException("该信息ID" + msg051.infoId1 + "账户中尚有余额，不能销户。");
+                }
+                hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                hmActFundMapper.updateByPrimaryKey(hmActFund);
+            } else {
+                throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
+            }
+        }
+        return hmbMsgList.size();
+    }
+
+    @Transactional
+    public int cancelActNoFundsByMsgList(List<HmbMsg> hmbMsgList) {
+        for (HmbMsg hmbMsg : hmbMsgList) {
+            if ("01051".equals(hmbMsg.getMsgType())) {
+                Msg051 msg051 = (Msg051) hmbMsg;
+                HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
+                if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+                    throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                 }
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);

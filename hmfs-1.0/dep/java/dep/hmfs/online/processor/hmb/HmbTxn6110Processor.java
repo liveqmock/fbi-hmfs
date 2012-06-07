@@ -14,6 +14,6 @@ public class HmbTxn6110Processor extends HmbSyncAbstractTxnProcessor {
 
     @Override
     public int process(String txnCode, String msgSn, List<HmbMsg> hmbMsgList) {
-        return hmbActinfoService.cancelActinfoFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
+        return hmbActinfoService.cancelActinfoIdFundsByMsgList(hmbMsgList.subList(1, hmbMsgList.size()));
     }
 }
