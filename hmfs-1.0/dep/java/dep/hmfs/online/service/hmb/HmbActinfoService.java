@@ -295,9 +295,13 @@ public class HmbActinfoService {
         for (HmbMsg hmbMsg : hmbMsgList) {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
-                HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
+                //HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
+                //2012-05-31  linyong
+                HmActFund hmActFund = qryHmActfundByInfoID(msg051.infoId1);
                 if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
-                    throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
+                    //throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
+                    //2012-05-31 linyong
+                    throw new RuntimeException("该信息ID" + msg051.infoId1 + "账户中尚有余额，不能销户。");
                 }
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
