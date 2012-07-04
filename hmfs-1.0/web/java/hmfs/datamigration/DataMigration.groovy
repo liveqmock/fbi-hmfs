@@ -19,6 +19,7 @@ class DataMigration {
         mig.checkFundTxn()
     }
 
+    //核对帐户余额表数据
     def checkFundAct() {
         localdb.eachRow("select * from mig_acct where parent_fund is null") {
             def fund = it.fund
@@ -36,7 +37,6 @@ class DataMigration {
             if (bal != sumbal) {
                 println "======核算户:${fund} 余额:${bal}, 分户余额合计:${sumbal}, 分户数:${count} "
             }
-
             /*
             localdb.eachRow("select * from mig_acct where parent_fund = ${fund}") {
                 localdb.eachRow("select count(*) cnt from mig_acct where parent_fund = ${it.fund}") {
@@ -49,7 +49,7 @@ class DataMigration {
         }
     }
 
-
+    //核对流水表数据
     def checkFundTxn() {
         localdb.eachRow("select * from mig_acct") {
             def fund = it.fund
@@ -81,5 +81,6 @@ class DataMigration {
         }
     }
 
-
+    //TODO
+    //TODO 移植后 数据核对
 }
