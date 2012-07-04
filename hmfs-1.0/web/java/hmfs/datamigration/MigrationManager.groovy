@@ -9,12 +9,12 @@ import groovy.sql.Sql
  * Time: обнГ4:27
  * To change this template use File | Settings | File Templates.
  */
-class DataMigration {
+class MigrationManager {
     def localdbdef = [url: 'jdbc:oracle:thin:@localhost:1521:orcl', user: 'hmfs', password: 'hmfs', driver: 'oracle.jdbc.driver.OracleDriver']
     def localdb = Sql.newInstance(localdbdef.url, localdbdef.user, localdbdef.password, localdbdef.driver)
 
     static void main(args) {
-        DataMigration mig = new DataMigration();
+        MigrationManager mig = new MigrationManager();
         mig.checkFundAct()
         mig.checkFundTxn()
     }
