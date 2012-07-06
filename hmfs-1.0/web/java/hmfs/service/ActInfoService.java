@@ -178,4 +178,9 @@ public class ActInfoService {
         example.createCriteria().andTxnDateEqualTo(txnDate);
         return  hmChkTxnMapper.countByExample(example);
     }
+
+    public boolean checkVoucherPrintStatus(HmMsgIn msgIn){
+        return false;
+
+    }
 }

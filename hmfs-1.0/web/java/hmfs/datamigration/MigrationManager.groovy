@@ -10,8 +10,8 @@ import groovy.sql.Sql
  * To change this template use File | Settings | File Templates.
  */
 class MigrationManager {
-    def localdbdef = [url: 'jdbc:oracle:thin:@localhost:1521:orcl', user: 'hmfs', password: 'hmfs', driver: 'oracle.jdbc.driver.OracleDriver']
-    def localdb = Sql.newInstance(localdbdef.url, localdbdef.user, localdbdef.password, localdbdef.driver)
+    def dbparam = [url: 'jdbc:oracle:thin:@localhost:1521:orcl', user: 'hmfs', password: 'hmfs', driver: 'oracle.jdbc.driver.OracleDriver']
+    def db = Sql.newInstance(dbparam.url, dbparam.user, dbparam.password, dbparam.driver)
     def mainpath = "c:/temp/"
 
     static void main(args) {
@@ -42,40 +42,40 @@ class MigrationManager {
         //核对流水表数据
         mig.checkFundTxn()
 
-        mig.localdb.close()
+        mig.db.close()
     }
 
     def initBizDBTable(){
-        localdb.execute("truncate table hm_act_fund")
-        localdb.execute("truncate table hm_act_stl")
-        localdb.execute("truncate table hm_chk_act")
-        localdb.execute("truncate table hm_chk_txn")
-        localdb.execute("truncate table hm_msg_in")
-        localdb.execute("truncate table hm_msg_out")
-        localdb.execute("truncate table hm_msg_cancel")
-        localdb.execute("truncate table hm_txn_fund")
-        localdb.execute("truncate table hm_txn_stl")
-        localdb.execute("truncate table hm_txn_vch")
-        localdb.execute("truncate table tmp_msg_in")
-        localdb.execute("truncate table tmp_msg_out")
+        db.execute("truncate table hm_act_fund")
+        db.execute("truncate table hm_act_stl")
+        db.execute("truncate table hm_chk_act")
+        db.execute("truncate table hm_chk_txn")
+        db.execute("truncate table hm_msg_in")
+        db.execute("truncate table hm_msg_out")
+        db.execute("truncate table hm_msg_cancel")
+        db.execute("truncate table hm_txn_fund")
+        db.execute("truncate table hm_txn_stl")
+        db.execute("truncate table hm_txn_vch")
+        db.execute("truncate table tmp_msg_in")
+        db.execute("truncate table tmp_msg_out")
         println "\t数据库业务表初始化完成。"
     }
 
     def initMigrationDBTable(){
-        localdb.execute("truncate table mig_real_acct")
-        localdb.execute("truncate table mig_acct")
-        localdb.execute("truncate table mig_acct_water")
-        localdb.execute("truncate table mig_base_info")
-        localdb.execute("truncate table mig_hou_info")
-        localdb.execute("truncate table mig_owner_info")
-        localdb.execute("truncate table mig_pay_detail")
-        localdb.execute("truncate table mig_pay_detail_all")
-        println "\t数据库数据移植表初始化完成。"
+        db.execute("truncate table mig_real_acct")
+        db.execute("truncate table mig_acct")
+        db.execute("truncate table mig_acct_water")
+        db.execute("truncate table mig_base_info")
+        db.execute("truncate table mig_hou_info")
+        db.execute("truncate table mig_owner_info")
+        db.execute("truncate table mig_pay_detail")
+        db.execute("truncate table mig_pay_detail_all")
+        println "\t数据库数据移植表初始化完成。\n"
     }
 
     def initSystemCtrlTable(){
-        localdb.execute("update hm_sys_ctl set sys_sts='0', txnseq=1")
-        println "\t数据库系统控制表初始化完成。"
+        db.execute("update hm_sys_ctl set sys_sts='0', txnseq=1")
+        println "\t数据库系统控制表初始化完成。\n"
     }
 
     def processSqlFile(){
@@ -88,7 +88,7 @@ class MigrationManager {
         processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
         processSqlFile("pay_detail(全部清册，包括已发银行未交款 未解锁的).sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
         processSqlFile("pay_detail(在途的).sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
-        println "\t修改SQL文件结束。"
+        println "\t修改SQL文件结束。\n"
     }
 
     def processSqlFile(String infile, String outfile, String srcStr, String destStr){
@@ -110,7 +110,7 @@ class MigrationManager {
         importData("mig_owner_info")
         importData("mig_pay_detail_all")
         importData("mig_pay_detail")
-        println "\t导入数据完成..."
+        println "\t导入数据完成...\n"
     }
 
     def importData(String sqlfile){
@@ -120,12 +120,19 @@ class MigrationManager {
 
     def checkFundAct() {
         println "\t开始核对总分余额数据..."
-        localdb.eachRow("select * from mig_acct where parent_fund is null") {
+
+        def totalBal = db.firstRow("select sum(a.bal) as totalbal from mig_acct a where parent_fund  is null").totalbal
+        def realAcctBal = db.firstRow("select bal from MIG_REAL_ACCT").bal
+        if (totalBal != realAcctBal) {
+            println "\t\t结算户余额:${realAcctBal}, 核算户余额合计:${totalBal}, 差额:${realAcctBal-totalBal} "
+        }
+
+        db.eachRow("select * from mig_acct where parent_fund is null") {
             def fund = it.fund
             def bal = it.bal
             def sumbal = 0;
             def count = 0;
-            localdb.eachRow("select count(*) as cnt,sum(bal) as bal from mig_acct where parent_fund = ${fund}") {
+            db.eachRow("select count(*) as cnt,sum(bal) as bal from mig_acct where parent_fund = ${fund}") {
                 sumbal = it.bal
                 count = it.cnt
             }
@@ -134,11 +141,11 @@ class MigrationManager {
                 count = 0
             }
             if (bal != sumbal) {
-                println "\t\t核算户:${fund} 余额:${bal}, 分户余额合计:${sumbal}, 分户数:${count} "
+                println "\t\t核算户:${fund} 余额:${bal}, 分户余额合计:${sumbal}, 分户数:${count}, 差额:${bal-sumbal} "
             }
             /*
-            localdb.eachRow("select * from mig_acct where parent_fund = ${fund}") {
-                localdb.eachRow("select count(*) cnt from mig_acct where parent_fund = ${it.fund}") {
+            db.eachRow("select * from mig_acct where parent_fund = ${fund}") {
+                db.eachRow("select count(*) cnt from mig_acct where parent_fund = ${it.fund}") {
                     if (it.cnt > 0) {
                         println "存在三级核算户"
                     }
@@ -146,12 +153,12 @@ class MigrationManager {
             }
             */
         }
-        println "\t核对总分余额数据完成。"
+        println "\t核对总分余额数据完成。\n"
     }
 
     def checkFundTxn() {
         println "\t开始核对帐务流水数据..."
-        localdb.eachRow("select * from mig_acct") {
+        db.eachRow("select * from mig_acct") {
             def fund = it.fund
             def bal = it.bal
             def txnamt = 0
@@ -171,7 +178,7 @@ class MigrationManager {
                           from MIG_ACCT_WATER t
                          where t.fund = ${fund}
                     """
-                localdb.eachRow(sql) {
+                db.eachRow(sql) {
                     txnamt = it.amt
                 }
                 if (bal != txnamt) {
@@ -179,11 +186,13 @@ class MigrationManager {
                 }
             }
         }
-        println "\t核对帐务流水数据完成。"
+        println "\t核对帐务流水数据完成。\n"
     }
 
     //数据转换
     def tranAcctInfo(){
+        println "\t开始处理帐户数据..."
+
         //导入项目核算户
         def sql = """
             insert into HM_ACT_FUND
@@ -230,7 +239,7 @@ class MigrationManager {
                   on act.owner = binfo.info_id
                where act.parent_fund is null
         """
-        localdb.execute(sql)
+        db.execute(sql)
 
         //导入分户核算户
         sql = """
@@ -301,16 +310,20 @@ class MigrationManager {
                 join mig_hou_info hinfo
                   on binfo.info_id = hinfo.info_id
         """
-        localdb.execute(sql)
+        db.execute(sql)
 
         //更新项目核算户
         sql = """
             update HM_ACT_FUND t set t.fund_actno2 = '#'  where t.fund_acttype2 = '#'
         """
-        localdb.execute(sql)
+        db.execute(sql)
+        println "\t帐户数据处理完成。\n"
+
     }
 
     def tranMsgIn(){
+        println "\t开始处理MSGIN数据..."
+
         //生成汇总报文记录 MSG_005
         def sql = """
                 insert into hm_msg_in
@@ -360,16 +373,16 @@ class MigrationManager {
                          '05',
                          to_char(sysdate, 'yyyyMMdd'),
                          to_char(sysdate, 'HH24Miss'),
-                         '00',
+                         '20',
                          '5210'
                     from dual
         """
-        localdb.eachRow("select batch_no,sum(own_amt) sumownamt, count(*) as cnt from mig_pay_detail group by batch_no"){
-             localdb.execute(sql, [it.batch_no, it.sumownamt])
+        db.eachRow("select batch_no,sum(tran_amt) sum_tran_amt, count(*) as cnt from mig_pay_detail_all group by batch_no"){
+             db.execute(sql, [it.batch_no, it.sum_tran_amt])
         }
 
         //获取银行账户信息
-        def row = localdb.firstRow("select * from mig_real_acct")
+        def row = db.firstRow("select * from mig_real_acct")
 
         //生成明细报文记录 MSG_035
         sql = """
@@ -418,15 +431,15 @@ class MigrationManager {
                      '511',
                      '${row.fund}',
                      '210',
-                     mpd.own_amt,
+                     mpd.tran_amt,
                      '#',
                      '${row.account_name}',
                      to_char(sysdate, 'yyyyMMdd'),
                      to_char(sysdate, 'HH24Miss'),
-                     '00',
+                     '20',
                      1,
                      '5210'
-                from mig_pay_detail mpd
+                from mig_pay_detail_all mpd
                 join mig_base_info binfo
                   on mpd.info_id = binfo.info_id
                 join mig_acct act
@@ -434,7 +447,11 @@ class MigrationManager {
                 join mig_hou_info hinfo
                   on mpd.info_id = hinfo.info_id
         """
-        localdb.execute(sql)
+        db.execute(sql)
+
+        //修改在途的记录状态
+        db.execute("update hm_msg_in a set a.txn_ctl_sts = '00' where exists (select 1 from mig_pay_detail b where  b.batch_no = a.msg_sn)")
+        println "\t处理MSGIN数据完成。\n"
     }
 
     //TODO 移植后 数据核对
