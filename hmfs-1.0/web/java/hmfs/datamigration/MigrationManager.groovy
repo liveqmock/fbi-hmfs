@@ -18,8 +18,8 @@ class MigrationManager {
         MigrationManager mig = new MigrationManager();
 
         //初始化本地业务表和系统控制表
-        mig.initBizDBTable()
-        mig.initSystemCtrlTable()
+        //mig.initBizDBTable()
+        //mig.initSystemCtrlTable()
 
         //修改SQL中表名
         //mig.processSqlFile();
@@ -31,16 +31,19 @@ class MigrationManager {
         //mig.importData()
 
         //处理帐户表信息
-        mig.tranAcctInfo()
+        //mig.tranAcctInfo()
 
         //处理MSGIN表数据（在途的）
-        mig.tranMsgIn()
+        //mig.tranMsgIn()
 
         //核对帐户余额表数据
         mig.checkFundAct()
 
         //核对流水表数据
-        mig.checkFundTxn()
+        //mig.checkFundTxn()
+
+        //核对移植后数据一致性
+        mig.checkLocalBizData()
 
         mig.db.close()
     }
@@ -58,7 +61,7 @@ class MigrationManager {
         db.execute("truncate table hm_txn_vch")
         db.execute("truncate table tmp_msg_in")
         db.execute("truncate table tmp_msg_out")
-        println "\t数据库业务表初始化完成。"
+        println "\t数据库业务表初始化完成。\n"
     }
 
     def initMigrationDBTable(){
@@ -127,7 +130,7 @@ class MigrationManager {
             println "\t\t结算户余额:${realAcctBal}, 核算户余额合计:${totalBal}, 差额:${realAcctBal-totalBal} "
         }
 
-        db.eachRow("select * from mig_acct where parent_fund is null") {
+        db.eachRow("select * from mig_acct where acct_type = '511'") {
             def fund = it.fund
             def bal = it.bal
             def sumbal = 0;
@@ -557,6 +560,31 @@ class MigrationManager {
 
     //移植后 数据核对
     def checkLocalBizData(){
+        println "\t开始核对移植后本地表中总分余额数据..."
 
+        def totalBal = db.firstRow("select sum(t.act_bal) as totalbal from HM_ACT_FUND t  where t.fund_acttype1='511'").totalbal
+        def realAcctBal = db.firstRow("select t.act_bal as bal from HM_ACT_STL t").bal
+        if (totalBal != realAcctBal) {
+            println "\t\t结算户余额:${realAcctBal}, 核算户余额合计:${totalBal}, 差额:${realAcctBal-totalBal} "
+        }
+
+        db.eachRow("select * from HM_ACT_FUND t  where t.fund_actno2 ='#'") {
+            def fund = it.fund_actno1
+            def bal = it.act_bal
+            def sumbal = 0;
+            def count = 0;
+            db.eachRow("select count(*) as cnt,sum(act_bal) as bal from HM_ACT_FUND where fund_actno2 = ${fund}") {
+                sumbal = it.bal
+                count = it.cnt
+            }
+            if (sumbal == null) {
+                sumbal = 0
+                count = 0
+            }
+            if (bal != sumbal) {
+                println "\t\t核算户:${fund} 余额:${bal}, 分户余额合计:${sumbal}, 分户数:${count}, 差额:${bal-sumbal} "
+            }
+        }
+        println "\t核对移植后本地表中总分余额数据完成。\n"
     }
 }
