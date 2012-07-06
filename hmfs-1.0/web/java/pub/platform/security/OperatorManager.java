@@ -9,6 +9,7 @@ import pub.platform.system.manage.dao.PtDeptBean;
 import pub.platform.system.manage.dao.PtOperBean;
 import pub.platform.utils.BusinessDate;
 import pub.platform.utils.ImgSign;
+import skyline.auth.MD5Helper;
 
 import java.io.File;
 import java.io.Serializable;
@@ -145,8 +146,10 @@ public class OperatorManager implements Serializable {
 		DatabaseConnection dc = cm.get();
         //SqlSession session = IbatisFactory.ORACLE.getInstance().openSession();
 		try {
-			String loginWhere = "where operid='" + operid
-					+ "' and operpasswd ='" + password + "'and operenabled='1'";
+			//String loginWhere = "where operid='" + operid
+			//		+ "' and operpasswd ='" + password + "'and operenabled='1'";
+            String loginWhere = "where operid='" + operid
+                    + "' and operpasswd ='" + MD5Helper.getMD5String(password) + "'and operenabled='1'";
             this.operatorid = operid;
             operator = new PtOperBean();
             operator = (PtOperBean) operator.findFirstByWhere(loginWhere);

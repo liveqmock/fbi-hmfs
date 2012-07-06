@@ -2,15 +2,17 @@ package pub.platform.system.manage.oper;
 
 import pub.platform.form.control.*;
 import pub.platform.system.manage.dao.*;
+import skyline.auth.MD5Helper;
 
 public class PasswordInsertAction extends Action {
      PtOperBean operbean = new PtOperBean();
 
      public int doBusiness() {
-           
-           operbean.setOperpasswd(this.req.getFieldValue("newpwd"));
-           
-           this.res.setType(0);
+
+         //operbean.setOperpasswd(this.req.getFieldValue("newpwd"));
+         operbean.setOperpasswd(MD5Helper.getMD5String(this.req.getFieldValue("newpwd")));
+
+         this.res.setType(0);
            
            if (operbean.updateByWhere(" where (deptid='"+this.req.getFieldValue("deptid")+"')and(operid='"+this.req.getFieldValue("operid")+"')") <0){
 
