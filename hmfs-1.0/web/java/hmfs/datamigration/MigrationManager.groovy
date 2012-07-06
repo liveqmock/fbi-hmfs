@@ -18,8 +18,8 @@ class MigrationManager {
         MigrationManager mig = new MigrationManager();
 
         //初始化本地业务表和系统控制表
-        mig.initBizDBTable()
-        mig.initSystemCtrlTable()
+        //mig.initBizDBTable()
+        //mig.initSystemCtrlTable()
 
         //修改SQL中表名
         //mig.processSqlFile();
@@ -31,16 +31,16 @@ class MigrationManager {
         //mig.importData()
 
         //处理帐户表信息
-        mig.tranAcctInfo()
+        //mig.tranAcctInfo()
 
         //处理MSGIN表数据（在途的）
-        mig.tranMsgIn()
+        //mig.tranMsgIn()
 
         //核对帐户余额表数据
-        mig.checkFundAct()
+        //mig.checkFundAct()
 
         //核对流水表数据
-        mig.checkFundTxn()
+        //mig.checkFundTxn()
 
         //核对移植后数据一致性
         mig.checkLocalBizData()
@@ -568,7 +568,7 @@ class MigrationManager {
             println "\t\t结算户余额:${realAcctBal}, 核算户余额合计:${totalBal}, 差额:${realAcctBal-totalBal} "
         }
 
-        db.eachRow("select * from HM_ACT_FUND t  where t.fund_actno2 ='#'") {
+        db.eachRow("select * from HM_ACT_FUND t  where t.fund_acttype1 ='511'") {
             def fund = it.fund_actno1
             def bal = it.act_bal
             def sumbal = 0;
@@ -585,6 +585,37 @@ class MigrationManager {
                 println "\t\t核算户:${fund} 余额:${bal}, 分户余额合计:${sumbal}, 分户数:${count}, 差额:${bal-sumbal} "
             }
         }
+
+        //余额表与流水表核对
+        db.eachRow("select * from hm_act_fund") {
+            def fund = it.fund_actno1
+            def bal = it.act_bal
+            def txnamt = 0
+
+            if (bal != 0) {
+                def sql = """
+                        select sum(case
+                                     when (t.reverse_flag = '0' and t.dc_flag = 'D') then
+                                      t.txn_amt
+                                     when (t.reverse_flag = '0' and t.dc_flag = 'C') then
+                                      -t.txn_amt
+                                     when (t.reverse_flag = '1' and t.dc_flag = 'D') then
+                                      -t.txn_amt
+                                     when (t.reverse_flag = '1' and t.dc_flag = 'C') then
+                                      t.txn_amt
+                                   end) as amt
+                          from hm_txn_fund t
+                         where t.fund_actno = ${fund}
+                    """
+                db.eachRow(sql) {
+                    txnamt = it.amt
+                }
+                if (bal != txnamt) {
+                    println "\t\t核算户:${fund} 余额:${bal}, 流水表发生额合计:${txnamt} "
+                }
+            }
+        }
+
         println "\t核对移植后本地表中总分余额数据完成。\n"
     }
 }
