@@ -18,8 +18,8 @@ class MigrationManager {
         MigrationManager mig = new MigrationManager();
 
         //初始化本地业务表和系统控制表
-        //mig.initBizDBTable()
-        //mig.initSystemCtrlTable()
+        mig.initBizDBTable()
+        mig.initSystemCtrlTable()
 
         //修改SQL中表名
         //mig.processSqlFile();
@@ -31,16 +31,16 @@ class MigrationManager {
         //mig.importData()
 
         //处理帐户表信息
-        //mig.tranAcctInfo()
+        mig.tranAcctInfo()
 
         //处理MSGIN表数据（在途的）
-        //mig.tranMsgIn()
+        mig.tranMsgIn()
 
         //核对帐户余额表数据
         mig.checkFundAct()
 
         //核对流水表数据
-        //mig.checkFundTxn()
+        mig.checkFundTxn()
 
         //核对移植后数据一致性
         mig.checkLocalBizData()
@@ -402,9 +402,9 @@ class MigrationManager {
                      b.tran_amt,
                      case b.tran_flag
                        when '1' then
-                        'D'
-                       when '2' then
                         'C'
+                       when '2' then
+                        'D'
                      end,
                      b.is_cancel,
                      b.day_lbal,

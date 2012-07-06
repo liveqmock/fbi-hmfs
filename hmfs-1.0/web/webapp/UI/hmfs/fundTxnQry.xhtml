@@ -81,8 +81,11 @@
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="借贷别" style="text-align: center">
-                                    <h:outputText value="#{record.dcFlag}"/>
+                                <p:column headerText="缴费/支取" style="text-align: center">
+                                    <h:outputText value="#{actInfoAction.dcFlagCode.valueOfAlias(record.dcFlag).title}"/>
+                                </p:column>
+                                <p:column headerText="是否冲正" style="text-align: center">
+                                    <h:outputText value="#{record.reverseFlag==0? '否':'是'}"/>
                                 </p:column>
                                 <p:column headerText="交易时间" style="text-align: center">
                                     <h:outputText value="#{record.txnDate} #{record.txnTime}"/>

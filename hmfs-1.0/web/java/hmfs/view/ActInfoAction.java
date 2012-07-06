@@ -1,5 +1,6 @@
 package hmfs.view;
 
+import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.*;
@@ -47,6 +48,7 @@ public class ActInfoAction implements Serializable {
     private HmTxnStl[] selectedStlDetlRecord;
 
     private FundActnoStatus fundActnoStatus = FundActnoStatus.NORMAL;
+    private DCFlagCode dcFlagCode = DCFlagCode.DEPOSIT;
 
     private SelectItem[] actnoStatusList = new SelectItem[]{
             new SelectItem("0", "Õý³£"),
@@ -288,5 +290,13 @@ public class ActInfoAction implements Serializable {
 
     public void setCbsActno(String cbsActno) {
         this.cbsActno = cbsActno;
+    }
+
+    public DCFlagCode getDcFlagCode() {
+        return dcFlagCode;
+    }
+
+    public void setDcFlagCode(DCFlagCode dcFlagCode) {
+        this.dcFlagCode = dcFlagCode;
     }
 }
