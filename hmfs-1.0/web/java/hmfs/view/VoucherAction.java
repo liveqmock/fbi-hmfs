@@ -34,7 +34,7 @@ public class VoucherAction {
     @PostConstruct
     public void init() {
         hmMsgIn = new HmMsgIn();
-        hmMsgIn.setBankName("aaaaaaa111");
+        hmMsgIn.setBankName(" ");
     }
     public HmMsgIn getHmMsgIn() {
 
