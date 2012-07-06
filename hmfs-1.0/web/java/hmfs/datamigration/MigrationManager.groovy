@@ -193,8 +193,57 @@ class MigrationManager {
     def tranAcctInfo(){
         println "\t开始处理帐户数据..."
 
-        //导入项目核算户
+        //导入结算户数据
         def sql = """
+            insert into HM_ACT_STL
+              (pkid,
+               branch_id,
+               bank_name,
+               cbs_actno,
+               cbs_actname,
+               cbs_acttype,
+               deposit_type,
+               org_id,
+               org_type,
+               org_name,
+               settle_actno1,
+               settle_acttype1,
+               act_sts,
+               act_bal,
+               intc_pdt,
+               last_txn_dt,
+               last_act_bal,
+               open_act_date,
+               close_act_date,
+               frz_act_date,
+               recversion)
+              select sys_guid(),
+                     t.bank_code,
+                     t.bank_name,
+                     t.real_nmbr,
+                     t.account_name,
+                     '01',
+                     t.saving_type,
+                     t.owner,
+                     '10',
+                     '房管局',
+                     t.fund,
+                     t.acct_type,
+                     t.acct_status,
+                     t.bal,
+                     t.int_base,
+                     to_char(sysdate, 'yyyyMMdd'),
+                     0,
+                     to_char(sysdate, 'yyyyMMdd'),
+                     null,
+                     null,
+                     0
+                from MIG_REAL_ACCT t
+        """
+        db.execute(sql)
+
+        //导入项目核算户
+         sql = """
             insert into HM_ACT_FUND
               (pkid,
                fund_actno1,
@@ -317,8 +366,60 @@ class MigrationManager {
             update HM_ACT_FUND t set t.fund_actno2 = '#'  where t.fund_acttype2 = '#'
         """
         db.execute(sql)
-        println "\t帐户数据处理完成。\n"
 
+        //处理核算户交易明细
+        sql = """
+            insert into hm_txn_fund a
+              (PKID,
+               FUND_ACTNO,
+               FUND_ACTTYPE,
+               CBS_TXN_SN,
+               TXN_SN,
+               TXN_SUB_SN,
+               TXN_AMT,
+               DC_FLAG,
+               REVERSE_FLAG,
+               LAST_ACT_BAL,
+               TXN_DATE,
+               TXN_TIME,
+               TXN_CODE,
+               ACTION_CODE,
+               TXN_STS,
+               OPAC_BRID,
+               TXAC_BRID,
+               OPR1_NO,
+               OPR2_NO,
+               REMARK)
+              select sys_guid(),
+                     b.fund,
+                     b.acct_type,
+                     0000000000000000,
+                     b.batch_no,
+                     lpad(b.sub_water, 5, '0'),
+                     b.tran_amt,
+                     case b.tran_flag
+                       when '1' then
+                        'D'
+                       when '2' then
+                        'C'
+                     end,
+                     b.is_cancel,
+                     b.day_lbal,
+                     b.tran_date,
+                     trim(b.tran_time),
+                     b.tran_type,
+                     '',
+                     '',
+                     '',
+                     '',
+                     '',
+                     '',
+                     '数据移植初始化'
+                from mig_acct_water b
+        """
+        db.execute(sql)
+
+        println "\t帐户数据处理完成。\n"
     }
 
     def tranMsgIn(){
@@ -454,5 +555,8 @@ class MigrationManager {
         println "\t处理MSGIN数据完成。\n"
     }
 
-    //TODO 移植后 数据核对
+    //移植后 数据核对
+    def checkLocalBizData(){
+
+    }
 }

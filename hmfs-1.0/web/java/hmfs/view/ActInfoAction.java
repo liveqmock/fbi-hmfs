@@ -77,7 +77,7 @@ public class ActInfoAction implements Serializable {
 
         this.cbsActno = actInfoService.selectStlActno();
         this.qryParam.setCbsActno(this.cbsActno);
-        initList();
+        //initList();
     }
 
     private void initList(){
