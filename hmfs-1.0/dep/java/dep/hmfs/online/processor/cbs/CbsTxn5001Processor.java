@@ -103,22 +103,27 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
             String[] details = detailStr.split("\n");
             // 保存主机明细数据
             for (String detail : details) {
-                TIA5001.Body.Record record = new TIA5001.Body.Record();
+                logger.info("====" + detail);
                 String[] fields = detail.split("\\|");
-                record.txnSerialNo = fields[0];
-                record.txnAmt = fields[1];
-                record.txnType = fields[2];
-                tia5001.body.recordList.add(record);
+                int recordCnt = fields.length / 3;
+                for (int i = 0; i < recordCnt; i++){
+                    TIA5001.Body.Record record = new TIA5001.Body.Record();
+                    record.txnSerialNo = fields[i*3+0].trim();
+                    record.txnAmt = fields[i*3+1].trim();
+                    record.txnType = fields[i*3+2].trim();
+                    logger.info(record.txnSerialNo + " " + record.txnAmt + " "+ record.txnType);
 
-                HmChkTxn hmChkTxn = new HmChkTxn();
-                hmChkTxn.setPkid(UUID.randomUUID().toString());
-                hmChkTxn.setTxnDate(tia5001.body.txnDate);
-                hmChkTxn.setSendSysId(hmSysCtl.getBankId());
-                hmChkTxn.setActno(tia5001.body.cbsActNo);
-                hmChkTxn.setTxnamt(new BigDecimal(record.txnAmt));
-                hmChkTxn.setMsgSn(record.txnSerialNo);
-                hmChkTxn.setDcFlag(record.txnType);
-                hmbActinfoService.insertChkTxn(hmChkTxn);
+                    tia5001.body.recordList.add(record);
+                    HmChkTxn hmChkTxn = new HmChkTxn();
+                    hmChkTxn.setPkid(UUID.randomUUID().toString());
+                    hmChkTxn.setTxnDate(tia5001.body.txnDate);
+                    hmChkTxn.setSendSysId(hmSysCtl.getBankId());
+                    hmChkTxn.setActno(tia5001.body.cbsActNo);
+                    hmChkTxn.setTxnamt(new BigDecimal(record.txnAmt));
+                    hmChkTxn.setMsgSn(record.txnSerialNo);
+                    hmChkTxn.setDcFlag(record.txnType);
+                    hmbActinfoService.insertChkTxn(hmChkTxn);
+                }
             }
             // TODO 查询结算户交易明细到明细对账表
             List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryHmTxnStlForChkAct(tia5001.body.txnDate);
