@@ -99,9 +99,9 @@ public interface HmTxnStlMapper {
     int updateByPrimaryKey(HmTxnStl record);
 
 
-    @Select(" select t.txn_sn as txnSn,t.cbs_txn_sn as cbsTxnSn,sum(t.txn_amt) txnAmt," +
+    @Select(" select t.cbs_actno as cbsActno, t.txn_sn as txnSn,t.cbs_txn_sn as cbsTxnSn,sum(t.txn_amt) txnAmt," +
             " txn_date as txnDate,t.dc_flag as dcFlag from HM_TXN_STL t " +
-            " group by t.txn_sn,t.cbs_txn_sn,txn_date,t.dc_flag " +
+            " group by t.cbs_actno, t.txn_sn,t.cbs_txn_sn,txn_date,t.dc_flag " +
             " having t.txn_date in #{date} " +
             " order by t.cbs_txn_sn")
     List<HmTxnStl> qryHmTxnStlForChkAct(@Param("date")String date);

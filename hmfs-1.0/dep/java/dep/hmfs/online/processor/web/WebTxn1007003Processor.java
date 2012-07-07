@@ -27,10 +27,10 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         //清理本日旧数据
-        deleteOldActChkDataByTxnDate(txnDate, "99");
-        deleteOldActChkDataByTxnDate(txnDate, "00");
-        deleteOldTxnChkDataByTxnDate(txnDate, "99");
-        deleteOldTxnChkDataByTxnDate(txnDate, "00");
+        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "99");
+        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "00");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "99");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getFirstChkReqBuf(txnCode, txnDate));
@@ -47,31 +47,41 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         } else {
             //保存国土局到本地数据库
-            processChkBalResponse(msgList, txnDate);
+            hmbSysTxnService.processChkBalResponse(msgList, txnDate);
             //数据核对处理
-            if (verifyActBalData(txnDate)) {
+            boolean verify = hmbSysTxnService.verifyActBalData(txnDate);
+
+            if (verify) {
                 txnResult = "0000|余额对帐成功";
             } else {
-                //发送二次核对报文
-                responseMap = sendDataUntilRcv(getSecondChkReqBuf(txnCode, txnDate));
-                //处理返回报文
-                msgList = responseMap.get(txnCode);
-                if (msgList == null || msgList.size() == 0) {
-                    Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
-                    throw new RuntimeException(msg100.rtnInfo);
-                }
-                msg002 = (Msg002) msgList.get(0);
-                if (!msg002.rtnInfoCode.equals("00")) {
-                    throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
-                } else {
-                    //数据核对处理
-                    //保存国土局到本地数据库
-                    processChkBalResponse(msgList, txnDate);
-                    verifyActBalData(txnDate);
+                logger.info("开始第二次校验处理");
+
+                //查找对帐状态为不符且发送方为‘99’（本地数据）的
+                List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
+
+                if (chkActList.isEmpty()) { //对于存在对帐不符记录且是中心的数据有但本地数据没有的情况，直接返回失败
                     txnResult =  "9999|余额对帐失败";
+                }else{
+                    //发送二次核对报文
+                    responseMap = sendDataUntilRcv(getSecondChkReqBuf(chkActList, txnCode, txnDate));
+                    //处理返回报文
+                    msgList = responseMap.get(txnCode);
+                    if (msgList == null || msgList.size() == 0) {
+                        Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
+                        throw new RuntimeException(msg100.rtnInfo);
+                    }
+                    msg002 = (Msg002) msgList.get(0);
+                    if (!msg002.rtnInfoCode.equals("00")) {
+                        throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
+                    } else {
+                        //数据核对处理
+                        //保存国土局到本地数据库
+                        hmbSysTxnService.processChkBalResponse(msgList, txnDate);
+                        hmbSysTxnService.verifyActBalData(txnDate);
+                        txnResult =  "9999|余额对帐失败";
+                    }
                 }
             }
-
         }
         //置系统控制表状态 : 余额对帐完成  TODO:处理时机需探讨
         updateSysCtlStatus(SysCtlSts.HMB_CHK_OVER);
@@ -106,15 +116,18 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             hmbMsgList.add(msg098);
 
             //保存发起对帐的数据到本地数据库
+            /*
             HmChkAct hmChkAct = new HmChkAct();
             hmChkAct.setPkid(UUID.randomUUID().toString());
             hmChkAct.setActno(msg098.fundActno1);
             hmChkAct.setTxnDate(txnDate);
-            //hmChkAct.setSendSysId(SEND_SYS_ID);
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(msg098.actBal);
             hmChkActMapper.insert(hmChkAct);
+            */
         }
+        //保存发起对帐的数据到本地数据库
+        hmbSysTxnService.insertChkFundRecord(actFundList, txnDate);
 
         for (HmActStl hmActStl : actStlList) {
             Msg094 msg094 = new Msg094();
@@ -127,6 +140,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             hmbMsgList.add(msg094);
 
             //保存发起对帐的数据到本地数据库
+            /*
             HmChkAct hmChkAct = new HmChkAct();
             hmChkAct.setPkid(UUID.randomUUID().toString());
             hmChkAct.setActno(msg094.settleActno1);
@@ -135,16 +149,20 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(msg094.actBal);
             hmChkActMapper.insert(hmChkAct);
+            */
         }
+        //保存发起对帐的数据到本地数据库
+        hmbSysTxnService.insertChkStlRecord(actStlList, txnDate);
 
         return messageFactory.marshal(txnCode, hmbMsgList);
     }
 
     //第二轮余额对帐报文：第一轮核对不上的项目核算户中的分户核算户
-    private byte[] getSecondChkReqBuf(String txnCode, String txnDate) {
-        List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
+    private byte[] getSecondChkReqBuf(List<HmChkAct> chkActList, String txnCode, String txnDate) {
+        //List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
         List<String> chkFailedActnoList = new ArrayList<String>();
         for (HmChkAct hmChkAct : chkActList) {
+            //logger.info("==核对失败帐号：" + hmChkAct.getActno());
             chkFailedActnoList.add(hmChkAct.getActno());
         }
         List<HmActFund> actFundList = hmbSysTxnService.selectIndividFundActinfo(chkFailedActnoList);
@@ -172,6 +190,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             hmbMsgList.add(msg098);
 
             //保存发起对帐的数据到本地数据库
+            /*
             HmChkAct hmChkAct = new HmChkAct();
             hmChkAct.setPkid(UUID.randomUUID().toString());
             hmChkAct.setActno(msg098.fundActno1);
@@ -180,51 +199,12 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(msg098.actBal);
             hmChkActMapper.insert(hmChkAct);
+            */
         }
+        //保存发起对帐的数据到本地数据库
+        hmbSysTxnService.insertChkFundRecord(actFundList, txnDate);
 
         return messageFactory.marshal(txnCode, hmbMsgList);
-    }
-
-    /**
-     * 处理国土局返回的余额对帐信息
-     */
-    private void processChkBalResponse(List<HmbMsg> msgList, String txnDate) {
-        Msg002 msg002 = (Msg002) msgList.get(0);
-        //TODO
-        // String txnDate = msg002.msgDt.substring(0,8);
-        for (HmbMsg hmbMsg : msgList.subList(1, msgList.size())) {
-            HmChkAct hmChkAct = new HmChkAct();
-            hmChkAct.setPkid(UUID.randomUUID().toString());
-            hmChkAct.setTxnDate(txnDate);
-            hmChkAct.setSendSysId("00");
-            if (hmbMsg instanceof Msg098) {
-                hmChkAct.setActno(((Msg098) hmbMsg).fundActno1);
-                hmChkAct.setActbal(((Msg098) hmbMsg).getActBal());
-            } else {
-                hmChkAct.setActno(((Msg094) hmbMsg).settleActno1);
-                hmChkAct.setActbal(((Msg094) hmbMsg).getActBal());
-            }
-            hmChkActMapper.insert(hmChkAct);
-        }
-    }
-
-    /**
-     * 校验余额对帐数据
-     *
-     * @return
-     */
-    private boolean verifyActBalData(String txnDate) {
-        int successNumber = 0;
-        int failNumber = 0;
-        successNumber = hmCmnMapper.verifyChkaclResult_0(txnDate, "99", "00");
-        logger.info(txnDate + "对帐成功笔数：" + successNumber);
-
-        failNumber = hmCmnMapper.verifyChkaclResult_11(txnDate, "99", "00");
-        failNumber += hmCmnMapper.verifyChkaclResult_12(txnDate, "99", "00");
-        failNumber += hmCmnMapper.verifyChkaclResult_2(txnDate, "99", "00");
-        logger.info(txnDate + "对帐失败笔数：" + failNumber);
-
-        return failNumber == 0;
     }
 
 }

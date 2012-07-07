@@ -1,7 +1,5 @@
 package dep.hmfs.online.processor.web;
 
-import common.repository.hmfs.model.HmChkActExample;
-import common.repository.hmfs.model.HmChkTxnExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,17 +24,4 @@ public abstract class WebAbstractHmbProductTxnProcessor extends  WebAbstractHmbT
 
     protected abstract String process(String request);
 
-
-    //按日期清除余额对帐数据
-    protected void deleteOldActChkDataByTxnDate(String txnDate, String sendSysId){
-        HmChkActExample example = new HmChkActExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate).andSendSysIdEqualTo(sendSysId);
-        hmChkActMapper.deleteByExample(example);
-    }
-    //按日期清除余额对帐数据
-    protected void deleteOldTxnChkDataByTxnDate(String txnDate, String sendSysId){
-        HmChkTxnExample example = new HmChkTxnExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate).andSendSysIdEqualTo(sendSysId);
-        hmChkTxnMapper.deleteByExample(example);
-    }
 }

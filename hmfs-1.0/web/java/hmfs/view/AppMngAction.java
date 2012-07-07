@@ -65,7 +65,7 @@ public class AppMngAction implements Serializable {
     public String onLogon() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
+        //if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
             try {
                 String response = depService.process("1007000");
                 if (response.startsWith("0000")) { //成功
@@ -77,9 +77,9 @@ public class AppMngAction implements Serializable {
                 logger.error("签到失败。请重新发起签到。" ,e);
                 MessageUtil.addError("签到失败。请重新发起签到。" + e.getMessage());
             }
-        } else {
-            MessageUtil.addError("系统初始或与国土局对帐完成后方可签到。");
-        }
+        //} else {
+        //    MessageUtil.addError("系统初始或与国土局对帐完成后方可签到。");
+        //}
         init();
         return null;
     }
@@ -87,7 +87,7 @@ public class AppMngAction implements Serializable {
     public String onLogout() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
+        //if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
                 String response = depService.process("1007001");
                 if (response.startsWith("0000")) { //成功
@@ -99,9 +99,9 @@ public class AppMngAction implements Serializable {
                logger.error("签退失败。请重新发起签退。" ,e);
                MessageUtil.addError("签退失败。请重新发起签退。" + e.getMessage());
             }
-        } else {
+        //} else {
             MessageUtil.addError("系统签到完成后方可签退。");
-        }
+        //}
         init();
         return null;
     }
@@ -114,8 +114,7 @@ public class AppMngAction implements Serializable {
     public String onHmbDailyChk() {
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.HOST_CHK_OVER)
-                ||sysCtlSts.equals(SysCtlSts.SIGNOUT)) {
+        //if (sysCtlSts.equals(SysCtlSts.HOST_CHK_OVER) || sysCtlSts.equals(SysCtlSts.SIGNOUT)) {
             try {
                 String response = depService.process("1007003");
                 if (response.startsWith("0000")) { //成功
@@ -127,9 +126,9 @@ public class AppMngAction implements Serializable {
                 logger.error("对帐处理失败， 请重新发起对帐。" ,e);
                 MessageUtil.addError("对帐处理失败， 请重新发起对帐。" + e.getMessage());
             }
-        } else {
-            MessageUtil.addError("签退后或主机对帐后方可进行国土局对帐。");
-        }
+        //} else {
+        //    MessageUtil.addError("签退后或主机对帐后方可进行国土局对帐。");
+        //}
         init();
         return null;
     }

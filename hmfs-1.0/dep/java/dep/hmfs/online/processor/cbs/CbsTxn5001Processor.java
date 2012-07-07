@@ -111,7 +111,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                     record.txnSerialNo = fields[i*3+0].trim();
                     record.txnAmt = fields[i*3+1].trim();
                     record.txnType = fields[i*3+2].trim();
-                    logger.info(record.txnSerialNo + " " + record.txnAmt + " "+ record.txnType);
+                    //logger.info(record.txnSerialNo + " " + record.txnAmt + " "+ record.txnType);
 
                     tia5001.body.recordList.add(record);
                     HmChkTxn hmChkTxn = new HmChkTxn();
@@ -134,6 +134,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 hmChkTxn.setTxnDate(tia5001.body.txnDate);
                 hmChkTxn.setSendSysId("99");
                 hmChkTxn.setActno(txnStl.getCbsActno());
+
                 hmChkTxn.setTxnamt(txnStl.getTxnAmt());
                 hmChkTxn.setMsgSn(txnStl.getTxnSn());
                 hmChkTxn.setDcFlag(txnStl.getDcFlag());
@@ -163,7 +164,12 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
         }
         // 余额对账
-        if (new BigDecimal(tia5001.body.accountBalance).compareTo(hmActStl.getActBal()) != 0) {
+        BigDecimal localCbsActBal = hmActStl.getActBal();
+        BigDecimal hostCbsActBal = new BigDecimal(tia5001.body.accountBalance.trim()).divide(new BigDecimal(100));
+        if (hostCbsActBal.compareTo(localCbsActBal) != 0) {
+            logger.info("主机会计帐号余额：" + hostCbsActBal.toString());
+            logger.info("本地会计帐号余额：" + localCbsActBal.toString());
+            logger.info("差额：" + localCbsActBal.subtract(hostCbsActBal).toString());
             throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
         }
         if (res == null || !res.startsWith("0000")) {

@@ -28,8 +28,8 @@ public class WebTxn1007004Processor extends WebAbstractHmbProductTxnProcessor {
         String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         //清理本日旧数据
-        deleteOldTxnChkDataByTxnDate(txnDate, "99");
-        deleteOldTxnChkDataByTxnDate(txnDate, "00");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "99");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
         //发送报文
         Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getRequestBuf(txnCode));

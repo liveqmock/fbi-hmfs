@@ -18,29 +18,29 @@ class MigrationManager {
         MigrationManager mig = new MigrationManager();
 
         //初始化本地业务表和系统控制表
-        //mig.initBizDBTable()
-        //mig.initSystemCtrlTable()
+        mig.initBizDBTable()
+        mig.initSystemCtrlTable()
 
         //修改SQL中表名
-        //mig.processSqlFile();
+        mig.processSqlFile();
 
         //初始化数据移植表
-        //mig.initMigrationDBTable()
+        mig.initMigrationDBTable()
 
         //导入待移植数据到DB中
-        //mig.importData()
+        mig.importData()
 
         //处理帐户表信息
-        //mig.tranAcctInfo()
+        mig.tranAcctInfo()
 
         //处理MSGIN表数据（在途的）
-        //mig.tranMsgIn()
+        mig.tranMsgIn()
 
-        //核对帐户余额表数据
-        //mig.checkFundAct()
+        //核对移植前帐户余额表数据
+        mig.checkFundAct()
 
-        //核对流水表数据
-        //mig.checkFundTxn()
+        //核对移植前流水表数据
+        mig.checkFundTxn()
 
         //核对移植后数据一致性
         mig.checkLocalBizData()
@@ -61,7 +61,33 @@ class MigrationManager {
         db.execute("truncate table hm_txn_vch")
         db.execute("truncate table tmp_msg_in")
         db.execute("truncate table tmp_msg_out")
-        println "\t数据库业务表初始化完成。\n"
+        println "\t1.数据库业务表初始化完成。\n"
+    }
+
+    def initSystemCtrlTable(){
+        db.execute("update hm_sys_ctl set sys_sts='0', txnseq=1")
+        println "\t2.数据库系统控制表初始化完成。\n"
+    }
+
+    def processSqlFile(){
+        println "\t3.开始修改SQL文件..."
+        processSqlFile("real_acct.sql", "mig_real_acct.sql", "Insert into QDHMFMS.REAL_ACCT", "Insert into MIG_REAL_ACCT");
+        processSqlFile("acct.sql", "mig_acct.sql", "Insert into QDHMFMS.ACCT", "Insert into MIG_ACCT");
+        processSqlFile("acct_water.sql", "mig_acct_water.sql", "Insert into QDHMFMS.ACCT_WATER", "Insert into MIG_ACCT_WATER");
+        processSqlFile("base_info.sql", "mig_base_info.sql", "Insert into QDHMFMS.BASE_INFO", "Insert into MIG_BASE_INFO");
+        processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into QDHMFMS.HOU_INFO", "Insert into MIG_HOU_INFO");
+        processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
+        processSqlFile("pay_detail_all.sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
+        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
+        println "\t3.修改SQL文件结束。\n"
+    }
+
+    def processSqlFile(String infile, String outfile, String srcStr, String destStr){
+        BufferedWriter writer = new File(mainpath + outfile).newWriter()
+        new File(mainpath + infile).eachLine {line->
+            writer.write(line.replace(srcStr, destStr) + '\n')
+        }
+        writer.close()
     }
 
     def initMigrationDBTable(){
@@ -73,38 +99,12 @@ class MigrationManager {
         db.execute("truncate table mig_owner_info")
         db.execute("truncate table mig_pay_detail")
         db.execute("truncate table mig_pay_detail_all")
-        println "\t数据库数据移植表初始化完成。\n"
-    }
-
-    def initSystemCtrlTable(){
-        db.execute("update hm_sys_ctl set sys_sts='0', txnseq=1")
-        println "\t数据库系统控制表初始化完成。\n"
-    }
-
-    def processSqlFile(){
-        println "\t开始修改SQL文件..."
-        processSqlFile("real_acct.sql", "mig_real_acct.sql", "Insert into QDHMFMS.REAL_ACCT", "Insert into MIG_REAL_ACCT");
-        processSqlFile("acct.sql", "mig_acct.sql", "Insert into QDHMFMS.ACCT", "Insert into MIG_ACCT");
-        processSqlFile("acct_water.sql", "mig_acct_water.sql", "Insert into QDHMFMS.ACCT_WATER", "Insert into MIG_ACCT_WATER");
-        processSqlFile("base_info.sql", "mig_base_info.sql", "Insert into QDHMFMS.BASE_INFO", "Insert into MIG_BASE_INFO");
-        processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into QDHMFMS.HOU_INFO", "Insert into MIG_HOU_INFO");
-        processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
-        processSqlFile("pay_detail(全部清册，包括已发银行未交款 未解锁的).sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
-        processSqlFile("pay_detail(在途的).sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
-        println "\t修改SQL文件结束。\n"
-    }
-
-    def processSqlFile(String infile, String outfile, String srcStr, String destStr){
-        BufferedWriter writer = new File(mainpath + outfile).newWriter()
-        new File(mainpath + infile).eachLine {line->
-            writer.write(line.replace(srcStr, destStr) + '\n')
-        }
-        writer.close()
+        println "\t4.数据库数据移植表初始化完成。\n"
     }
 
 
     def importData(){
-        println "\t开始导入数据..."
+        println "\t5.开始导入数据..."
         importData("mig_real_acct")
         importData("mig_acct")
         importData("mig_acct_water")
@@ -113,7 +113,7 @@ class MigrationManager {
         importData("mig_owner_info")
         importData("mig_pay_detail_all")
         importData("mig_pay_detail")
-        println "\t导入数据完成...\n"
+        println "\t5.导入数据完成...\n"
     }
 
     def importData(String sqlfile){
@@ -122,7 +122,7 @@ class MigrationManager {
     }
 
     def checkFundAct() {
-        println "\t开始核对总分余额数据..."
+        println "\t8.开始核对移植前总分余额数据..."
 
         def totalBal = db.firstRow("select sum(a.bal) as totalbal from mig_acct a where parent_fund  is null").totalbal
         def realAcctBal = db.firstRow("select bal from MIG_REAL_ACCT").bal
@@ -156,12 +156,12 @@ class MigrationManager {
             }
             */
         }
-        println "\t核对总分余额数据完成。\n"
+        println "\t8.核对移植前总分余额数据完成。\n"
     }
 
     def checkFundTxn() {
-        println "\t开始核对帐务流水数据..."
-        db.eachRow("select * from mig_acct") {
+        println "\t9.开始核对移植前帐务流水数据..."
+        db.eachRow("select * from mig_acct where acct_type='570'") {
             def fund = it.fund
             def bal = it.bal
             def txnamt = 0
@@ -189,12 +189,12 @@ class MigrationManager {
                 }
             }
         }
-        println "\t核对帐务流水数据完成。\n"
+        println "\t9.核对移植前帐务流水数据完成。\n"
     }
 
     //数据转换
     def tranAcctInfo(){
-        println "\t开始处理帐户数据..."
+        println "\t6.开始处理帐户数据..."
 
         //导入结算户数据
         def sql = """
@@ -228,7 +228,7 @@ class MigrationManager {
                      '01',
                      t.saving_type,
                      t.owner,
-                     '10',
+                     '80',
                      '房管局',
                      t.fund,
                      t.acct_type,
@@ -422,11 +422,11 @@ class MigrationManager {
         """
         db.execute(sql)
 
-        println "\t帐户数据处理完成。\n"
+        println "\t6.帐户数据处理完成。\n"
     }
 
     def tranMsgIn(){
-        println "\t开始处理MSGIN数据..."
+        println "\t7.开始处理MSGIN数据..."
 
         //生成汇总报文记录 MSG_005
         def sql = """
@@ -555,12 +555,12 @@ class MigrationManager {
 
         //修改在途的记录状态
         db.execute("update hm_msg_in a set a.txn_ctl_sts = '00' where exists (select 1 from mig_pay_detail b where  b.batch_no = a.msg_sn)")
-        println "\t处理MSGIN数据完成。\n"
+        println "\t7.处理MSGIN数据完成。\n"
     }
 
     //移植后 数据核对
     def checkLocalBizData(){
-        println "\t开始核对移植后本地表中总分余额数据..."
+        println "\t10.开始核对移植后本地表中总分余额数据..."
 
         def totalBal = db.firstRow("select sum(t.act_bal) as totalbal from HM_ACT_FUND t  where t.fund_acttype1='511'").totalbal
         def realAcctBal = db.firstRow("select t.act_bal as bal from HM_ACT_STL t").bal
@@ -587,7 +587,7 @@ class MigrationManager {
         }
 
         //余额表与流水表核对
-        db.eachRow("select * from hm_act_fund") {
+        db.eachRow("select * from hm_act_fund where fund_acttype1='570'") {
             def fund = it.fund_actno1
             def bal = it.act_bal
             def txnamt = 0
@@ -616,6 +616,14 @@ class MigrationManager {
             }
         }
 
-        println "\t核对移植后本地表中总分余额数据完成。\n"
+
+        //核对结算户一直前后的余额是否一致
+        def realAcctBal_hmb = db.firstRow("select bal from MIG_REAL_ACCT").bal
+        if (realAcctBal_hmb != realAcctBal) {
+            println "\t\t结算户数据移植前后余额不一致, 差额:${realAcctBal-realAcctBal_hmb} "
+        }
+
+        println "\t10.核对移植后本地表中总分余额数据完成。\n"
     }
+
 }

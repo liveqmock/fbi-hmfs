@@ -25,10 +25,12 @@ public abstract class CbsAbstractTxnProcessor {
 
     public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
 
-    public TOA run(String serialNo, byte[] datagramBytes) throws Exception {
-        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
-        if(!SysCtlSts.SIGNON.getCode().equals(hmSysCtl.getSysSts())) {
-            throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_ON.getCode());
+    public TOA run(String txnCode, String serialNo, byte[] datagramBytes) throws Exception {
+        if (!"5001".equals(txnCode)) {
+            HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+            if (!SysCtlSts.SIGNON.getCode().equals(hmSysCtl.getSysSts())) {
+                throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_ON.getCode());
+            }
         }
         return process(serialNo, datagramBytes);
     }
