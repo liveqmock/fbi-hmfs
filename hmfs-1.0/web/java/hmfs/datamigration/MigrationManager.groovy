@@ -113,6 +113,33 @@ class MigrationManager {
         importData("mig_owner_info")
         importData("mig_pay_detail_all")
         importData("mig_pay_detail")
+
+        //TODO 若中心提供的数据中parent_fund为正确的数据 则此处不必再处理parent_fund
+        //按照owner_info表的关联关系修正 parent_fund
+        def sql = """
+            update mig_acct x1
+               set x1.parent_fund =
+                   (select superfund
+                      from (select t1.*,
+                                   (select fund from mig_acct where owner = superid) as superfund
+                              from (select t.fund,
+                                           t.parent_fund,
+                                           t.owner,
+                                           (select a.super_id
+                                              from MIG_OWNER_INFO a
+                                             where a.info_id = t.owner
+                                               and a.super_type = '30') as superid
+                                      from MIG_ACCT t) t1) x2
+                     where x2.owner = x1.owner)
+        """
+        db.execute(sql)
+
+        sql = """
+            update mig_acct_water a1 set a1.parent_fund=(select a2.parent_fund from mig_acct a2 where a2.fund=a1.fund)
+        """
+        db.execute(sql)
+
+
         println "\t5.导入数据完成...\n"
     }
 
@@ -364,11 +391,22 @@ class MigrationManager {
         """
         db.execute(sql)
 
-        //更新项目核算户
+        //更新项目核算户 空字段信息
         sql = """
             update HM_ACT_FUND t set t.fund_actno2 = '#'  where t.fund_acttype2 = '#'
         """
         db.execute(sql)
+
+        //更新缴存比例  TODO：待确认
+        sql = """
+          update hm_act_fund f
+            set f.DEP_STANDARD2 =
+               (select ' ' || '|' || to_char(hinfo.check_rate, '0.99')
+                  from mig_hou_info hinfo
+                 where f.info_id1 = hinfo.info_id)
+        """
+        db.execute(sql)
+
 
         //处理核算户交易明细
         sql = """
