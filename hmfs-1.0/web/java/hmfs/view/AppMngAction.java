@@ -100,7 +100,7 @@ public class AppMngAction implements Serializable {
                MessageUtil.addError("签退失败。请重新发起签退。" + e.getMessage());
             }
         //} else {
-            MessageUtil.addError("系统签到完成后方可签退。");
+            //MessageUtil.addError("系统签到完成后方可签退。");
         //}
         init();
         return null;

@@ -34,8 +34,7 @@
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
                                         <h:outputLabel value="起始帐号:"  style="font-weight: bold"/>
-                                        <p:inputText required="true" requiredMessage="起始帐号必须输入。"
-                                                     value="#{actInfoAction.qryParam.startActno}"/>
+                                        <p:inputText required="false" value="#{actInfoAction.qryParam.startActno}"/>
                                         <h:outputLabel value="结束帐号:"  style="font-weight: bold"/>
                                         <p:inputText value="#{actInfoAction.qryParam.endActno}"/>
                                         <h:outputLabel value="起始日期:" for="startDate"  style="font-weight: bold"/>
@@ -44,6 +43,15 @@
                                         <h:outputLabel value="结束日期:" for="endDate"  style="font-weight: bold"/>
                                         <p:inputText id="endDate" required="true" value="#{actInfoAction.qryParam.endDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="帐户类型:"  style="font-weight: bold"/>
+                                        <h:selectOneMenu style="width:153px;"
+                                                         value="#{actInfoAction.qryParam.fundActType}">
+                                            <f:selectItems value="#{actInfoAction.fundActTypeList}"/>
+                                        </h:selectOneMenu>
+                                        <h:outputLabel value="交易金额:"  style="font-weight: bold"/>
+                                        <p:inputText  value="#{actInfoAction.qryParam.txnAmt}">
+                                            <f:convertNumber currencySymbol="" type="currency" groupingUsed="#{false}"></f:convertNumber>
+                                        </p:inputText>
                                     </h:panelGrid>
                                     <h:panelGrid>
                                         <p:commandButton  style="width:120px;" value="查询交易明细"

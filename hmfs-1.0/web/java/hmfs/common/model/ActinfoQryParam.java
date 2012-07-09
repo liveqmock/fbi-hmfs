@@ -1,5 +1,7 @@
 package hmfs.common.model;
 
+import java.math.BigDecimal;
+
 public class ActinfoQryParam {
     private String cbsActno = "";
     private String startActno = "";
@@ -8,6 +10,8 @@ public class ActinfoQryParam {
     private String actnoStatus = "";
     private String startDate = "";
     private String endDate = "";
+    private BigDecimal txnAmt = new BigDecimal(0.00);
+    private String fundActType = "";  //511:项目户 570：分户
 
     public String getCbsActno() {
         return cbsActno;
@@ -63,5 +67,21 @@ public class ActinfoQryParam {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public BigDecimal getTxnAmt() {
+        return txnAmt;
+    }
+
+    public void setTxnAmt(BigDecimal txnAmt) {
+        this.txnAmt = txnAmt;
+    }
+
+    public String getFundActType() {
+        return fundActType;
+    }
+
+    public void setFundActType(String fundActType) {
+        this.fundActType = fundActType;
     }
 }

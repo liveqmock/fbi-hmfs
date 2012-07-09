@@ -1,6 +1,7 @@
 package hmfs.view;
 
 import common.enums.DCFlagCode;
+import common.enums.FundActType;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.*;
@@ -19,6 +20,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,12 +51,10 @@ public class ActInfoAction implements Serializable {
 
     private FundActnoStatus fundActnoStatus = FundActnoStatus.NORMAL;
     private DCFlagCode dcFlagCode = DCFlagCode.DEPOSIT;
+    private FundActType fundActType = FundActType.PROJECT;
 
-    private SelectItem[] actnoStatusList = new SelectItem[]{
-            new SelectItem("0", "正常"),
-            new SelectItem("1", "销户"),
-            new SelectItem("2", "封帐")
-    };
+    private List<SelectItem> actnoStatusList = new ArrayList<SelectItem>();
+    private List<SelectItem> fundActTypeList = new ArrayList<SelectItem>();
 
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
@@ -79,6 +79,14 @@ public class ActInfoAction implements Serializable {
 
         this.cbsActno = actInfoService.selectStlActno();
         this.qryParam.setCbsActno(this.cbsActno);
+
+        for(FundActnoStatus c : FundActnoStatus.values())
+            actnoStatusList.add(new SelectItem(c.getCode(), c.getTitle()));
+
+        fundActTypeList.add(new SelectItem("", ""));
+        for(FundActType c : FundActType.values())
+            fundActTypeList.add(new SelectItem(c.getCode(), c.getTitle()));
+
         //initList();
     }
 
@@ -196,11 +204,11 @@ public class ActInfoAction implements Serializable {
         this.actInfoService = actInfoService;
     }
 
-    public SelectItem[] getActnoStatusList() {
+    public List<SelectItem> getActnoStatusList() {
         return actnoStatusList;
     }
 
-    public void setActnoStatusList(SelectItem[] actnoStatusList) {
+    public void setActnoStatusList(List<SelectItem> actnoStatusList) {
         this.actnoStatusList = actnoStatusList;
     }
 
@@ -298,5 +306,21 @@ public class ActInfoAction implements Serializable {
 
     public void setDcFlagCode(DCFlagCode dcFlagCode) {
         this.dcFlagCode = dcFlagCode;
+    }
+
+    public List<SelectItem> getFundActTypeList() {
+        return fundActTypeList;
+    }
+
+    public void setFundActTypeList(List<SelectItem> fundActTypeList) {
+        this.fundActTypeList = fundActTypeList;
+    }
+
+    public FundActType getFundActType() {
+        return fundActType;
+    }
+
+    public void setFundActType(FundActType fundActType) {
+        this.fundActType = fundActType;
     }
 }

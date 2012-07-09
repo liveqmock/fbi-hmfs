@@ -7,11 +7,14 @@ import common.repository.hmfs.model.*;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import hmfs.common.model.ActinfoQryParam;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import skyline.service.PlatformService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -55,6 +58,8 @@ public class ActInfoService {
     @Resource
     private  HmChkActMapper hmChkActMapper;
 
+    @Resource
+    private  PlatformService platformService;
 
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
@@ -113,9 +118,40 @@ public class ActInfoService {
     //核算户交易明细
     public List<HmTxnFund> selectFundTxnDetlList(ActinfoQryParam param) {
         HmTxnFundExample example = new HmTxnFundExample();
-        example.createCriteria()
-                .andFundActnoBetween(param.getStartActno(), param.getEndActno())
-                .andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        HmTxnFundExample.Criteria criteria = example.createCriteria();
+
+        criteria.andTxnDateBetween(param.getStartDate(), param.getEndDate());
+
+        String startActno = param.getStartActno();
+        String endActno = param.getEndActno();
+        if (!StringUtils.isEmpty(startActno) || !StringUtils.isEmpty(endActno)) {
+            criteria.andFundActnoBetween(startActno, endActno);
+        }
+
+        String fundActType = param.getFundActType();
+        if (!StringUtils.isEmpty(fundActType)) {
+            criteria.andFundActtypeEqualTo(fundActType);
+        }
+
+        BigDecimal txnAmt = param.getTxnAmt();
+        if (txnAmt.compareTo(new BigDecimal(0)) != 0) {
+            criteria.andTxnAmtEqualTo(txnAmt);
+        }
+
+        int count = txnFundMapper.countByExample(example);
+
+        int max_query_count = 0;
+        try {
+            max_query_count = Integer.parseInt(platformService.selectEnuExpandValue("SYSTEMPARAM", "MAXQRYNUM"));
+        } catch (NumberFormatException e) {
+            logger.error("系统参数（最大查询笔数）定义错误。采用默认值 10000");
+            max_query_count = 10000;
+        }
+
+        if (count > max_query_count) {
+            throw new RuntimeException("查询结果集笔数超过" + max_query_count + "笔，请改变查询参数，缩小查询范围。");
+        }
+
         example.setOrderByClause("fund_actno, txn_date, txn_time");
         return txnFundMapper.selectByExample(example);
     }
