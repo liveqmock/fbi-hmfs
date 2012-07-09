@@ -38,7 +38,7 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         String txnCode = "7000";
         HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
+        //if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
             try {
                 updateHmSctRecord(hmSysCtl);
                 doHmbSignTxn(txnCode, "301");
@@ -48,9 +48,9 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        } else {
-            throw new RuntimeException("系统初始或与国土局对帐完成后方可签到。");
-        }
+        //} else {
+        //    throw new RuntimeException("系统初始或与国土局对帐完成后方可签到。");
+        //}
     }
 
     private void doHmbSignTxn(String txnCode, String actionCode) throws Exception {

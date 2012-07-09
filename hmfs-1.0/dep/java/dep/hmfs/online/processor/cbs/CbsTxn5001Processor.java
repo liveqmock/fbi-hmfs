@@ -170,7 +170,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
             logger.info("主机会计帐号余额：" + hostCbsActBal.toString());
             logger.info("本地会计帐号余额：" + localCbsActBal.toString());
             logger.info("差额：" + localCbsActBal.subtract(hostCbsActBal).toString());
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
+            //throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
         }
         if (res == null || !res.startsWith("0000")) {
             throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
