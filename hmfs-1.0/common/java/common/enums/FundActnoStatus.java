@@ -8,8 +8,8 @@ import java.util.Hashtable;
 public enum FundActnoStatus implements EnumApp {
 
     NORMAL("0", "正常"),
-    CANCEL("1", "销户"),
-    FORBID("2", "封帐");
+    FORBID("1", "封帐"),
+    CANCEL("2", "注销");
 
     private String code = null;
     private String title = null;
