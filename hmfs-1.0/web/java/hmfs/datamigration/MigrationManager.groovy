@@ -3,7 +3,12 @@ package hmfs.datamigration
 import groovy.sql.Sql
 
 /**
- * Created with IntelliJ IDEA.
+ * 数据移植程序
+ *
+ * 注意：
+ *  1.须手工进行总总核对：房管中心给的会计帐号余额 = 银行核心的帐户余额
+ *  2.导入结算户数据时 须修改SQL语句中的 org_id, org_type
+ *
  * User: zhanrui
  * Date: 12-7-2
  * Time: 下午4:27
@@ -397,7 +402,7 @@ class MigrationManager {
         """
         db.execute(sql)
 
-        //更新缴存比例  TODO：待确认
+        //更新缴存比例  TODO：待确认 工程造价（暂用空格代替）
         sql = """
           update hm_act_fund f
             set f.DEP_STANDARD2 =
