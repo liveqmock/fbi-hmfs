@@ -287,6 +287,23 @@ public class HmbActinfoService {
         actFund.setIntcPdt(zero);
         actFund.setOpenActDate(today);
         actFund.setRecversion(0);
+        // 2012-07-10 zhangxiaobo 新增分户时 更新项目户建筑面积、分户数+1
+        if (actFund.getFundActno2() != null && !"#".equals(actFund.getFundActno2().trim())) {
+            HmActFund hmActFund = qryHmActfundByActNo(actFund.getFundActno2());
+            if (hmActFund != null) {
+                hmActFund.setCellNum(String.valueOf(Integer.parseInt(hmActFund.getCellNum()) + 1));
+                logger.info("项目核算户建筑面积" + hmActFund.getBuilderArea()
+                        + " 新开分户核算户建筑面积" + actFund.getBuilderArea());
+                try {
+                    hmActFund.setBuilderArea(new BigDecimal(hmActFund.getBuilderArea().trim())
+                            .add(new BigDecimal(actFund.getBuilderArea().trim())).toString());
+                } catch (Exception e) {
+                    logger.error("项目核算户建筑面积" + hmActFund.getBuilderArea()
+                            + " 新开分户核算户建筑面积" + actFund.getBuilderArea() + "[数据格式错误]");
+                }
+                hmActFundMapper.updateByPrimaryKey(hmActFund);
+            }
+        }
         return hmActFundMapper.insert(actFund);
     }
 
