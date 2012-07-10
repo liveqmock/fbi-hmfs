@@ -32,12 +32,12 @@ public interface HmCmnMapper {
             "   set chksts = '0'" +
             " where txn_date = #{txnDate}" +
             "   and actno in (select t1.actno" +
-            "                   from (select actno, actbal" +
+            "                   from (select * " +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId1}" +
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t1," +
-            "                        (select actno, actbal" +
+            "                        (select * " +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId2}" +
             "                            and acttype = #{actType}" +
@@ -85,12 +85,12 @@ public interface HmCmnMapper {
             "   set chksts = '2'" +
             " where txn_date = #{txnDate}" +
             "   and actno in (select t1.actno" +
-            "                   from (select actno, actbal" +
+            "                   from (select * " +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId1}" +
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t1," +
-            "                        (select actno, actbal" +
+            "                        (select * " +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId2}" +
             "                            and acttype = #{actType}" +
