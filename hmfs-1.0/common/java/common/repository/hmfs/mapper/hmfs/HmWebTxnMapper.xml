@@ -195,4 +195,95 @@
             order by coalesce(actno1,actno2)
     </select>
 
+
+    <!--房产中心余额对帐结果 -->
+    <select id="selectHmbChkActResult" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
+            select * from (
+             select t1.pkid as pkid1,
+                    t1.txn_date as txnDate1,
+                    t1.actno as actno1,
+                    t1.actbal as actbal1,
+                    t1.cell_num as cellNum1,
+                    t1.builder_area as builderArea1,
+                    t2.pkid as pkid2,
+                    t2.txn_date as txnDate2,
+                    t2.actno as actno2,
+                    t2.actbal as actbal2,
+                    t2.cell_num as cellNum2,
+                    t2.builder_area as builderArea2
+               from HM_CHK_ACT t1, HM_CHK_ACT t2
+              where t1.txn_date = #{txnDate}
+                and t1.txn_date = t2.txn_date
+                and t1.send_sys_id = #{sendSysId}
+                and t2.send_sys_id = '99'
+                and t1.actno = t2.actno
+                and t1.chksts = '2'
+                and t2.chksts = '2'
+            union all
+             select t1.pkid as pkid1,
+                    t1.txn_date as txnDate1,
+                    t1.actno as actno1,
+                    t1.actbal as actbal1,
+                    t1.cell_num as cellNum1,
+                    t1.builder_area as builderArea1,
+                    '' as pkid2,
+                    '' as txnDate2,
+                    '' as actno2,
+                    0 as actbal2,
+                    '' as cellNum2,
+                    '' as builderArea2
+               from HM_CHK_ACT t1
+              where t1.txn_date = #{txnDate}
+                and t1.send_sys_id = #{sendSysId}
+                and t1.chksts = '1'
+            union all
+             select t2.pkid as pkid1,
+                    '' as txnDate1,
+                    '' as actno1,
+                    0 as actbal1,
+                    '' as cellNum1,
+                    '' as builderArea1,
+                    t2.pkid as pkid2,
+                    t2.txn_date as txnDate2,
+                    t2.actno as actno2,
+                    t2.actbal as actbal2,
+                    t2.cell_num as cellNum2,
+                    t2.builder_area as builderArea2
+               from HM_CHK_ACT t2
+              where t2.txn_date = #{txnDate}
+                and t2.send_sys_id = '99'
+                and t2.chksts = '1'
+            )
+            order by coalesce(actno1,actno2)
+    </select>
+
+    <!--房产中心余额对帐结果 -->
+    <select id="selectHmbChkActSuccResult" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
+            select * from (
+             select t1.pkid as pkid1,
+                    t1.txn_date as txnDate1,
+                    t1.actno as actno1,
+                    t1.actbal as actbal1,
+                    t1.cell_num as cellNum1,
+                    t1.builder_area as builderArea1,
+                    t2.pkid as pkid2,
+                    t2.txn_date as txnDate2,
+                    t2.actno as actno2,
+                    t2.actbal as actbal2,
+                    t2.cell_num as cellNum2,
+                    t2.builder_area as builderArea2
+               from HM_CHK_ACT t1, HM_CHK_ACT t2
+              where t1.txn_date = #{txnDate}
+                and t1.txn_date = t2.txn_date
+                and t1.send_sys_id = #{sendSysId}
+                and t2.send_sys_id = '99'
+                and t1.actno = t2.actno
+                and t1.chksts = '0'
+                and t2.chksts = '0'
+            )
+            order by coalesce(actno1,actno2)
+    </select>
+
 </mapper>

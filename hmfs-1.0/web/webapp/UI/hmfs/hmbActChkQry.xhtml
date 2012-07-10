@@ -23,7 +23,7 @@
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
                             <p:panel style="margin-top:10px">
-                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                <h:panelGrid columns="3" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="业务日期:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
@@ -31,9 +31,15 @@
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"
                                                      value="#{actChkAction.qryParam.startDate}"/>
                                     </h:panelGrid>
-                                    <h:panelGrid id="buttons">
-                                        <p:commandButton style="width:110px;" value=" 查  询 "
+                                    <h:panelGrid id="buttons1">
+                                        <p:commandButton style="width:110px;" value="查询不平数据"
                                                          action="#{actChkAction.onQueryHmb}"
+                                                         update="pdt,msgs">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                    <h:panelGrid id="buttons2">
+                                        <p:commandButton style="width:110px;" value="查询平账数据"
+                                                         action="#{actChkAction.onQuerySuccHmb}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -59,14 +65,18 @@
                                 <p:columnGroup type="header">
                                     <p:row>
                                         <p:column rowspan="2" headerText="交易日期" />
-                                        <p:column colspan="2" headerText="维修资金管理平台数据" />
-                                        <p:column colspan="2" headerText="国土局数据" />
+                                        <p:column colspan="4" headerText="维修资金管理平台数据" />
+                                        <p:column colspan="4" headerText="国土局数据" />
                                     </p:row>
                                     <p:row>
                                         <p:column headerText="帐号" />
                                         <p:column headerText="帐户余额" />
+                                        <p:column headerText="户数" />
+                                        <p:column headerText="面积" />
                                         <p:column headerText="帐号" />
                                         <p:column headerText="帐户余额" />
+                                        <p:column headerText="户数" />
+                                        <p:column headerText="面积" />
                                     </p:row>
                                 </p:columnGroup>
                                 <p:column headerText="交易日期" style="text-align: center">
@@ -80,6 +90,12 @@
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="户数" style="text-align: center">
+                                    <h:outputText value="#{record.cellNum1}"/>
+                                </p:column>
+                                <p:column headerText="面积" style="text-align: center">
+                                    <h:outputText value="#{record.builderArea1}"/>
+                                </p:column>
                                 <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.actno1}"/>
                                 </p:column>
@@ -87,6 +103,12 @@
                                     <h:outputText value="#{record.actbal1==0? '':record.actbal1}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
+                                </p:column>
+                                <p:column headerText="户数" style="text-align: center">
+                                    <h:outputText value="#{record.cellNum2}"/>
+                                </p:column>
+                                <p:column headerText="面积" style="text-align: center">
+                                    <h:outputText value="#{record.builderArea2}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

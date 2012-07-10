@@ -147,6 +147,11 @@ public class HmbSysTxnService extends HmbBaseService {
             //hmChkAct.setSendSysId(SEND_SYS_ID);
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(hmActFund.getActBal());
+            hmChkAct.setActtype(hmActFund.getFundActtype1());
+            hmChkAct.setInfoId1(hmActFund.getInfoId1());
+            hmChkAct.setInfoIdType1(hmActFund.getInfoIdType1());
+            hmChkAct.setCellNum(hmActFund.getCellNum());
+            hmChkAct.setBuilderArea(hmActFund.getBuilderArea());
             hmChkActMapper.insert(hmChkAct);
         }
     }
@@ -160,6 +165,11 @@ public class HmbSysTxnService extends HmbBaseService {
             //hmChkAct.setSendSysId(SEND_SYS_ID);
             hmChkAct.setSendSysId("99");
             hmChkAct.setActbal(stl.getActBal());
+            hmChkAct.setActtype(stl.getSettleActtype1());  //帐户类型 210
+            hmChkAct.setInfoId1(stl.getOrgId());    //单位ID  100
+            hmChkAct.setInfoIdType1(stl.getOrgType());  //单位类型  80
+            hmChkAct.setCellNum("0");
+            hmChkAct.setBuilderArea("0");
             hmChkActMapper.insert(hmChkAct);
         }
     }
@@ -180,9 +190,19 @@ public class HmbSysTxnService extends HmbBaseService {
             if (hmbMsg instanceof Msg098) {
                 hmChkAct.setActno(((Msg098) hmbMsg).fundActno1);
                 hmChkAct.setActbal(((Msg098) hmbMsg).getActBal());
+                hmChkAct.setActtype(((Msg098) hmbMsg).getFundActtype1());
+                hmChkAct.setInfoId1(((Msg098) hmbMsg).getInfoId1());
+                hmChkAct.setInfoIdType1(((Msg098) hmbMsg).getInfoIdType1());
+                hmChkAct.setCellNum(((Msg098) hmbMsg).getCellNum());
+                hmChkAct.setBuilderArea(((Msg098) hmbMsg).getBuilderArea());
             } else {
                 hmChkAct.setActno(((Msg094) hmbMsg).settleActno1);
                 hmChkAct.setActbal(((Msg094) hmbMsg).getActBal());
+                hmChkAct.setActtype(((Msg094) hmbMsg).getSettleActtype1());
+                hmChkAct.setInfoId1(((Msg094) hmbMsg).getOrgId());
+                hmChkAct.setInfoIdType1(((Msg094) hmbMsg).getOrgType());
+                hmChkAct.setCellNum("0");
+                hmChkAct.setBuilderArea("0");
             }
             hmChkActMapper.insert(hmChkAct);
         }
@@ -194,15 +214,17 @@ public class HmbSysTxnService extends HmbBaseService {
      * @return
      */
     @Transactional(propagation= Propagation.REQUIRES_NEW)
-    public boolean verifyActBalData(String txnDate) {
+    public boolean verifyHmbActBalData(String txnDate, String actType) {
         int successNumber = 0;
         int failNumber = 0;
-        successNumber = hmCmnMapper.verifyChkaclResult_0(txnDate, "99", "00");
+        successNumber = hmCmnMapper.verifyChkActResult_0(txnDate, "99", "00", "210");
+        successNumber = successNumber + hmCmnMapper.verifyChkActResult_0(txnDate, "99", "00", actType);
         logger.info(txnDate + "对帐成功笔数：" + successNumber);
 
-        failNumber = hmCmnMapper.verifyChkaclResult_11(txnDate, "99", "00");
-        failNumber += hmCmnMapper.verifyChkaclResult_12(txnDate, "99", "00");
-        failNumber += hmCmnMapper.verifyChkaclResult_2(txnDate, "99", "00");
+        failNumber = hmCmnMapper.verifyChkActResult_11(txnDate, "99", "00");
+        failNumber += hmCmnMapper.verifyChkActResult_12(txnDate, "99", "00");
+        failNumber += hmCmnMapper.verifyChkActResult_2(txnDate, "99", "00", "210");
+        failNumber += hmCmnMapper.verifyChkActResult_2(txnDate, "99", "00", actType);
         logger.info(txnDate + "对帐失败笔数：" + failNumber);
 
         return failNumber == 0;

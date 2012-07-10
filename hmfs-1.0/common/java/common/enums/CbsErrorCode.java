@@ -28,6 +28,8 @@ public enum CbsErrorCode implements EnumApp {
     VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),
 
     SYS_NOT_SIGN_ON("5001", "系统未签到"),
+    SYS_NOT_SIGN_OUT("5002", "系统未签退或不处于对帐完成状态"),
+
     NET_COMMUNICATE_ERROR("7000", "网络连接异常"),
     NET_COMMUNICATE_TIMEOUT("7001", "网络连接超时"),
     DATA_ANALYSIS_ERROR("8000", "报文解析错误"),

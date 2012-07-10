@@ -52,6 +52,10 @@
                                         <p:inputText  value="#{actInfoAction.qryParam.txnAmt}">
                                             <f:convertNumber currencySymbol="" type="currency" groupingUsed="#{false}"></f:convertNumber>
                                         </p:inputText>
+                                        <h:outputLabel value="申请单号:"  style="font-weight: bold"/>
+                                        <p:inputText required="false" value="#{actInfoAction.qryParam.msgSn}"/>
+                                        <h:outputLabel value="主机流水号:"  style="font-weight: bold"/>
+                                        <p:inputText required="false" value="#{actInfoAction.qryParam.cbsTxnSn}"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
                                         <p:commandButton  style="width:120px;" value="查询交易明细"
@@ -81,6 +85,9 @@
                                 <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.fundActno}"/>
                                 </p:column>
+                                <p:column headerText="帐号类型" style="text-align: center">
+                                    <h:outputText value="#{record.fundActtype}"/>
+                                </p:column>
                                 <p:column headerText="申请单号" style="text-align: center">
                                     <h:outputText value="#{record.txnSn}"/>
                                 </p:column>
@@ -103,7 +110,7 @@
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="主机交易流水号" style="text-align: center">
+                                <p:column headerText="主机流水号" style="text-align: center">
                                     <h:outputText value="#{record.cbsTxnSn}"/>
                                 </p:column>
                             </p:dataTable>

@@ -26,9 +26,19 @@ public abstract class CbsAbstractTxnProcessor {
     public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
 
     public TOA run(String txnCode, String serialNo, byte[] datagramBytes) throws Exception {
-        if (!"5001".equals(txnCode)) {
-            HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
-            if (!SysCtlSts.SIGNON.getCode().equals(hmSysCtl.getSysSts())) {
+        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+        String sysSts = hmSysCtl.getSysSts();
+
+        /*
+            对于主机发起的交易（或WEB层发起的交易），此处不检查签到签退交易时系统的状态。
+            签到签退交易（包括自动发起的交易）由房产交易中心的系统控制。
+         */
+        if ("5001".equals(txnCode)) { //对帐交易
+            if (!SysCtlSts.SIGNOUT.getCode().equals(sysSts) || !SysCtlSts.HMB_CHK_OVER.getCode().equals(sysSts)) {
+                throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_OUT.getCode());
+            }
+        }else{ //其它交易（不包括WEB层发起的签到签退）
+            if (!SysCtlSts.SIGNON.getCode().equals(sysSts)) {
                 throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_ON.getCode());
             }
         }

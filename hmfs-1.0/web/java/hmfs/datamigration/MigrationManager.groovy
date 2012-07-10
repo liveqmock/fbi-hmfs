@@ -23,8 +23,8 @@ class MigrationManager {
         MigrationManager mig = new MigrationManager();
 
         //初始化本地业务表和系统控制表
-        mig.initBizDBTable()
-        mig.initSystemCtrlTable()
+        //mig.initBizDBTable()
+        //mig.initSystemCtrlTable()
 
         //修改SQL中表名
         mig.processSqlFile();

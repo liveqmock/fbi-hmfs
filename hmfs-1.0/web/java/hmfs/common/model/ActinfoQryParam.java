@@ -12,6 +12,9 @@ public class ActinfoQryParam {
     private String endDate = "";
     private BigDecimal txnAmt = new BigDecimal(0.00);
     private String fundActType = "";  //511:项目户 570：分户
+    private String msgSn = "";        //申请单号
+    private String cbsTxnSn = "";     //主机流水号
+
 
     public String getCbsActno() {
         return cbsActno;
@@ -83,5 +86,21 @@ public class ActinfoQryParam {
 
     public void setFundActType(String fundActType) {
         this.fundActType = fundActType;
+    }
+
+    public String getMsgSn() {
+        return msgSn;
+    }
+
+    public void setMsgSn(String msgSn) {
+        this.msgSn = msgSn;
+    }
+
+    public String getCbsTxnSn() {
+        return cbsTxnSn;
+    }
+
+    public void setCbsTxnSn(String cbsTxnSn) {
+        this.cbsTxnSn = cbsTxnSn;
     }
 }

@@ -27,7 +27,7 @@ public interface HmCmnMapper {
     /**
      * 校验余额对帐结果
      */
-
+    //双方帐户都存在 核对 平账
     @Update("update HM_CHK_ACT" +
             "   set chksts = '0'" +
             " where txn_date = #{txnDate}" +
@@ -35,17 +35,26 @@ public interface HmCmnMapper {
             "                   from (select actno, actbal" +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId1}" +
+            "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t1," +
             "                        (select actno, actbal" +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId2}" +
+            "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
+            "                    and t1.cell_num = t2.cell_num" +
+            "                    and t1.builder_area = t2.builder_area" +
+            //"                    and t1.acttype = t2.acttype" +
+            //"                    and t1.info_id1 = t2.info_id1" +
+            //"                    and t1.info_id1_type1 = t2.info_id1_type1" +
             "                    and t1.actbal = t2.actbal)")
-    public int verifyChkaclResult_0(@Param("txnDate") String txnDate,
+    public int verifyChkActResult_0(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
-                                    @Param("sendSysId2") String sendSysId2);
+                                    @Param("sendSysId2") String sendSysId2,
+                                    @Param("actType") String actType);
 
+    //核对我有他无
     @Update("update HM_CHK_ACT" +
             "   set chksts = '1'" +
             " where txn_date = #{txnDate}" +
@@ -54,10 +63,11 @@ public interface HmCmnMapper {
             "                       from HM_CHK_ACT" +
             "                      where send_sys_id = #{sendSysId2}" +
             "                        and txn_date = #{txnDate})")
-    public int verifyChkaclResult_11(@Param("txnDate") String txnDate,
+    public int verifyChkActResult_11(@Param("txnDate") String txnDate,
                                      @Param("sendSysId1") String sendSysId1,
                                      @Param("sendSysId2") String sendSysId2);
 
+    //核对我无他有
     @Update("update HM_CHK_ACT" +
             "   set chksts = '1'" +
             " where txn_date = #{txnDate}" +
@@ -66,10 +76,11 @@ public interface HmCmnMapper {
             "                       from HM_CHK_ACT" +
             "                      where send_sys_id = #{sendSysId1}" +
             "                        and txn_date = #{txnDate})")
-    public int verifyChkaclResult_12(@Param("txnDate") String txnDate,
+    public int verifyChkActResult_12(@Param("txnDate") String txnDate,
                                      @Param("sendSysId1") String sendSysId1,
                                      @Param("sendSysId2") String sendSysId2);
 
+    //双方帐户都存在 核对不平的情况
     @Update("update HM_CHK_ACT" +
             "   set chksts = '2'" +
             " where txn_date = #{txnDate}" +
@@ -77,15 +88,20 @@ public interface HmCmnMapper {
             "                   from (select actno, actbal" +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId1}" +
+            "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t1," +
             "                        (select actno, actbal" +
             "                           from HM_CHK_ACT" +
             "                          where send_sys_id = #{sendSysId2}" +
+            "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
+            "                    and t1.cell_num != t2.cell_num" +
+            "                    and t1.builder_area != t2.builder_area" +
             "                    and t1.actbal != t2.actbal)")
-    public int verifyChkaclResult_2(@Param("txnDate") String txnDate,
+    public int verifyChkActResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
-                                    @Param("sendSysId2") String sendSysId2);
+                                    @Param("sendSysId2") String sendSysId2,
+                                    @Param("actType") String actType);
 
 }

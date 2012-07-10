@@ -46,6 +46,7 @@ public class ActChkAction implements Serializable {
 
     private int totalCount;
     private int totalErrorCount;
+    private int totalSuccessCount;
 
     private BigDecimal totalAmt;
 
@@ -84,8 +85,23 @@ public class ActChkAction implements Serializable {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
-            this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
+            //this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectHmbChkActResult("00", this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+    public String onQuerySuccHmb() {
+        try {
+            this.totalCount = actInfoService.countChkActRecordNumber(this.qryParam.getStartDate());
+            if (totalCount == 0) {
+                MessageUtil.addError("本日无对帐数据。");
+                return null;
+            }
+            this.detlList = actInfoService.selectHmbChkActSuccResult("00", this.qryParam.getStartDate());
+            this.totalSuccessCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -227,5 +243,13 @@ public class ActChkAction implements Serializable {
 
     public void setSelectedRecord(HmChkActVO selectedRecord) {
         this.selectedRecord = selectedRecord;
+    }
+
+    public int getTotalSuccessCount() {
+        return totalSuccessCount;
+    }
+
+    public void setTotalSuccessCount(int totalSuccessCount) {
+        this.totalSuccessCount = totalSuccessCount;
     }
 }

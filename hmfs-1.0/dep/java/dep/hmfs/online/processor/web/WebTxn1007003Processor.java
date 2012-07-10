@@ -49,7 +49,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             //保存国土局到本地数据库
             hmbSysTxnService.processChkBalResponse(msgList, txnDate);
             //数据核对处理
-            boolean verify = hmbSysTxnService.verifyActBalData(txnDate);
+            boolean verify = hmbSysTxnService.verifyHmbActBalData(txnDate, "511");
 
             if (verify) {
                 txnResult = "0000|余额对帐成功";
@@ -77,7 +77,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
                         //数据核对处理
                         //保存国土局到本地数据库
                         hmbSysTxnService.processChkBalResponse(msgList, txnDate);
-                        hmbSysTxnService.verifyActBalData(txnDate);
+                        hmbSysTxnService.verifyHmbActBalData(txnDate, "570");
                         txnResult =  "9999|余额对帐失败";
                     }
                 }

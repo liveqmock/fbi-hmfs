@@ -138,6 +138,13 @@ public class ActInfoService {
             criteria.andTxnAmtEqualTo(txnAmt);
         }
 
+        if (!StringUtils.isEmpty(param.getMsgSn())) {
+            criteria.andTxnSnEqualTo(param.getMsgSn());
+        }
+        if (!StringUtils.isEmpty(param.getCbsTxnSn())) {
+            criteria.andCbsTxnSnEqualTo(param.getCbsTxnSn());
+        }
+
         int count = txnFundMapper.countByExample(example);
 
         int max_query_count = 0;
@@ -197,6 +204,17 @@ public class ActInfoService {
     public List<HmChkActVO> selectChkActResult(String sendSysId, String txnDate){
         return  hmWebTxnMapper.selectChkActResult(sendSysId, txnDate);
     }
+
+    //房产中心余额对帐结果查询
+    public List<HmChkActVO> selectHmbChkActResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectHmbChkActResult(sendSysId, txnDate);
+    }
+
+    //房产中心余额对帐结果查询(对帐成功数据)
+    public List<HmChkActVO> selectHmbChkActSuccResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectHmbChkActSuccResult(sendSysId, txnDate);
+    }
+
     //流水对帐结果查询
     public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String txnDate){
         return  hmWebTxnMapper.selectChkTxnResult(sendSysId, txnDate);

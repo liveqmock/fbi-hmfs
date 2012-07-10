@@ -15,6 +15,10 @@ public class HmChkActVO {
     private String actno2;
     private BigDecimal actbal2;
     private String chksts;
+    private String cellNum1;
+    private String cellNum2;
+    private String builderArea1;
+    private String builderArea2;
 
     public String getPkid1() {
         return pkid1;
@@ -110,5 +114,37 @@ public class HmChkActVO {
 
     public void setChksts(String chksts) {
         this.chksts = chksts;
+    }
+
+    public String getCellNum1() {
+        return cellNum1;
+    }
+
+    public void setCellNum1(String cellNum1) {
+        this.cellNum1 = cellNum1;
+    }
+
+    public String getCellNum2() {
+        return cellNum2;
+    }
+
+    public void setCellNum2(String cellNum2) {
+        this.cellNum2 = cellNum2;
+    }
+
+    public String getBuilderArea1() {
+        return builderArea1;
+    }
+
+    public void setBuilderArea1(String builderArea1) {
+        this.builderArea1 = builderArea1;
+    }
+
+    public String getBuilderArea2() {
+        return builderArea2;
+    }
+
+    public void setBuilderArea2(String builderArea2) {
+        this.builderArea2 = builderArea2;
     }
 }
