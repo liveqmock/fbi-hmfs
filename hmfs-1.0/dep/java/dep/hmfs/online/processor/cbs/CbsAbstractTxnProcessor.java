@@ -34,7 +34,7 @@ public abstract class CbsAbstractTxnProcessor {
             签到签退交易（包括自动发起的交易）由房产交易中心的系统控制。
          */
         if ("5001".equals(txnCode)) { //对帐交易
-            if (!SysCtlSts.SIGNOUT.getCode().equals(sysSts) || !SysCtlSts.HMB_CHK_OVER.getCode().equals(sysSts)) {
+            if (!SysCtlSts.SIGNOUT.getCode().equals(sysSts) && !SysCtlSts.HMB_CHK_OVER.getCode().equals(sysSts)) {
                 throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_OUT.getCode());
             }
         }else{ //其它交易（不包括WEB层发起的签到签退）
