@@ -55,7 +55,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 new String[]{"00005"});
 
         if (payInfoList.size() <= 0) {
-            throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_EXIST.getCode());
+            throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }
 
         /*
@@ -78,12 +78,11 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         }
 
         boolean isSendOver = false;
+        String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
         try {
-            String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
-            txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
-                    tia4001.body.billStatus);
             isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
                     tia4001.body.billStatus);
+
         } catch (Exception e) {
             logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
@@ -91,6 +90,9 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         if (!isSendOver) {
             logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
+        } else {
+            txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
+                    tia4001.body.billStatus);
         }
         return null;
     }
