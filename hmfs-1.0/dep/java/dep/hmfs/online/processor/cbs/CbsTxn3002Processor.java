@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,6 +38,7 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
     private HmbActinfoService hmbActinfoService;
 
     @Override
+    @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
         TIA3002 tia3002 = new TIA3002();
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();

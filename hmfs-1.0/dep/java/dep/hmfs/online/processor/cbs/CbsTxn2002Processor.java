@@ -31,6 +31,7 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
     private HmbClientReqService hmbClientReqService;
 
     @Override
+    @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
         TIA2002 tia2002 = new TIA2002();
         tia2002.body.drawApplyNo = new String(bytes, 0, 18).trim();

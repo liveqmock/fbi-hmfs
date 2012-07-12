@@ -1,6 +1,7 @@
 package dep.hmfs.online.processor.cbs;
 
 import common.enums.CbsErrorCode;
+import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
@@ -10,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +36,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
     private HmbTxnsnGenerator hmbTxnsnGenerator;
 
     @Override
+    @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) throws InvocationTargetException, IllegalAccessException {
 
         TIA4001 tia4001 = new TIA4001();
@@ -43,9 +47,17 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             if (bytes.length != 43) {
                 throw new RuntimeException(CbsErrorCode.DATA_ANALYSIS_ERROR.getCode());
             } else {
-                tia4001.body.payApplyNo = new String(bytes, 25, 18);
+                tia4001.body.payApplyNo = new String(bytes, 25, 18).trim();
             }
         }
+        // TODO 检查是否存在此申请单号
+        List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
+                new String[]{"00005"});
+
+        if (payInfoList.size() <= 0) {
+            throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_EXIST.getCode());
+        }
+
         /*
         票据状态	         1	    1:领用；2:使用；3:作废
         打印票据起始编号	12	    票据起始编号
@@ -64,9 +76,19 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         if (startNo > endNo) {
             throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
         }
-        String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
-        txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo, tia4001.body.billStatus);
-        if (!hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo, tia4001.body.billStatus)) {
+
+        boolean isSendOver = false;
+        try {
+            String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
+            txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
+                    tia4001.body.billStatus);
+            isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
+                    tia4001.body.billStatus);
+        } catch (Exception e) {
+            logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);
+            throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
+        }
+        if (!isSendOver) {
             logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
         }

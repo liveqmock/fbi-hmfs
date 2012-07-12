@@ -3,6 +3,7 @@ package dep.hmfs.online.service.hmb;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmActFund;
+import common.repository.hmfs.model.HmSysCtl;
 import common.service.SystemService;
 import dep.gateway.xsocket.client.impl.XSocketBlockClient;
 import dep.hmfs.online.processor.hmb.domain.*;
@@ -83,15 +84,19 @@ public class HmbClientReqService extends HmbBaseService {
         msg005.msgDt = SystemService.formatTodayByPattern("yyyyMMddHHmmss");
         List<HmbMsg> hmbMsgList = new ArrayList<HmbMsg>();
         hmbMsgList.add(msg005);
+        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+
         // 领用
         if (VouchStatus.RECEIVED.getCode().equals(vouchStatus) || VouchStatus.CANCEL.getCode().equals(vouchStatus)) {
             for (long i = startNo; i <= endNo; i++) {
                 Msg049 msg049 = new Msg049();
                 msg049.actionCode = "144";
                 //59:单位ID
-                msg049.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
+                //msg049.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
+                msg049.orgId = hmSysCtl.getBankUnitId();
                 //60:单位类型
-                msg049.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
+//                msg049.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
+                msg049.orgType = hmSysCtl.getBankUnitType();
 
                 msg049.receiptNo = StringUtils.leftPad(String.valueOf(i), 12, "0");
                 msg049.voucherSts = vouchStatus;
@@ -124,12 +129,17 @@ public class HmbClientReqService extends HmbBaseService {
                 msg037.depType = totalPayInfo.getHouseDepType();
                 //80:交存人       21 信息名称
                 msg037.depPerson = msginLog.getInfoName();
+                // TODO
                 //59:单位ID
-                msg037.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
+//                msg037.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
+                msg037.orgId = hmSysCtl.getBankUnitId();
                 //60:单位类型
-                msg037.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
+//                msg037.orgType = PropertyManager.getProperty("hmfs_bank_unit_type");
+                msg037.orgType = hmSysCtl.getBankUnitType();
+
                 //61:单位名称
-                msg037.orgName = PropertyManager.getProperty("hmfs_bank_unit_name");
+//                msg037.orgName = PropertyManager.getProperty("hmfs_bank_unit_name");
+                msg037.orgName = hmSysCtl.getBankUnitName();
                 msg037.linkMsgSn = msgSn;
                 hmbMsgList.add(msg037);
             }
