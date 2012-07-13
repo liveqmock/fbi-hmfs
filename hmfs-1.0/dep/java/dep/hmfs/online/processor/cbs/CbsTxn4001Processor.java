@@ -5,8 +5,8 @@ import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
-import dep.hmfs.online.service.hmb.TxnVouchService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
+import dep.hmfs.online.service.hmb.TxnVouchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,10 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         try {
             isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
                     tia4001.body.billStatus);
-
+            if (isSendOver) {
+                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
+                        tia4001.body.billStatus);
+            }
         } catch (Exception e) {
             logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
@@ -90,9 +93,6 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         if (!isSendOver) {
             logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
-        } else {
-            txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
-                    tia4001.body.billStatus);
         }
         return null;
     }
