@@ -53,7 +53,7 @@ public class HmbActinfoService {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
-    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {
         HmChkActExample example = new HmChkActExample();
         example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
@@ -65,7 +65,7 @@ public class HmbActinfoService {
         return hmChkActMapper.insert(hmChkAct);
     }
 
-    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int deleteCbsChkTxnByDate(String date8, String cbsActno, String sendSysId) {
         HmChkTxnExample example = new HmChkTxnExample();
         example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
@@ -290,7 +290,14 @@ public class HmbActinfoService {
         actFund.setRecversion(0);
         // 2012-07-10 zhangxiaobo 新增分户时 更新项目户建筑面积、分户数+1
         if (actFund.getFundActno2() != null && !"#".equals(actFund.getFundActno2().trim())) {
+
             HmActFund hmActFund = qryHmActfundByActNo(actFund.getFundActno2());
+            // 如果上级项目核算户分户数为0，那么该项目户的分户数和面积先置为0，然后累加
+            int cnt = qrySubActfundCnt(actFund.getFundActno2());
+            if(cnt == 0) {
+                hmActFund.setCellNum("0");
+                hmActFund.setBuilderArea("0");
+            }
             if (hmActFund != null) {
                 hmActFund.setCellNum(String.valueOf(Integer.parseInt(hmActFund.getCellNum().trim()) + 1));
                 logger.info("项目核算户建筑面积" + hmActFund.getBuilderArea()
@@ -323,6 +330,21 @@ public class HmbActinfoService {
                 }
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
+                // 2012-07-16 zhangxiaobo 分户销户时项目核算户分户数-1 面积减分户面积
+                if (hmActFund.getFundActno2() != null && !"#".equals(hmActFund.getFundActno2().trim())) {
+                    HmActFund hmActFund2 = qryHmActfundByActNo(hmActFund.getFundActno2());
+                    hmActFund2.setCellNum(String.valueOf(Integer.parseInt(hmActFund2.getCellNum().trim()) - 1));
+                    logger.info("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                            + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea());
+                    try {
+                        hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea().trim())
+                                .subtract(new BigDecimal(hmActFund.getBuilderArea().trim())).toString());
+                    } catch (Exception e) {
+                        logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                                + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
+                    }
+                    hmActFundMapper.updateByPrimaryKey(hmActFund2);
+                }
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
@@ -341,6 +363,20 @@ public class HmbActinfoService {
                 }
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);
+                if (hmActFund.getFundActno2() != null && !"#".equals(hmActFund.getFundActno2().trim())) {
+                    HmActFund hmActFund2 = qryHmActfundByActNo(hmActFund.getFundActno2());
+                    hmActFund2.setCellNum(String.valueOf(Integer.parseInt(hmActFund2.getCellNum().trim()) - 1));
+                    logger.info("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                            + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea());
+                    try {
+                        hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea().trim())
+                                .subtract(new BigDecimal(hmActFund.getBuilderArea().trim())).toString());
+                    } catch (Exception e) {
+                        logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                                + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
+                    }
+                    hmActFundMapper.updateByPrimaryKey(hmActFund2);
+                }
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
@@ -395,5 +431,20 @@ public class HmbActinfoService {
         if (!"#".equals(msg035.fundActno2.trim())) {
             actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.DEPOSIT.getCode(), "115", "115");
         }
+    }
+
+    // 按主机流水号查询结算户交易明细
+    public HmTxnStl qryTxnStlByCbsSn(String cbsSn) {
+        HmTxnStlExample example = new HmTxnStlExample();
+        example.createCriteria().andCbsTxnSnEqualTo(cbsSn);
+        List<HmTxnStl> txnStlList = hmTxnStlMapper.selectByExample(example);
+        return txnStlList.size() > 0 ? txnStlList.get(0) : null;
+    }
+
+    // 查询项目户下分户数
+    public int qrySubActfundCnt(String actFundNo) {
+        HmActFundExample example = new HmActFundExample();
+        example.createCriteria().andFundActno2EqualTo(actFundNo).andActStsEqualTo(FundActnoStatus.NORMAL.getCode());
+        return hmActFundMapper.countByExample(example);
     }
 }

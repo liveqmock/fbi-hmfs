@@ -46,7 +46,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         tia5001.body.txnDate = new String(bytes, 46, 8).trim();
 
         // 如果对账日期不是系统当前日期，则返回错误。
-       /* if (!SystemService.formatTodayByPattern("yyyyMMdd").equals(tia5001.body.txnDate)) {
+        /* if (!SystemService.formatTodayByPattern("yyyyMMdd").equals(tia5001.body.txnDate)) {
             throw new RuntimeException(CbsErrorCode.CBS_ACT_CHK_DATE_ERROR.getCode());
         }*/
 
@@ -106,11 +106,11 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 logger.info("====" + detail);
                 String[] fields = detail.split("\\|");
                 int recordCnt = fields.length / 3;
-                for (int i = 0; i < recordCnt; i++){
+                for (int i = 0; i < recordCnt; i++) {
                     TIA5001.Body.Record record = new TIA5001.Body.Record();
-                    record.txnSerialNo = fields[i*3+0].trim();
-                    record.txnAmt = fields[i*3+1].trim();
-                    record.txnType = fields[i*3+2].trim();
+                    record.txnSerialNo = fields[i * 3 + 0].trim();
+                    record.txnAmt = fields[i * 3 + 1].trim();
+                    record.txnType = fields[i * 3 + 2].trim();
                     //logger.info(record.txnSerialNo + " " + record.txnAmt + " "+ record.txnType);
 
                     tia5001.body.recordList.add(record);
@@ -147,7 +147,10 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
             } else {
                 for (TIA5001.Body.Record r : tia5001.body.recordList) {
                     logger.info("【主机】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
-                    HmTxnStl hmTxnStl = hmTxnStlList.get(index);
+                    //HmTxnStl hmTxnStl = hmTxnStlList.get(index);
+                    // 2012-07-16按主机流水号查询结算户交易明细
+                    HmTxnStl hmTxnStl = hmbActinfoService.qryTxnStlByCbsSn(r.txnSerialNo);
+
                     logger.info("【本地】流水号：" + hmTxnStl.getCbsTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
                             " ==记账方向： " + hmTxnStl.getDcFlag());
                     if (!r.txnSerialNo.equals(hmTxnStl.getCbsTxnSn())
