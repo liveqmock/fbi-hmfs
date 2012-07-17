@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry location="/svn-haierfip/ref/ojdbc6.jar"/>
+    <classPathEntry location="/svn-fbihmfs/lib/ojdbc6.jar"/>
 
     <!--信息 -->
     <context id="AllInfo" targetRuntime="MyBatis3">
@@ -33,13 +33,13 @@
 
 
         <!--业务类例子 -->
-        <!--
-        <table schema="hmfs" tableName="">
+
+        <table schema="hmfs" tableName="hm_act_fund_del">
             <property name="ignoreQualifiersAtRuntime" value="true" />
             <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
-            <columnOverride column="" jdbcType="TIMESTAMP"/>
+
         </table>
-        -->
+
 
 <!--
         <table schema="hmfs" tableName="hm_sys_ctl">

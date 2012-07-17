@@ -48,6 +48,8 @@ public class HmbActinfoService {
     private HmChkTxnMapper hmChkTxnMapper;
     @Autowired
     private HmSysCtlMapper hmSysCtlMapper;
+    @Autowired
+    private HmActFundDelMapper hmActFundDelMapper;
 
     public HmSysCtl getSysCtl() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
@@ -118,10 +120,10 @@ public class HmbActinfoService {
         }
     }
 
-    public boolean isExistFundActNo(String fundActno) {
+    public List<HmActFund> qryExistFundActNo(String fundActno) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActno);
-        return hmActFundMapper.countByExample(example) > 0;
+        return hmActFundMapper.selectByExample(example);
     }
 
     @Transactional
@@ -276,8 +278,21 @@ public class HmbActinfoService {
         HmActFund actFund = new HmActFund();
         actFund.setPkid(UUID.randomUUID().toString());
         BeanUtils.copyProperties(actFund, hmbMsg);
-        if (isExistFundActNo(actFund.getFundActno1())) {
-            return 1;
+        // 2012-07-16 新户开户  如果已销户，则从核算户表删除，保存到hm_act_fund_del
+        List<HmActFund> originActFundList = qryExistFundActNo(actFund.getFundActno1());
+        if (originActFundList.size() > 0) {
+            for (HmActFund record : originActFundList) {
+                if (FundActnoStatus.NORMAL.getCode().equals(record.getActSts())
+                        || FundActnoStatus.FORBID.getCode().equals(record.getActSts())) {
+                    throw new RuntimeException("分户核算户" + record.getFundActno1() + "已存在，不可重复开户。");
+                } else if (FundActnoStatus.CANCEL.getCode().equals(record.getActSts())) {
+                    // TODO
+                    HmActFundDel hmActFundDel = new HmActFundDel();
+                    BeanUtils.copyProperties(hmActFundDel, record);
+                    hmActFundDelMapper.insert(hmActFundDel);
+                    hmActFundMapper.deleteByPrimaryKey(record.getPkid());
+                }
+            }
         }
         String today = SystemService.formatTodayByPattern("yyyyMMdd");
         BigDecimal zero = new BigDecimal(0);
@@ -294,7 +309,7 @@ public class HmbActinfoService {
             HmActFund hmActFund = qryHmActfundByActNo(actFund.getFundActno2());
             // 如果上级项目核算户分户数为0，那么该项目户的分户数和面积先置为0，然后累加
             int cnt = qrySubActfundCnt(actFund.getFundActno2());
-            if(cnt == 0) {
+            if (cnt == 0) {
                 hmActFund.setCellNum("0");
                 hmActFund.setBuilderArea("0");
             }
