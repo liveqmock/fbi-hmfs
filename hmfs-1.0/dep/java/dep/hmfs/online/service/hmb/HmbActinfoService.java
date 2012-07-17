@@ -282,15 +282,14 @@ public class HmbActinfoService {
         List<HmActFund> originActFundList = qryExistFundActNo(actFund.getFundActno1());
         if (originActFundList.size() > 0) {
             for (HmActFund record : originActFundList) {
-                if (FundActnoStatus.NORMAL.getCode().equals(record.getActSts())
-                        || FundActnoStatus.FORBID.getCode().equals(record.getActSts())) {
-                    throw new RuntimeException("分户核算户" + record.getFundActno1() + "已存在，不可重复开户。");
-                } else if (FundActnoStatus.CANCEL.getCode().equals(record.getActSts())) {
+                if (FundActnoStatus.CANCEL.getCode().equals(record.getActSts())) {
                     // TODO
                     HmActFundDel hmActFundDel = new HmActFundDel();
                     BeanUtils.copyProperties(hmActFundDel, record);
                     hmActFundDelMapper.insert(hmActFundDel);
                     hmActFundMapper.deleteByPrimaryKey(record.getPkid());
+                } else {
+                    throw new RuntimeException("分户核算户" + record.getFundActno1() + "已存在，不可重复开户。");
                 }
             }
         }
@@ -459,7 +458,7 @@ public class HmbActinfoService {
     // 查询项目户下分户数
     public int qrySubActfundCnt(String actFundNo) {
         HmActFundExample example = new HmActFundExample();
-        example.createCriteria().andFundActno2EqualTo(actFundNo).andActStsEqualTo(FundActnoStatus.NORMAL.getCode());
+        example.createCriteria().andFundActno2EqualTo(actFundNo).andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
         return hmActFundMapper.countByExample(example);
     }
 }
