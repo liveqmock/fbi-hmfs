@@ -146,6 +146,11 @@ public class HmbClientReqService extends HmbBaseService {
         } else {
             throw new RuntimeException("票据状态错误: " + vouchStatus);
         }
+        // 2012-7-17 保存5610票据管理交易报文
+        Map<String, List<HmbMsg>> outMap = new HashMap<String, List<HmbMsg>>();
+        outMap.put("5610", hmbMsgList);
+        saveMsgoutLogByMap(outMap);
+        //-------------------------------
         byte[] txnBuf = messageFactory.marshal("5610", hmbMsgList);
         Map<String, List<HmbMsg>> rtnMsgMap = sendDataUntilRcv(txnBuf);
         List<HmbMsg> rtnMsgList = rtnMsgMap.get("5610");

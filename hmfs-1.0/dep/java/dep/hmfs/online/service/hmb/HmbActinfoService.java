@@ -7,6 +7,7 @@ import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,8 +153,9 @@ public class HmbActinfoService {
             } else if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
                 HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
-                hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
-                hmActFundMapper.updateByPrimaryKey(hmActFund);
+                /* hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                hmActFundMapper.updateByPrimaryKey(hmActFund);*/
+                calcelActFund(hmActFund);
             } /*else {
                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + hmbMsg.getMsgType() + "！");
             }*/
@@ -168,13 +170,36 @@ public class HmbActinfoService {
                 updateActinfosByMsginLog(msginLog);
             } else if ("01051".equals(msginLog.getMsgType())) {
                 HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
-                hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
-                hmActFundMapper.updateByPrimaryKey(hmActFund);
+                /*hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
+                hmActFundMapper.updateByPrimaryKey(hmActFund);*/
+                calcelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + msginLog.getMsgType() + "！");
             }
         }
         return fundInfoList.size();
+    }
+
+    private void calcelActFund(HmActFund hmActFund) {
+        if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+            throw new RuntimeException("该核算户" + hmActFund.getFundActno1() + "账户中尚有余额，不能销户。");
+        }
+        hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
+        hmActFundMapper.updateByPrimaryKey(hmActFund);
+        if (hmActFund.getFundActno2() != null && !"#".equals(hmActFund.getFundActno2().trim())) {
+            HmActFund hmActFund2 = qryHmActfundByActNo(hmActFund.getFundActno2());
+            hmActFund2.setCellNum(String.valueOf(Integer.parseInt(hmActFund2.getCellNum().trim()) - 1));
+            logger.info("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                    + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea());
+            try {
+                hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea().trim())
+                        .subtract(new BigDecimal(hmActFund.getBuilderArea().trim())).toString());
+            } catch (Exception e) {
+                logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
+            }
+            hmActFundMapper.updateByPrimaryKey(hmActFund2);
+        }
     }
 
     private int updateActinfosByMsg(Msg033 msg033) throws InvocationTargetException, IllegalAccessException {
@@ -208,6 +233,23 @@ public class HmbActinfoService {
         hmActFund.setInfoName(msg033.infoName);
         hmActFund.setInfoAddr(msg033.infoAddr);
         hmActFund.setCellNum(msg033.cellNum);
+        BigDecimal fundArea = new BigDecimal(hmActFund.getBuilderArea());
+        BigDecimal newArea = new BigDecimal(msg033.builderArea);
+
+        BigDecimal builderArea = new BigDecimal("0.00");
+        if (fundArea.compareTo(newArea) > 0) {
+            builderArea = fundArea.subtract(newArea);
+            HmActFund hmActFund2 = qryHmActfundByActNo(hmActFund.getFundActno2());
+            hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea()).subtract(builderArea).toString());
+            hmActFundMapper.updateByPrimaryKey(hmActFund2);
+        } else if (fundArea.compareTo(newArea) < 0) {
+            builderArea = newArea.subtract(fundArea);
+            HmActFund hmActFund2 = qryHmActfundByActNo(hmActFund.getFundActno2());
+            hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea()).add(builderArea).toString());
+            hmActFundMapper.updateByPrimaryKey(hmActFund2);
+        } else {
+            // 面积无变化
+        }
         hmActFund.setBuilderArea(msg033.builderArea);
         if ("60".equals(msg033.infoIdType1)) {
             hmActFund.setDevOrgName(msg033.devOrgName);
@@ -225,6 +267,7 @@ public class HmbActinfoService {
             hmActFund.setHouseCustPhone(msg033.houseCustPhone);
             hmActFund.setElevatorType(msg033.elevatorType);
             hmActFund.setHouseTotalAmt(msg033.houseTotalAmt);
+
             // 信息类型30——项目核算户
         } else if ("30".equals(msg033.infoIdType1)) {
             // 无其他可更改字段
@@ -262,6 +305,7 @@ public class HmbActinfoService {
             hmActFund.setHouseCustPhone(msginLog.getHouseCustPhone());
             hmActFund.setElevatorType(msginLog.getElevatorType());
             hmActFund.setHouseTotalAmt(msginLog.getHouseTotalAmt());
+
             // 信息类型30——项目核算户
         } else if ("30".equals(msginLog.getInfoIdType1())) {
             // 无其他可更改字段
@@ -285,7 +329,12 @@ public class HmbActinfoService {
                 if (FundActnoStatus.CANCEL.getCode().equals(record.getActSts())) {
                     // TODO
                     HmActFundDel hmActFundDel = new HmActFundDel();
-                    BeanUtils.copyProperties(hmActFundDel, record);
+                    try {
+                        PropertyUtils.copyProperties(hmActFundDel, record);
+                    } catch (NoSuchMethodException e) {
+                        logger.error("核算户" + record.getFundActno1() + "销户失败。", e);
+                        throw new RuntimeException("核算户" + record.getFundActno1() + "销户失败。");
+                    }
                     hmActFundDelMapper.insert(hmActFundDel);
                     hmActFundMapper.deleteByPrimaryKey(record.getPkid());
                 } else {
@@ -302,6 +351,14 @@ public class HmbActinfoService {
         actFund.setIntcPdt(zero);
         actFund.setOpenActDate(today);
         actFund.setRecversion(0);
+        actFund.setInitActBal(zero);
+        actFund.setIntAmt(zero);
+        actFund.setIncrAmt(zero);
+        actFund.setOthInAm(zero);
+        actFund.setAgnInAmt(zero);
+        actFund.setOutAmt(zero);
+        actFund.setIncrOutAmt(zero);
+        actFund.setOthOutAmt(zero);
         // 2012-07-10 zhangxiaobo 新增分户时 更新项目户建筑面积、分户数+1
         if (actFund.getFundActno2() != null && !"#".equals(actFund.getFundActno2().trim())) {
 
@@ -337,7 +394,7 @@ public class HmbActinfoService {
                 //HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
                 //2012-05-31  linyong
                 HmActFund hmActFund = qryHmActfundByInfoID(msg051.infoId1);
-                if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+                /*if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
                     //throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                     //2012-05-31 linyong
                     throw new RuntimeException("该信息ID" + msg051.infoId1 + "账户中尚有余额，不能销户。");
@@ -358,7 +415,8 @@ public class HmbActinfoService {
                                 + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
                     }
                     hmActFundMapper.updateByPrimaryKey(hmActFund2);
-                }
+                }*/
+                calcelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
@@ -372,7 +430,7 @@ public class HmbActinfoService {
             if ("01051".equals(hmbMsg.getMsgType())) {
                 Msg051 msg051 = (Msg051) hmbMsg;
                 HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
-                if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+                /*if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
                     throw new RuntimeException("该核算户" + msg051.fundActno1 + "账户中尚有余额，不能销户。");
                 }
                 hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
@@ -390,7 +448,8 @@ public class HmbActinfoService {
                                 + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
                     }
                     hmActFundMapper.updateByPrimaryKey(hmActFund2);
-                }
+                }*/
+                calcelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }

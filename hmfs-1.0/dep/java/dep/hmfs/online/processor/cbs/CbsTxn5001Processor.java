@@ -150,7 +150,9 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                     //HmTxnStl hmTxnStl = hmTxnStlList.get(index);
                     // 2012-07-16按主机流水号查询结算户交易明细
                     HmTxnStl hmTxnStl = hmbActinfoService.qryTxnStlByCbsSn(r.txnSerialNo);
-
+                    if (hmTxnStl == null) {
+                        throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
+                    }
                     logger.info("【本地】流水号：" + hmTxnStl.getCbsTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
                             " ==记账方向： " + hmTxnStl.getDcFlag());
                     if (!r.txnSerialNo.equals(hmTxnStl.getCbsTxnSn())
