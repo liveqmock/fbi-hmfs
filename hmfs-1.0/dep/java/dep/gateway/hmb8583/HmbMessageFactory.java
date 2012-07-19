@@ -119,6 +119,8 @@ public class HmbMessageFactory {
         List<IsoMessage> isoMessageList = txnMsgMap.get(txnCode);
         List<HmbMsg> msgBeanList = new ArrayList<HmbMsg>();
         for (IsoMessage message : isoMessageList) {
+            //TODO 设定日志级别或开关 生产环境稳定后应关闭，防止日志文件过大
+            logger.info(message.toString());
             String msgCode = message.getMsgCode();
             try {
                 Class<?> clazz = Class.forName(packageName + ".Msg" + msgCode);
