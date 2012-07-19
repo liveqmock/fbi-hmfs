@@ -130,7 +130,7 @@
             order by coalesce(actno1,actno2)
     </select>
 
-    <!--流水对帐结果 -->
+    <!--流水对帐结果 不平数据 -->
     <select id="selectChkTxnResult" parameterType="java.lang.String"
             resultType="common.repository.hmfs.model.hmfs.HmChkTxnVO">
             select * from (
@@ -192,11 +192,39 @@
                    and t2.msg_sn not in
                        (select t1.msg_sn from HM_CHK_TXN t1 where t1.send_sys_id = #{sendSysId} and t1.txn_date = #{txnDate})
             )
-            order by coalesce(actno1,actno2)
+            order by coalesce(msgSn1,msgSn2)
+    </select>
+
+    <!--流水对帐结果 平账数据 -->
+    <select id="selectChkTxnSuccResult" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.hmfs.HmChkTxnVO">
+            select * from (
+                 select t1.pkid     as pkid1,
+                        t1.txn_date as txnDate1,
+                        t1.actno    as actno1,
+                        t1.txnamt   as txnamt1,
+                        t1.msg_sn   as msgSn1,
+                        t1.dc_flag   as dcFlag1,
+                        t2.pkid     as pkid2,
+                        t2.txn_date as txnDate2,
+                        t2.actno    as actno2,
+                        t2.txnamt   as txnamt2,
+                        t2.msg_sn   as msgSn2,
+                        t2.dc_flag   as dcFlag2
+                   from HM_CHK_TXN t1, HM_CHK_TXN t2
+                  where t1.txn_date = #{txnDate}
+                    and t1.txn_date = t2.txn_date
+                    and t1.send_sys_id = #{sendSysId}
+                    and t2.send_sys_id = '99'
+                    and t1.msg_sn = t2.msg_sn
+                    and t1.chksts = '0'
+                    and t2.chksts = '0'
+            )
+            order by coalesce(msgSn1,msgSn2)
     </select>
 
 
-    <!--房产中心余额对帐结果 -->
+    <!--房产中心余额对帐结果 不平数据 -->
     <select id="selectHmbChkActResult" parameterType="java.lang.String"
             resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
             select * from (
@@ -258,7 +286,7 @@
             order by coalesce(actno1,actno2)
     </select>
 
-    <!--房产中心余额对帐结果 -->
+    <!--房产中心余额对帐结果 平账数据 -->
     <select id="selectHmbChkActSuccResult" parameterType="java.lang.String"
             resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
             select * from (

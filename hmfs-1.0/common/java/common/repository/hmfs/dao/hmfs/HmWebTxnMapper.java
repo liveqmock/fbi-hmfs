@@ -26,6 +26,7 @@ public interface HmWebTxnMapper {
 
     //流水对帐结果查询
     public List<HmChkTxnVO> selectChkTxnResult(@Param("sendSysId") String sendSysId, @Param("txnDate") String txnDate);
+    public List<HmChkTxnVO> selectChkTxnSuccResult(@Param("sendSysId") String sendSysId, @Param("txnDate") String txnDate);
 
 
     //20120710 zhanrui
