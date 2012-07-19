@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -43,7 +44,6 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
 
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
-    @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
         TIA1002 tia1002 = new TIA1002();
         tia1002.body.payApplyNo = new String(bytes, 0, 18).trim();
@@ -67,6 +67,9 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
             return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
+            // 2012-07-19 更新原交易码为新交易码
+            // 暂时新加事务处理，不更新原交易码为新交易码
+            // hmbActinfoService.updateCbsTxnSn(tia1002.body.payApplyNo, tia1002.body.payAmt, txnSerialNo);
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
         }
     }
@@ -74,7 +77,7 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
     /*
       交款交易。
     */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private TOA1002 handlePayTxnAndSendToHmb(String cbsSerialNo, HmMsgIn totalPayInfo, TIA1002 tia1002, List<HmMsgIn> payInfoList) throws Exception {
 
         if (!"debug".equalsIgnoreCase(PropertyManager.getProperty("hmfs_sys_status_flag"))) {

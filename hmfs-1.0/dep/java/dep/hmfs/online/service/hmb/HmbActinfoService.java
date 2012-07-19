@@ -43,6 +43,8 @@ public class HmbActinfoService {
     @Autowired
     private HmTxnStlMapper hmTxnStlMapper;
     @Autowired
+    private HmTxnFundMapper hmTxnFundMapper;
+    @Autowired
     private HmChkActMapper hmChkActMapper;
     @Autowired
     private HmChkTxnMapper hmChkTxnMapper;
@@ -141,7 +143,7 @@ public class HmbActinfoService {
                 HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
                 /* hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);*/
-                calcelActFund(hmActFund);
+                cancelActFund(hmActFund);
             } /*else {
                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + hmbMsg.getMsgType() + "！");
             }*/
@@ -158,7 +160,7 @@ public class HmbActinfoService {
                 HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
                 /*hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
                 hmActFundMapper.updateByPrimaryKey(hmActFund);*/
-                calcelActFund(hmActFund);
+                cancelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户更新子报文序号" + msginLog.getMsgType() + "！");
             }
@@ -166,7 +168,7 @@ public class HmbActinfoService {
         return fundInfoList.size();
     }
 
-    private void calcelActFund(HmActFund hmActFund) {
+    private void cancelActFund(HmActFund hmActFund) {
         if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
             throw new RuntimeException("该核算户" + hmActFund.getFundActno1() + "账户中尚有余额，不能销户。");
         }
@@ -182,6 +184,8 @@ public class HmbActinfoService {
                         .subtract(new BigDecimal(hmActFund.getBuilderArea().trim())).toString());
             } catch (Exception e) {
                 logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]", e);
+                throw new RuntimeException("项目核算户建筑面积" + hmActFund2.getBuilderArea()
                         + " 销户分户核算户建筑面积" + hmActFund.getBuilderArea() + "[数据格式错误]");
             }
             hmActFundMapper.updateByPrimaryKey(hmActFund2);
@@ -402,7 +406,7 @@ public class HmbActinfoService {
                     }
                     hmActFundMapper.updateByPrimaryKey(hmActFund2);
                 }*/
-                calcelActFund(hmActFund);
+                cancelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
@@ -435,7 +439,7 @@ public class HmbActinfoService {
                     }
                     hmActFundMapper.updateByPrimaryKey(hmActFund2);
                 }*/
-                calcelActFund(hmActFund);
+                cancelActFund(hmActFund);
             } else {
                 throw new RuntimeException("报文体中含有非核算户撤销子报文序号" + hmbMsg.getMsgType() + "！");
             }
@@ -505,5 +509,34 @@ public class HmbActinfoService {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andFundActno2EqualTo(actFundNo).andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
         return hmActFundMapper.countByExample(example);
+    }
+
+    // 重复交款时，更新旧主机交易号为新交易号，表 HM_TXN_STL, HM_TXN_FUND
+    // 不更新 HM_TXN_VCH
+    @Transactional
+    public void updateCbsTxnSn(String msgSn, String txnAmt, String newCbsSn) {
+
+        // update HM_TXN_STL
+        HmTxnStlExample txnStlExample = new HmTxnStlExample();
+        txnStlExample.createCriteria().andTxnSnEqualTo(msgSn).andTxnAmtEqualTo(new BigDecimal(txnAmt));
+        List<HmTxnStl> txnStlList = hmTxnStlMapper.selectByExample(txnStlExample);
+        if (txnStlList.size() == 1) {
+            HmTxnStl txnStl = txnStlList.get(0);
+            txnStl.setCbsTxnSn(newCbsSn);
+            hmTxnStlMapper.updateByPrimaryKey(txnStl);
+        } else {
+            logger.info("未查询到已有HmTxnStl交易，申请单号：" + msgSn + ", 交款金额：" + txnAmt);
+        }
+        // update HM_TXN_FUND
+        HmTxnFundExample txnFundExample = new HmTxnFundExample();
+        txnFundExample.createCriteria().andTxnSnEqualTo(msgSn).andTxnAmtEqualTo(new BigDecimal(txnAmt));
+        List<HmTxnFund> txnFundList = hmTxnFundMapper.selectByExample(txnFundExample);
+        if (txnFundList.size() == 1) {
+            HmTxnFund txnFund = txnFundList.get(0);
+            txnFund.setCbsTxnSn(newCbsSn);
+            hmTxnFundMapper.updateByPrimaryKey(txnFund);
+        } else {
+            logger.info("未查询到已有HmTxnFund交易，申请单号：" + msgSn + ", 交款金额：" + txnAmt);
+        }
     }
 }

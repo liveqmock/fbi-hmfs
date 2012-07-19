@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmActFund;
@@ -90,6 +91,7 @@ public class HmbClientReqService extends HmbBaseService {
         if (VouchStatus.RECEIVED.getCode().equals(vouchStatus) || VouchStatus.CANCEL.getCode().equals(vouchStatus)) {
             for (long i = startNo; i <= endNo; i++) {
                 Msg049 msg049 = new Msg049();
+                msg049.msgType = "01049";
                 msg049.actionCode = "144";
                 //59:单位ID
                 //msg049.orgId = PropertyManager.getProperty("hmfs_bank_unit_id");
@@ -106,8 +108,10 @@ public class HmbClientReqService extends HmbBaseService {
         } else if (VouchStatus.USED.getCode().equals(vouchStatus)) {
             String[] payMsgTypes = {"01035", "01045"};
             List<HmMsgIn> payInfoList = qrySubMsgsByMsgSnAndTypes(txnApplyNo, payMsgTypes);
-
-
+            // 2012-07-19 票据使用数与交款笔数不等
+            if (payInfoList.size() != (endNo - startNo + 1)) {
+                throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+            }
             HmMsgIn totalPayInfo = qryTotalMsgByMsgSn(txnApplyNo, "00005");
             for (long i = startNo; i <= endNo; i++) {
                 HmMsgIn msginLog = payInfoList.get((int) (i - startNo));
@@ -116,6 +120,7 @@ public class HmbClientReqService extends HmbBaseService {
                 Msg037 msg037 = new Msg037();
                 BeanUtils.copyProperties(msg037, actFund);
 
+                msg037.msgType = "01037";
                 msg037.actionCode = "141";
                 msg037.txnAmt1 = msginLog.getTxnAmt1();
                 msg037.receiptNo = StringUtils.leftPad(String.valueOf(i), 12, "0");
