@@ -6,22 +6,23 @@ import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
+import dep.hmfs.online.service.hmb.HmbSysTxnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by IntelliJ IDEA.
+ * 对帐.
  * User: zhangxiaobo
  * Date: 12-3-8
  * Time: 上午11:47
- * To change this template use File | Settings | File Templates.
  */
 @Component
 public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
@@ -29,9 +30,18 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
 
     @Autowired
     private HmbActinfoService hmbActinfoService;
+
+    @Resource
+    protected HmbSysTxnService hmbSysTxnService;
+
     @Autowired
     private WebTxn1007003Processor webTxn7003Processor;
 
+    /**
+     * 20120719 zhanrui
+     * 整理主机发起对帐程序流程
+     * 修改事务传播属性：REQUIRES_NEW  在对帐失败，抛出异常的情况下，仍保留历史供查询。
+     */
     @Override
     @Transactional
     public TOA process(String txnSerialNo, byte[] bytes) {
@@ -40,149 +50,133 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         账户金额	16	账号当日余额
         日期	8	yyyyMMdd
          */
-        TIA5001 tia5001 = new TIA5001();
-        tia5001.body.cbsActNo = new String(bytes, 0, 30).trim();
-        tia5001.body.accountBalance = new String(bytes, 30, 16).trim();
-        tia5001.body.txnDate = new String(bytes, 46, 8).trim();
-
-        // 如果对账日期不是系统当前日期，则返回错误。
-        /* if (!SystemService.formatTodayByPattern("yyyyMMdd").equals(tia5001.body.txnDate)) {
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_CHK_DATE_ERROR.getCode());
-        }*/
-
-        logger.info("【主机】账号：" + tia5001.body.cbsActNo);
-        logger.info("【主机】余额：" + tia5001.body.accountBalance);
-        logger.info("【主机】交易日期：" + tia5001.body.txnDate);
+        String cbsActNo = new String(bytes, 0, 30).trim();
+        String accountBalance = new String(bytes, 30, 16).trim();
+        String txnDate = new String(bytes, 46, 8).trim();
+        logger.info("【主机】账号：" + cbsActNo + "【主机】余额：" + accountBalance + "【主机】交易日期：" + txnDate);
 
         HmSysCtl hmSysCtl = hmbActinfoService.getSysCtl();
+        String bankId = hmSysCtl.getBankId();
 
-        // 删除日期为txnDate的会计账户余额对账记录
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, hmSysCtl.getBankId());
-        hmbActinfoService.deleteCbsChkActByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
-        // 删除会计账号交易明细对账记录
-        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, hmSysCtl.getBankId());
-        hmbActinfoService.deleteCbsChkTxnByDate(tia5001.body.txnDate, tia5001.body.cbsActNo, "99");
+        clearTodayChkData(cbsActNo, txnDate, bankId);
 
         // 发起国土局余额对账
-        // TODO 发起国土局明细对账【暂无此交易】
-        String res = null;
+        String hmbChkResponse = null;
         try {
-            res = webTxn7003Processor.process(null);
-            /*if (res == null || !res.startsWith("0000")) {
-                throw new RuntimeException("与国土局对账异常不平！");
-            }*/
+            //hmbChkResponse = webTxn7003Processor.process(null);
         } catch (Exception e) {
-            res = "9999|与国土局对账不平！";
-            logger.error("对账异常", e);
+            hmbChkResponse = "9999|与国土局对账不平！";
+            logger.error("与国土局对帐处理异常", e);
         }
-        // 与国土局对账完成
+
+        //新增本地余额对帐流水
+        try {
+            appendLocalActBalRecord(cbsActNo, accountBalance, txnDate, bankId);
+        } catch (Exception e) {
+            throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
+        }
+
+        if (bytes.length > 54) {
+            boolean chktxnResult = false;
+            try {
+                //新增主机对帐流水记录
+                appendCbsChkTxnRecord(bytes, cbsActNo, txnDate, bankId);
+                //增加结算户交易明细到明细对账表
+                appendLocalChkTxnRecord(txnDate);
+                //校验对帐数据
+                chktxnResult = hmbSysTxnService.verifyChkTxnData(txnDate, bankId);
+            } catch (Exception e) {
+                logger.error("处理错误", e);
+                throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
+            }
+            if (!chktxnResult){
+                throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
+            }
+        }else{
+            logger.error("TIA报文错误" + new String(bytes));
+            throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
+        }
+
+        //注意：建行对帐策略：不进行主机余额对帐
+        if (hmbChkResponse == null || !hmbChkResponse.startsWith("0000")) {
+            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
+        }
+        return null;
+    }
+
+    private void clearTodayChkData(String cbsActNo, String txnDate, String bankId) {
+        // 删除日期为txnDate的会计账户余额对账记录
+        hmbSysTxnService.deleteCbsChkActByDate(txnDate, cbsActNo, bankId);
+        hmbSysTxnService.deleteCbsChkActByDate(txnDate, cbsActNo, "99");
+        // 删除会计账号交易明细对账记录
+        hmbSysTxnService.deleteCbsChkTxnByDate(txnDate, cbsActNo, bankId);
+        hmbSysTxnService.deleteCbsChkTxnByDate(txnDate, cbsActNo, "99");
+    }
+
+    private void appendLocalChkTxnRecord(String txnDate) {
+        List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryHmTxnStlForChkAct(txnDate);
+
+        for (HmTxnStl txnStl : hmTxnStlList) {
+            HmChkTxn hmChkTxn = new HmChkTxn();
+            hmChkTxn.setPkid(UUID.randomUUID().toString());
+            hmChkTxn.setTxnDate(txnDate);
+            hmChkTxn.setSendSysId("99");
+            hmChkTxn.setActno(txnStl.getCbsActno());
+
+            hmChkTxn.setTxnamt(txnStl.getTxnAmt());
+            hmChkTxn.setMsgSn(txnStl.getCbsTxnSn());
+            hmChkTxn.setDcFlag(txnStl.getDcFlag());
+            hmbSysTxnService.insertChkTxnWithNewTx(hmChkTxn);
+        }
+    }
+
+    private void appendLocalActBalRecord(String cbsActNo, String accountBalance, String txnDate, String bankId) {
         // 新增 日期为txnDate的会计账户余额对账记录
         HmChkAct hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
-        hmChkAct.setTxnDate(tia5001.body.txnDate);
-        hmChkAct.setSendSysId(hmSysCtl.getBankId());
-        hmChkAct.setActno(tia5001.body.cbsActNo);
-        hmChkAct.setActbal(new BigDecimal(tia5001.body.accountBalance));
-        hmbActinfoService.insertChkAct(hmChkAct);
+        hmChkAct.setTxnDate(txnDate);
+        hmChkAct.setSendSysId(bankId);
+        hmChkAct.setActno(cbsActNo);
+        hmChkAct.setActbal(new BigDecimal(accountBalance));
+        hmbSysTxnService.insertChkActWithNewTx(hmChkAct);
         // DEP 会计(结算)账户余额
-        HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(tia5001.body.cbsActNo);
+        HmActStl hmActStl = hmbActinfoService.qryHmActstlByCbsactNo(cbsActNo);
         hmChkAct = new HmChkAct();
         hmChkAct.setPkid(UUID.randomUUID().toString());
-        hmChkAct.setTxnDate(tia5001.body.txnDate);
+        hmChkAct.setTxnDate(txnDate);
         hmChkAct.setSendSysId("99");
         hmChkAct.setActno(hmActStl.getCbsActno());
         hmChkAct.setActbal(hmActStl.getActBal());
-        hmbActinfoService.insertChkAct(hmChkAct);
+        hmbSysTxnService.insertChkActWithNewTx(hmChkAct);
+    }
 
-        // 有明细数据
-        int txnErrCnt = 0;
-        if (bytes.length > 54) {
-            byte[] detailBytes = new byte[bytes.length - 54];
-            System.arraycopy(bytes, 54, detailBytes, 0, detailBytes.length);
-            String detailStr = new String(detailBytes);
-            String[] details = detailStr.split("\n");
-            // 保存主机明细数据
-            for (String detail : details) {
-                logger.info("====" + detail);
-                String[] fields = detail.split("\\|");
-                int recordCnt = fields.length / 3;
-                for (int i = 0; i < recordCnt; i++) {
-                    TIA5001.Body.Record record = new TIA5001.Body.Record();
-                    record.txnSerialNo = fields[i * 3 + 0].trim();
-                    record.txnAmt = fields[i * 3 + 1].trim();
-                    record.txnType = fields[i * 3 + 2].trim();
-                    //logger.info(record.txnSerialNo + " " + record.txnAmt + " "+ record.txnType);
-
-                    tia5001.body.recordList.add(record);
-                    HmChkTxn hmChkTxn = new HmChkTxn();
-                    hmChkTxn.setPkid(UUID.randomUUID().toString());
-                    hmChkTxn.setTxnDate(tia5001.body.txnDate);
-                    hmChkTxn.setSendSysId(hmSysCtl.getBankId());
-                    hmChkTxn.setActno(tia5001.body.cbsActNo);
-                    hmChkTxn.setTxnamt(new BigDecimal(record.txnAmt));
-                    hmChkTxn.setMsgSn(record.txnSerialNo);
-                    hmChkTxn.setDcFlag(record.txnType);
-                    hmbActinfoService.insertChkTxn(hmChkTxn);
-                }
-            }
-            // TODO 查询结算户交易明细到明细对账表
-            List<HmTxnStl> hmTxnStlList = hmbActinfoService.qryHmTxnStlForChkAct(tia5001.body.txnDate);
-
-            for (HmTxnStl txnStl : hmTxnStlList) {
+    private void appendCbsChkTxnRecord(byte[] bytes, String cbsActNo, String txnDate, String bankId) {
+        TIA5001 tia5001 = new TIA5001();
+        byte[] detailBytes = new byte[bytes.length - 54];
+        System.arraycopy(bytes, 54, detailBytes, 0, detailBytes.length);
+        String detailStr = new String(detailBytes);
+        String[] details = detailStr.split("\n");
+        // 保存主机明细数据
+        for (String detail : details) {
+            logger.info("====" + detail);
+            String[] fields = detail.split("\\|");
+            int recordCnt = fields.length / 3;
+            for (int i = 0; i < recordCnt; i++) {
+                TIA5001.Body.Record record = new TIA5001.Body.Record();
+                record.txnSerialNo = fields[i * 3 + 0].trim();
+                record.txnAmt = fields[i * 3 + 1].trim();
+                record.txnType = fields[i * 3 + 2].trim();
+                tia5001.body.recordList.add(record);
                 HmChkTxn hmChkTxn = new HmChkTxn();
                 hmChkTxn.setPkid(UUID.randomUUID().toString());
-                hmChkTxn.setTxnDate(tia5001.body.txnDate);
-                hmChkTxn.setSendSysId("99");
-                hmChkTxn.setActno(txnStl.getCbsActno());
-
-                hmChkTxn.setTxnamt(txnStl.getTxnAmt());
-                hmChkTxn.setMsgSn(txnStl.getTxnSn());
-                hmChkTxn.setDcFlag(txnStl.getDcFlag());
-                hmbActinfoService.insertChkTxn(hmChkTxn);
-            }
-            // 明细对账
-            int index = 0;
-            if (tia5001.body.recordList.size() != hmTxnStlList.size()) {
-                txnErrCnt = 1;
-            } else {
-                for (TIA5001.Body.Record r : tia5001.body.recordList) {
-                    logger.info("【主机】流水号：" + r.txnSerialNo + " ==交易金额： " + r.txnAmt + " ==记账方向： " + r.txnType);
-                    //HmTxnStl hmTxnStl = hmTxnStlList.get(index);
-                    // 2012-07-16按主机流水号查询结算户交易明细
-                    HmTxnStl hmTxnStl = hmbActinfoService.qryTxnStlByCbsSn(r.txnSerialNo);
-                    if (hmTxnStl == null) {
-                        throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
-                    }
-                    logger.info("【本地】流水号：" + hmTxnStl.getCbsTxnSn() + " ==交易金额： " + hmTxnStl.getTxnAmt() +
-                            " ==记账方向： " + hmTxnStl.getDcFlag());
-                    if (!r.txnSerialNo.equals(hmTxnStl.getCbsTxnSn())
-                            || hmTxnStl.getTxnAmt().compareTo(new BigDecimal(r.txnAmt)) != 0
-                            || !r.txnType.equals(hmTxnStl.getDcFlag())) {
-                        logger.error("账户交易明细内容不一致！");
-                        txnErrCnt++;
-                    }
-                    index++;
-                }
+                hmChkTxn.setTxnDate(txnDate);
+                hmChkTxn.setSendSysId(bankId);
+                hmChkTxn.setActno(cbsActNo);
+                hmChkTxn.setTxnamt(new BigDecimal(record.txnAmt));
+                hmChkTxn.setMsgSn(record.txnSerialNo);
+                hmChkTxn.setDcFlag(record.txnType);
+                hmbSysTxnService.insertChkTxnWithNewTx(hmChkTxn);
             }
         }
-        if (hmActStl == null) {
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_NOT_EXIST.getCode());
-        }
-        // 余额对账
-        BigDecimal localCbsActBal = hmActStl.getActBal();
-        BigDecimal hostCbsActBal = new BigDecimal(tia5001.body.accountBalance.trim()).divide(new BigDecimal(100));
-        if (hostCbsActBal.compareTo(localCbsActBal) != 0) {
-            logger.info("主机会计帐号余额：" + hostCbsActBal.toString());
-            logger.info("本地会计帐号余额：" + localCbsActBal.toString());
-            logger.info("差额：" + localCbsActBal.subtract(hostCbsActBal).toString());
-            //throw new RuntimeException(CbsErrorCode.CBS_ACT_BAL_ERROR.getCode());
-        }
-        if (res == null || !res.startsWith("0000")) {
-            throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
-        }
-        if (txnErrCnt != 0) {
-            throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
-        }
-        return null;
     }
 }
