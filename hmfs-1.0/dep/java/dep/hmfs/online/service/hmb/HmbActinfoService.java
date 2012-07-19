@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,23 +55,10 @@ public class HmbActinfoService {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {
-        HmChkActExample example = new HmChkActExample();
-        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
-        return hmChkActMapper.deleteByExample(example);
-    }
 
     @Transactional
     public int insertChkAct(HmChkAct hmChkAct) {
         return hmChkActMapper.insert(hmChkAct);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public int deleteCbsChkTxnByDate(String date8, String cbsActno, String sendSysId) {
-        HmChkTxnExample example = new HmChkTxnExample();
-        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
-        return hmChkTxnMapper.deleteByExample(example);
     }
 
     @Transactional

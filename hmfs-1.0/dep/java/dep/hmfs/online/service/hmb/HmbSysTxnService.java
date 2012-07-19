@@ -120,7 +120,7 @@ public class HmbSysTxnService extends HmbBaseService {
     }
 
 
-    //========================对帐专用 20120707 zhanrui 临时修改============
+    //========================国土局对帐专用 20120707 zhanrui 临时修改============
     //按日期清除余额对帐数据
     @Transactional(propagation= Propagation.REQUIRES_NEW)
     public void deleteOldActChkDataByTxnDate(String txnDate, String sendSysId){
@@ -225,6 +225,45 @@ public class HmbSysTxnService extends HmbBaseService {
         failNumber += hmCmnMapper.verifyChkActResult_12(txnDate, "99", "00");
         failNumber += hmCmnMapper.verifyChkActResult_2(txnDate, "99", "00", "210");
         failNumber += hmCmnMapper.verifyChkActResult_2(txnDate, "99", "00", actType);
+        logger.info(txnDate + "对帐失败笔数：" + failNumber);
+
+        return failNumber == 0;
+    }
+
+    //========================主机对帐专用 20120719 zhanrui 临时修改============
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int deleteCbsChkActByDate(String date8, String cbsActno, String sendSysId) {
+        HmChkActExample example = new HmChkActExample();
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
+        return hmChkActMapper.deleteByExample(example);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int deleteCbsChkTxnByDate(String date8, String cbsActno, String sendSysId) {
+        HmChkTxnExample example = new HmChkTxnExample();
+        example.createCriteria().andTxnDateEqualTo(date8).andActnoEqualTo(cbsActno).andSendSysIdEqualTo(sendSysId);
+        return hmChkTxnMapper.deleteByExample(example);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int insertChkActWithNewTx(HmChkAct hmChkAct) {
+        return hmChkActMapper.insert(hmChkAct);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int insertChkTxnWithNewTx(HmChkTxn hmChkTxn) {
+        return hmChkTxnMapper.insert(hmChkTxn);
+    }
+
+    //校验流水对帐数据
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    public boolean verifyChkTxnData(String txnDate, String bankId) {
+        int successNumber = hmCmnMapper.verifyChkTxnResult_0(txnDate, "99", bankId);
+        logger.info(txnDate + "对帐成功笔数：" + successNumber);
+
+        int failNumber = hmCmnMapper.verifyChkTxnResult_11(txnDate, "99", bankId);
+        failNumber += hmCmnMapper.verifyChkTxnResult_12(txnDate, "99", bankId);
+        failNumber += hmCmnMapper.verifyChkTxnResult_2(txnDate, "99", bankId);
         logger.info(txnDate + "对帐失败笔数：" + failNumber);
 
         return failNumber == 0;

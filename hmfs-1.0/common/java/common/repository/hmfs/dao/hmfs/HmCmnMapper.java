@@ -24,9 +24,8 @@ public interface HmCmnMapper {
             " msg_sn = #{msgsn} ")
     public int updateMsginSts(@Param("msgsn") String msgsn, @Param("sts") String sts);
 
-    /**
-     * 校验余额对帐结果
-     */
+
+    //===========校验余额对帐结果====================================================================
     //双方帐户都存在 核对 平账
     @Update("update HM_CHK_ACT" +
             "   set chksts = '0'" +
@@ -103,5 +102,73 @@ public interface HmCmnMapper {
                                     @Param("sendSysId1") String sendSysId1,
                                     @Param("sendSysId2") String sendSysId2,
                                     @Param("actType") String actType);
+
+
+    //===========校验流水对帐结果====================================================================
+    //双方帐户都存在 核对 平账
+    @Update("update HM_CHK_TXN" +
+            "   set chksts = '0'" +
+            " where txn_date = #{txnDate}" +
+            "   and msg_sn in (select t1.msg_sn" +
+            "                   from (select * " +
+            "                           from HM_CHK_TXN" +
+            "                          where send_sys_id = #{sendSysId1}" +
+            "                            and txn_date = #{txnDate}) t1," +
+            "                        (select * " +
+            "                           from HM_CHK_TXN" +
+            "                          where send_sys_id = #{sendSysId2}" +
+            "                            and txn_date = #{txnDate}) t2" +
+            "                  where t1.msg_sn = t2.msg_sn" +
+            "                    and t1.txnamt = t2.txnamt" +
+            "                    and t1.dc_flag = t2.dc_flag)")
+    public int verifyChkTxnResult_0(@Param("txnDate") String txnDate,
+                                    @Param("sendSysId1") String sendSysId1,
+                                    @Param("sendSysId2") String sendSysId2);
+
+    //核对我有他无
+    @Update("update HM_CHK_TXN" +
+            "   set chksts = '1'" +
+            " where txn_date = #{txnDate}" +
+            "   and send_sys_id = #{sendSysId1}" +
+            "   and msg_sn not in (select msg_sn" +
+            "                       from HM_CHK_TXN" +
+            "                      where send_sys_id = #{sendSysId2}" +
+            "                        and txn_date = #{txnDate})")
+    public int verifyChkTxnResult_11(@Param("txnDate") String txnDate,
+                                     @Param("sendSysId1") String sendSysId1,
+                                     @Param("sendSysId2") String sendSysId2);
+
+    //核对我无他有
+    @Update("update HM_CHK_TXN" +
+            "   set chksts = '1'" +
+            " where txn_date = #{txnDate}" +
+            "   and send_sys_id = #{sendSysId2}" +
+            "   and msg_sn not in (select msg_sn" +
+            "                       from HM_CHK_TXN" +
+            "                      where send_sys_id = #{sendSysId1}" +
+            "                        and txn_date = #{txnDate})")
+    public int verifyChkTxnResult_12(@Param("txnDate") String txnDate,
+                                     @Param("sendSysId1") String sendSysId1,
+                                     @Param("sendSysId2") String sendSysId2);
+
+    //双方帐户都存在 核对不平的情况
+    @Update("update HM_CHK_TXN" +
+            "   set chksts = '2'" +
+            " where txn_date = #{txnDate}" +
+            "   and msg_sn in (select t1.msg_sn" +
+            "                   from (select * " +
+            "                           from HM_CHK_TXN" +
+            "                          where send_sys_id = #{sendSysId1}" +
+            "                            and txn_date = #{txnDate}) t1," +
+            "                        (select * " +
+            "                           from HM_CHK_TXN" +
+            "                          where send_sys_id = #{sendSysId2}" +
+            "                            and txn_date = #{txnDate}) t2" +
+            "                  where t1.msg_sn = t2.msg_sn" +
+            "                    and t1.txnamt != t2.txnamt" +
+            "                    and t1.dc_flag != t2.dc_flag)")
+    public int verifyChkTxnResult_2(@Param("txnDate") String txnDate,
+                                    @Param("sendSysId1") String sendSysId1,
+                                    @Param("sendSysId2") String sendSysId2);
 
 }
