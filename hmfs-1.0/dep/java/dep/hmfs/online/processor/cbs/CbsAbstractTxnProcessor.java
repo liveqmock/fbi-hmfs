@@ -6,6 +6,7 @@ import common.repository.hmfs.dao.HmSysCtlMapper;
 import common.repository.hmfs.model.HmSysCtl;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.service.hmb.HmbBaseService;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -25,6 +26,7 @@ public abstract class CbsAbstractTxnProcessor {
 
     public abstract TOA process(String txnSerialNo, byte[] bytes) throws Exception;
 
+    @Transactional
     public TOA run(String txnCode, String serialNo, byte[] datagramBytes) throws Exception {
         HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
         String sysSts = hmSysCtl.getSysSts();
