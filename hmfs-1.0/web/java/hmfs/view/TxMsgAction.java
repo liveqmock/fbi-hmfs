@@ -30,6 +30,8 @@ public class TxMsgAction implements Serializable {
     private String sysDate;
     private String sysTime;
     private String txnDate;
+    private String startDate;
+    private String endDate;
     private String sysSts;
 
     private String txnCode;
@@ -58,6 +60,8 @@ public class TxMsgAction implements Serializable {
         this.sysTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        this.setStartDate(date);
+        this.setEndDate(date);
 
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
@@ -67,16 +71,16 @@ public class TxMsgAction implements Serializable {
     }
 
     private void initList() {
-        this.hisMsginList = appMngService.selectHisMsginList(txnCode, msgSn);
-        this.hisMsgoutList = appMngService.selectHisMsgoutList(txnCode, msgSn);
-        this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
-        this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
+        this.hisMsginList = appMngService.selectHmMsginList(startDate, endDate, txnCode, msgSn);
+        this.hisMsgoutList = appMngService.selectHmMsgoutList(startDate, endDate, txnCode, msgSn);
+        this.tmpMsginList = appMngService.selectTmpMsginList(startDate, endDate, txnCode, msgSn);
+        this.tmpMsgoutList = appMngService.selectTmpMsgoutList(startDate, endDate, txnCode, msgSn);
     }
 
 
-    public String onQueryHisMsgin() {
+    public String onQueryHmMsgin() {
         try {
-            this.hisMsginList = appMngService.selectHisMsginList(txnCode, msgSn);
+            this.hisMsginList = appMngService.selectHmMsginList(startDate, endDate, txnCode, msgSn);
             if (hisMsginList.size() == 0) {
                 MessageUtil.addWarn("未查询到记录.");
             }
@@ -86,9 +90,9 @@ public class TxMsgAction implements Serializable {
         return null;
     }
 
-    public String onQueryHisMsgout() {
+    public String onQueryHmMsgout() {
         try {
-            this.hisMsgoutList = appMngService.selectHisMsgoutList(txnCode, msgSn);
+            this.hisMsgoutList = appMngService.selectHmMsgoutList(startDate, endDate, txnCode, msgSn);
             if (hisMsgoutList.size() == 0) {
                 MessageUtil.addWarn("未查询到记录.");
             }
@@ -100,7 +104,7 @@ public class TxMsgAction implements Serializable {
 
     public String onQueryTmpMsgin() {
         try {
-            this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
+            this.tmpMsginList = appMngService.selectTmpMsginList(startDate, endDate, txnCode, msgSn);
             if (tmpMsginList.size() == 0) {
                 MessageUtil.addWarn("未查询到记录.");
             }
@@ -112,7 +116,7 @@ public class TxMsgAction implements Serializable {
 
     public String onQueryTmpMsgout() {
         try {
-            this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
+            this.tmpMsgoutList = appMngService.selectTmpMsgoutList(startDate, endDate, txnCode, msgSn);
             if (tmpMsgoutList.size() == 0) {
                 MessageUtil.addWarn("未查询到记录.");
             }
@@ -288,5 +292,21 @@ public class TxMsgAction implements Serializable {
 
     public void setDepService(DepService depService) {
         this.depService = depService;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }

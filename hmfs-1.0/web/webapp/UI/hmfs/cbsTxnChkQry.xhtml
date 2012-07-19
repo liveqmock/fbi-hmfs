@@ -23,7 +23,7 @@
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
                             <p:panel style="margin-top:10px">
-                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                <h:panelGrid columns="3" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="业务日期:" style="font-weight: bold"/>
                                         <p:inputText required="true" size="25"
@@ -32,10 +32,16 @@
                                                      value="#{txnChkAction.qryParam.startDate}"/>
                                     </h:panelGrid>
                                     <h:panelGrid id="buttons">
-                                        <p:commandButton style="width:110px;" value=" 查  询 "
+                                        <p:commandButton style="width:110px;" value="查询不平数据"
                                                          action="#{txnChkAction.onQueryCbs}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
+                                    </h:panelGrid>
+                                    <h:panelGrid id="buttons2">
+                                            <p:commandButton style="width:110px;" value="查询平账数据"
+                                                             action="#{txnChkAction.onQuerySuccCbs}"
+                                                             update="pdt,msgs">
+                                            </p:commandButton>
                                     </h:panelGrid>
                                 </h:panelGrid>
                             </p:panel>
@@ -59,8 +65,8 @@
                                 <p:columnGroup type="header">
                                     <p:row>
                                         <p:column rowspan="2" headerText="交易日期" />
-                                        <p:column colspan="4" headerText="维修资金管理平台数据" />
                                         <p:column colspan="4" headerText="主机端数据" />
+                                        <p:column colspan="4" headerText="维修资金管理平台数据" />
                                     </p:row>
                                     <p:row>
                                         <p:column headerText="帐号" />

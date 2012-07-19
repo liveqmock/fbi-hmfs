@@ -34,14 +34,20 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="交易码:"/>
+                                        <h:outputLabel value="起始日期:" for="startDate"  style="font-weight: bold"/>
+                                        <p:inputText id="startDate" required="true" value="#{txMsgAction.startDate}"
+                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="结束日期:" for="endDate"  style="font-weight: bold"/>
+                                        <p:inputText id="endDate" required="true" value="#{txMsgAction.endDate}"
+                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="交易码:" style="font-weight: bold"/>
                                         <p:inputText value="#{txMsgAction.txnCode}"/>
-                                        <h:outputLabel value="交易编号:"/>
+                                        <h:outputLabel value="交易编号:" style="font-weight: bold"/>
                                         <p:inputText value="#{txMsgAction.msgSn}"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
                                         <p:commandButton style="width:90px;" value="查询"
-                                                         action="#{txMsgAction.onQueryHisMsgin}"
+                                                         action="#{txMsgAction.onQueryHmMsgin}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -62,7 +68,7 @@
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
-                                         emptyMessage="数据记录为空...">
+                                         emptyMessage="...">
                                 <p:column headerText="交易码"><h:outputText value="#{record.txnCode}"/></p:column>
                                 <p:column headerText="报文的子序号"><h:outputText value="#{record.msgSubSn}"/></p:column>
                                 <p:column headerText="报文类型"><h:outputText value="#{record.msgType}"/></p:column>

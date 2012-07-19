@@ -63,8 +63,8 @@ public class HmbMockAction implements Serializable {
     }
 
     private void initList() {
-        this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
-        this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
+//        this.tmpMsginList = appMngService.selectTmpMsginList(txnCode, msgSn);
+//        this.tmpMsgoutList = appMngService.selectTmpMsgoutList(txnCode, msgSn);
     }
 
 

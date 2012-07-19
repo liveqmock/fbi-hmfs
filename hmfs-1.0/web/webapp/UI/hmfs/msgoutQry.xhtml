@@ -33,14 +33,20 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="4" cellspacing="5">
-                                        <h:outputLabel value="交易码:"/>
-                                        <p:inputText  value="#{txMsgAction.txnCode}"/>
-                                        <h:outputLabel value="交易编号:"/>
-                                        <p:inputText  value="#{txMsgAction.msgSn}"/>
+                                        <h:outputLabel value="起始日期:" for="startDate"  style="font-weight: bold"/>
+                                        <p:inputText id="startDate" required="true" value="#{txMsgAction.startDate}"
+                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="结束日期:" for="endDate"  style="font-weight: bold"/>
+                                        <p:inputText id="endDate" required="true" value="#{txMsgAction.endDate}"
+                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="交易码:" style="font-weight: bold"/>
+                                        <p:inputText value="#{txMsgAction.txnCode}"/>
+                                        <h:outputLabel value="交易编号:" style="font-weight: bold"/>
+                                        <p:inputText value="#{txMsgAction.msgSn}"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
                                         <p:commandButton style="width:90px;" value="查询"
-                                                         action="#{txMsgAction.onQueryHisMsgin}"
+                                                         action="#{txMsgAction.onQueryHmMsgout}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -55,7 +61,7 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{txMsgAction.hisMsginList}" var="record"
+                                         value="#{txMsgAction.hisMsgoutList}" var="record"
                                          rowKey="#{record.pkid}"
                                          selection="#{txMsgAction.selectedHisMsginRecords}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"

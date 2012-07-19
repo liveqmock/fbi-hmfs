@@ -47,6 +47,8 @@ public class TxnChkAction implements Serializable {
 
     private int totalCount;
     private int totalErrorCount;
+    private int totalSuccessCount;
+
     private BigDecimal totalAmt;
 
     @ManagedProperty(value = "#{appMngService}")
@@ -98,6 +100,21 @@ public class TxnChkAction implements Serializable {
                 return null;
             }
             this.totalErrorCount = this.detlList.size();
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
+    public String onQuerySuccCbs() {
+        try {
+            this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
+            if (totalCount == 0) {
+                MessageUtil.addError("本日无对帐数据。");
+                return null;
+            }
+            this.detlList = actInfoService.selectChkTxnSuccResult(this.bankId, this.qryParam.getStartDate());
+            this.totalSuccessCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -224,5 +241,13 @@ public class TxnChkAction implements Serializable {
 
     public void setSelectedRecord(HmChkTxnVO selectedRecord) {
         this.selectedRecord = selectedRecord;
+    }
+
+    public int getTotalSuccessCount() {
+        return totalSuccessCount;
+    }
+
+    public void setTotalSuccessCount(int totalSuccessCount) {
+        this.totalSuccessCount = totalSuccessCount;
     }
 }

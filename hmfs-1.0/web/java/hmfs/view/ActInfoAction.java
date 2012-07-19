@@ -154,6 +154,20 @@ public class ActInfoAction implements Serializable {
         }
         return null;
     }
+
+    //分户交易明细
+    public String onQueryIndiviFundDetl(){
+        try {
+            this.fundDetlList = actInfoService.selectFundTxnDetlList(qryParam);
+            if (fundDetlList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
     //=============================
 
     public String getSysDate() {

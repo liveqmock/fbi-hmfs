@@ -1,5 +1,6 @@
 package hmfs.service;
 
+import common.enums.FundActType;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
@@ -163,6 +164,32 @@ public class ActInfoService {
         return txnFundMapper.selectByExample(example);
     }
 
+    // 分户交易明细
+    public List<HmTxnFund> selectIndiviFundTxnDetlList(ActinfoQryParam param) {
+        HmTxnFundExample example = new HmTxnFundExample();
+        HmTxnFundExample.Criteria criteria = example.createCriteria();
+
+        criteria.andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        criteria.andFundActtypeEqualTo(FundActType.INDIVID.getCode());
+
+        int count = txnFundMapper.countByExample(example);
+
+        int max_query_count = 0;
+        try {
+            max_query_count = Integer.parseInt(platformService.selectEnuExpandValue("SYSTEMPARAM", "MAXQRYNUM"));
+        } catch (NumberFormatException e) {
+            logger.error("系统参数（最大查询笔数）定义错误。采用默认值 10000");
+            max_query_count = 10000;
+        }
+
+        if (count > max_query_count) {
+            throw new RuntimeException("查询结果集笔数超过" + max_query_count + "笔，请改变查询参数，缩小查询范围。");
+        }
+
+        example.setOrderByClause("fund_actno, txn_date, txn_time");
+        return txnFundMapper.selectByExample(example);
+    }
+
     //结算户交易明细
     public List<HmTxnStl> selectStlTxnDetl(ActinfoQryParam param) {
         HmTxnStlExample example = new HmTxnStlExample();
@@ -218,6 +245,9 @@ public class ActInfoService {
     //流水对帐结果查询
     public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String txnDate){
         return  hmWebTxnMapper.selectChkTxnResult(sendSysId, txnDate);
+    }
+    public List<HmChkTxnVO> selectChkTxnSuccResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectChkTxnSuccResult(sendSysId, txnDate);
     }
 
     //按日期统计余额对帐表数据

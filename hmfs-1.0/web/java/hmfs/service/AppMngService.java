@@ -37,6 +37,20 @@ public class AppMngService {
          return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
+    public List<TmpMsgOut>  selectTmpMsgoutList(String startDate, String endDate, String txnCode, String msgSn){
+        TmpMsgOutExample example = new TmpMsgOutExample();
+        example.createCriteria().andMsgProcDateBetween(startDate, endDate).andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
+        return tmpMsgOutMapper.selectByExample(example);
+    }
+
+    public List<TmpMsgIn>  selectTmpMsginList(String startDate, String endDate, String txnCode, String msgSn){
+        TmpMsgInExample example = new TmpMsgInExample();
+        example.createCriteria().andMsgProcDateBetween(startDate, endDate).andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
+        example.setOrderByClause("msg_sn, msg_sub_sn");
+        return tmpMsgInMapper.selectByExample(example);
+    }
+
     public List<TmpMsgOut>  selectTmpMsgoutList(String txnCode, String msgSn){
         TmpMsgOutExample example = new TmpMsgOutExample();
         example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
@@ -51,16 +65,16 @@ public class AppMngService {
         return tmpMsgInMapper.selectByExample(example);
     }
 
-    public List<HmMsgOut>  selectHisMsgoutList(String txnCode, String msgSn){
+    public List<HmMsgOut> selectHmMsgoutList(String startDate, String endDate, String txnCode, String msgSn){
         HmMsgOutExample example = new HmMsgOutExample();
-        example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
+        example.createCriteria().andMsgProcDateBetween(startDate, endDate).andTxnCodeLike("%" + txnCode + "%").andMsgSnLike("%"+msgSn+"%");
         example.setOrderByClause("msg_sn, msg_sub_sn");
         return hmMsgOutMapper.selectByExample(example);
     }
 
-    public List<HmMsgIn>  selectHisMsginList(String txnCode, String msgSn){
+    public List<HmMsgIn> selectHmMsginList(String startDate, String endDate, String txnCode, String msgSn){
         HmMsgInExample example = new HmMsgInExample();
-        example.createCriteria().andTxnCodeLike("%"+txnCode+"%").andMsgSnLike("%"+msgSn+"%");
+        example.createCriteria().andMsgProcDateBetween(startDate, endDate).andTxnCodeLike("%" + txnCode + "%").andMsgSnLike("%"+msgSn+"%");
         example.setOrderByClause("msg_sn, msg_sub_sn");
         return hmMsgInMapper.selectByExample(example);
     }
