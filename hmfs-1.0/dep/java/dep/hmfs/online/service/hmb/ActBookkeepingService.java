@@ -176,7 +176,7 @@ public class ActBookkeepingService {
             hmActFund.setActBal(amt.add(hmActFund.getActBal()));
         } else if (DCFlagCode.WITHDRAW.getCode().equalsIgnoreCase(dc)) {
             logger.info("核算账户【" + hmActFund.getFundActno1() + "】余额：" + String.format("%.2f", hmActFund.getActBal()) + " 支取金额：" +
-                                    String.format("%.2f", amt));
+                    String.format("%.2f", amt));
             if (hmActFund.getActBal().compareTo(amt) < 0) {
                 throw new RuntimeException(CbsErrorCode.FUND_ACT_BAL_LESS.getCode());
             }
