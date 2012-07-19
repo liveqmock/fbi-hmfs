@@ -63,7 +63,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         // 发起国土局余额对账
         String hmbChkResponse = null;
         try {
-            //hmbChkResponse = webTxn7003Processor.process(null);
+            hmbChkResponse = webTxn7003Processor.process(null);
         } catch (Exception e) {
             hmbChkResponse = "9999|与国土局对账不平！";
             logger.error("与国土局对帐处理异常", e);
