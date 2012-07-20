@@ -44,7 +44,7 @@ public class CbsMsgHandleService implements IMessageHandler {
             strBuilder.append(tiaHeader.txnCode);
             if ("1001".equals(tiaHeader.txnCode)) {
                 if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
-                    strBuilder.append("120319004843521000010.00           2   " +
+                    strBuilder.append("120319004843521000110.00           2   " +
                             StringPad.rightPad4ChineseToByteLength("张三", 60, " ") +
                             StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
                             StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
