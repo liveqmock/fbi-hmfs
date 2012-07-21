@@ -89,16 +89,20 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
                 logger.error("处理错误", e);
                 throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
             }
-            if (!chktxnResult){
+            if (!chktxnResult) {
                 throw new RuntimeException(CbsErrorCode.CBS_ACT_TXNS_ERROR.getCode());
             }
-        }else{
+        } else {
             logger.error("TIA报文错误" + new String(bytes));
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
 
         //注意：建行对帐策略：不进行主机余额对帐
-        if (hmbChkResponse == null || !hmbChkResponse.startsWith("0000")) {
+        if (hmbChkResponse == null) {
+            throw new RuntimeException(CbsErrorCode.NET_COMMUNICATE_TIMEOUT.getCode());
+        }
+
+        if (!hmbChkResponse.startsWith("0000")) {
             throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
         }
         return null;

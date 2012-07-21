@@ -3,7 +3,7 @@ package common.enums;
 import java.util.Hashtable;
 
 /**
- CBS中间
+ * CBS中间
  */
 public enum CbsErrorCode implements EnumApp {
 
@@ -16,13 +16,13 @@ public enum CbsErrorCode implements EnumApp {
 
     CBS_ACT_BAL_LESS("2001", "会计账户余额不足"),
     CBS_ACT_NOT_EXIST("2002", "该账户不存在"),
-    CBS_ACT_BAL_ERROR("2003", "账户余额不一致"),
-    CBS_ACT_TXNS_ERROR("2004", "账户交易明细不一致"),
+    CBS_ACT_BAL_ERROR("2003", "账户余额不平"),
+    CBS_ACT_TXNS_ERROR("2004", "账户交易明细账务不平"),
     CBS_ACT_CHK_DATE_ERROR("2005", "对账日期错误"),
 
     FUND_ACT_BAL_LESS("3001", "核算账户余额不足"),
     FUND_ACT_NOT_EXIST("3002", "该核算户不存在"),
-    FUND_ACT_CHK_ERROR("3003", "国土局账户余额对账异常"),
+    FUND_ACT_CHK_ERROR("3003", "国土局账户余额对账不平"),
 
     VOUCHER_NUM_ERROR("4001", "票据号码输入有误"),
     VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),
@@ -35,7 +35,7 @@ public enum CbsErrorCode implements EnumApp {
     NET_COMMUNICATE_TIMEOUT("7001", "网络连接超时"),
     DATA_ANALYSIS_ERROR("8000", "报文解析错误"),
 
-    SYSTEM_ERROR("9000","系统异常,请联系管理员");
+    SYSTEM_ERROR("9000", "系统异常,请联系管理员");
 
     private String code = null;
     private String title = null;

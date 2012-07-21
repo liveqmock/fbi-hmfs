@@ -79,6 +79,7 @@ public class HmbClientReqService extends HmbBaseService {
     public boolean sendVouchsToHmb(String msgSn, long startNo, long endNo, String txnApplyNo, String vouchStatus) throws InvocationTargetException, IllegalAccessException {
         Msg005 msg005 = new Msg005();
         msg005.msgSn = msgSn;
+        msg005.msgType = "00005";
         msg005.submsgNum = (int) (endNo - startNo + 1);
         msg005.sendSysId = PropertyManager.getProperty("SEND_SYS_ID");
         msg005.origSysId = msg005.sendSysId;
