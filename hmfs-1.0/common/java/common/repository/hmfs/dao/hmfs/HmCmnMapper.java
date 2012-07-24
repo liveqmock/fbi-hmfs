@@ -14,10 +14,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HmCmnMapper {
-    @Select("select txnseq from hm_sys_ctl where sct_seqno = '1' for update")
+    // TODO DB2»·¾³ Update Ê§°Ü
+    @Select("select txnseq from hmfs.hm_sys_ctl where sct_seqno = '1' for update")
     public int selectTxnseq();
 
-    @Update("update hm_sys_ctl set txnseq = #{txnsn}  where sct_seqno = '1'")
+    @Update("update hmfs.hm_sys_ctl set txnseq = #{txnsn}  where sct_seqno = '1'")
     public int updateTxnseq(@Param("txnsn") int txnsn);
 
     @Update("update hm_msg_in set txn_ctl_sts = #{sts} where " +
