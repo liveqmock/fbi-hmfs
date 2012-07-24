@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HmCmnMapper {
-    // TODO DB2»·¾³ Update Ê§°Ü
+
     @Select("select txnseq from hmfs.hm_sys_ctl where sct_seqno = '1' for update")
     public int selectTxnseq();
 
