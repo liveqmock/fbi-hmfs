@@ -7,7 +7,6 @@ import dep.hmfs.online.processor.hmb.domain.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,13 +35,16 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
      */
     public void processSignon() {
         String txnCode = "7000";
-        HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
+        //HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
+        //SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
         //if (sysCtlSts.equals(SysCtlSts.INIT) || sysCtlSts.equals(SysCtlSts.HMB_CHK_OVER)) {
             try {
-                updateHmSctRecord(hmSysCtl);
+                //updateHmSctRecord(hmSysCtl);
+                hmbSysTxnService.checkDateAndUpdateTxnSeqForSignon();
                 doHmbSignTxn(txnCode, "301");
+                HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
                 hmSysCtl.setSysSts(SysCtlSts.SIGNON.getCode());
+
                 hmSysCtl.setSignonDt(new Date());
                 hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
             } catch (Exception e) {
@@ -80,15 +82,5 @@ public class WebTxn1007000Processor extends WebAbstractHmbProductTxnProcessor{
         if (!msg002.rtnInfoCode.equals("00")) {
             throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
         }
-    }
-
-    private void updateHmSctRecord(HmSysCtl hmSysCtl){
-        String date8 = new SimpleDateFormat("yyyyMMdd").format(new Date());
-
-        if (!date8.equals(hmSysCtl.getTxnDate())) {
-            hmSysCtl.setTxnDate(date8);
-            hmSysCtl.setTxnseq(1);
-        }
-
     }
 }

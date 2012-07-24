@@ -33,21 +33,22 @@ public class WebTxn1007001Processor extends WebAbstractHmbProductTxnProcessor{
      */
     public void processSignout() {
         String txnCode = "7001";
-        HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
-        SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
-        if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
+        //HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
+        //SysCtlSts sysCtlSts = SysCtlSts.valueOfAlias(hmSysCtl.getSysSts());
+        //if (sysCtlSts.equals(SysCtlSts.SIGNON)) {
             try {
+                doHmbSignTxn(txnCode, "302");
+                HmSysCtl hmSysCtl = hmbSysTxnService.getAppSysStatus();
                 hmSysCtl.setSysSts(SysCtlSts.SIGNOUT.getCode());
                 hmSysCtl.setSignoutDt(new Date());
-                doHmbSignTxn(txnCode, "302");
                 hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
             } catch (Exception e) {
                 logger.error("签退失败。请重新发起签退。", e);
                 throw new RuntimeException("签退失败。请重新发起签退。" + e.getMessage());
             }
-        } else {
-            throw new RuntimeException("系统签到完成后方可签退。");
-        }
+        //} else {
+        //    throw new RuntimeException("系统签到完成后方可签退。");
+        //}
     }
 
 

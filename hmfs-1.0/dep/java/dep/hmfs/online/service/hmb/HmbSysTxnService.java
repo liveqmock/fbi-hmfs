@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -267,6 +269,20 @@ public class HmbSysTxnService extends HmbBaseService {
         logger.info(txnDate + "对帐失败笔数：" + failNumber);
 
         return failNumber == 0;
+    }
+
+
+    //======================20120724 zhanrui 签到时日期与序列号处理==========
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    public HmSysCtl checkDateAndUpdateTxnSeqForSignon(){
+        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+        String date8 = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        if (!date8.equals(hmSysCtl.getTxnDate())) {
+            hmSysCtl.setTxnDate(date8);
+            hmSysCtl.setTxnseq(1);
+        }
+        hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
+        return hmSysCtl;
     }
 
 }
