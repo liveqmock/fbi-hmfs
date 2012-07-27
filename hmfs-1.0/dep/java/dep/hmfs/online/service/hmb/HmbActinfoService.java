@@ -57,17 +57,6 @@ public class HmbActinfoService {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
 
-
-    @Transactional
-    public int insertChkAct(HmChkAct hmChkAct) {
-        return hmChkActMapper.insert(hmChkAct);
-    }
-
-    @Transactional
-    public int insertChkTxn(HmChkTxn hmChkTxn) {
-        return hmChkTxnMapper.insert(hmChkTxn);
-    }
-
     public List<HmTxnStl> qryHmTxnStlForChkAct(String txnDate) {
         List<HmTxnStl> hmTxnStlList = hmTxnStlMapper.qryHmTxnStlForChkAct(txnDate);
         return hmTxnStlList;
@@ -169,9 +158,10 @@ public class HmbActinfoService {
     }
 
     private void cancelActFund(HmActFund hmActFund) {
-        if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
+        // 7-27 拆分户时分户尚有余额，也可销户
+        /* if (hmActFund.getActBal().compareTo(new BigDecimal(0)) > 0) {
             throw new RuntimeException("该核算户" + hmActFund.getFundActno1() + "账户中尚有余额，不能销户。");
-        }
+        }*/
         hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
         hmActFundMapper.updateByPrimaryKey(hmActFund);
         if (hmActFund.getFundActno2() != null && !"#".equals(hmActFund.getFundActno2().trim())) {
@@ -273,7 +263,6 @@ public class HmbActinfoService {
 
         HmActFund hmActFund = qryHmActfundByActNo(msginLog.getFundActno1());
         //PropertyUtils.copyProperties(hmActFund, msginLog);
-
         hmActFund.setInfoCode(msginLog.getInfoCode());
         hmActFund.setInfoName(msginLog.getInfoName());
         hmActFund.setInfoAddr(msginLog.getInfoAddr());
@@ -453,6 +442,7 @@ public class HmbActinfoService {
 
 
     //更新核算帐户信息 (不开立新户)
+    // 将A项目户下的分户的上级项目户更新为B，同时更新A的分户和面积。
     @Transactional
     public void op145changeFundActinfo(Msg033 msg) throws InvocationTargetException, IllegalAccessException {
         HmActFundExample example = new HmActFundExample();
@@ -463,27 +453,65 @@ public class HmbActinfoService {
         }
         //TODO  检查多条？
         HmActFund actFund = actFundList.get(0);
+
+        // 更新上级核算户的分户和余额（A-）
+        if (actFund.getFundActno2() != null && !"#".equals(actFund.getFundActno2().trim())) {
+            HmActFund hmActFund2 = qryHmActfundByActNo(actFund.getFundActno2());
+            hmActFund2.setCellNum(String.valueOf(Integer.parseInt(hmActFund2.getCellNum().trim()) - 1));
+            logger.info("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                    + " -分户核算户建筑面积" + actFund.getBuilderArea());
+            try {
+                hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea().trim())
+                        .subtract(new BigDecimal(actFund.getBuilderArea().trim())).toString());
+            } catch (Exception e) {
+                logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " -分户核算户建筑面积" + actFund.getBuilderArea() + "[数据格式错误]", e);
+                throw new RuntimeException("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " -分户核算户建筑面积" + actFund.getBuilderArea() + "[数据格式错误]");
+            }
+            hmActFundMapper.updateByPrimaryKey(hmActFund2);
+        }
+        // B+
+        if (msg.fundActno2 != null && !"#".equals(msg.fundActno2.trim())) {
+            HmActFund hmActFund2 = qryHmActfundByActNo(msg.fundActno2);
+            hmActFund2.setCellNum(String.valueOf(Integer.parseInt(hmActFund2.getCellNum().trim()) + 1));
+            logger.info("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                    + " +分户核算户建筑面积" + actFund.getBuilderArea());
+            try {
+                hmActFund2.setBuilderArea(new BigDecimal(hmActFund2.getBuilderArea().trim())
+                        .add(new BigDecimal(actFund.getBuilderArea().trim())).toString());
+            } catch (Exception e) {
+                logger.error("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " +分户核算户建筑面积" + actFund.getBuilderArea() + "[数据格式错误]", e);
+                throw new RuntimeException("项目核算户建筑面积" + hmActFund2.getBuilderArea()
+                        + " +分户核算户建筑面积" + actFund.getBuilderArea() + "[数据格式错误]");
+            }
+            hmActFundMapper.updateByPrimaryKey(hmActFund2);
+        }
         int recversion = actFund.getRecversion() + 1;
-        BeanUtils.copyProperties(actFund, msg);
+        // BeanUtils.copyProperties(actFund, msg);
+        actFund.setFundActno2(msg.fundActno2);
         actFund.setRemark("TXN6210 项目拆分合并" + new Date().toString());
         actFund.setRecversion(recversion);
         hmActFundMapper.updateByPrimaryKey(actFund);
     }
 
 
-    //125:取款销户
+    //125:取款销户 2012-07-27
     public void op125cancelActinfoFunds(String msgSn, Msg051 msg051) throws ParseException {
+        //取款帐务处理
+        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno1, msg051.actBal,
+                DCFlagCode.WITHDRAW.getCode(), "125", "125");
+        if (!"#".equals(msg051.fundActno2.trim())) {
+            actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno2, msg051.actBal,
+                    DCFlagCode.WITHDRAW.getCode(), "125", "125");
+        }
         //销户
         HmActFund hmActFund = qryHmActfundByActNo(msg051.fundActno1);
-        hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
-        hmActFundMapper.updateByPrimaryKey(hmActFund);
-        //取款帐务处理
-        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno1, msg051.actBal, "D", "125", "125");
-        if (!"#".equals(msg051.fundActno2.trim())) {
-            actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno2, msg051.actBal, "D", "125", "125");
-        }
+        /*hmActFund.setActSts(FundActnoStatus.CANCEL.getCode());
+        hmActFundMapper.updateByPrimaryKey(hmActFund);*/
+        cancelActFund(hmActFund);
     }
-
 
     //115:存款
     @Transactional
@@ -513,7 +541,7 @@ public class HmbActinfoService {
 
     // 重复交款时，更新旧主机交易号为新交易号，表 HM_TXN_STL, HM_TXN_FUND
     // 不更新 HM_TXN_VCH
-    @Transactional
+    /*@Transactional
     public void updateCbsTxnSn(String msgSn, String txnAmt, String newCbsSn) {
 
         // update HM_TXN_STL
@@ -538,5 +566,5 @@ public class HmbActinfoService {
         } else {
             logger.info("未查询到已有HmTxnFund交易，申请单号：" + msgSn + ", 交款金额：" + txnAmt);
         }
-    }
+    }*/
 }

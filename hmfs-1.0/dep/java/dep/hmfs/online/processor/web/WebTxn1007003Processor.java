@@ -5,6 +5,7 @@ import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmActStl;
 import common.repository.hmfs.model.HmChkAct;
 import dep.hmfs.online.processor.hmb.domain.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -26,14 +27,23 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         String txnCode = "7003";
         String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
+        Map<String, List<HmbMsg>> responseMap = null;
+        try {
+            //发送报文
+            responseMap = sendDataUntilRcv(getFirstChkReqBuf(txnCode, txnDate));
+        } catch (RuntimeException re) {
+            if (!StringUtils.isEmpty(re.getMessage()) && re.getMessage().startsWith("700")) {
+                txnResult = "7001|网络连接超时";
+                return txnResult;
+            }
+        }
+
         //清理本日旧数据
         hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "99");
         hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "00");
         hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "99");
         hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
-        //发送报文
-        Map<String, List<HmbMsg>> responseMap = sendDataUntilRcv(getFirstChkReqBuf(txnCode, txnDate));
 
         //处理返回报文
         List<HmbMsg> msgList = responseMap.get(txnCode);
@@ -60,8 +70,8 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
                 List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
 
                 if (chkActList.isEmpty()) { //对于存在对帐不符记录且是中心的数据有但本地数据没有的情况，直接返回失败
-                    txnResult =  "9999|余额对帐失败";
-                }else{
+                    txnResult = "9999|余额对帐失败";
+                } else {
                     //发送二次核对报文
                     responseMap = sendDataUntilRcv(getSecondChkReqBuf(chkActList, txnCode, txnDate));
                     //处理返回报文
@@ -78,7 +88,7 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
                         //保存国土局到本地数据库
                         hmbSysTxnService.processChkBalResponse(msgList, txnDate);
                         hmbSysTxnService.verifyHmbActBalData(txnDate, "570");
-                        txnResult =  "9999|余额对帐失败";
+                        txnResult = "9999|余额对帐失败";
                     }
                 }
             }

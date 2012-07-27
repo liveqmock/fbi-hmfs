@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.hmb;
 
+import common.enums.DCFlagCode;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg009;
 import dep.hmfs.online.processor.hmb.domain.Msg033;
@@ -50,8 +51,10 @@ public class HmbTxn6210Processor extends HmbSyncAbstractTxnProcessor {
         BigDecimal amt = msg009.txnAmt1;
 
         //余额、流水处理
-        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, payOutActno, amt, "D", "145", "145");
-        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, payInActno, amt, "C", "145", "145");
+        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, payOutActno, amt,
+                DCFlagCode.WITHDRAW.getCode(), "145", "145");
+        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, payInActno, amt,
+                DCFlagCode.DEPOSIT.getCode(), "145", "145");
         return hmbMsgList.size() - 1;
     }
 

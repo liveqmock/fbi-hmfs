@@ -74,7 +74,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            RuntimeException re = new RuntimeException("通讯或解包错误." + e.getMessage());
+            RuntimeException re = new RuntimeException("700通讯或解包错误." + e.getMessage());
             re.initCause(e);
             throw re;
         } finally {

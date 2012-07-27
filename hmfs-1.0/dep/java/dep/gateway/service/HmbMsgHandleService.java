@@ -75,7 +75,9 @@ public class HmbMsgHandleService implements IMessageHandler {
     }
 
     private byte[] syncHandleMessage(HmbAbstractTxnProcessor processor, String txnCode, String msgType, String msgSn, List<HmbMsg> hmbMsgList) {
-        String rtnMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msgType) + 1), 3, "0");
+        logger.info("MsgType:" + msgType);
+        String rtnMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msgType.substring(2)) + 1), 3, "0");
+        logger.info("rtnMsgType:" + rtnMsgType);
         SummaryResponseMsg summaryMsg = null;
         try {
             summaryMsg = (SummaryResponseMsg) Class.forName(SummaryMsg.class.getPackage().getName() + ".Msg" + rtnMsgType).newInstance();
@@ -97,11 +99,14 @@ public class HmbMsgHandleService implements IMessageHandler {
         rtnHmbMsgList.add(summaryMsg);
         try {
             if (processor instanceof HmbSyncSubAbstractTxnProcessor) {
-                for (HmbMsg msg : hmbMsgList.subList(1, hmbMsgList.size())) {
+                HmbMsg hmbMsg = hmbMsgList.get(0);
+                List<HmbMsg> rtnSubHmbMsgList = hmbMsgList.subList(1, hmbMsgList.size());
+                for (HmbMsg msg : rtnSubHmbMsgList) {
                     SubMsg subMsg = null;
-                    String rtnSubMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msg.getMsgType()) + 1), 3, "0");
+                    logger.info("msg.msgType:" + msg.getMsgType());
+                    String rtnSubMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msg.getMsgType().substring(2)) + 1), 3, "0");
+                    logger.info("rtnSubMsgType:" + rtnSubMsgType);
                     subMsg = (SubMsg) Class.forName(SubMsg.class.getPackage().getName() + ".Msg" + rtnSubMsgType).newInstance();
-                    HmbMsg hmbMsg = hmbMsgList.get(0);
                     BeanUtils.copyProperties(subMsg, hmbMsg);
                     rtnHmbMsgList.add(subMsg);
                 }

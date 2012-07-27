@@ -98,11 +98,11 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         }
 
         //注意：建行对帐策略：不进行主机余额对帐
-        if (hmbChkResponse == null) {
+        if (hmbChkResponse != null && hmbChkResponse.startsWith(CbsErrorCode.NET_COMMUNICATE_TIMEOUT.getCode())) {
             throw new RuntimeException(CbsErrorCode.NET_COMMUNICATE_TIMEOUT.getCode());
         }
 
-        if (!hmbChkResponse.startsWith("0000")) {
+        if (hmbChkResponse == null || !hmbChkResponse.startsWith("0000")) {
             throw new RuntimeException(CbsErrorCode.FUND_ACT_CHK_ERROR.getCode());
         }
         return null;

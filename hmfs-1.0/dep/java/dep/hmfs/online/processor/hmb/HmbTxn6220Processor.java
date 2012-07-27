@@ -1,6 +1,7 @@
 package dep.hmfs.online.processor.hmb;
 
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.Msg035;
 import dep.hmfs.online.processor.hmb.domain.Msg051;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,10 @@ public class HmbTxn6220Processor extends HmbSyncAbstractTxnProcessor {
             } else if ("01033".equals(msgType)) {
                 hmbActinfoService.createActinfoFundByHmbMsg(hmbMsg);
             } else if ("01035".equals(msgType)) {
+                hmbActinfoService.op115deposite(msgSn, (Msg035) hmbMsg);
             }
         }
-        return  hmbMsgList.size() - 1;
+        return hmbMsgList.size() - 1;
     }
 
 

@@ -1,6 +1,7 @@
 package dep.hmfs.online.processor.cbs;
 
 import common.enums.CbsErrorCode;
+import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
@@ -50,12 +51,14 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 tia4001.body.payApplyNo = new String(bytes, 25, 18).trim();
             }
         }
-        // TODO 检查是否存在此申请单号
-        List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
-                new String[]{"00005"});
+        if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
+            // TODO 检查是否存在此申请单号
+            List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
+                    new String[]{"00005"});
 
-        if (payInfoList.size() <= 0) {
-            throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
+            if (payInfoList.size() <= 0) {
+                throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
+            }
         }
 
         /*
@@ -88,7 +91,10 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             }
         } catch (Exception e) {
             logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);
-            throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
+            if (e.getMessage().startsWith("700")) {
+                throw new RuntimeException(CbsErrorCode.NET_COMMUNICATE_ERROR.getCode());
+            } else
+                throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
         if (!isSendOver) {
             logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);

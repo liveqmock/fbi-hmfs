@@ -177,7 +177,7 @@ public class HmbClientReqService extends HmbBaseService {
             hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
             return messageFactory.unmarshal(hmfsDatagram);
         } catch (Exception e) {
-            throw new RuntimeException("通讯或解包错误.", e);
+            throw new RuntimeException("700通讯或解包错误.", e);
         } finally {
             try {
                 if (socketBlockClient != null) {

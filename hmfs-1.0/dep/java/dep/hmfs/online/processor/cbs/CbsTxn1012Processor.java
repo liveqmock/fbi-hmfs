@@ -60,7 +60,7 @@ public class CbsTxn1012Processor extends CbsAbstractTxnProcessor {
         if (actBookkeepingService.checkMsginTxnCtlSts(totalTxnInfo, payInfoList, new BigDecimal(tia1012.body.txnAmt))) {
             // 交款交易。
             logger.info("数据检查正确, 记账、发送报文至房管局并等待响应...");
-            List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payMsgTypes);
+           // List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payMsgTypes);
             actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1012");
             hmbBaseService.updateMsginSts(tia1012.body.txnApplyNo, TxnCtlSts.SUCCESS);
         }
