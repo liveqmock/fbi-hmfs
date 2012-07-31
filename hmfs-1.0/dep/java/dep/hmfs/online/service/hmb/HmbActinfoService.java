@@ -302,9 +302,14 @@ public class HmbActinfoService {
         actFund.setPkid(UUID.randomUUID().toString());
         BeanUtils.copyProperties(actFund, hmbMsg);
         // 2012-07-16 新户开户  如果已销户，则从核算户表删除，保存到hm_act_fund_del
+        logger.info("【新开户核算户信息】账号:" + actFund.getFundActno1() + "类型:" + actFund.getFundActtype1());
+        logger.info("【新开户核算户信息】上级账号:" + actFund.getFundActno2() + "类型:" + actFund.getFundActtype2());
         List<HmActFund> originActFundList = qryExistFundActNo(actFund.getFundActno1());
         if (originActFundList.size() > 0) {
             for (HmActFund record : originActFundList) {
+                logger.info("【新开户核算户信息】已有账号:" + record.getFundActno1() + "类型:" + record.getFundActtype1());
+                logger.info("【新开户核算户信息】已有账号上级账户:" + record.getFundActno1() + "类型:" + record.getFundActtype1());
+
                 if (FundActnoStatus.CANCEL.getCode().equals(record.getActSts())) {
                     // TODO
                     HmActFundDel hmActFundDel = new HmActFundDel();
@@ -317,7 +322,7 @@ public class HmbActinfoService {
                     hmActFundDelMapper.insert(hmActFundDel);
                     hmActFundMapper.deleteByPrimaryKey(record.getPkid());
                 } else {
-                    throw new RuntimeException("分户核算户" + record.getFundActno1() + "已存在，不可重复开户。");
+                    throw new RuntimeException("核算户" + record.getFundActno1() + "已存在。");
                 }
             }
         }
