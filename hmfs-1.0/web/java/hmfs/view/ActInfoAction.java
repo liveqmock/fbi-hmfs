@@ -5,7 +5,9 @@ import common.enums.FundActType;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.repository.hmfs.model.*;
+import common.repository.hmfs.model.hmfs.HmFundTxnVO;
 import hmfs.common.model.ActinfoQryParam;
+import hmfs.common.util.JxlsManager;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,9 @@ public class ActInfoAction implements Serializable {
     private HmActStl[] selectedStlBalRecords;
     private HmTxnFund[] selectedFundDetlRecord;
     private HmTxnStl[] selectedStlDetlRecord;
+
+    //核算分户交易明细
+    private List<HmFundTxnVO> indiviFundDetlList;
 
     private FundActnoStatus fundActnoStatus = FundActnoStatus.NORMAL;
     private DCFlagCode dcFlagCode = DCFlagCode.DEPOSIT;
@@ -158,12 +163,24 @@ public class ActInfoAction implements Serializable {
     //分户交易明细
     public String onQueryIndiviFundDetl(){
         try {
-            this.fundDetlList = actInfoService.selectFundTxnDetlList(qryParam);
-            if (fundDetlList.isEmpty()) {
+            this.indiviFundDetlList = actInfoService.selectIndiviFundTxnDetlList(qryParam);
+            if (indiviFundDetlList.isEmpty()) {
                 MessageUtil.addWarn("数据不存在...");
             }
         } catch (Exception e) {
+            logger.error("处理失败。", e);
             MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+    public String onExportExcelForIndiviFund(){
+        if (this.indiviFundDetlList.size() == 0) {
+            MessageUtil.addWarn("记录为空...");
+            return null;
+        } else {
+            String excelFilename = "分户账务交易清单-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xls";
+            JxlsManager jxls = new JxlsManager();
+            jxls.exportIndiviFundTxnList(excelFilename, this.indiviFundDetlList);
         }
         return null;
     }
@@ -336,5 +353,13 @@ public class ActInfoAction implements Serializable {
 
     public void setFundActType(FundActType fundActType) {
         this.fundActType = fundActType;
+    }
+
+    public List<HmFundTxnVO> getIndiviFundDetlList() {
+        return indiviFundDetlList;
+    }
+
+    public void setIndiviFundDetlList(List<HmFundTxnVO> indiviFundDetlList) {
+        this.indiviFundDetlList = indiviFundDetlList;
     }
 }

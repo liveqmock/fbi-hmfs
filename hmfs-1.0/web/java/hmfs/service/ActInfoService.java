@@ -7,6 +7,7 @@ import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
 import common.repository.hmfs.model.*;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
+import common.repository.hmfs.model.hmfs.HmFundTxnVO;
 import hmfs.common.model.ActinfoQryParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -165,7 +166,7 @@ public class ActInfoService {
     }
 
     // 分户交易明细
-    public List<HmTxnFund> selectIndiviFundTxnDetlList(ActinfoQryParam param) {
+    public List<HmFundTxnVO> selectIndiviFundTxnDetlList(ActinfoQryParam param) {
         HmTxnFundExample example = new HmTxnFundExample();
         HmTxnFundExample.Criteria criteria = example.createCriteria();
 
@@ -186,8 +187,7 @@ public class ActInfoService {
             throw new RuntimeException("查询结果集笔数超过" + max_query_count + "笔，请改变查询参数，缩小查询范围。");
         }
 
-        example.setOrderByClause("fund_actno, txn_date, txn_time");
-        return txnFundMapper.selectByExample(example);
+        return hmWebTxnMapper.selectIndiviFundTxnDetail(param.getStartDate(), param.getEndDate());
     }
 
     //结算户交易明细

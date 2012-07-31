@@ -26,7 +26,7 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="分户核算账户交易明细日报表">
+                <p:tab title="核算分户账户交易明细日报表">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
@@ -41,13 +41,13 @@
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton  style="width:80px;" value="查询明细"
+                                        <p:commandButton  style="width:100px;" value="查询明细"
                                                          action="#{actInfoAction.onQueryIndiviFundDetl}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
-                                        <p:commandButton  style="width:80px;" value="导出EXCEL"
-                                                         action="#{actInfoAction.onExportExcel}"
-                                                         update="pdt,msgs">
+                                        <p:commandButton  style="width:100px;" value="导出EXCEL"
+                                                         action="#{actInfoAction.onExportExcelForIndiviFund}"
+                                                         ajax="false">
                                         </p:commandButton>
                                     </h:panelGrid>
                                 </h:panelGrid>
@@ -61,7 +61,7 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{actInfoAction.fundDetlList}" var="record"
+                                         value="#{actInfoAction.indiviFundDetlList}" var="record"
                                          rowKey="#{record.pkid}"
                                          selection="#{actInfoAction.selectedFundDetlRecord}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -69,36 +69,40 @@
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="multiple" style="width:18px"/>
-                                <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.fundActno}"/>
-                                </p:column>
-                                <p:column headerText="帐号类型" style="text-align: center">
-                                    <h:outputText value="#{record.fundActtype}"/>
+                                <p:column headerText="交易时间" style="text-align: center">
+                                    <h:outputText value="#{record.txndate} #{record.txntime}"/>
                                 </p:column>
                                 <p:column headerText="申请单号" style="text-align: center">
-                                    <h:outputText value="#{record.txnSn}"/>
+                                    <h:outputText value="#{record.msgsn}"/>
+                                </p:column>
+                                <p:column headerText="帐号" style="text-align: center">
+                                    <h:outputText value="#{record.actno}"/>
                                 </p:column>
                                 <p:column headerText="交易金额">
-                                    <h:outputText value="#{record.txnAmt}" style="float: right">
+                                    <h:outputText value="#{record.txnamt}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="缴费/支取" style="text-align: center">
-                                    <h:outputText value="#{actInfoAction.dcFlagCode.valueOfAlias(record.dcFlag).title}"/>
+                                <p:column headerText="借贷" style="text-align: center">
+                                    <h:outputText value="#{record.dcflag}"/>
                                 </p:column>
-                                <p:column headerText="是否冲正" style="text-align: center">
-                                    <h:outputText value="#{record.reverseFlag==0? '否':'是'}"/>
+                                <p:column headerText="冲正" style="text-align: center">
+                                    <h:outputText value="#{record.revflag}"/>
                                 </p:column>
-                                <p:column headerText="交易时间" style="text-align: center">
-                                    <h:outputText value="#{record.txnDate} #{record.txnTime}"/>
+                                <p:column headerText="票据号" style="text-align: center">
+                                    <h:outputText value="#{record.vchnum}"/>
                                 </p:column>
-                                <p:column headerText="上日余额">
-                                    <h:outputText value="#{record.lastActBal}" style="float: right">
-                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
-                                    </h:outputText>
+                                <p:column headerText="名称" style="text-align: center">
+                                    <h:outputText value="#{record.infoname}"/>
+                                </p:column>
+                                <p:column headerText="地址" style="text-align: center">
+                                    <h:outputText value="#{record.infoaddr}"/>
+                                </p:column>
+                                <p:column headerText="面积" style="text-align: center">
+                                    <h:outputText value="#{record.area}"/>
                                 </p:column>
                                 <p:column headerText="主机流水号" style="text-align: center">
-                                    <h:outputText value="#{record.cbsTxnSn}"/>
+                                    <h:outputText value="#{record.cbstxnsn}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>
