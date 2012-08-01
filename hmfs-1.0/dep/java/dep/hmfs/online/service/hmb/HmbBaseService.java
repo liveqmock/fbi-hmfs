@@ -15,6 +15,7 @@ import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -88,6 +89,7 @@ public class HmbBaseService {
     public int updateMsginSts(String msgSn, TxnCtlSts sts) {
         return hmCmnMapper.updateMsginSts(msgSn, sts.getCode());
     }
+
     /**
      * 接收并保存交易报文
      *
@@ -101,7 +103,8 @@ public class HmbBaseService {
      */
     @Transactional
     public int updateOrInsertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
-        String msgSn = "";
+        SummaryMsg summaryMsg = (SummaryMsg) hmbMsgList.get(0);
+        String msgSn = summaryMsg.msgSn;
         HmMsgInExample example = new HmMsgInExample();
         example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
         List<HmMsgIn> msginLogList = hmMsgInMapper.selectByExample(example);

@@ -31,19 +31,17 @@ public class HmbTxn6302Processor extends HmbAsyncAbstractTxnProcessor {
                     // TODO 2012-08-01
                     // 核算户资金划入：房管中心向他行发划出报文的同时，也发送一划入报文到我行，我行即时开户，发送同步9999报文到中心，
                     // 在他行将资金划出，向中心发送异步划出响应报文后，中心又向我行发送划入报文。
-                    // TODO 临时处理：不进行开户前的检查，如已开户，则对开户报文不做处理。
-                    // TODO 待定
+                    // 处理：不进行开户前的检查，如已开户，则对开户报文不做处理。
+                    // 【可能的方案是】：首次接收划入报文时，做开户处理。他行资金划出后，中心再次发送划入报文时，对033子报文不做开户处理，
+                    // 资金划入划出由客户端（主机或web端手动发起）
                     List<HmActFund> origActFunds = hmbActinfoService.qryExistFundActNo(msg033.fundActno1);
-                    if (origActFunds.size() == 0) {
-                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
-                    }
                     boolean allCancel = true;
                     for (HmActFund actFund : origActFunds) {
                         if (!FundActnoStatus.CANCEL.getCode().equals(actFund.getActSts())) {
                             allCancel = false;
                         }
                     }
-                    if (allCancel) {
+                    if (allCancel || origActFunds.size() == 0) {
                         hmbActinfoService.createActinfoFundByHmbMsg(msg033);
                     }
 
@@ -58,21 +56,14 @@ public class HmbTxn6302Processor extends HmbAsyncAbstractTxnProcessor {
                     logger.info("分户[" + msg033.fundActno2 + "] [" + msg033.fundActtype2 + "]");
                     //hmbActinfoService.createActinfoFundByHmbMsg(msg033);
                     // TODO 2012-08-01
-                    // 核算户资金划入：房管中心向他行发划出报文的同时，也发送一划入报文到我行，我行即时开户，发送同步9999报文到中心，
-                    // 在他行将资金划出，向中心发送异步划出响应报文后，中心又向我行发送划入报文。
-                    // TODO 临时处理：不进行开户前的检查，如已开户，则对开户报文不做处理。
-                    // TODO 待定
                     List<HmActFund> origActFunds = hmbActinfoService.qryExistFundActNo(msg033.fundActno1);
-                    if (origActFunds.size() == 0) {
-                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
-                    }
                     boolean allCancel = true;
                     for (HmActFund actFund : origActFunds) {
                         if (!FundActnoStatus.CANCEL.getCode().equals(actFund.getActSts())) {
                             allCancel = false;
                         }
                     }
-                    if (allCancel) {
+                    if (allCancel || origActFunds.size() == 0) {
                         hmbActinfoService.createActinfoFundByHmbMsg(msg033);
                     }
                 }
