@@ -1,5 +1,7 @@
 package dep.hmfs.online.processor.hmb;
 
+import common.enums.FundActnoStatus;
+import common.repository.hmfs.model.HmActFund;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
 import dep.hmfs.online.processor.hmb.domain.Msg033;
 import org.slf4j.Logger;
@@ -25,7 +27,26 @@ public class HmbTxn6302Processor extends HmbAsyncAbstractTxnProcessor {
                 if ("#".equals(msg033.fundActno2)) {
                     logger.info("项目户[" + msg033.fundActno1 + "] [" + msg033.fundActtype1 + "]");
                     logger.info("项目户[" + msg033.fundActno2 + "] [" + msg033.fundActtype2 + "]");
-                    hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    // hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    // TODO 2012-08-01
+                    // 核算户资金划入：房管中心向他行发划出报文的同时，也发送一划入报文到我行，我行即时开户，发送同步9999报文到中心，
+                    // 在他行将资金划出，向中心发送异步划出响应报文后，中心又向我行发送划入报文。
+                    // TODO 临时处理：不进行开户前的检查，如已开户，则对开户报文不做处理。
+                    // TODO 待定
+                    List<HmActFund> origActFunds = hmbActinfoService.qryExistFundActNo(msg033.fundActno1);
+                    if (origActFunds.size() == 0) {
+                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    }
+                    boolean allCancel = true;
+                    for (HmActFund actFund : origActFunds) {
+                        if (!FundActnoStatus.CANCEL.getCode().equals(actFund.getActSts())) {
+                            allCancel = false;
+                        }
+                    }
+                    if (allCancel) {
+                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    }
+
                 }
             }
         }
@@ -35,7 +56,25 @@ public class HmbTxn6302Processor extends HmbAsyncAbstractTxnProcessor {
                 if (!"#".equals(msg033.fundActno2)) {
                     logger.info("分户[" + msg033.fundActno1 + "] [" + msg033.fundActtype1 + "]");
                     logger.info("分户[" + msg033.fundActno2 + "] [" + msg033.fundActtype2 + "]");
-                    hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    //hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    // TODO 2012-08-01
+                    // 核算户资金划入：房管中心向他行发划出报文的同时，也发送一划入报文到我行，我行即时开户，发送同步9999报文到中心，
+                    // 在他行将资金划出，向中心发送异步划出响应报文后，中心又向我行发送划入报文。
+                    // TODO 临时处理：不进行开户前的检查，如已开户，则对开户报文不做处理。
+                    // TODO 待定
+                    List<HmActFund> origActFunds = hmbActinfoService.qryExistFundActNo(msg033.fundActno1);
+                    if (origActFunds.size() == 0) {
+                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    }
+                    boolean allCancel = true;
+                    for (HmActFund actFund : origActFunds) {
+                        if (!FundActnoStatus.CANCEL.getCode().equals(actFund.getActSts())) {
+                            allCancel = false;
+                        }
+                    }
+                    if (allCancel) {
+                        hmbActinfoService.createActinfoFundByHmbMsg(msg033);
+                    }
                 }
             }
         }
