@@ -27,6 +27,12 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         String txnCode = "7003";
         String txnDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
+        //清理本日旧数据
+        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "99");
+        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "00");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "99");
+        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "00");
+
         Map<String, List<HmbMsg>> responseMap = null;
         try {
             //发送报文
@@ -38,11 +44,6 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             }
         }
 
-        //清理本日旧数据
-        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "99");
-        hmbSysTxnService.deleteOldActChkDataByTxnDate(txnDate, "00");
-        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "99");
-        hmbSysTxnService.deleteOldTxnChkDataByTxnDate(txnDate, "00");
 
 
         //处理返回报文
