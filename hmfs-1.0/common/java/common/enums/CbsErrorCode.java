@@ -31,6 +31,8 @@ public enum CbsErrorCode implements EnumApp {
     SYS_NOT_SIGN_OUT("5002", "系统未签退或不处于对帐完成状态"),
 
     MSG_IN_SN_NOT_EXIST("6001", "申请单号不存在"),
+    MSG_IN_SN_VCH_EXIST("6002", "该申请单号已使用票据"),
+    MSG_IN_SN_NOT_SUCCESS("6003", "该申请单号未交款或已撤销"),
     NET_COMMUNICATE_ERROR("7000", "网络连接异常"),
     NET_COMMUNICATE_TIMEOUT("7001", "网络连接超时"),
     DATA_ANALYSIS_ERROR("8000", "报文解析错误"),

@@ -1,6 +1,7 @@
 package dep.hmfs.online.processor.cbs;
 
 import common.enums.CbsErrorCode;
+import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.common.HmbTxnsnGenerator;
@@ -52,12 +53,19 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             }
         }
         if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
-            // TODO 检查是否存在此申请单号
             List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
                     new String[]{"00005"});
-
+            // 检查是否存在此申请单号
             if (payInfoList.size() <= 0) {
                 throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
+            }
+            // 2012-08-01 检查是否已交款成功
+            if (!TxnCtlSts.SUCCESS.getCode().equals(payInfoList.get(0))) {
+                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
+            }
+            // 2012-08-01 检查该申请单号是否已使用票据
+            if (txnVouchService.isExistMsgSnVch(tia4001.body.payApplyNo)) {
+                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_VCH_EXIST.getCode());
             }
         }
 
