@@ -96,9 +96,9 @@ public interface HmCmnMapper {
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
-            "                    and t1.cell_num != t2.cell_num" +
-            "                    and t1.builder_area != t2.builder_area" +
-            "                    and t1.actbal != t2.actbal)")
+            "                    and (t1.cell_num != t2.cell_num" +
+            "                    or t1.builder_area != t2.builder_area" +
+            "                    or t1.actbal != t2.actbal))")
     public int verifyChkActResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
                                     @Param("sendSysId2") String sendSysId2,
@@ -166,8 +166,8 @@ public interface HmCmnMapper {
             "                          where send_sys_id = #{sendSysId2}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.msg_sn = t2.msg_sn" +
-            "                    and t1.txnamt != t2.txnamt" +
-            "                    and t1.dc_flag != t2.dc_flag)")
+            "                    and (t1.txnamt != t2.txnamt" +
+            "                    or t1.dc_flag != t2.dc_flag))")
     public int verifyChkTxnResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
                                     @Param("sendSysId2") String sendSysId2);
