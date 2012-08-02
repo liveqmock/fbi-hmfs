@@ -60,7 +60,8 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
             }
             // 2012-08-01 检查是否已交款成功
-            if (!TxnCtlSts.SUCCESS.getCode().equals(payInfoList.get(0))) {
+            HmMsgIn oriMsgIn = payInfoList.get(0);
+            if (!TxnCtlSts.SUCCESS.getCode().equals(oriMsgIn.getTxnCtlSts())) {
                 throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
             }
             // 2012-08-01 检查该申请单号是否已使用票据
@@ -86,6 +87,13 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         }
         if (startNo > endNo) {
             throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+        }
+
+        // 检查票据是否已使用
+        for (long i = startNo; i <= endNo; i++) {
+            if (txnVouchService.isUsedVchNo(String.valueOf(i))) {
+                throw new RuntimeException(CbsErrorCode.VOUCHER_USED.getCode());
+            }
         }
 
         boolean isSendOver = false;

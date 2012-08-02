@@ -46,4 +46,10 @@ public class TxnVouchService {
         example.createCriteria().andFundTxnSnEqualTo(msgSn);
         return hmTxnVchMapper.countByExample(example) > 0;
     }
+
+    public boolean isUsedVchNo(String vchNo) {
+        HmTxnVchExample example = new HmTxnVchExample();
+        example.createCriteria().andVchNumEqualTo(vchNo);
+        return hmTxnVchMapper.countByExample(example) > 0;
+    }
 }
