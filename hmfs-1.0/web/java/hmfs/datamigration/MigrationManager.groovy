@@ -441,7 +441,7 @@ class MigrationManager {
                      b.acct_type,
                      0000000000000000,
                      b.batch_no,
-                     lpad(b.sub_water, 5, '0'),
+                     b.sub_water,
                      b.tran_amt,
                      case b.tran_flag
                        when '1' then
