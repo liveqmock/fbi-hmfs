@@ -3,6 +3,7 @@ package common.repository.hmfs.dao;
 import common.repository.hmfs.model.HmTxnStl;
 import common.repository.hmfs.model.HmTxnStlExample;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -96,4 +97,11 @@ public interface HmTxnStlMapper {
      * @mbggenerated Fri Aug 03 18:06:06 CST 2012
      */
     int updateByPrimaryKey(HmTxnStl record);
+
+    @Select(" select t.cbs_actno as cbsActno, t.txn_sn as txnSn,t.cbs_txn_sn as cbsTxnSn,sum(t.txn_amt) txnAmt," +
+            " txn_date as txnDate,t.dc_flag as dcFlag from HM_TXN_STL t " +
+            " group by t.cbs_actno, t.txn_sn,t.cbs_txn_sn,txn_date,t.dc_flag " +
+            " having t.txn_date in #{date} " +
+            " order by t.cbs_txn_sn")
+    List<HmTxnStl> qryHmTxnStlForChkAct(@Param("date") String date);
 }

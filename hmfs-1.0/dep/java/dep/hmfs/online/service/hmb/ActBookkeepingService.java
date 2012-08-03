@@ -143,7 +143,7 @@ public class ActBookkeepingService {
         hmTxnStl.setCbsTxnSn(cbsTxnSn);
         hmTxnStl.setTxnSn(msgSn);
         hmTxnStl.setStlActno(hmActStl.getSettleActno1());
-        hmTxnStl.setTxnSubSn(String.valueOf(subSn));
+        hmTxnStl.setTxnSubSn(subSn);
         hmTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
         hmTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
         hmTxnStl.setTxnCode(cbsTxnCode);
@@ -199,7 +199,7 @@ public class ActBookkeepingService {
         hmTxnFund.setFundActno(hmActFund.getFundActno1());
         hmTxnFund.setFundActtype(hmActFund.getFundActtype1());
         hmTxnFund.setTxnSn(msgSn);
-        hmTxnFund.setTxnSubSn(String.valueOf(txnSubSn));
+        hmTxnFund.setTxnSubSn(txnSubSn);
         hmTxnFund.setTxnAmt(amt);
         hmTxnFund.setDcFlag(dc);
         hmTxnFund.setLastActBal(hmActFund.getLastActBal());
