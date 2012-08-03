@@ -328,23 +328,17 @@
                    txn.reverse_flag as revflag,
                    txn.cbs_txn_sn   as cbstxnsn,
                    vch.vch_num      as vchnum,
-                   msg.info_name    as infoname,
-                   msg.info_addr    as infoaddr,
-                   msg.builder_area as area
+                   act.info_name    as infoname,
+                   act.info_addr    as infoaddr,
+                   act.builder_area as area
               from HM_TXN_FUND txn
-              left join HM_MSG_IN msg
-                on txn.txn_sn = msg.msg_sn
-              left join (select t.fund_txn_sn,
-                                t.txn_sn,
-                                t.txn_sub_sn,
-                                max(t.vch_num) vch_num
-                           from HM_TXN_VCH t
-                          where t.vch_sts = '2'
-                          group by t.fund_txn_sn, t.txn_sn, t.txn_sub_sn) vch
-                on msg.msg_sn = vch.fund_txn_sn
-               and msg.msg_sub_sn = vch.txn_sub_sn + 2
+               join HM_ACT_FUND act
+                on txn.fund_actno = act.fund_actno1
+               left join HM_TXN_VCH vch
+                on txn.txn_sn = vch.fund_txn_sn
+               and txn.txn_sub_sn = vch.txn_sub_sn + 1
+               and vch.vch_sts='2'
              where txn.fund_acttype = '570'
-               and substr(msg.msg_type, 1, 2) != '00'
                and txn.txn_date between #{startDate} and #{endDate}
              order by txndate, txntime, actno
      </select>
