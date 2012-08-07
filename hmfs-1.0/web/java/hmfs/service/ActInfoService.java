@@ -228,23 +228,23 @@ public class ActInfoService {
     }
 
     //余额对帐结果查询
-    public List<HmChkActVO> selectChkActResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectChkActResult(sendSysId, txnDate);
+    public List<HmChkActVO> selectCbsChkActFailResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectCbsChkActFailResult(sendSysId, txnDate);
     }
 
-    //房产中心余额对帐结果查询
-    public List<HmChkActVO> selectHmbChkActResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectHmbChkActResult(sendSysId, txnDate);
+    //房产中心余额对帐结果查询(不平账数据)
+    public List<HmChkActVO> selectHmbChkActFailResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectHmbChkActFailResult(sendSysId, txnDate);
     }
 
-    //房产中心余额对帐结果查询(对帐成功数据)
+    //房产中心余额对帐结果查询(平账数据)
     public List<HmChkActVO> selectHmbChkActSuccResult(String sendSysId, String txnDate){
         return  hmWebTxnMapper.selectHmbChkActSuccResult(sendSysId, txnDate);
     }
 
     //流水对帐结果查询
-    public List<HmChkTxnVO> selectChkTxnResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectChkTxnResult(sendSysId, txnDate);
+    public List<HmChkTxnVO> selectChkTxnFailResult(String sendSysId, String txnDate){
+        return  hmWebTxnMapper.selectChkTxnFailResult(sendSysId, txnDate);
     }
     public List<HmChkTxnVO> selectChkTxnSuccResult(String sendSysId, String txnDate){
         return  hmWebTxnMapper.selectChkTxnSuccResult(sendSysId, txnDate);

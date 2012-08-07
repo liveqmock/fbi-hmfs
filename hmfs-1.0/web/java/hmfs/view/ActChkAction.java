@@ -78,16 +78,19 @@ public class ActChkAction implements Serializable {
         //this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
     }
 
-    public String onQueryHmb() {
+    public String onQueryFailHmb() {
         try {
             this.totalCount = actInfoService.countChkActRecordNumber(this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
-            //this.detlList = actInfoService.selectChkActResult("00", this.qryParam.getStartDate());
-            this.detlList = actInfoService.selectHmbChkActResult("00", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectHmbChkActFailResult("00", this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
+            if (this.totalErrorCount == 0) {
+                MessageUtil.addError("无不平账数据。");
+                return null;
+            }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -102,21 +105,29 @@ public class ActChkAction implements Serializable {
             }
             this.detlList = actInfoService.selectHmbChkActSuccResult("00", this.qryParam.getStartDate());
             this.totalSuccessCount = this.detlList.size();
+            if (this.totalSuccessCount == 0) {
+                MessageUtil.addError("无平账数据。");
+                return null;
+            }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
         return null;
     }
 
-    public String onQueryCbs() {
+    public String onQueryFailCbs() {
         try {
             this.totalCount = actInfoService.countChkActRecordNumber(this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
-            this.detlList = actInfoService.selectChkActResult(this.bankId, this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectCbsChkActFailResult(this.bankId, this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
+            if (this.totalErrorCount == 0) {
+                MessageUtil.addError("无不平账数据。");
+                return null;
+            }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }

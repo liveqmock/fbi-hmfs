@@ -83,7 +83,7 @@ public class TxnChkAction implements Serializable {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
-            this.detlList = actInfoService.selectChkTxnResult("00", this.qryParam.getStartDate());
+            this.detlList = actInfoService.selectChkTxnFailResult("00", this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
@@ -91,15 +91,19 @@ public class TxnChkAction implements Serializable {
         return null;
     }
 
-    public String onQueryCbs() {
+    public String onQueryFailCbs() {
         try {
             this.totalCount = actInfoService.countChkTxnRecordNumber(this.qryParam.getStartDate());
-            this.detlList = actInfoService.selectChkTxnResult(this.bankId, this.qryParam.getStartDate());
             if (totalCount == 0) {
                 MessageUtil.addError("本日无对帐数据。");
                 return null;
             }
+            this.detlList = actInfoService.selectChkTxnFailResult(this.bankId, this.qryParam.getStartDate());
             this.totalErrorCount = this.detlList.size();
+            if (this.totalErrorCount == 0) {
+                MessageUtil.addError("无不平账数据。");
+                return null;
+            }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
@@ -115,6 +119,10 @@ public class TxnChkAction implements Serializable {
             }
             this.detlList = actInfoService.selectChkTxnSuccResult(this.bankId, this.qryParam.getStartDate());
             this.totalSuccessCount = this.detlList.size();
+            if (this.totalSuccessCount == 0) {
+                MessageUtil.addError("无平账数据。");
+                return null;
+            }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
