@@ -1,6 +1,7 @@
 package hmfs.service;
 
 import common.enums.FundActType;
+import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
@@ -55,13 +56,13 @@ public class ActInfoService {
     private HmWebTxnMapper hmWebTxnMapper;
 
     @Resource
-    private  HmChkTxnMapper hmChkTxnMapper;
+    private HmChkTxnMapper hmChkTxnMapper;
 
     @Resource
-    private  HmChkActMapper hmChkActMapper;
+    private HmChkActMapper hmChkActMapper;
 
     @Resource
-    private  PlatformService platformService;
+    private PlatformService platformService;
 
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
@@ -207,7 +208,7 @@ public class ActInfoService {
         List<HmMsgIn> hmMsgInList = hmMsgInMapper.selectByExample(example);
         if (hmMsgInList.size() > 1) {
             throw new RuntimeException("汇总报文多于一条！");
-        }else if (hmMsgInList.size() == 0) {
+        } else if (hmMsgInList.size() == 0) {
             throw new RuntimeException("汇总报文未找到！");
         }
         return hmMsgInList.get(0);
@@ -222,48 +223,68 @@ public class ActInfoService {
         return hmMsgInMapper.selectByExample(example);
     }
 
+    // 根据申请单号查询所有销户明细
+    public List<HmMsgIn> selectCancelActSubMsgList(String msgSn) {
+        HmMsgInExample example = new HmMsgInExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn)
+                .andMsgTypeEqualTo("01051").andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
+        example.setOrderByClause("MSG_SUB_SN");
+        return hmMsgInMapper.selectByExample(example);
+    }
+
+    // 根据申请单号查询所有开户明细
+    public List<HmMsgIn> selectCreateActSubMsgList(String msgSn) {
+        HmMsgInExample example = new HmMsgInExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn)
+                .andMsgTypeEqualTo("01033").andTxnCtlStsNotEqualTo(TxnCtlSts.CANCEL.getCode());
+        example.setOrderByClause("MSG_SUB_SN");
+        return hmMsgInMapper.selectByExample(example);
+    }
+
     //缴款交易：查询子报文信息
-    public List<HmMsgIn> selectSubMsgListByMsgSn(String msgSn){
+    public List<HmMsgIn> selectSubMsgListByMsgSn(String msgSn) {
         return hmWebTxnMapper.selectSubMsgListByMsgSn(msgSn);
     }
 
     //余额对帐结果查询
-    public List<HmChkActVO> selectCbsChkActFailResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectCbsChkActFailResult(sendSysId, txnDate);
+    public List<HmChkActVO> selectCbsChkActFailResult(String sendSysId, String txnDate) {
+        return hmWebTxnMapper.selectCbsChkActFailResult(sendSysId, txnDate);
     }
 
     //房产中心余额对帐结果查询(不平账数据)
-    public List<HmChkActVO> selectHmbChkActFailResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectHmbChkActFailResult(sendSysId, txnDate);
+    public List<HmChkActVO> selectHmbChkActFailResult(String sendSysId, String txnDate) {
+        return hmWebTxnMapper.selectHmbChkActFailResult(sendSysId, txnDate);
     }
 
     //房产中心余额对帐结果查询(平账数据)
-    public List<HmChkActVO> selectHmbChkActSuccResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectHmbChkActSuccResult(sendSysId, txnDate);
+    public List<HmChkActVO> selectHmbChkActSuccResult(String sendSysId, String txnDate) {
+        return hmWebTxnMapper.selectHmbChkActSuccResult(sendSysId, txnDate);
     }
 
     //流水对帐结果查询
-    public List<HmChkTxnVO> selectChkTxnFailResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectChkTxnFailResult(sendSysId, txnDate);
+    public List<HmChkTxnVO> selectChkTxnFailResult(String sendSysId, String txnDate) {
+        return hmWebTxnMapper.selectChkTxnFailResult(sendSysId, txnDate);
     }
-    public List<HmChkTxnVO> selectChkTxnSuccResult(String sendSysId, String txnDate){
-        return  hmWebTxnMapper.selectChkTxnSuccResult(sendSysId, txnDate);
+
+    public List<HmChkTxnVO> selectChkTxnSuccResult(String sendSysId, String txnDate) {
+        return hmWebTxnMapper.selectChkTxnSuccResult(sendSysId, txnDate);
     }
 
     //按日期统计余额对帐表数据
-    public int countChkActRecordNumber(String txnDate){
+    public int countChkActRecordNumber(String txnDate) {
         HmChkActExample example = new HmChkActExample();
         example.createCriteria().andTxnDateEqualTo(txnDate);
-        return  hmChkActMapper.countByExample(example);
-    }
-    //按日期统计流水对帐表数据
-    public int countChkTxnRecordNumber(String txnDate){
-        HmChkTxnExample example = new HmChkTxnExample();
-        example.createCriteria().andTxnDateEqualTo(txnDate);
-        return  hmChkTxnMapper.countByExample(example);
+        return hmChkActMapper.countByExample(example);
     }
 
-    public boolean checkVoucherPrintStatus(HmMsgIn msgIn){
+    //按日期统计流水对帐表数据
+    public int countChkTxnRecordNumber(String txnDate) {
+        HmChkTxnExample example = new HmChkTxnExample();
+        example.createCriteria().andTxnDateEqualTo(txnDate);
+        return hmChkTxnMapper.countByExample(example);
+    }
+
+    public boolean checkVoucherPrintStatus(HmMsgIn msgIn) {
         return false;
 
     }
