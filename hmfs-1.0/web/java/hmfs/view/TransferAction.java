@@ -78,8 +78,8 @@ public class TransferAction implements Serializable {
         this.qryParam.setCbsActno(this.cbsActno);
     }
 
-    //查询
-    public String onQuery() {
+    //查询转出
+    public String onQueryOut() {
         try {
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
             TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
@@ -89,14 +89,18 @@ public class TransferAction implements Serializable {
                 MessageUtil.addError("本笔申请单处理状态错误，当前状态为：" + txnCtlSts.getTitle());
                 return null;
             }
-            this.subMsgList = actInfoService.selectSubMsgList(msgSn);
-            this.totalCount = this.subMsgList.size();
+            List<HmMsgIn> subMsg6301List = actInfoService.selectSubMsgList(msgSn);
 
             //总分金额核对  注意：此处明细记录的交易金额为 F35：账户余额
             this.totalAmt = new BigDecimal(0.00);
-            for (HmMsgIn hmMsgIn : this.subMsgList) {
-                this.totalAmt = this.totalAmt.add(hmMsgIn.getActBal());
+            for (HmMsgIn hmMsgIn : subMsg6301List) {
+                if ("01039".equals(hmMsgIn.getMsgType())) {
+                    this.totalAmt = this.totalAmt.add(hmMsgIn.getActBal());
+                }
             }
+            this.subMsgList = actInfoService.selectCancelActSubMsgList(msgSn);
+            this.totalCount = this.subMsgList.size();
+
             if (txnAmt.compareTo(this.totalAmt) != 0) {
                 this.checkPassed = false;
                 MessageUtil.addError("交易金额不符！此申请单明细金额合计为：" + this.totalAmt.toString());
@@ -111,6 +115,7 @@ public class TransferAction implements Serializable {
                 }
             }
         } catch (Exception e) {
+            logger.error("处理失败。", e);
             MessageUtil.addError("处理失败。" + e.getMessage());
         }
         return null;
@@ -123,7 +128,7 @@ public class TransferAction implements Serializable {
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("跨行资金划出交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {
@@ -132,6 +137,50 @@ public class TransferAction implements Serializable {
         }
         return null;
     }
+
+    //查询转入
+    public String onQueryIn() {
+        try {
+            this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
+            TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
+            if (!txnCtlSts.equals(TxnCtlSts.INIT)) {
+                this.checkPassed = false;
+                logger.error("交易处理状态错误。" + this.summaryMsg.getTxnCtlSts());
+                MessageUtil.addError("本笔申请单处理状态错误，当前状态为：" + txnCtlSts.getTitle());
+                return null;
+            }
+            List<HmMsgIn> subMsg6302List = actInfoService.selectSubMsgList(msgSn);
+
+            //总分金额核对  注意：此处明细记录的交易金额为 F35：账户余额
+            this.totalAmt = new BigDecimal(0.00);
+            for (HmMsgIn hmMsgIn : subMsg6302List) {
+                if ("01035".equals(hmMsgIn.getMsgType()) || "01045".equals(hmMsgIn.getMsgType())) {
+                    this.totalAmt = this.totalAmt.add(hmMsgIn.getTxnAmt1());
+                }
+            }
+            this.subMsgList = actInfoService.selectCreateActSubMsgList(msgSn);
+            this.totalCount = this.subMsgList.size();
+
+            if (txnAmt.compareTo(this.totalAmt) != 0) {
+                this.checkPassed = false;
+                MessageUtil.addError("交易金额不符！此申请单明细金额合计为：" + this.totalAmt.toString());
+            } else {
+                //与界面输入的金额比对
+                BigDecimal msgTxnAmt = this.summaryMsg.getTxnAmt1();
+                if (msgTxnAmt.compareTo(this.txnAmt) != 0) {
+                    this.checkPassed = false;
+                    MessageUtil.addError("交易金额不符！此申请单金额为：" + msgTxnAmt.toString());
+                } else {
+                    this.checkPassed = true;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("处理失败。", e);
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
     //资金划入处理
     public String onConfirmTransIn() {
         try {
@@ -139,7 +188,7 @@ public class TransferAction implements Serializable {
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("跨行资金划入交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {
@@ -156,7 +205,7 @@ public class TransferAction implements Serializable {
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("空户跨行资金划出交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {
@@ -165,6 +214,7 @@ public class TransferAction implements Serializable {
         }
         return null;
     }
+
     //空户资金划入处理
     public String onConfirmEmptyTransIn() {
         try {
@@ -172,7 +222,7 @@ public class TransferAction implements Serializable {
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("空户跨行资金划入交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {

@@ -22,6 +22,7 @@
                     event.keyCode = 9;
                 }
             }
+
             //]]>
         </script>
     </ui:define>
@@ -32,7 +33,7 @@
                     <h:form>
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
-                            <p:focus for="msgsn" />
+                            <p:focus for="msgsn"/>
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
@@ -55,7 +56,7 @@
                                         <p:commandButton style="width:110px;" value="查询转出信息"
                                                          disabled="#{transferAction.checkPassed}"
                                                          rendered="#{!transferAction.confirmed}"
-                                                         action="#{transferAction.onQuery}"
+                                                         action="#{transferAction.onQueryOut}"
                                                          update="pdt,msgs,buttons,panel2">
                                         </p:commandButton>
                                         <p:commandButton style="width:110px;" value="确认转出"
@@ -88,14 +89,21 @@
                                 <p:column headerText="资金帐号" style="text-align: center">
                                     <h:outputText value="#{record.fundActno1}"/>
                                 </p:column>
+                                <p:column headerText="帐户类型" style="text-align: center">
+                                    <h:outputText
+                                            value="#{actInfoAction.fundActType.valueOfAlias(record.fundActtype1).title}"/>
+                                </p:column>
                                 <p:column headerText="账户余额" style="text-align: right">
                                     <h:outputText value="#{record.actBal}"/>
                                 </p:column>
-                                <p:column headerText="住宅地址" style="text-align: center">
-                                    <h:outputText value="#{record.infoAddr}"/>
+                                <p:column headerText="分户数" style="text-align: center">
+                                    <h:outputText value="#{record.cellNum}"/>
                                 </p:column>
                                 <p:column headerText="建筑面积" style="text-align: center">
                                     <h:outputText value="#{record.builderArea}"/>
+                                </p:column>
+                                <p:column headerText="住宅地址" style="text-align: center">
+                                    <h:outputText value="#{record.infoAddr}"/>
                                 </p:column>
                                 <p:column headerText="住宅类型" style="text-align: center">
                                     <h:outputText value="#{record.houseDepType}"/>
@@ -114,14 +122,16 @@
                                         <h:outputLabel value="划出方项目ID:" style="font-weight: normal;"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.infoId1}"/>
-                                        <h:outputLabel value="划出方项目类型:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划出方项目类型:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      style="margin-left: 25px;"
                                                      value="#{transferAction.summaryMsg.infoIdType1}"/>
                                         <h:outputLabel value="划入方项目ID:" style="font-weight: normal"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.infoId2}"/>
-                                        <h:outputLabel value="划入方项目类型:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划入方项目类型:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      style="margin-left: 25px;"
                                                      value="#{transferAction.summaryMsg.infoIdType2}"/>
@@ -133,19 +143,22 @@
                                         <h:outputLabel value="划出方核算帐号:" style="font-weight: normal"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.fundActno1}"/>
-                                        <h:outputLabel value="划出方核算帐号类型:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划出方核算帐号类型:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.fundActtype1}"/>
                                         <h:outputLabel value="划入方核算帐号:" style="font-weight: normal"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.fundActno2}"/>
-                                        <h:outputLabel value="划入方核算帐号类型:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划入方核算帐号类型:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.fundActtype2}"/>
                                         <h:outputLabel value="划出方账户余额:" style="font-weight: normal"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.actBal}"/>
-                                        <h:outputLabel value="划出方会计帐号:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划出方会计帐号:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.payoutActno}"/>
                                     </h:panelGrid>
@@ -153,7 +166,8 @@
                                         <h:outputLabel value="划入方会计帐号:" style="font-weight: normal"/>
                                         <p:inputText size="25" readonly="true"
                                                      value="#{transferAction.summaryMsg.payinActno}"/>
-                                        <h:outputLabel value="划入方开户银行:" style="font-weight: normal; margin-left: 20px;"/>
+                                        <h:outputLabel value="划入方开户银行:"
+                                                       style="font-weight: normal; margin-left: 20px;"/>
                                         <p:inputText size="25" readonly="true"
                                                      style="margin-left: 25px;"
                                                      value="#{transferAction.summaryMsg.bankName}"/>
