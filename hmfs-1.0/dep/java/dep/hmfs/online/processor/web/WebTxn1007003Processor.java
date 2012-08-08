@@ -45,7 +45,6 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
         }
 
 
-
         //处理返回报文
         List<HmbMsg> msgList = responseMap.get(txnCode);
         if (msgList == null || msgList.size() == 0) {
@@ -65,37 +64,43 @@ public class WebTxn1007003Processor extends WebAbstractHmbProductTxnProcessor {
             if (verify) {
                 txnResult = "0000|余额对帐成功";
             } else {
-                logger.info("开始第二次校验处理");
+                // 20120808 测试过程中发现在二次发送分户核算户余额对账数据到中心后，中心仍然返回项目核算户余额
+                // 而且可能将之前的项目户余额删除，导致中心对账结果显示账户银行不存在
+                // 因此注释掉下面二次报文发送，只发送一次项目核算户余额
+                /* logger.info("开始第二次校验处理");
 
-                //查找对帐状态为不符且发送方为‘99’（本地数据）的
-                List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
+            //查找对帐状态为不符且发送方为‘99’（本地数据）的
+            List<HmChkAct> chkActList = hmbSysTxnService.selectChkFailedFundActList(txnDate);
 
-                if (chkActList.isEmpty()) { //对于存在对帐不符记录且是中心的数据有但本地数据没有的情况，直接返回失败
-                    txnResult = "9999|余额对帐失败";
-                } else {
-                    //发送二次核对报文
-                    responseMap = sendDataUntilRcv(getSecondChkReqBuf(chkActList, txnCode, txnDate));
-                    //处理返回报文
-                    msgList = responseMap.get(txnCode);
-                    if (msgList == null || msgList.size() == 0) {
-                        Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
-                        throw new RuntimeException(msg100.rtnInfo);
-                    }
-                    msg002 = (Msg002) msgList.get(0);
-                    if (!msg002.rtnInfoCode.equals("00")) {
-                        throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
-                    } else {
-                        //数据核对处理
-                        //保存国土局到本地数据库
-                        hmbSysTxnService.processChkBalResponse(msgList, txnDate);
-                        hmbSysTxnService.verifyHmbActBalData(txnDate, "570");
-                        txnResult = "9999|余额对帐失败";
-                    }
+            if (chkActList.isEmpty()) { //对于存在对帐不符记录且是中心的数据有但本地数据没有的情况，直接返回失败
+                txnResult = "9999|余额对帐失败";
+            } else {
+
+                // TODO 发送二次核对报文
+                responseMap = sendDataUntilRcv(getSecondChkReqBuf(chkActList, txnCode, txnDate));
+                //处理返回报文
+                msgList = responseMap.get(txnCode);
+                if (msgList == null || msgList.size() == 0) {
+                    Msg100 msg100 = (Msg100) responseMap.get("9999").get(0);
+                    throw new RuntimeException(msg100.rtnInfo);
                 }
+                msg002 = (Msg002) msgList.get(0);
+                if (!msg002.rtnInfoCode.equals("00")) {
+                    throw new RuntimeException("国土局返回错误信息：" + msg002.rtnInfo);
+                } else {
+                    //数据核对处理
+                    //保存国土局到本地数据库
+                    hmbSysTxnService.processChkBalResponse(msgList, txnDate);
+                    hmbSysTxnService.verifyHmbActBalData(txnDate, "570");
+                    txnResult = "9999|余额对帐失败";
+                }*/
+                txnResult = "9999|余额对帐失败";
             }
         }
+
         //置系统控制表状态 : 余额对帐完成  TODO:处理时机需探讨
         updateSysCtlStatus(SysCtlSts.HMB_CHK_OVER);
+
         return txnResult;
     }
 
