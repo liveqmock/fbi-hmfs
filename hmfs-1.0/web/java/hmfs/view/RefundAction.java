@@ -11,7 +11,9 @@ import hmfs.service.AppMngService;
 import hmfs.service.DepService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pub.platform.system.manage.dao.PtOperBean;
 import skyline.common.utils.MessageUtil;
+import skyline.service.PlatformService;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -60,6 +62,8 @@ public class RefundAction implements Serializable {
     private ActInfoService actInfoService;
     @ManagedProperty(value = "#{depService}")
     private DepService depService;
+    @ManagedProperty(value = "#{platformService}")
+    private PlatformService platformService;
 
     @PostConstruct
     public void init() {
@@ -121,11 +125,13 @@ public class RefundAction implements Serializable {
     //退款处理
     public String onConfirm() {
         try {
-            String response = depService.process("1005230|" + this.msgSn);
+            PtOperBean oper = platformService.getOperatorManager().getOperator();
+            String response = depService.process("1005230|" + this.msgSn + "|"
+                    + oper.getDeptid() + "|" + oper.getOperid());
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("退款交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {
@@ -141,7 +147,7 @@ public class RefundAction implements Serializable {
         List<HmMsgIn> allSubMsgList = actInfoService.selectSubMsgList(msgSn);
         for (HmMsgIn hmMsgIn : allSubMsgList) {
             String msgType = hmMsgIn.getMsgType();
-            if (msgType.equals("01039")||msgType.equals("01043")) {
+            if (msgType.equals("01039") || msgType.equals("01043")) {
                 this.subMsgList.add(hmMsgIn);
             }
         }
@@ -251,6 +257,14 @@ public class RefundAction implements Serializable {
 
     public void setActInfoService(ActInfoService actInfoService) {
         this.actInfoService = actInfoService;
+    }
+
+    public PlatformService getPlatformService() {
+        return platformService;
+    }
+
+    public void setPlatformService(PlatformService platformService) {
+        this.platformService = platformService;
     }
 
     public boolean isCheckPassed() {

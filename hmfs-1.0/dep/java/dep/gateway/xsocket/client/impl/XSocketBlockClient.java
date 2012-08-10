@@ -128,8 +128,8 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     public static void main(String[] args) {
         try {
-//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
-            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
+            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
+//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
             /*
             120426090967521000	3689.85
             120426090968521000	3080.91
@@ -175,13 +175,13 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
             //String datagram = "1234567890888891000040012000000010114000000010115120319004843521000";
 //            String datagram = "123456789088889100005001100000000000003               268945.33       201204171234567890123333|60.00|C\n1234567890654321|133716.39|D";
             // 1011 划入查询
-//            String datagram = "123456789012345600001011120427091101630200";
+//            String datagram = "123456789012345600001011" + "120802106820630200";
             // 1012 划入确认
-//         String datagram = "123456789012345600001012" + "120427091101630200" + StringUtils.rightPad("2832.54", 16, ' ');
+         String datagram = "123456789012345600001012" + "120802106820630200" + StringUtils.rightPad("51.00", 16, ' ');
             // 2011 划出查询
-//               String datagram = "123456789012345600002011120427091101630100";
-            // 2012 划入确认
-            String datagram = "123456789012345600002012" + "120427091101630100" + StringUtils.rightPad("2832.54", 16, ' ');
+//              String datagram = "123456789012345500002011" + "120802106821630100";
+            // 2012 划出确认 51.00
+//            String datagram = "123456789012345100002012" + "120802106821630100" + StringUtils.rightPad("51.00", 16, ' ');
 
             socketBlockClient.sendDataUntilRcv(StringUtils.rightPad(datagram.getBytes().length + 6 + "", 6, " ") + datagram, 6);
             //socketBlockClient.close();

@@ -16,7 +16,9 @@ import hmfs.service.DepService;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pub.platform.system.manage.dao.PtOperBean;
 import skyline.common.utils.MessageUtil;
+import skyline.service.PlatformService;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -69,6 +71,8 @@ public class DepositAction implements Serializable {
     private ActInfoService actInfoService;
     @ManagedProperty(value = "#{depService}")
     private DepService depService;
+    @ManagedProperty(value = "#{platformService}")
+    private PlatformService platformService;
 
     @PostConstruct
     public void init() {
@@ -130,11 +134,14 @@ public class DepositAction implements Serializable {
     //缴款处理
     public String onConfirm() {
         try {
-            String response = depService.process("1005210|" + this.msgSn);
+            // 用户机构号和柜员号
+            PtOperBean oper = platformService.getOperatorManager().getOperator();
+            String response = depService.process("1005210|" + this.msgSn + "|"
+                    + oper.getDeptid() + "|" + oper.getOperid());
             if (response.startsWith("0000")) { //成功
                 this.confirmed = true;
                 MessageUtil.addInfo("缴款交易处理成功。");
-            }else{
+            } else {
                 MessageUtil.addError("处理失败。" + response);
             }
         } catch (Exception e) {
@@ -144,7 +151,7 @@ public class DepositAction implements Serializable {
         return null;
     }
 
-    public String onPrintAll(){
+    public String onPrintAll() {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
 
@@ -186,7 +193,7 @@ public class DepositAction implements Serializable {
         document.close();
     }
 
-    public void  searchFirstOneRecordForPrint(ActionEvent actionEvent){
+    public void searchFirstOneRecordForPrint(ActionEvent actionEvent) {
 //        for (HmMsgIn hmMsgIn : this.subMsgList) {
 //
 //        }
@@ -342,6 +349,14 @@ public class DepositAction implements Serializable {
 
     public void setDepService(DepService depService) {
         this.depService = depService;
+    }
+
+    public PlatformService getPlatformService() {
+        return platformService;
+    }
+
+    public void setPlatformService(PlatformService platformService) {
+        this.platformService = platformService;
     }
 
     public boolean isConfirmed() {

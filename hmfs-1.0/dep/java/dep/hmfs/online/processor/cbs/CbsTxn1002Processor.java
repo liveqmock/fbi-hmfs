@@ -5,6 +5,7 @@ import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA1002;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA1002;
@@ -44,8 +45,10 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA1002 tia1002 = new TIA1002();
+        tia1002.header.deptCode = tiaHeader.deptCode;
+        tia1002.header.operCode = tiaHeader.operCode;
         tia1002.body.payApplyNo = new String(bytes, 0, 18).trim();
         tia1002.body.payAmt = new String(bytes, 18, 16).trim();
 
@@ -64,7 +67,7 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
         if (actBookkeepingService.checkMsginTxnCtlSts(totalPayInfo, payInfoList, new BigDecimal(tia1002.body.payAmt))) {
             // 交款交易。
             logger.info("数据检查正确, 发送报文至房管局并等待响应...");
-            return handlePayTxnAndSendToHmb(txnSerialNo, totalPayInfo, tia1002, payInfoList);
+            return handlePayTxnAndSendToHmb(tiaHeader.serialNo, totalPayInfo, tia1002, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
@@ -79,7 +82,8 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
 
         if (!"debug".equalsIgnoreCase(PropertyManager.getProperty("hmfs_sys_status_flag"))) {
             // 批量核算户账户信息更新
-            actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1002");
+            actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, tia1002.header.deptCode.trim(),
+                    tia1002.header.operCode.trim(), payInfoList, DCFlagCode.DEPOSIT.getCode(), "1002");
             hmbBaseService.updateMsginSts(tia1002.body.payApplyNo, TxnCtlSts.SUCCESS);
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
         } else {

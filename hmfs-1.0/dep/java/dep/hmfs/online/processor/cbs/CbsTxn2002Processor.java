@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2002;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
@@ -32,8 +33,10 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
 
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA2002 tia2002 = new TIA2002();
+        tia2002.header.deptCode = tiaHeader.deptCode;
+        tia2002.header.operCode = tiaHeader.operCode;
         tia2002.body.drawApplyNo = new String(bytes, 0, 18).trim();
         tia2002.body.drawAmt = new String(bytes, 18, 16).trim();
 
@@ -46,7 +49,7 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (actBookkeepingService.checkMsginTxnCtlSts(totalDrawInfo, drawInfoList, new BigDecimal(tia2002.body.drawAmt))) {
             // 支取交易。
-            return handleDrawTxn(txnSerialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
+            return handleDrawTxn(tiaHeader.serialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
             return null;
@@ -60,7 +63,8 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
     private TOA handleDrawTxn(String cbsSerialNo, TIA2002 tia2002, HmMsgIn totalMsginLog, String[] subMsgTypes, List<HmMsgIn> drawInfoList) throws Exception {
 
         // 批量核算户账户信息更新
-        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, drawInfoList, DCFlagCode.WITHDRAW.getCode(), "2002");
+        actBookkeepingService.actBookkeepingByMsgins(cbsSerialNo, tia2002.header.deptCode.trim(),
+                tia2002.header.operCode.trim(), drawInfoList, DCFlagCode.WITHDRAW.getCode(), "2002");
 
         hmbBaseService.updateMsginSts(tia2002.body.drawApplyNo, TxnCtlSts.SUCCESS);
 

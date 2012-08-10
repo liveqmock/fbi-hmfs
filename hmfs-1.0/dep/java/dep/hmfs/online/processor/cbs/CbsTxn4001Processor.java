@@ -5,6 +5,7 @@ import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import dep.hmfs.common.HmbTxnsnGenerator;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
@@ -39,7 +40,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
 
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws InvocationTargetException, IllegalAccessException {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws InvocationTargetException, IllegalAccessException {
 
         TIA4001 tia4001 = new TIA4001();
         tia4001.body.billStatus = new String(bytes, 0, 1).trim();
@@ -102,7 +103,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
                     tia4001.body.billStatus);
             if (isSendOver) {
-                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, txnSerialNo, tia4001.body.payApplyNo,
+                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, tiaHeader.serialNo, tia4001.body.payApplyNo,
                         tia4001.body.billStatus);
             }
         } catch (Exception e) {
@@ -113,7 +114,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
         if (!isSendOver) {
-            logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + txnSerialNo);
+            logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + tiaHeader.serialNo);
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
         }
         return null;

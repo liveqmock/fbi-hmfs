@@ -3,6 +3,7 @@ package dep.hmfs.online.processor.cbs;
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2001;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA2001;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class CbsTxn2001Processor extends CbsAbstractTxnProcessor {
 
     @Override
-    public TOA process(String txnSerialNo, byte[] bytes) {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) {
         TIA2001 tia2001 = new TIA2001();
         tia2001.body.drawApplyNo = new String(bytes, 0, 18).trim();
 

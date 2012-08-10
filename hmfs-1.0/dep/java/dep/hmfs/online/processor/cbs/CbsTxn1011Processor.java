@@ -3,6 +3,7 @@ package dep.hmfs.online.processor.cbs;
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA1011;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA1011;
@@ -27,7 +28,7 @@ public class CbsTxn1011Processor extends CbsAbstractTxnProcessor {
     private HmbActinfoService hmbActinfoService;
 
     @Override
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         logger.info("【报文正文长度】:" + bytes.length);
         TIA1011 tia1011 = new TIA1011();
         tia1011.body.txnApplyNo = new String(bytes, 0, 18).trim();

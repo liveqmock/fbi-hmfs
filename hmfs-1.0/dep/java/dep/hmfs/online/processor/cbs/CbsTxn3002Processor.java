@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA3002;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
@@ -39,7 +40,7 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
 
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA3002 tia3002 = new TIA3002();
         tia3002.body.refundApplyNo = new String(bytes, 0, 18).trim();
         tia3002.body.refundAmt = new String(bytes, 18, 16).trim();
@@ -53,7 +54,8 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
         if (actBookkeepingService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia3002.body.refundAmt))) {
             // 退款交易。
             // 批量核算户账户信息更新
-            actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "3002");
+            actBookkeepingService.actBookkeepingByMsgins(tiaHeader.serialNo, tiaHeader.deptCode.trim(),
+                    tiaHeader.operCode.trim(), fundInfoList, DCFlagCode.WITHDRAW.getCode(), "3002");
             // 核算户变更、销户
             String[] updateFundMsgTypes = {"01033", "01051"};
             List<HmMsgIn> updateFundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3002.body.refundApplyNo, updateFundMsgTypes);

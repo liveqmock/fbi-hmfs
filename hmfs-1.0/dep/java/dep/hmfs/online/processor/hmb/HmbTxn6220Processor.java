@@ -34,11 +34,11 @@ public class HmbTxn6220Processor extends HmbSyncAbstractTxnProcessor {
         for (HmbMsg hmbMsg : hmbMsgList.subList(1, hmbMsgList.size())) {
             String msgType = hmbMsg.getMsgType();
             if ("01051".equals(msgType)) {
-                hmbActinfoService.op125cancelActinfoFunds(msgSn, (Msg051) hmbMsg);
+                hmbActinfoService.op125cancelActinfoFunds(msgSn, "hmfs", "hmbtxn6220", (Msg051) hmbMsg);
             } else if ("01033".equals(msgType)) {
                 hmbActinfoService.createActinfoFundByHmbMsg(hmbMsg);
             } else if ("01035".equals(msgType)) {
-                hmbActinfoService.op115deposite(msgSn, (Msg035) hmbMsg);
+                hmbActinfoService.op115deposite(msgSn, "hmfs", "hmbtxn6220", (Msg035) hmbMsg);
             }
         }
         return hmbMsgList.size() - 1;

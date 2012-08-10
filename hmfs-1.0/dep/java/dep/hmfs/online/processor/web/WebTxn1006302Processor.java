@@ -48,6 +48,8 @@ public class WebTxn1006302Processor extends WebAbstractHmbProductBizTxnProcessor
         String[] fields = request.split("\\|");
         //String txnCode = fields[0];
         String msgSn = fields[1];
+        String deptCode = fields[2];
+        String operCode = fields[3];
 
         String[] payMsgTypes = {"01035", "01045"};
 
@@ -64,7 +66,7 @@ public class WebTxn1006302Processor extends WebAbstractHmbProductBizTxnProcessor
             logger.info("数据检查正确, 记账、发送报文至房管局并等待响应...");
             // List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msgSn, payMsgTypes);
             actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                    payInfoList, DCFlagCode.DEPOSIT.getCode(), "6302");
+                    deptCode, operCode, payInfoList, DCFlagCode.DEPOSIT.getCode(), "6302");
             hmbBaseService.updateMsginSts(msgSn, TxnCtlSts.SUCCESS);
         }
         String[] payRtnMsgTypes = {"01033", "01035", "01045"};

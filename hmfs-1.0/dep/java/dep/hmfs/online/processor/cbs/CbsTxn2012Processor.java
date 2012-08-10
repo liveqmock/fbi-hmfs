@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2012;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
@@ -39,7 +40,7 @@ public class CbsTxn2012Processor extends CbsAbstractTxnProcessor {
 
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA2012 tia2012 = new TIA2012();
         tia2012.body.txnApplyNo = new String(bytes, 0, 18).trim();
         tia2012.body.txnAmt = new String(bytes, 18, 16).trim();
@@ -52,7 +53,8 @@ public class CbsTxn2012Processor extends CbsAbstractTxnProcessor {
         // 检查该笔交易汇总报文记录，若该笔报文已撤销或不存在，则返回交易失败信息
         if (actBookkeepingService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, new BigDecimal(tia2012.body.txnAmt))) {
             // 退款交易。
-            actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "2012");
+            actBookkeepingService.actBookkeepingByMsgins(tiaHeader.serialNo, tiaHeader.deptCode.trim(),
+                    tiaHeader.operCode.trim(), fundInfoList, DCFlagCode.WITHDRAW.getCode(), "2012");
             List<HmMsgIn> cancelDetailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2012.body.txnApplyNo, new String[]{"01051"});
             hmbActinfoService.updateActinfoFundsByMsginList(cancelDetailMsginLogs);
             hmbBaseService.updateMsginSts(tia2012.body.txnApplyNo, TxnCtlSts.SUCCESS);

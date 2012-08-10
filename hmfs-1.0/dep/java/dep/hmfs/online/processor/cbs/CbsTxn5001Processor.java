@@ -2,6 +2,7 @@ package dep.hmfs.online.processor.cbs;
 
 import common.enums.CbsErrorCode;
 import common.repository.hmfs.model.*;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
@@ -44,7 +45,7 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
      */
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) {
         /*
         开户账号	30	维修资金监管部门账号
         账户金额	16	账号当日余额

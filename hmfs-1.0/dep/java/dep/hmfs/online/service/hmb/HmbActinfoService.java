@@ -80,8 +80,10 @@ public class HmbActinfoService {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActNo).andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
         List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
-        if (actFundList.size() != 1) {
-            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！【核算户号】：" + fundActNo);
+        if (actFundList.size() == 0) {
+            throw new RuntimeException("未查询到该核算户！【核算户号】：" + fundActNo);
+        } else if (actFundList.size() > 1) {
+            throw new RuntimeException("查询到多个核算户！【核算户号】：" + fundActNo);
         } else {
             return actFundList.get(0);
         }
@@ -91,8 +93,10 @@ public class HmbActinfoService {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andInfoId1EqualTo(infoID);
         List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
-        if (actFundList.size() != 1) {
-            throw new RuntimeException("未查询到该核算户记录或查询到多个账户！【信息ID】：" + infoID);
+        if (actFundList.size() == 0) {
+            throw new RuntimeException("未查询到该核算户！【信息ID】：" + infoID);
+        } else if (actFundList.size() > 1) {
+            throw new RuntimeException("查询到多个核算户！【信息ID】：" + infoID);
         } else {
             return actFundList.get(0);
         }
@@ -503,12 +507,12 @@ public class HmbActinfoService {
 
 
     //125:取款销户 2012-07-27
-    public void op125cancelActinfoFunds(String msgSn, Msg051 msg051) throws ParseException {
+    public void op125cancelActinfoFunds(String msgSn, String deptCode, String operCode, Msg051 msg051) throws ParseException {
         //取款帐务处理
-        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno1, msg051.actBal,
+        actBookkeepingService.fundActBookkeeping(null, deptCode, operCode, msgSn, 1, msg051.fundActno1, msg051.actBal,
                 DCFlagCode.WITHDRAW.getCode(), "125", "125");
         if (!"#".equals(msg051.fundActno2.trim())) {
-            actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg051.fundActno2, msg051.actBal,
+            actBookkeepingService.fundActBookkeeping(null, deptCode, operCode, msgSn, 1, msg051.fundActno2, msg051.actBal,
                     DCFlagCode.WITHDRAW.getCode(), "125", "125");
         }
         //销户
@@ -520,12 +524,12 @@ public class HmbActinfoService {
 
     //115:存款
     @Transactional
-    public void op115deposite(String msgSn, Msg035 msg035) throws ParseException {
+    public void op115deposite(String msgSn, String deptCode, String operCode, Msg035 msg035) throws ParseException {
 
         // 批量核算户账户信息更新
-        actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.DEPOSIT.getCode(), "115", "115");
+        actBookkeepingService.fundActBookkeeping(null, deptCode, operCode, msgSn, 1, msg035.fundActno1, msg035.txnAmt1, DCFlagCode.DEPOSIT.getCode(), "115", "115");
         if (!"#".equals(msg035.fundActno2.trim())) {
-            actBookkeepingService.fundActBookkeeping(null, msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.DEPOSIT.getCode(), "115", "115");
+            actBookkeepingService.fundActBookkeeping(null, deptCode, operCode, msgSn, 1, msg035.fundActno2, msg035.txnAmt1, DCFlagCode.DEPOSIT.getCode(), "115", "115");
         }
     }
 

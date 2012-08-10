@@ -47,6 +47,8 @@ public class WebTxn1005310Processor extends WebAbstractHmbProductBizTxnProcessor
         String[] fields = request.split("\\|");
         //String txnCode = fields[0];
         String msgSn = fields[1];
+        String deptCode = fields[2];
+        String operCode = fields[3];
 
         // 查询交易汇总报文记录
         HmMsgIn totalDrawInfo = hmbBaseService.qryTotalMsgByMsgSn(msgSn, "00007");
@@ -57,7 +59,7 @@ public class WebTxn1005310Processor extends WebAbstractHmbProductBizTxnProcessor
 
         // 批量核算户账户信息更新
         actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                drawInfoList, DCFlagCode.WITHDRAW.getCode(), "5310");
+                deptCode, operCode, drawInfoList, DCFlagCode.WITHDRAW.getCode(), "5310");
 
         hmbBaseService.updateMsginSts(msgSn, TxnCtlSts.SUCCESS);
 

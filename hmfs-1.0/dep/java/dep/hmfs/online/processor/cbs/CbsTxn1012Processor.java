@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA1012;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
@@ -40,7 +41,7 @@ public class CbsTxn1012Processor extends CbsAbstractTxnProcessor {
     // 业务平台发起交款交易，发送至房管局，成功响应后取明细发送至业务平台
     @Override
     @Transactional
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA1012 tia1012 = new TIA1012();
         tia1012.body.txnApplyNo = new String(bytes, 0, 18).trim();
         tia1012.body.txnAmt = new String(bytes, 18, 16).trim();
@@ -61,7 +62,8 @@ public class CbsTxn1012Processor extends CbsAbstractTxnProcessor {
             // 交款交易。
             logger.info("数据检查正确, 记账、发送报文至房管局并等待响应...");
            // List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payMsgTypes);
-            actBookkeepingService.actBookkeepingByMsgins(txnSerialNo, payInfoList, DCFlagCode.DEPOSIT.getCode(), "1012");
+            actBookkeepingService.actBookkeepingByMsgins(tiaHeader.serialNo, tiaHeader.deptCode.trim(),
+                    tiaHeader.operCode.trim(), payInfoList, DCFlagCode.DEPOSIT.getCode(), "1012");
             hmbBaseService.updateMsginSts(tia1012.body.txnApplyNo, TxnCtlSts.SUCCESS);
         }
         String[] payRtnMsgTypes = {"01033", "01035", "01045"};

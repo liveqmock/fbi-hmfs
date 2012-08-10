@@ -28,9 +28,9 @@ public class CbsMsgHandleService implements IMessageHandler {
         TOA toa = null;
         TIAHeader tiaHeader = new TIAHeader();
         tiaHeader.initFields(bytes);
-        logger.info("【报文长度】：" + bytes.length + "【流水号】：" + tiaHeader.serialNo + " 【错误码】：" + tiaHeader.errorCode);
-        byte[] datagramBytes = new byte[bytes.length - 24];
-        System.arraycopy(bytes, 24, datagramBytes, 0, datagramBytes.length);
+
+        byte[] datagramBytes = new byte[bytes.length - 45];
+        System.arraycopy(bytes, 45, datagramBytes, 0, datagramBytes.length);
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(StringPad.rightPad4ChineseToByteLength(tiaHeader.serialNo, 16, " "));
@@ -45,7 +45,7 @@ public class CbsMsgHandleService implements IMessageHandler {
 
         try {
             CbsAbstractTxnProcessor cbsTxnProcessor = (CbsAbstractTxnProcessor) ContainerManager.getBean("cbsTxn" + tiaHeader.txnCode + "Processor");
-            toa = cbsTxnProcessor.run(tiaHeader.txnCode, tiaHeader.serialNo, datagramBytes);
+            toa = cbsTxnProcessor.run(tiaHeader, datagramBytes);
             strBuilder.append("0000");
         } catch (Exception e) {
             if (e.getMessage() == null || e.getMessage().getBytes().length != 4) {
@@ -57,6 +57,9 @@ public class CbsMsgHandleService implements IMessageHandler {
         }
 
         strBuilder.append(tiaHeader.txnCode);
+        strBuilder.append(tiaHeader.deptCode);
+        strBuilder.append(tiaHeader.operCode);
+
         if (toa != null) {
             strBuilder.append(toa.toString());
         }

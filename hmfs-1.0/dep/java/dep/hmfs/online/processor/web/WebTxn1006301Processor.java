@@ -48,6 +48,8 @@ public class WebTxn1006301Processor extends WebAbstractHmbProductBizTxnProcessor
         String[] fields = request.split("\\|");
         //String txnCode = fields[0];
         String msgSn = fields[1];
+        String deptCode = fields[2];
+        String operCode = fields[3];
 
         String[] refundSubMsgTypes = {"01039"};
 
@@ -58,7 +60,7 @@ public class WebTxn1006301Processor extends WebAbstractHmbProductBizTxnProcessor
         if (actBookkeepingService.checkMsginTxnCtlSts(totalRefundInfo, fundInfoList, totalRefundInfo.getTxnAmt1())) {
             // �ۿ
             actBookkeepingService.actBookkeepingByMsgins(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
-                    fundInfoList, DCFlagCode.WITHDRAW.getCode(), "6301");
+                    deptCode, operCode, fundInfoList, DCFlagCode.WITHDRAW.getCode(), "6301");
             List<HmMsgIn> cancelDetailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(msgSn, new String[]{"01051"});
             hmbActinfoService.updateActinfoFundsByMsginList(cancelDetailMsginLogs);
             hmbBaseService.updateMsginSts(msgSn, TxnCtlSts.SUCCESS);

@@ -1,5 +1,6 @@
 package dep.hmfs.online.processor.cbs;
 
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2003;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Deprecated
 public class CbsTxn2003Processor extends CbsAbstractTxnProcessor {
     @Override
-    public TOA process(String txnSerialNo, byte[] bytes) {
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) {
         TIA2003 tia2003 = new TIA2003();
         tia2003.body.drawApplyNo = new String(bytes, 0, 18).trim();
         tia2003.body.drawAmt = new String(bytes, 18, 16).trim();

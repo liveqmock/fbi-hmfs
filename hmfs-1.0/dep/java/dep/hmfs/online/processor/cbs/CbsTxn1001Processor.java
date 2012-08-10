@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmMsgIn;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA1001;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA1001;
@@ -32,11 +33,11 @@ public class CbsTxn1001Processor extends CbsAbstractTxnProcessor {
     private HmbActinfoService hmbActinfoService;
 
     @Override
-    public TOA process(String txnSerialNo, byte[] bytes) throws Exception {
-        logger.info("【报文正文长度】:" + bytes.length);
+    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception {
         TIA1001 tia1001 = new TIA1001();
         tia1001.body.payApplyNo = new String(bytes, 0, 18).trim();
-        logger.info("【申请单号】：" + tia1001.body.payApplyNo);
+        logger.info("【报文正文长度】:" + bytes.length + "  【申请单号】：" + tia1001.body.payApplyNo);
+        logger.info("【网点编号】:" + tiaHeader.deptCode + "  【柜员编号】：" + tiaHeader.operCode);
 
         TOA1001 toa1001 = null;
         // 查询交款汇总信息
