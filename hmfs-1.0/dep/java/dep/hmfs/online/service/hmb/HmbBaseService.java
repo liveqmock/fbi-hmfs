@@ -2,10 +2,7 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
-import common.repository.hmfs.dao.HmMsgInMapper;
-import common.repository.hmfs.dao.HmMsgOutMapper;
-import common.repository.hmfs.dao.HmSysCtlMapper;
-import common.repository.hmfs.dao.TmpMsgInMapper;
+import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmMsgInExample;
@@ -122,7 +119,18 @@ public class HmbBaseService {
         return 1;
     }
 
-    private int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    // 同步交易报文 如果已存在报文，则视为已做业务处理
+    @Transactional
+    public int rcvedCntSyncMsginsByHmbMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+        SummaryMsg summaryMsg = (SummaryMsg) hmbMsgList.get(0);
+        String msgSn = summaryMsg.msgSn;
+        HmMsgInExample example = new HmMsgInExample();
+        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
+        int cnt = hmMsgInMapper.countByExample(example);
+        return cnt;
+    }
+
+    public int insertMsginsByHmbMsgList(String txnCode, List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         int index = 0;
         String msgSn = "";
         for (HmbMsg hmbMsg : hmbMsgList) {
@@ -183,5 +191,4 @@ public class HmbBaseService {
         }
         return index;
     }
-
 }
