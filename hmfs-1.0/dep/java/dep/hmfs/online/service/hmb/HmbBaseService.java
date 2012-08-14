@@ -121,7 +121,7 @@ public class HmbBaseService {
 
     // 同步交易报文 如果已存在报文，则视为已做业务处理
     @Transactional
-    public int rcvedCntSyncMsginsByHmbMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
+    public int cntRcvedSyncMsginsByHmbMsgList(List<HmbMsg> hmbMsgList) throws InvocationTargetException, IllegalAccessException {
         SummaryMsg summaryMsg = (SummaryMsg) hmbMsgList.get(0);
         String msgSn = summaryMsg.msgSn;
         HmMsgInExample example = new HmMsgInExample();

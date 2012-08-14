@@ -26,7 +26,7 @@ public abstract class HmbSyncSubAbstractTxnProcessor extends HmbAbstractTxnProce
            return process(txnCode, msgSn, hmbMsgList);*/
         // 同步交易报文
         // 查询已接收报文数
-        int rcvdMsgInCnt = hmbBaseService.rcvedCntSyncMsginsByHmbMsgList(hmbMsgList);
+        int rcvdMsgInCnt = hmbBaseService.cntRcvedSyncMsginsByHmbMsgList(hmbMsgList);
         // 如果已存在报文，则视为已做业务处理
         if (rcvdMsgInCnt > 0) {
             return rcvdMsgInCnt;
