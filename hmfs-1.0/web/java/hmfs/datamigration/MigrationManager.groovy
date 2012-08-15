@@ -27,13 +27,16 @@ class MigrationManager {
         //mig.initSystemCtrlTable()
 
         //修改SQL中表名
-        mig.processSqlFile();
+       // mig.processSqlFile();
 
         //初始化数据移植表
-        mig.initMigrationDBTable()
+       // mig.initMigrationDBTable()
 
         //导入待移植数据到DB中
-        mig.importData()
+       // mig.importData()
+
+        // 修复数据 parent_fund等
+        mig.updateMigData();
 
         //处理帐户表信息
         mig.tranAcctInfo()
@@ -109,7 +112,7 @@ class MigrationManager {
 
 
     def importData(){
-        println "\t5.开始导入数据..."
+        println "\t5.开始导入mig数据..."
         importData("mig_real_acct")
         importData("mig_acct")
         importData("mig_acct_water")
@@ -118,6 +121,11 @@ class MigrationManager {
         importData("mig_owner_info")
         importData("mig_pay_detail_all")
         importData("mig_pay_detail")
+        println "\t5.导入mig数据完成...\n"
+
+    }
+
+    def updateMigData() {
 
         //TODO 若中心提供的数据中parent_fund为正确的数据 则此处不必再处理parent_fund
         //按照owner_info表的关联关系修正 parent_fund
@@ -143,9 +151,7 @@ class MigrationManager {
             update mig_acct_water a1 set a1.parent_fund=(select a2.parent_fund from mig_acct a2 where a2.fund=a1.fund)
         """
         db.execute(sql)
-
-
-        println "\t5.导入数据完成...\n"
+        println "\t5.修复数据完成...\n"
     }
 
     def importData(String sqlfile){
