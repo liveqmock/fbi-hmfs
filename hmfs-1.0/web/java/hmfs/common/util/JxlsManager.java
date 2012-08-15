@@ -33,7 +33,7 @@ public class JxlsManager {
             Map beansMap = new HashMap();
             beansMap.put("records", records);
 
-            String reportPath = PropertyManager.getProperty("rptdir");
+            String reportPath = PropertyManager.getProperty("prj_root_dir");
             String templateFileName = reportPath + "/report/indiviFundTxn.xls";
 
             outputExcel(beansMap, templateFileName, filename);
