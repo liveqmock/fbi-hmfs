@@ -58,6 +58,10 @@ public class CbsTxn2012Processor extends CbsAbstractTxnProcessor {
             List<HmMsgIn> cancelDetailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2012.body.txnApplyNo, new String[]{"01051"});
             hmbActinfoService.updateActinfoFundsByMsginList(cancelDetailMsginLogs);
             hmbBaseService.updateMsginSts(tia2012.body.txnApplyNo, TxnCtlSts.SUCCESS);
+        } else {
+            // 2012-8-13 保存 重复交易明细
+            hmbActinfoService.insertDblTxnStl(tiaHeader, tia2012.body.txnApplyNo, DCFlagCode.WITHDRAW,
+                    "2012", new BigDecimal(tia2012.body.txnAmt.trim()));
         }
         String[] payRtnMsgTypes = {"01039", "01051"};
         List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2012.body.txnApplyNo, payRtnMsgTypes);

@@ -7,7 +7,11 @@ import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA3001;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA3001;
+import dep.util.PropertyManager;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +42,31 @@ public class CbsTxn3001Processor extends CbsAbstractTxnProcessor {
                 toa3001.body.refundFlag = "0";
                 hmbBaseService.updateMsginSts(tia3001.body.refundApplyNo, TxnCtlSts.HANDLING);
             }
+
+            // ½¨ÐÐ-Ã÷Ï¸
+            if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                String[] payMsgTypes = {"01039", "01043"};
+                List<HmMsgIn> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia3001.body.refundApplyNo, payMsgTypes);
+                if (payInfoList.size() > 0) {
+                    toa3001.body.refundDetailNum = String.valueOf(payInfoList.size());
+                    for (HmMsgIn hmMsgIn : payInfoList) {
+                        TOA3001.Body.Record record = new TOA3001.Body.Record();
+                        record.accountName = hmMsgIn.getInfoName();   //21
+                        record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
+                        record.address = hmMsgIn.getInfoAddr();    //22
+                        record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
+                        record.fundActno1 = hmMsgIn.getFundActno1();
+                        record.fundActno2 = hmMsgIn.getFundActno2();
+                        record.balAmt = String.format("%.2f", hmMsgIn.getActBal());
+                        record.toAccountNo = hmMsgIn.getPayinCbsActno();
+                        record.toAccountName = hmMsgIn.getPayinCbsActname();
+                        record.idType = hmMsgIn.getCertType();
+                        record.idCode = hmMsgIn.getCertId();
+                        toa3001.body.recordList.add(record);
+                    }
+                }
+            }
+
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
         }

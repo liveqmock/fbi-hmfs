@@ -11,6 +11,8 @@ import dep.hmfs.online.processor.hmb.domain.*;
 import dep.util.PropertyManager;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,8 @@ import java.util.Map;
  */
 @Service
 public class HmbClientReqService extends HmbBaseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(HmbClientReqService.class);
 
     protected XSocketBlockClient socketBlockClient;
     protected static String hmfsServerIP = PropertyManager.getProperty("socket_server_ip_hmfs");
@@ -185,7 +189,7 @@ public class HmbClientReqService extends HmbBaseService {
                     socketBlockClient = null;
                 }
             } catch (IOException e) {
-                //
+                logger.error("Socket关闭时发生异常。", e);
             }
         }
     }

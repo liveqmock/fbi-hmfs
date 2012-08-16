@@ -62,6 +62,10 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
             hmbActinfoService.updateActinfoFundsByMsginList(updateFundInfoList);
 
             hmbBaseService.updateMsginSts(tia3002.body.refundApplyNo, TxnCtlSts.SUCCESS);
+        } else {
+            // 2012-8-13 保存 重复交易明细
+            hmbActinfoService.insertDblTxnStl(tiaHeader, tia3002.body.refundApplyNo, DCFlagCode.WITHDRAW,
+                    "3002", new BigDecimal(tia3002.body.refundAmt.trim()));
         }
         // 5230 退款子报文序号
         String[] refundFundMsgTypes = {"01039", "01043", "01033", "01051"};
@@ -72,6 +76,6 @@ public class CbsTxn3002Processor extends CbsAbstractTxnProcessor {
             return null;
         } else {
             throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
-    }
+        }
     }
 }

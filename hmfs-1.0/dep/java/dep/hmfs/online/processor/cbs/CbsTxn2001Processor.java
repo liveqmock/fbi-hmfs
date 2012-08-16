@@ -7,7 +7,11 @@ import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2001;
 import dep.hmfs.online.processor.cbs.domain.txn.TOA2001;
+import dep.util.PropertyManager;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,6 +41,28 @@ public class CbsTxn2001Processor extends CbsAbstractTxnProcessor {
             } else {
                 hmbBaseService.updateMsginSts(tia2001.body.drawApplyNo, TxnCtlSts.HANDLING);
                 toa2001.body.drawFlag = "0";
+            }
+            toa2001.body.rcvAccountNo = totalDrawInfo.getPayinActno();
+            toa2001.body.rcvAccountName = totalDrawInfo.getPayinActName();
+
+            // ½¨ÐÐ-Ã÷Ï¸
+            if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                String[] payMsgTypes = {"01041"};
+                List<HmMsgIn> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia2001.body.drawApplyNo, payMsgTypes);
+                if (payInfoList.size() > 0) {
+                    toa2001.body.drawDetailNum = String.valueOf(payInfoList.size());
+                    for (HmMsgIn hmMsgIn : payInfoList) {
+                        TOA2001.Body.Record record = new TOA2001.Body.Record();
+                        record.accountName = hmMsgIn.getInfoName();   //21
+                        record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
+                        record.address = hmMsgIn.getInfoAddr();    //22
+                        record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
+                        record.fundActno1 = hmMsgIn.getFundActno1();
+                        record.fundActno2 = hmMsgIn.getFundActno2();
+                        record.balAmt = String.format("%.2f", hmMsgIn.getActBal());
+                        toa2001.body.recordList.add(record);
+                    }
+                }
             }
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());

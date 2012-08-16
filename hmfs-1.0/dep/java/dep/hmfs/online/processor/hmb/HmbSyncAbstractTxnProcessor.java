@@ -1,6 +1,7 @@
 package dep.hmfs.online.processor.hmb;
 
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
+import dep.hmfs.online.processor.hmb.domain.SummaryMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,8 @@ public abstract class HmbSyncAbstractTxnProcessor extends HmbAbstractTxnProcesso
         int rcvdMsgInCnt = hmbBaseService.cntRcvedSyncMsginsByHmbMsgList(hmbMsgList);
         // 如果已存在报文，则视为已做业务处理
         if (rcvdMsgInCnt > 0) {
+            SummaryMsg summaryMsg = (SummaryMsg) hmbMsgList.get(0);
+            logger.info("【已存在同步交易报文，则视为已做业务处理。】报文编号：" + summaryMsg.msgSn);
             return rcvdMsgInCnt;
         } else {
             hmbBaseService.insertMsginsByHmbMsgList(txnCode, hmbMsgList);

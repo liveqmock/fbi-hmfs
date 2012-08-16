@@ -5,6 +5,7 @@ import common.enums.FundActnoStatus;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.model.*;
 import common.service.SystemService;
+import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.hmb.domain.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -52,6 +53,8 @@ public class HmbActinfoService {
     private HmSysCtlMapper hmSysCtlMapper;
     @Autowired
     private HmActFundDelMapper hmActFundDelMapper;
+    @Autowired
+    protected HmTxnStlDblMapper hmTxnStlDblMapper;
 
     public HmSysCtl getSysCtl() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
@@ -576,4 +579,30 @@ public class HmbActinfoService {
             logger.info("未查询到已有HmTxnFund交易，申请单号：" + msgSn + ", 交款金额：" + txnAmt);
         }
     }*/
+
+    public int insertDblTxnStl(TIAHeader tiaHeader, String msgSn, DCFlagCode dc, String cbsTxnCode, BigDecimal txnAmt) {
+
+        HmActStlExample example = new HmActStlExample();
+        example.createCriteria().andActStsEqualTo(FundActnoStatus.NORMAL.getCode());
+        HmActStl stl = hmActStlMapper.selectByExample(example).get(0);
+
+        HmTxnStlDbl dbl = new HmTxnStlDbl();
+        dbl.setPkid(UUID.randomUUID().toString());
+        dbl.setCbsActno(stl.getCbsActno());
+        dbl.setStlActno(stl.getSettleActno1());
+        dbl.setCbsTxnSn(tiaHeader.serialNo);
+        dbl.setDcFlag(dc.getCode());
+        dbl.setTxacBrid(tiaHeader.deptCode);
+        dbl.setOpr1No(tiaHeader.operCode);
+        dbl.setOpr2No(tiaHeader.operCode);
+        dbl.setTxnSn(msgSn);
+        dbl.setTxnSubSn("0");
+        dbl.setTxnCode(cbsTxnCode);
+        dbl.setTxnAmt(txnAmt);
+        dbl.setRemark("重复流水");
+        dbl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        dbl.setTxnTime(SystemService.formatTodayByPattern("hhMMss"));
+        return hmTxnStlDblMapper.insert(dbl);
+    }
+
 }

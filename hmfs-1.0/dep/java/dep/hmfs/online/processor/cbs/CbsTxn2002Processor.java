@@ -8,6 +8,7 @@ import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA2002;
 import dep.hmfs.online.service.hmb.ActBookkeepingService;
+import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,8 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
     private ActBookkeepingService actBookkeepingService;
     @Autowired
     private HmbClientReqService hmbClientReqService;
+    @Autowired
+    private HmbActinfoService hmbActinfoService;
 
     @Override
     @Transactional
@@ -52,6 +55,9 @@ public class CbsTxn2002Processor extends CbsAbstractTxnProcessor {
             return handleDrawTxn(tiaHeader.serialNo, tia2002, totalDrawInfo, drawSubMsgTypes, drawInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
+            // 2012-8-13 保存 重复交易明细
+            hmbActinfoService.insertDblTxnStl(tiaHeader, tia2002.body.drawApplyNo, DCFlagCode.WITHDRAW,
+                    "2002", new BigDecimal(tia2002.body.drawAmt.trim()));
             return null;
         }
     }

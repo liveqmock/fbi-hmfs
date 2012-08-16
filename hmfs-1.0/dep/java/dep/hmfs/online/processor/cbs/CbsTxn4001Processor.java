@@ -103,7 +103,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
                     tia4001.body.billStatus);
             if (isSendOver) {
-                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, tiaHeader.serialNo, tia4001.body.payApplyNo,
+                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, tiaHeader, tia4001.body.payApplyNo,
                         tia4001.body.billStatus);
             }
         } catch (Exception e) {

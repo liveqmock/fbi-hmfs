@@ -70,6 +70,9 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
             return handlePayTxnAndSendToHmb(tiaHeader.serialNo, totalPayInfo, tia1002, payInfoList);
         } else {
             // 交易状态已经成功，直接生成成功报文到业务平台
+            // 2012-8-13 保存 重复交易明细
+            hmbActinfoService.insertDblTxnStl(tiaHeader, tia1002.body.payApplyNo, DCFlagCode.DEPOSIT,
+                    "1002", new BigDecimal(tia1002.body.payAmt.trim()));
             return getPayInfoDatagram(totalPayInfo.getTxnCode(), totalPayInfo, tia1002, payInfoList);
         }
     }

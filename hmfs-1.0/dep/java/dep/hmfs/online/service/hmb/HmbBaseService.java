@@ -125,7 +125,7 @@ public class HmbBaseService {
         SummaryMsg summaryMsg = (SummaryMsg) hmbMsgList.get(0);
         String msgSn = summaryMsg.msgSn;
         HmMsgInExample example = new HmMsgInExample();
-        example.createCriteria().andMsgSnEqualTo(msgSn).andMsgTypeLike("00%");
+        example.createCriteria().andMsgSnEqualTo(msgSn);
         int cnt = hmMsgInMapper.countByExample(example);
         return cnt;
     }

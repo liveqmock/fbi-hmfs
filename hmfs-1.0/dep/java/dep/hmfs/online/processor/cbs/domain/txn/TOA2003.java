@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 
+@Deprecated
 public class TOA2003 extends TOA implements Serializable {
     public Header header = new Header();
     public Body body = new Body();

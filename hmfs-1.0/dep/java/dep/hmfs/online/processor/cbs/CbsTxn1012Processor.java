@@ -61,10 +61,14 @@ public class CbsTxn1012Processor extends CbsAbstractTxnProcessor {
         if (actBookkeepingService.checkMsginTxnCtlSts(totalTxnInfo, payInfoList, new BigDecimal(tia1012.body.txnAmt))) {
             // 交款交易。
             logger.info("数据检查正确, 记账、发送报文至房管局并等待响应...");
-           // List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payMsgTypes);
+            // List<HmMsgIn> fundInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payMsgTypes);
             actBookkeepingService.actBookkeepingByMsgins(tiaHeader.serialNo, tiaHeader.deptCode.trim(),
                     tiaHeader.operCode.trim(), payInfoList, DCFlagCode.DEPOSIT.getCode(), "1012");
             hmbBaseService.updateMsginSts(tia1012.body.txnApplyNo, TxnCtlSts.SUCCESS);
+        } else {
+            // 2012-8-13 保存 重复交易明细
+            hmbActinfoService.insertDblTxnStl(tiaHeader, tia1012.body.txnApplyNo, DCFlagCode.DEPOSIT,
+                    "1012", new BigDecimal(tia1012.body.txnAmt.trim()));
         }
         String[] payRtnMsgTypes = {"01033", "01035", "01045"};
         List<HmMsgIn> detailMsginLogs = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1012.body.txnApplyNo, payRtnMsgTypes);
