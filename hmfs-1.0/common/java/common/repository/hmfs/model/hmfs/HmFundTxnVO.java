@@ -21,6 +21,8 @@ public class HmFundTxnVO {
     private  String dcflag;
     private  String revflag;
     private  String cbstxnsn;
+    private String bankid;
+    private String operid;
 
 
     public String getTxndate() {
@@ -125,5 +127,21 @@ public class HmFundTxnVO {
 
     public void setPkid(String pkid) {
         this.pkid = pkid;
+    }
+
+    public String getBankid() {
+        return bankid;
+    }
+
+    public void setBankid(String bankid) {
+        this.bankid = bankid;
+    }
+
+    public String getOperid() {
+        return operid;
+    }
+
+    public void setOperid(String operid) {
+        this.operid = operid;
     }
 }

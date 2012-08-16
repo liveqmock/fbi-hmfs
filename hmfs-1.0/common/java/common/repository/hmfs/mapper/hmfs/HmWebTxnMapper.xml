@@ -266,7 +266,9 @@
                    vch.vch_num      as vchnum,
                    act.info_name    as infoname,
                    act.info_addr    as infoaddr,
-                   act.builder_area as area
+                   act.builder_area as area,
+                   txn.txac_brid    as bankid,
+                   txn.opr1_no      as operid
               from HM_TXN_FUND txn
                join HM_ACT_FUND act
                 on txn.fund_actno = act.fund_actno1

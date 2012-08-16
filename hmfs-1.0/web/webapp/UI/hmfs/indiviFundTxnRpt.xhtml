@@ -33,19 +33,21 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
-                                        <h:outputLabel value="起始日期:" for="startDate"  style="font-weight: bold"/>
-                                        <p:inputText id="startDate" required="true" value="#{actInfoAction.qryParam.startDate}"
+                                        <h:outputLabel value="起始日期:" for="startDate" style="font-weight: bold"/>
+                                        <p:inputText id="startDate" required="true"
+                                                     value="#{actInfoAction.qryParam.startDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
-                                        <h:outputLabel value="结束日期:" for="endDate"  style="font-weight: bold"/>
-                                        <p:inputText id="endDate" required="true" value="#{actInfoAction.qryParam.endDate}"
+                                        <h:outputLabel value="结束日期:" for="endDate" style="font-weight: bold"/>
+                                        <p:inputText id="endDate" required="true"
+                                                     value="#{actInfoAction.qryParam.endDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton  style="width:100px;" value="查询明细"
+                                        <p:commandButton style="width:100px;" value="查询明细"
                                                          action="#{actInfoAction.onQueryIndiviFundDetl}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
-                                        <p:commandButton  style="width:100px;" value="导出EXCEL"
+                                        <p:commandButton style="width:100px;" value="导出EXCEL"
                                                          action="#{actInfoAction.onExportExcelForIndiviFund}"
                                                          ajax="false">
                                         </p:commandButton>
@@ -103,6 +105,12 @@
                                 </p:column>
                                 <p:column headerText="主机流水号" style="text-align: center">
                                     <h:outputText value="#{record.cbstxnsn}"/>
+                                </p:column>
+                                <p:column headerText="银行网点号" style="text-align: center">
+                                    <h:outputText value="#{record.bankid}"/>
+                                </p:column>
+                                <p:column headerText="柜员号" style="text-align: center">
+                                    <h:outputText value="#{record.operid}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>
