@@ -1,6 +1,7 @@
 package hmfs.datamigration
 
 import groovy.sql.Sql
+import java.text.SimpleDateFormat
 
 /**
  * 数据移植程序
@@ -22,18 +23,20 @@ class MigrationManager {
     static void main(args) {
         MigrationManager mig = new MigrationManager();
 
+        println("==== " + new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()) + " 开始数据移植...=======")
+
         //初始化本地业务表和系统控制表
-        //mig.initBizDBTable()
-        //mig.initSystemCtrlTable()
+        mig.initBizDBTable()
+        mig.initSystemCtrlTable()
 
         //修改SQL中表名
-       // mig.processSqlFile();
+       mig.processSqlFile();
 
         //初始化数据移植表
-       // mig.initMigrationDBTable()
+       mig.initMigrationDBTable()
 
         //导入待移植数据到DB中
-       // mig.importData()
+       mig.importData()
 
         // 修复数据 parent_fund等
         mig.updateMigData();
@@ -54,6 +57,9 @@ class MigrationManager {
         mig.checkLocalBizData()
 
         mig.db.close()
+
+        println("==== " + new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()) + " 完成数据移植...=======")
+
     }
 
     def initBizDBTable(){
@@ -86,7 +92,9 @@ class MigrationManager {
         processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into QDHMFMS.HOU_INFO", "Insert into MIG_HOU_INFO");
         processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
         processSqlFile("pay_detail_all.sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
-        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
+        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL");
+        processSqlFile("base_info_oper.sql", "mig_base_info_oper.sql", "Insert into QDHMFMS.BASE_INFO_OPER", "Insert into MIG_BASE_INFO_OPER");
+        processSqlFile("trade.sql", "mig_trade.sql", "Insert into QDHMFMS.TRADE", "Insert into MIG_TRADE");
         println "\t3.修改SQL文件结束。\n"
     }
 
@@ -107,6 +115,8 @@ class MigrationManager {
         db.execute("truncate table mig_owner_info")
         db.execute("truncate table mig_pay_detail")
         db.execute("truncate table mig_pay_detail_all")
+        db.execute("truncate table mig_base_info_oper")
+        db.execute("truncate table mig_trade")
         println "\t4.数据库数据移植表初始化完成。\n"
     }
 
@@ -121,6 +131,9 @@ class MigrationManager {
         importData("mig_owner_info")
         importData("mig_pay_detail_all")
         importData("mig_pay_detail")
+        importData("mig_base_info_oper")
+        importData("mig_trade")
+
         println "\t5.导入mig数据完成...\n"
 
     }

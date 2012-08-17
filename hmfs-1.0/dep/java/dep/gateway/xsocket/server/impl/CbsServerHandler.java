@@ -98,6 +98,8 @@ class CbsContentHandler extends ContentHandler {
     public boolean onData(INonBlockingConnection nbc) throws IOException {
 
         int available = nbc.available();
+        logger.info("【本地服务端:onData()】接收报文长度:" + available);
+
         // remaining：待接收报文长度，初始值为dataLength
         int lengthToRead = remaining;
         if (available < remaining) {
