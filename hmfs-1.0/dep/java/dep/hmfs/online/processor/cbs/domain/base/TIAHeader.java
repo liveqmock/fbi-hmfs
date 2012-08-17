@@ -17,8 +17,8 @@ public class TIAHeader implements Serializable {
     public String operCode = "hmfs";
 
     public void initFields(byte[] bytes) {
-        if (bytes == null || bytes.length < 24) {
-            throw new RuntimeException("报文头字节长度不够！");
+        if (bytes == null || bytes.length < 45) {
+            throw new RuntimeException("报文头字节长度错误！");
         }
         serialNo = new String(bytes, 0, 16);
         errorCode = new String(bytes, 16, 4);

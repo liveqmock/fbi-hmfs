@@ -7,6 +7,7 @@ import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.util.PropertyManager;
 import dep.util.StringPad;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,8 @@ public class CbsMsgHandleService implements IMessageHandler {
         System.arraycopy(bytes, 45, datagramBytes, 0, datagramBytes.length);
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(StringPad.rightPad4ChineseToByteLength(tiaHeader.serialNo, 16, " "));
+//        strBuilder.append(StringPad.rightPad4ChineseToByteLength(tiaHeader.serialNo, 16, " "));
+        strBuilder.append(StringUtils.rightPad(tiaHeader.serialNo, 16, " "));
 
         // ========================================================
         // debug
