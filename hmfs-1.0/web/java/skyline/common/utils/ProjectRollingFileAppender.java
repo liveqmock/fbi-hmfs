@@ -20,7 +20,9 @@ public class ProjectRollingFileAppender extends DailyRollingFileAppender {
         if (prjRoot == null || "".equals(prjRoot)) {
             throw new RuntimeException("项目配置参数错误，未配置：" + prj_root_dir);
         }
-        fileName = prjRoot + fileName;
+        if (!fileName.startsWith(prjRoot)) {
+            fileName = prjRoot + fileName;
+        }
         super.setFile(fileName, append, bufferedIO, bufferSize);
     }
 }
