@@ -41,6 +41,9 @@ public class ActInfoService {
     private HmActStlMapper actStlMapper;
 
     @Resource
+    private HmTxnStlDblMapper txnStlDblMapper;
+
+    @Resource
     private HmTxnFundMapper txnFundMapper;
 
     @Resource
@@ -199,6 +202,16 @@ public class ActInfoService {
                 .andTxnDateBetween(param.getStartDate(), param.getEndDate());
         example.setOrderByClause("stl_actno, txn_date, txn_time");
         return txnStlMapper.selectByExample(example);
+    }
+
+    //结算户重复交易明细
+    public List<HmTxnStlDbl> selectStlTxnDblDetl(ActinfoQryParam param) {
+        HmTxnStlDblExample example = new HmTxnStlDblExample();
+        example.createCriteria()
+                .andCbsActnoEqualTo(param.getCbsActno())
+                .andTxnDateBetween(param.getStartDate(), param.getEndDate());
+        example.setOrderByClause("stl_actno, txn_date, txn_time");
+        return txnStlDblMapper.selectByExample(example);
     }
 
     // 查询汇总报文信息  (不判断报文状态)

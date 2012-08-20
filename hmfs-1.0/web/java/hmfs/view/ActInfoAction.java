@@ -46,6 +46,7 @@ public class ActInfoAction implements Serializable {
     private List<HmActStl> stlBalList;
     private List<HmTxnFund> fundDetlList;
     private List<HmTxnStl> stlDetlList;
+    private List<HmTxnStlDbl> stlDetlDblList;
     private HmActFund[] selectedFundBalRecords;
     private HmActStl[] selectedStlBalRecords;
     private HmTxnFund[] selectedFundDetlRecord;
@@ -85,21 +86,21 @@ public class ActInfoAction implements Serializable {
         this.cbsActno = actInfoService.selectStlActno();
         this.qryParam.setCbsActno(this.cbsActno);
 
-        for(FundActnoStatus c : FundActnoStatus.values())
+        for (FundActnoStatus c : FundActnoStatus.values())
             actnoStatusList.add(new SelectItem(c.getCode(), c.getTitle()));
 
         fundActTypeList.add(new SelectItem("", ""));
-        for(FundActType c : FundActType.values())
+        for (FundActType c : FundActType.values())
             fundActTypeList.add(new SelectItem(c.getCode(), c.getTitle()));
 
         //initList();
     }
 
-    private void initList(){
+    private void initList() {
         this.fundBalList = actInfoService.selectAllFundActBalList(qryParam);
         if (this.fundBalList.size() > 0) {
             this.qryParam.setStartActno(this.fundBalList.get(0).getFundActno1());
-            this.qryParam.setEndActno(this.fundBalList.get(this.fundBalList.size()-1).getFundActno1());
+            this.qryParam.setEndActno(this.fundBalList.get(this.fundBalList.size() - 1).getFundActno1());
         }
         this.fundDetlList = actInfoService.selectFundTxnDetlList(qryParam);
         this.stlBalList = actInfoService.selectAllStlActBalList(qryParam);
@@ -121,7 +122,7 @@ public class ActInfoAction implements Serializable {
         return null;
     }
 
-    public String onQueryFundDetl(){
+    public String onQueryFundDetl() {
         if (StringUtils.isEmpty(qryParam.getEndActno())) {
             qryParam.setEndActno(qryParam.getStartActno());
         }
@@ -136,6 +137,7 @@ public class ActInfoAction implements Serializable {
         }
         return null;
     }
+
     public String onQueryCbsBal() {
         try {
             this.stlBalList = actInfoService.selectStlActBalList(qryParam);
@@ -148,7 +150,21 @@ public class ActInfoAction implements Serializable {
         return null;
     }
 
-    public String onQueryCbsDetl(){
+    public String onQueryCbsDblDetl() {
+        try {
+            //this.stlDetlList = actInfoService.selectStlTxnDetl(qryParam);
+             this.stlDetlDblList = actInfoService.selectStlTxnDblDetl(qryParam);
+            if (stlDetlDblList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            logger.error("处理失败。", e);
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
+    public String onQueryCbsDetl() {
         try {
             this.stlDetlList = actInfoService.selectStlTxnDetl(qryParam);
             if (stlDetlList.isEmpty()) {
@@ -161,7 +177,7 @@ public class ActInfoAction implements Serializable {
     }
 
     //分户交易明细
-    public String onQueryIndiviFundDetl(){
+    public String onQueryIndiviFundDetl() {
         try {
             this.indiviFundDetlList = actInfoService.selectIndiviFundTxnDetlList(qryParam);
             if (indiviFundDetlList.isEmpty()) {
@@ -173,7 +189,8 @@ public class ActInfoAction implements Serializable {
         }
         return null;
     }
-    public String onExportExcelForIndiviFund(){
+
+    public String onExportExcelForIndiviFund() {
         if (this.indiviFundDetlList.size() == 0) {
             MessageUtil.addWarn("记录为空...");
             return null;
@@ -305,6 +322,14 @@ public class ActInfoAction implements Serializable {
 
     public void setStlDetlList(List<HmTxnStl> stlDetlList) {
         this.stlDetlList = stlDetlList;
+    }
+
+    public List<HmTxnStlDbl> getStlDetlDblList() {
+        return stlDetlDblList;
+    }
+
+    public void setStlDetlDblList(List<HmTxnStlDbl> stlDetlDblList) {
+        this.stlDetlDblList = stlDetlDblList;
     }
 
     public HmActStl[] getSelectedStlBalRecords() {
