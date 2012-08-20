@@ -43,8 +43,8 @@ public interface HmCmnMapper {
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
-            "                    and to_number(t1.cell_num) = to_number(t2.cell_num)" +
-            "                    and to_number(t1.builder_area) = to_number(t2.builder_area)" +
+            "                    and cast(t1.cell_num as decimal(8,2)) = cast(t2.cell_num as decimal(8,2))" +
+            "                    and cast(t1.builder_area as decimal(8,2)) = cast(t2.builder_area as decimal(8,2))" +
             //"                    and t1.acttype = t2.acttype" +
             //"                    and t1.info_id1 = t2.info_id1" +
             //"                    and t1.info_id1_type1 = t2.info_id1_type1" +
@@ -96,8 +96,8 @@ public interface HmCmnMapper {
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
-            "                    and (to_number(t1.cell_num) != to_number(t2.cell_num)" +
-            "                    or to_number(t1.builder_area) != to_number(t2.builder_area)" +
+            "                    and (cast(t1.cell_num as decimal(8,2)) != cast(t2.cell_num as decimal(8,2))" +
+            "                    or cast(t1.builder_area as decimal(8,2)) != cast(t2.builder_area as decimal(8,2))" +
             "                    or t1.actbal != t2.actbal))")
     public int verifyChkActResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
