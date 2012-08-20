@@ -33,13 +33,11 @@
 
 
         <!--业务类例子 -->
-        <!--
-        <table schema="hmfs" tableName="">
+
+      <!--  <table schema="hmfs" tableName="BK_CMB_DEPT">
             <property name="ignoreQualifiersAtRuntime" value="true" />
-            <generatedKey column="pkid" sqlStatement="select sys_guid() from dual" identity="false"/>
-            <columnOverride column="" jdbcType="TIMESTAMP"/>
-        </table>
-        -->
+        </table>-->
+
 
         <!--
                 <table schema="hmfs" tableName="hm_sys_ctl">

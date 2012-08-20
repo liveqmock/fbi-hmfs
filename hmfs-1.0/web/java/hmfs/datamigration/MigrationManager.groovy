@@ -92,7 +92,7 @@ class MigrationManager {
         processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into QDHMFMS.HOU_INFO", "Insert into MIG_HOU_INFO");
         processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
         processSqlFile("pay_detail_all.sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
-        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL");
+        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
         processSqlFile("base_info_oper.sql", "mig_base_info_oper.sql", "Insert into QDHMFMS.BASE_INFO_OPER", "Insert into MIG_BASE_INFO_OPER");
         processSqlFile("trade.sql", "mig_trade.sql", "Insert into QDHMFMS.TRADE", "Insert into MIG_TRADE");
         println "\t3.修改SQL文件结束。\n"
