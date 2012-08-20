@@ -4,10 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
-import common.repository.hmfs.model.HmMsgIn;
-import common.repository.hmfs.model.HmMsgInExample;
-import common.repository.hmfs.model.HmMsgOut;
-import common.repository.hmfs.model.HmSysCtl;
+import common.repository.hmfs.model.*;
 import common.service.SystemService;
 import dep.gateway.hmb8583.HmbMessageFactory;
 import dep.hmfs.common.HmbTxnsnGenerator;
@@ -53,6 +50,8 @@ public class HmbBaseService {
     protected TmpMsgInMapper tmpMsgInMapper;
     @Resource
     protected HmCmnMapper hmCmnMapper;
+    @Resource
+    protected BkCmbDeptMapper bkCmbDeptMapper;
 
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
@@ -190,5 +189,15 @@ public class HmbBaseService {
             hmMsgOutMapper.insert(msgoutLog);
         }
         return index;
+    }
+
+    public String qryBkDeptNameById(String bankid) {
+        BkCmbDeptExample example = new BkCmbDeptExample();
+        example.createCriteria().andBkDeptIdEqualTo(bankid.trim());
+        List<BkCmbDept> cmbDeptList = bkCmbDeptMapper.selectByExample(example);
+        if(cmbDeptList.size() <= 0) {
+            return null;
+        }
+        return cmbDeptList.get(0).getBkDeptName();
     }
 }

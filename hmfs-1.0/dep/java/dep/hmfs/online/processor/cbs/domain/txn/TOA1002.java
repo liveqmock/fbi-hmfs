@@ -46,6 +46,7 @@ public class TOA1002 extends TOA implements Serializable {
             public String projAmt = "";
             public String payPart = "";
             public String accountNo = "";
+            public String bkDeptName = "";
 
             public String toFixedLengthString() {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -76,7 +77,8 @@ public class TOA1002 extends TOA implements Serializable {
                 stringBuilder.append(wipeVertical(houseType)).append(delimiter);
                 stringBuilder.append(wipeVertical(projAmt)).append(delimiter);
                 stringBuilder.append(wipeVertical(payPart)).append(delimiter);
-                stringBuilder.append(wipeVertical(accountNo));
+                stringBuilder.append(wipeVertical(accountNo)).append(delimiter);
+                stringBuilder.append(wipeVertical(bkDeptName));
                 return stringBuilder.toString();
             }
         }
