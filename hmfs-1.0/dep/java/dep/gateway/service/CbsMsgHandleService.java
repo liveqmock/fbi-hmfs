@@ -52,7 +52,10 @@ public class CbsMsgHandleService implements IMessageHandler {
         } catch (Exception e) {
             if (e.getMessage() == null || e.getMessage().getBytes().length != 4) {
                 logger.error("交易处理发生异常！", e);
-                strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());
+                if (e.getMessage().startsWith("700")) {
+                    throw new RuntimeException(CbsErrorCode.NET_COMMUNICATE_ERROR.getCode());
+                } else
+                    strBuilder.append(CbsErrorCode.SYSTEM_ERROR.getCode());
             } else {
                 strBuilder.append(e.getMessage());
             }
