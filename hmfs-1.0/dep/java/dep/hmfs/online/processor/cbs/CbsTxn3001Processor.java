@@ -55,14 +55,20 @@ public class CbsTxn3001Processor extends CbsAbstractTxnProcessor {
                         record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
                         record.address = hmMsgIn.getInfoAddr();    //22
                         record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
-                     /*   record.fundActno1 = hmMsgIn.getFundActno1();
-                        record.fundActno2 = hmMsgIn.getFundActno2();
-                        record.balAmt = String.format("%.2f", hmMsgIn.getActBal());
-                        record.toAccountNo = hmMsgIn.getPayinCbsActno();
-                        record.toAccountName = hmMsgIn.getPayinCbsActname();
-                        record.idType = hmMsgIn.getCertType();
-                        record.idCode = hmMsgIn.getCertId();*/
+                        /*   record.fundActno1 = hmMsgIn.getFundActno1();
+                      record.fundActno2 = hmMsgIn.getFundActno2();
+                      record.balAmt = String.format("%.2f", hmMsgIn.getActBal());
+                      record.toAccountNo = hmMsgIn.getPayinCbsActno();
+                      record.toAccountName = hmMsgIn.getPayinCbsActname();
+                      record.idType = hmMsgIn.getCertType();
+                      record.idCode = hmMsgIn.getCertId();*/
                         // 退款明细和交款明细改为一致 未赋值字段为空
+                        // 20120824 电话字段改为-转入账号 工程造价字段改为：转入账户名  缴存比例改为：证件号码
+                        record.toAcctNo = hmMsgIn.getPayinCbsActno();
+                        record.toAcctName = hmMsgIn.getPayinCbsActname();
+                        record.certID = hmMsgIn.getCertId();
+                        //--------------------------------------
+
                         record.accountNo = hmMsgIn.getFundActno1();
 
                         toa3001.body.recordList.add(record);

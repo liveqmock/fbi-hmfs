@@ -42,8 +42,8 @@ public class CbsTxn2001Processor extends CbsAbstractTxnProcessor {
                 hmbBaseService.updateMsginSts(tia2001.body.drawApplyNo, TxnCtlSts.HANDLING);
                 toa2001.body.drawFlag = "0";
             }
-            toa2001.body.rcvAccountNo = totalDrawInfo.getPayinActno();
-            toa2001.body.rcvAccountName = totalDrawInfo.getPayinActName();
+//            toa2001.body.rcvAccountNo = totalDrawInfo.getPayinActno();
+//            toa2001.body.rcvAccountName = totalDrawInfo.getPayinActName();
 
             // ½¨ÐÐ-Ã÷Ï¸
             if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
@@ -57,9 +57,10 @@ public class CbsTxn2001Processor extends CbsAbstractTxnProcessor {
                         record.txAmt = String.format("%.2f", hmMsgIn.getTxnAmt1());
                         record.address = hmMsgIn.getInfoAddr();    //22
                         record.houseArea = StringUtils.isEmpty(hmMsgIn.getBuilderArea()) ? "" : hmMsgIn.getBuilderArea();
-                        record.fundActno1 = hmMsgIn.getFundActno1();
-                        record.fundActno2 = hmMsgIn.getFundActno2();
+                        record.toAcctNo = totalDrawInfo.getPayinActno();
+                        record.toAcctName = totalDrawInfo.getPayinActName();
                         record.balAmt = String.format("%.2f", hmMsgIn.getActBal());
+                        record.accountNo = hmMsgIn.getFundActno1();
                         toa2001.body.recordList.add(record);
                     }
                 }

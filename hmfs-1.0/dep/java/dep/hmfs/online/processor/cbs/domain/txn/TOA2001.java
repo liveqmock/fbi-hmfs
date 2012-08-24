@@ -41,7 +41,7 @@ public class TOA2001 extends TOA implements Serializable {
         public String drawFlag = "";
         public String drawAmt = "";
 
-        public String rcvAccountNo = "";    //支取收款银行账号
+        /* public String rcvAccountNo = "";    //支取收款银行账号
         public String rcvAccountName = "";  //支取收款户名
 
         public String drawDetailNum;   // 明细数
@@ -71,6 +71,38 @@ public class TOA2001 extends TOA implements Serializable {
                 stringBuilder.append(StringUtils.rightPad(balAmt, 16, " "));
                 return stringBuilder.toString();
             }
+        }*/
+        public String drawDetailNum;   // 明细数
+
+        public List<Record> recordList = new ArrayList<Record>();
+
+        public static class Record {
+
+            public String accountName = "";
+            public String txAmt = "";
+            public String address = "";
+            public String houseArea = "";
+            public String toAcctNo = "";
+            public String houseType = "";
+            public String toAcctName = "";
+            public String balAmt = "";
+            public String accountNo = "";
+
+            public String toFixedLengthString() {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(accountName) ? "" : accountName,
+                        60, " "));
+                stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(address) ? "" : address,
+                        80, " "));
+                stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
+                stringBuilder.append(StringUtils.rightPad(StringUtils.isEmpty(toAcctNo) ? "" : toAcctNo, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(toAcctName, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(balAmt, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(accountNo, 12, " "));
+                return stringBuilder.toString();
+            }
         }
     }
 
@@ -82,9 +114,18 @@ public class TOA2001 extends TOA implements Serializable {
         stringBuilder.append(StringUtils.rightPad(body.drawAmt, 16, " "));
 
         // 建行 返回明细记录
-        if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+        /* if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
             stringBuilder.append(StringUtils.rightPad(body.rcvAccountNo, 21, " "));
             stringBuilder.append(StringPad.rightPad4ChineseToByteLength(body.rcvAccountName, 80, " "));
+            body.drawDetailNum = String.valueOf(body.recordList.size());
+            stringBuilder.append(StringUtils.rightPad(body.drawDetailNum, 4, " "));
+            if (body.recordList.size() > 0) {
+                for (Body.Record record : body.recordList) {
+                    stringBuilder.append(record.toFixedLengthString());
+                }
+            }
+        }*/
+        if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
             body.drawDetailNum = String.valueOf(body.recordList.size());
             stringBuilder.append(StringUtils.rightPad(body.drawDetailNum, 4, " "));
             if (body.recordList.size() > 0) {

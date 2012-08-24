@@ -87,33 +87,33 @@ public class TOA3001 extends TOA implements Serializable {
         }*/
         public List<Record> recordList = new ArrayList<Record>();
 
-               public static class Record {
-                   public String accountName = "";
-                   public String txAmt = "";
-                   public String address = "";
-                   public String houseArea = "";
-                   public String phoneNo = "";
-                   public String houseType = "";
-                   public String projAmt = "";
-                   public String payPart = "";
-                   public String accountNo = "";
+        public static class Record {
+            public String accountName = "";
+            public String txAmt = "";
+            public String address = "";
+            public String houseArea = "";
+            public String toAcctNo = "";
+            public String houseType = "";
+            public String toAcctName = "";
+            public String certID = "";
+            public String accountNo = "";
 
-                   public String toFixedLengthString() {
-                       StringBuilder stringBuilder = new StringBuilder();
-                       stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(accountName) ? "" : accountName,
-                               60, " "));
-                       stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
-                       stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(address) ? "" : address,
-                               80, " "));
-                       stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
-                       stringBuilder.append(StringUtils.rightPad(StringUtils.isEmpty(phoneNo) ? "" : phoneNo, 20, " "));
-                       stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
-                       stringBuilder.append(StringUtils.rightPad(projAmt, 20, " "));
-                       stringBuilder.append(StringUtils.rightPad(payPart, 20, " "));
-                       stringBuilder.append(StringUtils.rightPad(accountNo, 12, " "));
-                       return stringBuilder.toString();
-                   }
-               }
+            public String toFixedLengthString() {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(accountName) ? "" : accountName,
+                        60, " "));
+                stringBuilder.append(StringUtils.rightPad(txAmt, 16, " "));
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(StringUtils.isEmpty(address) ? "" : address,
+                        80, " "));
+                stringBuilder.append(StringUtils.rightPad(houseArea, 16, " "));
+                stringBuilder.append(StringUtils.rightPad(StringUtils.isEmpty(toAcctNo) ? "" : toAcctNo, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(houseType, 2, " "));
+                stringBuilder.append(StringPad.rightPad4ChineseToByteLength(toAcctName, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(certID, 20, " "));
+                stringBuilder.append(StringUtils.rightPad(accountNo, 12, " "));
+                return stringBuilder.toString();
+            }
+        }
 
     }
 
