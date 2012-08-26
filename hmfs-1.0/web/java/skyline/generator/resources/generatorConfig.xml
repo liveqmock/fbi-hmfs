@@ -33,8 +33,7 @@
 
 
         <!--业务类例子 -->
-
-      <!--  <table schema="hmfs" tableName="BK_CMB_DEPT">
+        <!--  <table schema="hmfs" tableName="BK_CMB_DEPT">
             <property name="ignoreQualifiersAtRuntime" value="true" />
         </table>-->
 

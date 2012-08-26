@@ -53,7 +53,7 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
         tia1002.body.payAmt = new String(bytes, 18, 16).trim();
 
         if ("07".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
-            String deptName = hmbClientReqService.qryBkDeptNameById(tiaHeader.deptCode.trim());
+            String deptName = hmbClientReqService.qryDeptNameById(tiaHeader.deptCode.trim());
             if (deptName == null) {
                 throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
             }
@@ -118,7 +118,7 @@ public class CbsTxn1002Processor extends CbsAbstractTxnProcessor {
         toa1002.body.payApplyNo = tia1002.body.payApplyNo;
         if (payInfoList.size() > 0) {
             toa1002.body.payDetailNum = String.valueOf(payInfoList.size());
-            String deptName = hmbClientReqService.qryBkDeptNameById(tia1002.header.deptCode);
+            String deptName = hmbClientReqService.qryDeptNameById(tia1002.header.deptCode);
             for (HmMsgIn hmMsgIn : payInfoList) {
                 HmActFund actFund = hmbActinfoService.qryHmActfundByActNo(hmMsgIn.getFundActno1());
                 TOA1002.Body.Record record = new TOA1002.Body.Record();

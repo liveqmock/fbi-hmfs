@@ -52,6 +52,8 @@ public class HmbBaseService {
     protected HmCmnMapper hmCmnMapper;
     @Resource
     protected BkCmbDeptMapper bkCmbDeptMapper;
+    @Resource(name = "bankDeptMapper")
+    protected PtdeptMapper ptdeptMapper;
 
     protected static String SEND_SYS_ID = PropertyManager.getProperty("SEND_SYS_ID");
     protected static String ORIG_SYS_ID = PropertyManager.getProperty("ORIG_SYS_ID");
@@ -191,13 +193,13 @@ public class HmbBaseService {
         return index;
     }
 
-    public String qryBkDeptNameById(String bankid) {
-        BkCmbDeptExample example = new BkCmbDeptExample();
-        example.createCriteria().andBkDeptIdEqualTo(bankid.trim());
-        List<BkCmbDept> cmbDeptList = bkCmbDeptMapper.selectByExample(example);
-        if(cmbDeptList.size() <= 0) {
+    // È¡ÍøµãÃû³Æ
+
+    public String qryDeptNameById(String deptid) {
+        Ptdept ptdept = ptdeptMapper.selectByPrimaryKey(deptid.trim());
+        if (ptdept == null) {
             return null;
         }
-        return cmbDeptList.get(0).getBkDeptName();
+        return ptdept.getDeptname();
     }
 }
