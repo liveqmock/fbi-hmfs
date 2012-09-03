@@ -65,6 +65,9 @@ public class ActInfoService {
     private HmChkActMapper hmChkActMapper;
 
     @Resource
+    private HmTxnVchMapper hmTxnVchMapper;
+
+    @Resource
     private PlatformService platformService;
 
     public HmSysCtl getAppSysStatus() {
@@ -300,5 +303,12 @@ public class ActInfoService {
     public boolean checkVoucherPrintStatus(HmMsgIn msgIn) {
         return false;
 
+    }
+
+    public List<HmTxnVch> qryTxnVchByStsAndDate(String startDate, String endDate, String vouchStatus) {
+        HmTxnVchExample example = new HmTxnVchExample();
+        example.createCriteria().andVchStsEqualTo(vouchStatus).andTxnDateBetween(startDate, endDate);
+        example.setOrderByClause(" txac_brid,opr1_no ");
+        return hmTxnVchMapper.selectByExample(example);
     }
 }
