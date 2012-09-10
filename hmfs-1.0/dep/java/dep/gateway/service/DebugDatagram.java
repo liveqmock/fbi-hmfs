@@ -66,9 +66,45 @@ public class DebugDatagram {
                     StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
                     StringPad.rightPad4ChineseToByteLength("119090909091", 12, " "));
         } else if ("2001".equals(tiaHeader.txnCode)) {
-            strBuilder.append("12031900484352100002.00            ");
+            strBuilder.append("120319004843521000110.00           2   " +
+                    StringPad.rightPad4ChineseToByteLength("张三", 60, " ") +
+                    StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                    StringPad.rightPad4ChineseToByteLength("98.88", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("89901111", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("1", 2, " ") +
+                    StringPad.rightPad4ChineseToByteLength("10000", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("119090909090", 12, " ") +
+                    StringPad.rightPad4ChineseToByteLength("李四", 60, " ") +
+                    StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                    StringPad.rightPad4ChineseToByteLength("98.78", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("89901110", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("4", 2, " ") +
+                    StringPad.rightPad4ChineseToByteLength("13000", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("119090909091", 12, " "));
         } else if ("3001".equals(tiaHeader.txnCode)) {
-            strBuilder.append("12031900484352100003.00            ");
+            strBuilder.append("120319004843521000110.00           2   " +
+                    StringPad.rightPad4ChineseToByteLength("张三", 60, " ") +
+                    StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                    StringPad.rightPad4ChineseToByteLength("98.88", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("89901111", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("1", 2, " ") +
+                    StringPad.rightPad4ChineseToByteLength("10000", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("119090909090", 12, " ") +
+                    StringPad.rightPad4ChineseToByteLength("李四", 60, " ") +
+                    StringPad.rightPad4ChineseToByteLength("500.00", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("深圳路", 80, " ") +
+                    StringPad.rightPad4ChineseToByteLength("98.78", 16, " ") +
+                    StringPad.rightPad4ChineseToByteLength("89901110", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("4", 2, " ") +
+                    StringPad.rightPad4ChineseToByteLength("13000", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("30", 20, " ") +
+                    StringPad.rightPad4ChineseToByteLength("119090909091", 12, " "));
         } else if ("5001".equals(tiaHeader.txnCode)) {
             TIA5001 tia5001 = new TIA5001();
             tia5001.body.cbsActNo = new String(datagramBytes, 0, 30).trim();
