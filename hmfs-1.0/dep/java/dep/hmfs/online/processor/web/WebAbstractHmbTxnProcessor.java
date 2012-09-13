@@ -70,6 +70,11 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
         try {
             socketBlockClient = new XSocketBlockClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
             hmfsDatagram = socketBlockClient.sendDataUntilRcvToHmb(bytes);
+/*
+            HmbSocketClient client = new HmbSocketClient(hmfsServerIP, hmfsServerPort, hmfsServerTimeout);
+            hmfsDatagram = client.sendrecv(bytes);
+*/
+
             return messageFactory.unmarshal(hmfsDatagram);
         } catch (RuntimeException e) {
             throw e;
@@ -84,6 +89,7 @@ public abstract class WebAbstractHmbTxnProcessor extends WebAbstractTxnProcessor
                 }
             } catch (IOException e) {
                 //
+                logger.error("SOCKET πÿ±’ ß∞‹°£");
             }
         }
     }
