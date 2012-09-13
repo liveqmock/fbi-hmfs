@@ -43,11 +43,9 @@ public interface HmCmnMapper {
             "                            and acttype = #{actType}" +
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
+//20120913 zhanrui 不核对面积
+//            "                    and cast(t1.builder_area as decimal(8,2)) = cast(t2.builder_area as decimal(8,2))" +
             "                    and cast(t1.cell_num as decimal(8,2)) = cast(t2.cell_num as decimal(8,2))" +
-            "                    and cast(t1.builder_area as decimal(8,2)) = cast(t2.builder_area as decimal(8,2))" +
-            //"                    and t1.acttype = t2.acttype" +
-            //"                    and t1.info_id1 = t2.info_id1" +
-            //"                    and t1.info_id1_type1 = t2.info_id1_type1" +
             "                    and t1.actbal = t2.actbal)")
     public int verifyChkActResult_0(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
@@ -97,7 +95,8 @@ public interface HmCmnMapper {
             "                            and txn_date = #{txnDate}) t2" +
             "                  where t1.actno = t2.actno" +
             "                    and (cast(t1.cell_num as decimal(8,2)) != cast(t2.cell_num as decimal(8,2))" +
-            "                    or cast(t1.builder_area as decimal(8,2)) != cast(t2.builder_area as decimal(8,2))" +
+//20120913 zhanrui 不核对面积
+//            "                    or cast(t1.builder_area as decimal(8,2)) != cast(t2.builder_area as decimal(8,2))" +
             "                    or t1.actbal != t2.actbal))")
     public int verifyChkActResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
