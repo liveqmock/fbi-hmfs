@@ -15,14 +15,14 @@ import java.nio.BufferUnderflowException;
  *
  * @author zxb
  */
-public class XSocketBlockClient extends ConnectClient implements IConnectHandler {
+public class MockXSocketBlockClient extends ConnectClient implements IConnectHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(XSocketBlockClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(MockXSocketBlockClient.class);
 
     private IBlockingConnection blockingConnection;
     private INonBlockingConnection nonBlockingConnection;
 
-    public XSocketBlockClient(String serverIP, int serverPort, long timeoutMills) throws IOException {
+    public MockXSocketBlockClient(String serverIP, int serverPort, long timeoutMills) throws IOException {
         super(serverIP, serverPort);
         nonBlockingConnection = new NonBlockingConnection(serverIP, serverPort, this);
         blockingConnection = new BlockingConnection(nonBlockingConnection);
@@ -128,7 +128,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     public static void main(String[] args) {
         try {
-            XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 60000);
+            MockXSocketBlockClient socketBlockClient = new MockXSocketBlockClient("127.0.0.1", 61601, 60000);
             //String datagram = "1234567890      00005001123456789123456789            10000.00        201203090000001|300|C\n21122000012|9090900|C\n000000455|300|D";
             // 1001 ½»¿î²éÑ¯
 //            String datagram = "123456789012345600001001120316004833521000";
