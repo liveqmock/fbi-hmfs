@@ -5,7 +5,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xsocket.MaxReadSizeExceededException;
-import org.xsocket.connection.*;
+import org.xsocket.connection.BlockingConnection;
+import org.xsocket.connection.IBlockingConnection;
+import org.xsocket.connection.IConnectHandler;
+import org.xsocket.connection.INonBlockingConnection;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -24,11 +27,24 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
 
     public XSocketBlockClient(String serverIP, int serverPort, long timeoutMills) throws IOException {
         super(serverIP, serverPort);
-        nonBlockingConnection = new NonBlockingConnection(serverIP, serverPort, this);
-        blockingConnection = new BlockingConnection(nonBlockingConnection);
+
+/*
+        java.util.logging.Logger log = java.util.logging.Logger.getLogger("org.xsocket.connection");
+        log.setLevel(Level.FINE);
+
+        ConsoleHandler ch = new ConsoleHandler();
+        ch.setLevel(Level.FINE);
+        log.addHandler(ch);
+*/
+
+
+//        nonBlockingConnection = new NonBlockingConnection(serverIP, serverPort, this);
+//        blockingConnection = new BlockingConnection(nonBlockingConnection);
+        blockingConnection = new BlockingConnection(serverIP, serverPort);
         blockingConnection.setConnectionTimeoutMillis(timeoutMills);
         blockingConnection.setEncoding("GBK");
         blockingConnection.setAutoflush(true);  //  设置自动清空缓存
+
     }
 
     @Override
@@ -58,9 +74,13 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         logger.info("【本地客户端】发送报文：" + new String(dataBytes));
         byte[] datagramBytes = null;
         if (sendData(dataBytes)) {
+            logger.info("接收connectionID：" + blockingConnection.getId());
+
             int garamTotalLength = Integer.parseInt(blockingConnection.readStringByLength(7).trim());
             logger.info("【本地客户端】接收报文总长度：" + garamTotalLength);
             datagramBytes = blockingConnection.readBytesByLength(garamTotalLength + 4);
+
+            logger.info("接收connectionID：" + blockingConnection.getId() + " 接收完成");
         }
         logger.info("【本地客户端】实际接收报文内容：" + new String(datagramBytes));
         logger.info("【本地客户端】实际接收报文内容长度：" + datagramBytes.length);
@@ -84,8 +104,10 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
         if (blockingConnection == null || !blockingConnection.isOpen()) {
             throw new RuntimeException("未建立连接！");
         } else {
+            logger.info("发送connectionID：" + blockingConnection.getId());
             blockingConnection.write(dataBytes);
             blockingConnection.flush();
+            logger.info("发送connectionID：" + blockingConnection.getId() + " 发送完成");
         }
         return true;
     }
@@ -107,10 +129,16 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
      * @throws java.io.IOException
      */
     public boolean close() throws IOException {
+        if (blockingConnection != null ) {
+            blockingConnection.close();
+            blockingConnection = null;
+        }
+/*
         if (blockingConnection != null && blockingConnection.isOpen()) {
             blockingConnection.close();
             blockingConnection = null;
         }
+*/
         if (nonBlockingConnection != null && nonBlockingConnection.isOpen()) {
             nonBlockingConnection.close();
             nonBlockingConnection = null;
@@ -129,7 +157,7 @@ public class XSocketBlockClient extends ConnectClient implements IConnectHandler
     public static void main(String[] args) {
         try {
             XSocketBlockClient socketBlockClient = new XSocketBlockClient("127.0.0.1", 61601, 10000000);
-//            XSocketBlockClient socketBlockClient = new XSocketBlockClient("48.135.44.51", 61601, 10000000);
+//            MockXSocketBlockClient socketBlockClient = new MockXSocketBlockClient("48.135.44.51", 61601, 10000000);
             /*
             120426090967521000	3689.85
             120426090968521000	3080.91
