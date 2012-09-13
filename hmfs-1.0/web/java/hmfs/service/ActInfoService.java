@@ -308,7 +308,7 @@ public class ActInfoService {
     public List<HmTxnVch> qryTxnVchByStsAndDate(String startDate, String endDate, String vouchStatus) {
         HmTxnVchExample example = new HmTxnVchExample();
         example.createCriteria().andVchStsEqualTo(vouchStatus).andTxnDateBetween(startDate, endDate);
-        example.setOrderByClause(" txac_brid,opr1_no ");
+        example.setOrderByClause(" txac_brid,opr1_no,txn_date ");
         return hmTxnVchMapper.selectByExample(example);
     }
 }
