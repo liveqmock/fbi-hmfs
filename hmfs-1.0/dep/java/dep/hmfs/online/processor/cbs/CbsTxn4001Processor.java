@@ -65,10 +65,13 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             if (!TxnCtlSts.SUCCESS.getCode().equals(oriMsgIn.getTxnCtlSts())) {
                 throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
             }
-            // 2012-08-01 检查该申请单号是否已使用票据
+           /*
+           // 2012-10-16 一笔申请单对应多笔票据时，在打印完票据后，票据号可能不连续，故取消此检查
+                       【注意】由此可能产生的问题是：如果误输入另外一笔已使用票据的单笔申请单号，则会造成申请单与票据对应错误。
+           // 2012-08-01 检查该申请单号是否已使用票据
             if (txnVouchService.isExistMsgSnVch(tia4001.body.payApplyNo)) {
                 throw new RuntimeException(CbsErrorCode.MSG_IN_SN_VCH_EXIST.getCode());
-            }
+            }*/
         }
 
         /*
