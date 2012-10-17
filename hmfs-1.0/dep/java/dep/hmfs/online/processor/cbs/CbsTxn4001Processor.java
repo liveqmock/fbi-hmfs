@@ -53,33 +53,14 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 tia4001.body.payApplyNo = new String(bytes, 25, 18).trim();
             }
         }
-        if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
-            List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
-                    new String[]{"00005"});
-            // 检查是否存在此申请单号
-            if (payInfoList.size() <= 0) {
-                throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
-            }
-            // 2012-08-01 检查是否已交款成功
-            HmMsgIn oriMsgIn = payInfoList.get(0);
-            if (!TxnCtlSts.SUCCESS.getCode().equals(oriMsgIn.getTxnCtlSts())) {
-                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
-            }
-           /*
-           // 2012-10-16 一笔申请单对应多笔票据时，在打印完票据后，票据号可能不连续，故取消此检查
-                       【注意】由此可能产生的问题是：如果误输入另外一笔已使用票据的单笔申请单号，则会造成申请单与票据对应错误。
-           // 2012-08-01 检查该申请单号是否已使用票据
-            if (txnVouchService.isExistMsgSnVch(tia4001.body.payApplyNo)) {
-                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_VCH_EXIST.getCode());
-            }*/
-        }
+
 
         /*
-        票据状态	         1	    1:领用；2:使用；3:作废
-        打印票据起始编号	12	    票据起始编号
-        打印票据结束编号	12	    票据结束编号
-        缴款通知书编号	    18	    非必填项，凭证使用时填写
-         */
+       票据状态	         1	    1:领用；2:使用；3:作废
+       打印票据起始编号	12	    票据起始编号
+       打印票据结束编号	12	    票据结束编号
+       缴款通知书编号	    18	    非必填项，凭证使用时填写
+        */
         long startNo = 0;
         long endNo = 0;
         try {
@@ -91,6 +72,32 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         }
         if (startNo > endNo) {
             throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+        }
+
+        if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
+            List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
+                    new String[]{"00005", "01035", "01045"});
+            // 检查是否存在此申请单号
+            if (payInfoList.size() <= 0) {
+                throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
+            }
+            // 2012-08-01 检查是否已交款成功
+            HmMsgIn oriMsgIn = payInfoList.get(0);
+            if (!TxnCtlSts.SUCCESS.getCode().equals(oriMsgIn.getTxnCtlSts())) {
+                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
+            }
+            /*
+           // 2012-10-16 一笔申请单对应多笔票据时，在打印完票据后，票据号可能不连续，故取消此检查
+                       【注意】由此可能产生的问题是：如果误输入另外一笔已使用票据的单笔申请单号，则会造成申请单与票据对应错误。
+           // 2012-08-01 检查该申请单号是否已使用票据
+            if (txnVouchService.isExistMsgSnVch(tia4001.body.payApplyNo)) {
+                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_VCH_EXIST.getCode());
+            }*/
+            //  2012-10-17 [检查]：系统内已记录使用票据数 + 当前使用数 > 该申请单缴款户数
+            int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(tia4001.body.payApplyNo);
+            if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size() - 1) {
+                throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+            }
         }
 
         // 检查票据是否已使用

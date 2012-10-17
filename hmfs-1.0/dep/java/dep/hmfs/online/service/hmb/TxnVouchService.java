@@ -46,9 +46,13 @@ public class TxnVouchService {
     }
 
     public boolean isExistMsgSnVch(String msgSn) {
+        return qryUsedVchCntByMsgsn(msgSn) > 0;
+    }
+
+    public int qryUsedVchCntByMsgsn(String msgSn) {
         HmTxnVchExample example = new HmTxnVchExample();
         example.createCriteria().andFundTxnSnEqualTo(msgSn);
-        return hmTxnVchMapper.countByExample(example) > 0;
+        return hmTxnVchMapper.countByExample(example);
     }
 
     public boolean isUsedVchNo(String vchNo) {
