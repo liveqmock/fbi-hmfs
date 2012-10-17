@@ -124,8 +124,10 @@ class HmbContentHandler extends ContentHandler {
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();
+            // 业务处理结束后，返回true
+            return true;
         }
-        // 2012-10-17 与CbsServerHandler一致
+        // 业务逻辑尚未处理完成
         return false;
     }
 }

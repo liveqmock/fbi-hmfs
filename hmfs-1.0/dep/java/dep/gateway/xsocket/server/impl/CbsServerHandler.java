@@ -123,7 +123,8 @@ class CbsContentHandler extends ContentHandler {
             nbc.flush();
             byteArrayOutStream.reset();
         }
-        return false;
+        // 业务处理结束后，返回true
+        return true;
     }
 }
 

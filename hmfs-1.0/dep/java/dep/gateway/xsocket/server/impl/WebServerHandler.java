@@ -119,7 +119,7 @@ class WebContentHandler extends ContentHandler {
         if (remaining == 0) {
 
             byteArrayOutStream.flush();
-            nbc.setAttachment(hdl);
+//            nbc.setAttachment(hdl);
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 
@@ -130,7 +130,8 @@ class WebContentHandler extends ContentHandler {
             byteArrayOutStream.reset();
             logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
             logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
+            return true;
         }
-        return true;
+        return false;
     }
 }
