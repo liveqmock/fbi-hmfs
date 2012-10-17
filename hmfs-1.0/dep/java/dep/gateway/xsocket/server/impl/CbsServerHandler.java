@@ -34,7 +34,7 @@ public class CbsServerHandler implements IServerHandler {
     public boolean onConnect(INonBlockingConnection nbc) throws IOException,
             BufferUnderflowException {
         String remoteName = nbc.getRemoteAddress().getHostName();
-        logger.info("【本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
+        logger.info("【CBS本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
         return true;
     }
 
@@ -43,19 +43,18 @@ public class CbsServerHandler implements IServerHandler {
      */
     @Override
     public boolean onDisconnect(INonBlockingConnection nbc) throws IOException {
-        logger.info("【本地服务端】远程主机与本地主机断开连接！");
+        logger.info("【CBS本地服务端】远程主机与本地主机断开连接！");
         return true;
     }
 
     public boolean onData(INonBlockingConnection connection) throws IOException {
 
-        logger.info("【本地服务端】本次可接收报文长度：" + connection.available());
+        logger.info("【CBS本地服务端】本次可接收报文长度：" + connection.available());
         // 报文长度
         int dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
-        logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
-
+        logger.info("【CBS本地服务端】需接收完整报文长度：" + dataLength);
         connection.setHandler(new CbsContentHandler(this, cbsMsgHandleService, dataLength));
-        return false;
+        return true;
     }
 
     /**
@@ -63,7 +62,7 @@ public class CbsServerHandler implements IServerHandler {
      */
     @Override
     public boolean onIdleTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地服务端】空闲超时。");
+        logger.error("【CBS本地服务端】空闲超时。");
         return true;
     }
 
@@ -72,13 +71,13 @@ public class CbsServerHandler implements IServerHandler {
      */
     @Override
     public boolean onConnectionTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地客户端】与远程主机连接超时。");
+        logger.error("【CBS本地服务端】与远程主机连接超时。");
         return true;
     }
 
     @Override
     public boolean onConnectException(INonBlockingConnection iNonBlockingConnection, IOException e) throws IOException {
-        logger.error("【本地客户端】与远程主机连接发生异常。");
+        logger.error("【CBS本地服务端】与远程主机连接发生异常。");
         return true;
     }
 
@@ -121,9 +120,10 @@ class CbsContentHandler extends ContentHandler {
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();
+            // 业务处理结束后，返回true
+            return true;
         }
-        // 业务处理结束后，返回true
-        return true;
+        return false;
     }
 }
 

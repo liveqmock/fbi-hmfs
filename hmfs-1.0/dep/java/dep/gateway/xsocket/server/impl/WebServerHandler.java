@@ -16,6 +16,7 @@ import java.nio.BufferUnderflowException;
 /**
  * 服务端数据处理类 监听维修资金监管系统管理界面发起的报文
  * 6位报文长度
+ *
  * @author zxb
  */
 @Component
@@ -25,6 +26,7 @@ public class WebServerHandler implements IServerHandler {
     private static final int DATA_LENGTH_FIELD_LENGTH = 6;
     @Autowired
     private WebMsgHandleService webMsgHandleService;
+
     /**
      * 连接的成功时的操作
      */
@@ -32,7 +34,7 @@ public class WebServerHandler implements IServerHandler {
     public boolean onConnect(INonBlockingConnection nbc) throws IOException,
             BufferUnderflowException {
         String remoteName = nbc.getRemoteAddress().getHostName();
-        logger.info("【本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
+        logger.info("【WEB本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
         return true;
     }
 
@@ -41,7 +43,7 @@ public class WebServerHandler implements IServerHandler {
      */
     @Override
     public boolean onDisconnect(INonBlockingConnection nbc) throws IOException {
-        logger.info("【本地服务端】远程主机与本地主机断开连接！");
+        logger.info("【WEB本地服务端】远程主机与本地主机断开连接！");
         return true;
     }
 
@@ -54,9 +56,7 @@ public class WebServerHandler implements IServerHandler {
         // 报文长度
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
         logger.info("【WEB本地服务端】需接收完整报文长度：" + dataLength);
-
         connection.setHandler(new WebContentHandler(this, webMsgHandleService, dataLength));
-
         return true;
     }
 
@@ -65,7 +65,7 @@ public class WebServerHandler implements IServerHandler {
      */
     @Override
     public boolean onIdleTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地服务端】空闲超时。");
+        logger.error("【WEB本地服务端】空闲超时。");
         return true;
     }
 
@@ -74,13 +74,13 @@ public class WebServerHandler implements IServerHandler {
      */
     @Override
     public boolean onConnectionTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地客户端】与远程主机连接超时。");
+        logger.error("【WEB本地服务端】与远程主机连接超时。");
         return true;
     }
 
     @Override
     public boolean onConnectException(INonBlockingConnection iNonBlockingConnection, IOException e) throws IOException {
-        logger.error("【本地客户端】与远程主机连接发生异常。");
+        logger.error("【WEB本地服务端】与远程主机连接发生异常。");
         return true;
     }
 

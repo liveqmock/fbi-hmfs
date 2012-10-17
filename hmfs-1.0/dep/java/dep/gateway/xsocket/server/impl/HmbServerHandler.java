@@ -32,7 +32,7 @@ public class HmbServerHandler implements IServerHandler {
     public boolean onConnect(INonBlockingConnection nbc) throws IOException,
             BufferUnderflowException {
         String remoteName = nbc.getRemoteAddress().getHostName();
-        logger.info("【本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
+        logger.info("【HMB本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
         return true;
     }
 
@@ -41,7 +41,7 @@ public class HmbServerHandler implements IServerHandler {
      */
     @Override
     public boolean onDisconnect(INonBlockingConnection nbc) throws IOException {
-        logger.info("【本地服务端】远程主机与本地主机断开连接！");
+        logger.info("【HMB本地服务端】远程主机与本地主机断开连接！");
         return true;
     }
 
@@ -52,9 +52,7 @@ public class HmbServerHandler implements IServerHandler {
         // 正文长度 + 4位交易编号长度
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH)) + 4;
         logger.info("【HMB本地服务端】需接收完整报文长度：" + dataLength);
-
         connection.setHandler(new HmbContentHandler(this, hmbMsgHandleService, dataLength));
-
         return true;
     }
 
@@ -63,7 +61,7 @@ public class HmbServerHandler implements IServerHandler {
      */
     @Override
     public boolean onIdleTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地服务端】空闲超时。");
+        logger.error("【HMB本地服务端】空闲超时。");
         return true;
     }
 
@@ -72,13 +70,13 @@ public class HmbServerHandler implements IServerHandler {
      */
     @Override
     public boolean onConnectionTimeout(INonBlockingConnection connection) throws IOException {
-        logger.error("【本地客户端】与远程主机连接超时。");
+        logger.error("【HMB本地服务端】与远程主机连接超时。");
         return true;
     }
 
     @Override
     public boolean onConnectException(INonBlockingConnection iNonBlockingConnection, IOException e) throws IOException {
-        logger.error("【本地客户端】与远程主机连接发生异常。");
+        logger.error("【HMB本地服务端】与远程主机连接发生异常。");
         return true;
     }    
 }
