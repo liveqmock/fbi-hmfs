@@ -49,7 +49,7 @@ public class CbsServerHandler implements IServerHandler {
 
     public boolean onData(INonBlockingConnection connection) throws IOException {
 
-        logger.info("【本地服务端】可接收报文长度：" + connection.available());
+        logger.info("【本地服务端】本次可接收报文长度：" + connection.available());
         // 报文长度
         int dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
         logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
@@ -98,7 +98,7 @@ class CbsContentHandler extends ContentHandler {
     public boolean onData(INonBlockingConnection nbc) throws IOException {
 
         int available = nbc.available();
-        logger.info("【本地服务端:onData()】接收报文长度:" + available);
+        logger.info("【CBS本地服务端:onData()】本次可接收报文长度:" + available);
 
         // remaining：待接收报文长度，初始值为dataLength
         int lengthToRead = remaining;
@@ -114,11 +114,10 @@ class CbsContentHandler extends ContentHandler {
             byteArrayOutStream.flush();
             //nbc.setAttachment(null);
             bytesDatagram = byteArrayOutStream.toByteArray();
-            logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
+            logger.info("【CBS本地服务端】已接收完整报文内容:" + new String(bytesDatagram));
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = cbsMsgHandleService.handleMessage(bytesDatagram);
-            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
-            logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
+            logger.info("【CBS本地服务端】响应报文内容:" + new String(resBytesMsg));
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();

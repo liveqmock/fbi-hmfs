@@ -47,13 +47,13 @@ public class WebServerHandler implements IServerHandler {
 
     public boolean onData(INonBlockingConnection connection) throws IOException {
 
-        logger.info("【本地服务端】可接收报文长度：" + connection.available());
+        logger.info("【WEB本地服务端】可接收报文长度：" + connection.available());
 
         int dataLength = 0;
 
         // 报文长度
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH_FIELD_LENGTH).trim()) - DATA_LENGTH_FIELD_LENGTH;
-        logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
+        logger.info("【WEB本地服务端】需接收完整报文长度：" + dataLength);
 
         connection.setHandler(new WebContentHandler(this, webMsgHandleService, dataLength));
 
@@ -121,15 +121,14 @@ class WebContentHandler extends ContentHandler {
             byteArrayOutStream.flush();
 //            nbc.setAttachment(hdl);
             bytesDatagram = byteArrayOutStream.toByteArray();
-            logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
+            logger.info("【WEB本地服务端】已接收完整报文内容:" + new String(bytesDatagram));
 
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = webMsgHandleService.handleMessage(bytesDatagram);
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();
-            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
-            logger.info("【本地服务端】发送报文长度:" + resBytesMsg.length);
+            logger.info("【WEB本地服务端】响应报文内容:" + new String(resBytesMsg));
             return true;
         }
         return false;

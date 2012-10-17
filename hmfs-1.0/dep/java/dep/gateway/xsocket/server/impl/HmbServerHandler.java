@@ -47,13 +47,11 @@ public class HmbServerHandler implements IServerHandler {
 
     public boolean onData(INonBlockingConnection connection) throws IOException {
 
-        logger.info("【本地服务端】可接收报文长度：" + connection.available());
-
+        logger.info("【HMB本地服务端】本次可接收报文长度：" + connection.available());
         int dataLength = 0;
-
         // 正文长度 + 4位交易编号长度
         dataLength = Integer.parseInt(connection.readStringByLength(DATA_LENGTH)) + 4;
-        logger.info("【本地服务端】需接收完整报文长度：" + dataLength);
+        logger.info("【HMB本地服务端】需接收完整报文长度：" + dataLength);
 
         connection.setHandler(new HmbContentHandler(this, hmbMsgHandleService, dataLength));
 
@@ -98,14 +96,14 @@ class HmbContentHandler extends ContentHandler {
 
     public boolean onData(INonBlockingConnection nbc) throws IOException {
         int available = nbc.available();
-        logger.info("【本地服务端:onData()】接收报文长度:" + available);
+        logger.info("【HMB本地服务端:onData()】本次可接收报文长度:" + available);
 
         int lengthToRead = remaining;
         if (available < remaining) {
             lengthToRead = available;
         }
         byte[] newBytes = nbc.readBytesByLength(lengthToRead);
-        logger.info("【本地服务端:onData()】接收报文内容:" + new String(newBytes));
+        logger.info("【HMB本地服务端:onData()】本次接收报文内容:" + new String(newBytes));
 
         byteArrayOutStream.write(newBytes);
         remaining -= lengthToRead;
@@ -116,11 +114,11 @@ class HmbContentHandler extends ContentHandler {
             // 2012-10-17 与CbsServerHandler一致 【注意】多包问题
 //            nbc.setAttachment(hdl);
             bytesDatagram = byteArrayOutStream.toByteArray();
-            logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
+            logger.info("【HMB本地服务端】已接收完整报文内容:" + new String(bytesDatagram));
 
             // 处理接收到的报文，并生成响应报文
             byte[] resBytesMsg = hmbMsgHandleService.handleMessage(bytesDatagram);
-            logger.info("【本地服务端】发送报文内容:" + new String(resBytesMsg));
+            logger.info("【HMB本地服务端】响应报文内容:" + new String(resBytesMsg));
             nbc.write(resBytesMsg);
             nbc.flush();
             byteArrayOutStream.reset();
