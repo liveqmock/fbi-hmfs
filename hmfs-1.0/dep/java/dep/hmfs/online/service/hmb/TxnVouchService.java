@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.VouchStatus;
 import common.repository.hmfs.dao.HmTxnVchMapper;
 import common.repository.hmfs.model.HmTxnVch;
 import common.repository.hmfs.model.HmTxnVchExample;
@@ -51,7 +52,7 @@ public class TxnVouchService {
 
     public int qryUsedVchCntByMsgsn(String msgSn) {
         HmTxnVchExample example = new HmTxnVchExample();
-        example.createCriteria().andFundTxnSnEqualTo(msgSn);
+        example.createCriteria().andFundTxnSnEqualTo(msgSn).andVchStsNotEqualTo(VouchStatus.CANCEL.getCode());
         return hmTxnVchMapper.countByExample(example);
     }
 
