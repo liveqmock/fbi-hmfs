@@ -76,7 +76,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
 
         if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
             List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
-                    new String[]{"00005", "01035", "01045"});
+                    new String[]{"01035", "01045"});
             // 检查是否存在此申请单号
             if (payInfoList.size() <= 0) {
                 throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());
@@ -95,7 +95,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             }*/
             //  2012-10-17 [检查]：系统内已记录使用票据数 + 当前使用数 > 该申请单缴款户数
             int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(tia4001.body.payApplyNo);
-            if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size() - 1) {
+            if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size()) {
                 throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
             }
         }
