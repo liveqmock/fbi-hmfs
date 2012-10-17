@@ -22,89 +22,6 @@
                         event.keyCode = 9;
                 }
             }
-
-            var nextPrtId;
-            function printAllVch() {
-                //alert(pdtvar.toString());
-                //var pkid = obj.parentNode.parentNode.parentNode.getAttribute("data-rk");
-                //var rows = pdtvar.getElementsByTagName("tr");
-//                for (var i=1;i<rows.length;++i)
-//                    rows[i].className = 'rowClassSelected';
-
-                //document.getElementById('printFrame').location.reload();
-                if (confirm("确认开始打印吗?")){
-                    //printall();
-                    //printTure();
-
-                    nextPrtId = '';
-                    //while (confirm("确认开始打印吗??")){
-                        getPrintRecord();
-                    //}
-                    //alert("====" + nextPrtId);
-
-                    //printHidden("common/qryWaitPrtVch.xhtml");
-                }
-            }
-
-            //查询
-            function handleGetPrintRecordComplete(xhr, status, args) {
-                if(args.validationFailed) {
-                    alert("交易返回结果异常！");
-                }
-                else {
-                    nextprtId = args.acctno;
-                    //printHidden("common/qryWaitPrtVch.xhtml")
-                    //document.frames["printFrame"].src = "common/qryWaitPrtVch.xhtml?id=" + nextprtId;
-//                    document.getElementById('printFrame').location.reload();
-//                    document.frames["printFrame"].location.reload();
-                    setTimeout(function(){
-                        document.frames['printFrame'].location.reload();
-                    },0);
-                    alert("acctno:" + args.acctno);
-                }
-            }
-
-            //
-            function printHidden(url) {
-                var mainform = document.getElementById("printDiv");
-                alert(mainform.innerHTML);
-                mainform.insertAdjacentHTML("beforeEnd",
-                        "<iframe name=printHiddenFrame width=20 height=20></iframe>");
-                var doc = printHiddenFrame.document;
-                doc.open();
-                //doc.write("<body onload=\"parent.printTure()\">");
-                doc.write("<body>");
-                doc.write("12121221212211212121212");
-                doc.write("<iframe name=printMe width=20 height=20 src=\"" +
-                        url + "\"></iframe>");
-                doc.write("</body>");
-                alert("111");
-                doc.close();
-            }
-
-
-            //用于设置打印参数
-            function printBase() {
-                factory.printing.header = "" //页眉
-                factory.printing.footer = "" //页脚
-                factory.printing.portrait = true //true为纵向打印，false为横向打印
-                factory.printing.leftMargin = 0.5
-                factory.printing.topMargin = 1.5
-                factory.printing.rightMargin = 0.5
-                factory.printing.bottomMargin = 1.5
-            }
-
-            function printTure()
-            {
-                alert("开始。。。");
-                printBase();
-//                document.getElementById("btnPrint").style.display = "none";//隐藏按钮
-                //factory.printing.Preview();
-//                factory.printing.Print(false);
-                factory.printing.Print(false, 'printFrame');
-//                document.getElementById("btnPrint").style.display = "inline";//显示按钮
-            }
-
             //]]>
         </script>
     </ui:define>
@@ -150,11 +67,6 @@
                                                          action="#{depositAction.onConfirm}"
                                                          update="pdt,msgs,buttons">
                                         </p:commandButton>
-                                        <p:commandButton style="width:110px;" value="凭证打印"
-                                                         rendered="#{depositAction.confirmed}"
-                                                         action="#{depositAction.onVchPrt}"
-                                                         update="pdt,msgs,buttons">
-                                        </p:commandButton>
                                     </h:panelGrid>
                                 </h:panelGrid>
                             </p:panel>
@@ -166,15 +78,6 @@
                                     <h:outputText value=""/>
                                 </f:facet>
                             </p:ajaxStatus>
-                            <p:menubar style="margin-bottom:3px;">
-                                <p:menuitem type="push" value="打印所选记录凭证" icon="ui-icon ui-icon-checked"
-                                            action="#{depositAction.onPrintAll}" ajax="false" />
-                                <p:menuitem type="push" value="打印列表中全部凭证" icon="ui-icon ui-icon-print"
-                                            process="@this"
-                                            onclick="printAllVch();"
-                                            update="msgs, pdt"
-                                            ajax="true"/>
-                            </p:menubar>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;margin-bottom:8px;"
                                          value="#{depositAction.subMsgList}" var="record"
                                          rowKey="#{record.pkid}"
@@ -213,24 +116,8 @@
                                 </p:column>
                             </p:dataTable>
                         </div>
-                        <p:remoteCommand name="printall" id="printall" async="true"
-                                         actionListener="#{depositAction.onPrintAll}"
-                                         update="msgs" process="@none"/>
-                        <p:remoteCommand name="getPrintRecord" id="getPrintRecord" async="true"
-                                         actionListener="#{depositAction.searchFirstOneRecordForPrint}"
-                                         update="msgs" process="@none"
-                                         oncomplete="handleGetPrintRecordComplete(xhr, status, args)"/>
-                        <div id="printDiv">
-
-                        </div>
-                        <iframe id="printFrame" width="100%" height="200" src="common/qryWaitPrtVch.xhtml"></iframe>
                     </h:form>
                 </p:tab>
-                <p:tab title="已打印票据清单">
-                    <h:form>
-                    </h:form>
-                </p:tab>
-
             </p:tabView>
         </div>
     </ui:define>
