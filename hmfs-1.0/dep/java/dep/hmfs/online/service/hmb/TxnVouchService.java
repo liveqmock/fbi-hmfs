@@ -52,7 +52,7 @@ public class TxnVouchService {
 
     public int qryUsedVchCntByMsgsn(String msgSn) {
         HmTxnVchExample example = new HmTxnVchExample();
-        example.createCriteria().andFundTxnSnEqualTo(msgSn).andVchStsNotEqualTo(VouchStatus.CANCEL.getCode());
+        example.createCriteria().andFundTxnSnEqualTo(msgSn).andVchStsEqualTo(VouchStatus.USED.getCode());
         return hmTxnVchMapper.countByExample(example);
     }
 
