@@ -113,7 +113,8 @@ class HmbContentHandler extends ContentHandler {
         if (remaining == 0) {
 
             byteArrayOutStream.flush();
-            nbc.setAttachment(hdl);
+            // 2012-10-17 与CbsServerHandler一致 【注意】多包问题
+//            nbc.setAttachment(hdl);
             bytesDatagram = byteArrayOutStream.toByteArray();
             logger.info("【本地服务端】接收报文内容:" + new String(bytesDatagram));
 
@@ -124,7 +125,8 @@ class HmbContentHandler extends ContentHandler {
             nbc.flush();
             byteArrayOutStream.reset();
         }
-        return true;
+        // 2012-10-17 与CbsServerHandler一致
+        return false;
     }
 }
 
