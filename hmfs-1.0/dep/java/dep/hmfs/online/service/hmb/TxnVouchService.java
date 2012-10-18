@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -27,11 +28,17 @@ public class TxnVouchService {
 
     @Transactional
     public long insertVouchsByNo(String msgSn, long startNo, long endNo, TIAHeader tiaHeader, String txnApplyNo, String vouchStatus) {
+        int maxSubsn = getMaxVchSubsn(tiaHeader.serialNo);
         for (long i = startNo; i <= endNo; i++) {
             HmTxnVch hmTxnVch = new HmTxnVch();
             hmTxnVch.setPkid(UUID.randomUUID().toString());
             hmTxnVch.setTxnSn(msgSn);
-            hmTxnVch.setTxnSubSn((int) (i - startNo));
+            //默认序号必须从0开始
+            if (maxSubsn == 0) {
+                hmTxnVch.setTxnSubSn(maxSubsn + (int) (i - startNo));
+            }else{
+                hmTxnVch.setTxnSubSn(maxSubsn + (int) (i - startNo) + 1);
+            }
             hmTxnVch.setFundTxnSn(txnApplyNo);
             hmTxnVch.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
             hmTxnVch.setTxnCode("4001");
@@ -44,6 +51,19 @@ public class TxnVouchService {
             hmTxnVchMapper.insertSelective(hmTxnVch);
         }
         return endNo - startNo + 1;
+    }
+
+    //获取指定申请单号中已使用票据的最大子流水号
+    private int getMaxVchSubsn(String msgSn){
+        HmTxnVchExample example = new HmTxnVchExample();
+        example.createCriteria().andFundTxnSnEqualTo(msgSn);
+        example.setOrderByClause(" txn_sub_sn desc");
+        List<HmTxnVch> txnVchList =  hmTxnVchMapper.selectByExample(example);
+        if (txnVchList.size() > 0) {
+            return txnVchList.get(0).getTxnSubSn();
+        }else{
+            return 0;
+        }
     }
 
     public boolean isExistMsgSnVch(String msgSn) {
