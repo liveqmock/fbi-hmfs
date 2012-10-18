@@ -1,6 +1,7 @@
 package hmfs.service;
 
 import common.enums.FundActType;
+import common.enums.FundActnoStatus;
 import common.enums.TxnCtlSts;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
@@ -68,6 +69,9 @@ public class ActInfoService {
     private HmTxnVchMapper hmTxnVchMapper;
 
     @Resource
+    private HmActFundMapper hmActFundMapper;
+
+    @Resource
     private PlatformService platformService;
 
     public HmSysCtl getAppSysStatus() {
@@ -78,6 +82,12 @@ public class ActInfoService {
         HmActStlExample example = new HmActStlExample();
         example.createCriteria();
         return actStlMapper.selectByExample(example).get(0).getCbsActno();
+    }
+
+    public HmActFund selectActFundByno(String fundActno) {
+        HmActFundExample example = new HmActFundExample();
+        example.createCriteria().andFundActno1EqualTo(fundActno).andActStsEqualTo(FundActnoStatus.NORMAL.getCode());
+        return hmActFundMapper.selectByExample(example).get(0);
     }
 
     public List<HmActStl> selectStlActnoRecord(String actno) {

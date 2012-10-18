@@ -1,6 +1,8 @@
 package hmfs.view;
 
+import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
+import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmTxnVch;
 import hmfs.common.util.JxlsManager;
 import hmfs.service.ActInfoService;
@@ -11,6 +13,7 @@ import skyline.common.utils.MessageUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,12 +28,11 @@ import java.util.List;
  */
 
 @ManagedBean
+@ViewScoped
 public class VoucherAction {
     private static final Logger logger = LoggerFactory.getLogger(VoucherAction.class);
 
-//    private HmMsgIn hmMsgIn;
-//    private List<HmMsgIn> subMsgList;
-
+    //    private HmMsgIn hmMsgIn;
     @ManagedProperty(value = "#{actInfoService}")
     private ActInfoService actInfoService;
 
@@ -40,6 +42,12 @@ public class VoucherAction {
     private List<HmTxnVch> vchList = new ArrayList<HmTxnVch>();
     private HmTxnVch selectedTxnVch;
     private VouchStatus vouchStatus = VouchStatus.USED;
+
+    private String msgSn;
+    private String fundActno;
+    private int totalCount;
+    private List<HmMsgIn> subMsgList;
+    private TxnCtlSts txnCtlSts = TxnCtlSts.SUCCESS;
 
     @PostConstruct
     public void init() {
@@ -79,6 +87,19 @@ public class VoucherAction {
         return null;
     }
 
+    public String onQrySubMsgin() {
+        try {
+            this.subMsgList = actInfoService.selectSubMsgList(msgSn);
+            this.totalCount = this.subMsgList.size();
+            if(this.totalCount <= 0) {
+                MessageUtil.addWarn("没有查询到数据记录。");
+            }
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+        return null;
+    }
+
     /* public HmMsgIn getHmMsgIn() {
 
             return hmMsgIn;
@@ -87,15 +108,49 @@ public class VoucherAction {
         public void setHmMsgIn(HmMsgIn hmMsgIn) {
             this.hmMsgIn = hmMsgIn;
         }
+        */
 
-        public List<HmMsgIn> getSubMsgList() {
-            return subMsgList;
-        }
+    // ----------------------------------------------------------
 
-        public void setSubMsgList(List<HmMsgIn> subMsgList) {
-            this.subMsgList = subMsgList;
-        }
-    */
+    public TxnCtlSts getTxnCtlSts() {
+        return txnCtlSts;
+    }
+
+    public void setTxnCtlSts(TxnCtlSts txnCtlSts) {
+        this.txnCtlSts = txnCtlSts;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public String getMsgSn() {
+        return msgSn;
+    }
+
+    public void setMsgSn(String msgSn) {
+        this.msgSn = msgSn;
+    }
+
+    public String getFundActno() {
+        return fundActno;
+    }
+
+    public void setFundActno(String fundActno) {
+        this.fundActno = fundActno;
+    }
+
+    public List<HmMsgIn> getSubMsgList() {
+        return subMsgList;
+    }
+
+    public void setSubMsgList(List<HmMsgIn> subMsgList) {
+        this.subMsgList = subMsgList;
+    }
 
     public String getVchStatus() {
         return vchStatus;

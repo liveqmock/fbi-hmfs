@@ -79,6 +79,9 @@ public class AppMngService {
         return hmMsgInMapper.selectByExample(example);
     }
 
+    public HmMsgIn selectHmMsginByPkid(String pkid){
+        return hmMsgInMapper.selectByPrimaryKey(pkid);
+    }
 
     public void updateTmpMsgoutRecord(TmpMsgOut tmpMsgOut){
        tmpMsgOutMapper.updateByPrimaryKey(tmpMsgOut);

@@ -15,7 +15,14 @@
                 width: 5%;
             }
         </style>
+        <script type="text/javascript" src="#{request.contextPath}/UI/support/pub.js" charset="GBK"/>
         <script language="JavaScript" type="text/JavaScript">
+            function doPopupPrintWindow(obj) {
+                var pkid = obj.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].innerHTML;
+                popupwindow = window.open("voucherPrint.xhtml?action=print&amp;pkid=" + pkid, "popupwindow",
+                        "height=500,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
+                popupwindow.focus;
+            }
             //<![CDATA[
             function KeyDown() {
                 if (event.keyCode == 13) {
@@ -81,13 +88,20 @@
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;margin-bottom:8px;"
                                          value="#{depositAction.subMsgList}" var="record"
                                          rowKey="#{record.pkid}"
-                                         selection="#{depositAction.selectedRecords}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} 【总笔数:#{depositAction.totalCount}】"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          widgetVar="pdtvar"
                                          emptyMessage="数据记录为空...">
-                                <p:column selectionMode="multiple" style="width:18px"/>
+                                <p:column style="display:none;" headerText="pkid">
+                                    <h:outputText value="#{record.pkid}"/>
+                                </p:column>
+                                <p:column headerText="缴款单号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSn}"/>
+                                </p:column>
+                                <p:column headerText="缴款子序号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSubSn}"/>
+                                </p:column>
                                 <p:column headerText="业主姓名" style="text-align: center">
                                     <h:outputText value="#{record.infoName}"/>
                                 </p:column>
@@ -105,14 +119,10 @@
                                 <p:column headerText="建筑面积" style="text-align: center">
                                     <h:outputText value="#{record.builderArea}"/>
                                 </p:column>
-                                <p:column headerText="住宅类型" style="text-align: center">
-                                    <h:outputText value="#{record.houseDepType}"/>
-                                </p:column>
-                                <p:column headerText="工程造价|缴存比例" style="text-align: center">
-                                    <h:outputText value="#{record.depStandard2}"/>
-                                </p:column>
-                                <p:column headerText="电话" style="text-align: center">
-                                    <h:outputText value="#{record.houseCustPhone}"/>
+
+                                <p:column headerText="操作" style="text-align:center;">
+                                    <p:commandLink value="打印凭证" style="color:blue"
+                                                   onclick="doPopupPrintWindow(this);"/>
                                 </p:column>
                             </p:dataTable>
                         </div>
