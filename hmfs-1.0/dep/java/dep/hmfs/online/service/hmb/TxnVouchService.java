@@ -29,7 +29,7 @@ public class TxnVouchService {
     @Transactional
     public long insertVouchsByNo(String msgSn, long startNo, long endNo, String serialNo,
                                  String deptCode, String operCode, String txnApplyNo, String vouchStatus) {
-        int maxSubsn = getMaxVchSubsn(tiaHeader.serialNo);
+        int maxSubsn = getMaxVchSubsn(serialNo);
         for (long i = startNo; i <= endNo; i++) {
             HmTxnVch hmTxnVch = new HmTxnVch();
             hmTxnVch.setPkid(UUID.randomUUID().toString());
