@@ -1,10 +1,12 @@
-package dep.hmfs.online.processor.cbs;
+package dep.hmfs.online.processor.web;
 
 import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
+import common.service.SystemService;
 import dep.hmfs.common.HmbTxnsnGenerator;
+import dep.hmfs.online.processor.cbs.CbsAbstractTxnProcessor;
 import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
@@ -27,9 +29,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
+public class WebTxn1005610Processor extends WebAbstractHmbProductBizTxnProcessor {
 
-    private static Logger logger = LoggerFactory.getLogger(CbsTxn4001Processor.class);
+    private static Logger logger = LoggerFactory.getLogger(WebTxn1005610Processor.class);
 
     @Autowired
     private TxnVouchService txnVouchService;
@@ -39,43 +41,30 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
     private HmbTxnsnGenerator hmbTxnsnGenerator;
 
     @Override
-    @Transactional
-    public TOA process(TIAHeader tiaHeader, byte[] bytes) throws InvocationTargetException, IllegalAccessException {
-
-        TIA4001 tia4001 = new TIA4001();
-        tia4001.body.billStatus = new String(bytes, 0, 1).trim();
-        tia4001.body.billStartNo = new String(bytes, 1, 12).trim();
-        tia4001.body.billEndNo = new String(bytes, 13, 12).trim();
-        if (bytes.length > 25) {
-            if (bytes.length != 43) {
-                throw new RuntimeException(CbsErrorCode.DATA_ANALYSIS_ERROR.getCode());
-            } else {
-                tia4001.body.payApplyNo = new String(bytes, 25, 18).trim();
-            }
-        }
-
-
-        /*
-       票据状态	         1	    1:领用；2:使用；3:作废
-       打印票据起始编号	12	    票据起始编号
-       打印票据结束编号	12	    票据结束编号
-       缴款通知书编号	    18	    非必填项，凭证使用时填写
-        */
-        long startNo = 0;
-        long endNo = 0;
+    protected String process(String request) {
         try {
-            startNo = Long.parseLong(tia4001.body.billStartNo);
-            endNo = Long.parseLong(tia4001.body.billEndNo);
+            processRequest(request);
         } catch (Exception e) {
-            logger.error("票据起止号码解析错误。", e);
-            throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+            logger.error("票据发送失败", e);
+            throw new RuntimeException("票据发送失败。" + CbsErrorCode.valueOf(e.getMessage()).getTitle() , e);
         }
-        if (startNo > endNo) {
-            throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
-        }
+        return "0000|票据发送成功";
+    }
 
-        if (VouchStatus.USED.getCode().equals(tia4001.body.billStatus)) {
-            List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(tia4001.body.payApplyNo,
+    @Transactional
+    private void processRequest(String request) throws Exception {
+        //发送报文
+        String[] fields = request.split("\\|");
+        //String txnCode = fields[0];
+        String applyno = fields[1];
+        String deptCode = fields[2];
+        String operCode = fields[3];
+        String vchStatus = fields[4];
+        long startNo = Long.parseLong(fields[5]);
+        long endNo = Long.parseLong(fields[6]);
+
+        if (VouchStatus.USED.getCode().equals(vchStatus)) {
+            List<HmMsgIn> payInfoList = hmbClientReqService.qrySubMsgsByMsgSnAndTypes(applyno,
                     new String[]{"01035", "01045"});
             // 检查是否存在此申请单号
             if (payInfoList.size() <= 0) {
@@ -86,15 +75,8 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             if (!TxnCtlSts.SUCCESS.getCode().equals(oriMsgIn.getTxnCtlSts())) {
                 throw new RuntimeException(CbsErrorCode.MSG_IN_SN_NOT_SUCCESS.getCode());
             }
-            /*
-           // 2012-10-16 一笔申请单对应多笔票据时，在打印完票据后，票据号可能不连续，故取消此检查
-                       【注意】由此可能产生的问题是：如果误输入另外一笔已使用票据的单笔申请单号，则会造成申请单与票据对应错误。
-           // 2012-08-01 检查该申请单号是否已使用票据
-            if (txnVouchService.isExistMsgSnVch(tia4001.body.payApplyNo)) {
-                throw new RuntimeException(CbsErrorCode.MSG_IN_SN_VCH_EXIST.getCode());
-            }*/
             //  2012-10-17 [检查]：系统内已记录使用票据数 + 当前使用数 > 该申请单缴款户数
-            int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(tia4001.body.payApplyNo);
+            int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(applyno);
             if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size()) {
                 throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
             }
@@ -110,12 +92,10 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
         boolean isSendOver = false;
         String msgSn = hmbTxnsnGenerator.generateTxnsn("5610");
         try {
-            isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, tia4001.body.payApplyNo,
-                    tia4001.body.billStatus);
+            isSendOver = hmbClientReqService.sendVouchsToHmb(msgSn, startNo, endNo, applyno, vchStatus);
             if (isSendOver) {
-                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, tiaHeader.serialNo,
-                        tiaHeader.deptCode, tiaHeader.operCode, tia4001.body.payApplyNo,
-                        tia4001.body.billStatus);
+                txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, SystemService.formatTodayByPattern("yyMMddHHMMSSsss"),
+                        deptCode, operCode, applyno, vchStatus);
             }
         } catch (Exception e) {
             logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);
@@ -125,9 +105,8 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 throw new RuntimeException(CbsErrorCode.SYSTEM_ERROR.getCode());
         }
         if (!isSendOver) {
-            logger.error("票据管理交易发送过程出现异常,前台交易流水号：" + tiaHeader.serialNo);
+            logger.error("票据管理交易发送过程出现异常");
             throw new RuntimeException(CbsErrorCode.VOUCHER_SEND_ERROR.getCode());
         }
-        return null;
     }
 }

@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .col-95 {
+                width: 95%;
+            }
+
+            .col-5 {
+                width: 5%;
+            }
+        </style>
+        <script type="text/javascript" src="#{request.contextPath}/UI/support/pub.js" charset="GBK"/>
+        <script type="text/javascript" language="javascript">
+            function doPopupPrintWindow(obj) {
+                var pkid = obj.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].innerHTML;
+                popupwindow = window.open("voucherPrint.xhtml?action=print&amp;pkid=" + pkid, "popupwindow",
+                        "height=500,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
+                popupwindow.focus;
+            }
+            function KeyDown() {
+                if (event.keyCode == 13) {
+                    event.keyCode = 9;
+                }
+            }
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <div style="margin:5px">
+            <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
+                <p:tab title="票据凭证发送">
+                    <h:form>
+                        <div id="qrytable">
+                            <p:focus for="msgsn"/>
+                            <p:messages id="msgs" showDetail="false"/>
+                            <p:panel style="margin-top:10px">
+                                <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
+                                    <h:panelGrid columns="2" cellspacing="5">
+                                        <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
+                                        <p:inputText required="true" size="25" id="msgsn"
+                                                     requiredMessage="申请单编号必须输入"
+                                                     value="#{voucherAction.msgSn}"
+                                                     onkeydown="KeyDown()"/>
+                                        <h:outputLabel value="票据起始号:" style="font-weight: bold"/>
+                                        <p:inputText required="true" size="25" id="startno"
+                                                     requiredMessage="票据起始号必须输入"
+                                                     value="#{voucherAction.startno}"
+                                                     onkeydown="KeyDown()"/>
+                                        <h:outputLabel value="票据终止号:" style="font-weight: bold"/>
+                                        <p:inputText size="25" id="endno"
+                                                     value="#{voucherAction.endno}"
+                                                     onkeydown="KeyDown()"/>
+                                        <h:outputLabel value="票据状态:" style="font-weight: bold"/>
+                                        <h:selectOneMenu value="#{voucherAction.vchSendStatus}" style="width: 184px;">
+                                            <f:selectItems value="#{voucherAction.vchStsList}"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid id="button">
+                                        <p:commandButton style="width:130px;" value="发送票据信息"
+                                                         action="#{voucherAction.onSendVoucher}"
+                                                         update="pdt,msgs">
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:panel>
+                            <p:ajaxStatus style="height:18px;text-align:center">
+                                <f:facet name="start">
+                                    <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                                </f:facet>
+                                <f:facet name="complete">
+                                    <h:outputText value=""/>
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:dataTable id="pdt" dynamic="true" style="width:100%;"
+                                         value="#{voucherAction.vchList}" var="record"
+                                         rowKey="#{record.pkid}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} [总笔数：#{voucherAction.totalCount}]"
+                                         paginator="true" rows="15" paginatorPosition="bottom"
+                                         rowsPerPageTemplate="100,50,30,15,5"
+                                         emptyMessage="数据记录为空...">
+                                <p:column style="display:none;" headerText="pkid">
+                                    <h:outputText value="#{record.pkid}"/>
+                                </p:column>
+                                <p:column headerText="缴款单号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSn}"/>
+                                </p:column>
+                                <p:column headerText="缴款子序号" style="text-align: center">
+                                    <h:outputText value="#{record.msgSubSn}"/>
+                                </p:column>
+                                <p:column headerText="业主姓名" style="text-align: center">
+                                    <h:outputText value="#{record.infoName}"/>
+                                </p:column>
+                                <p:column headerText="金额">
+                                    <h:outputText value="#{record.txnAmt1}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="资金帐号" style="text-align: center">
+                                    <h:outputText value="#{record.fundActno1}"/>
+                                </p:column>
+                                <p:column headerText="住宅地址" style="text-align: center">
+                                    <h:outputText value="#{record.infoAddr}"/>
+                                </p:column>
+                                <p:column headerText="建筑面积" style="text-align: center">
+                                    <h:outputText value="#{record.builderArea}"/>
+                                </p:column>
+
+                                <p:column headerText="交易状态" style="text-align: center">
+                                    <h:outputText
+                                            value="#{voucherAction.txnCtlSts.valueOfAlias(record.txnCtlSts).title}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+        </div>
+    </ui:define>
+</ui:composition>

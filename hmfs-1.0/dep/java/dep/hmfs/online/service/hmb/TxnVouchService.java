@@ -27,7 +27,8 @@ public class TxnVouchService {
     private HmTxnVchMapper hmTxnVchMapper;
 
     @Transactional
-    public long insertVouchsByNo(String msgSn, long startNo, long endNo, TIAHeader tiaHeader, String txnApplyNo, String vouchStatus) {
+    public long insertVouchsByNo(String msgSn, long startNo, long endNo, String serialNo,
+                                 String deptCode, String operCode, String txnApplyNo, String vouchStatus) {
         int maxSubsn = getMaxVchSubsn(tiaHeader.serialNo);
         for (long i = startNo; i <= endNo; i++) {
             HmTxnVch hmTxnVch = new HmTxnVch();
@@ -43,11 +44,11 @@ public class TxnVouchService {
             hmTxnVch.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
             hmTxnVch.setTxnCode("4001");
             hmTxnVch.setVchSts(vouchStatus);
-            hmTxnVch.setCbsTxnSn(tiaHeader.serialNo);
+            hmTxnVch.setCbsTxnSn(serialNo);
             hmTxnVch.setVchNum(String.valueOf(i));
-            hmTxnVch.setTxacBrid(tiaHeader.deptCode);
-            hmTxnVch.setOpr1No(tiaHeader.operCode);
-            hmTxnVch.setOpr2No(tiaHeader.operCode);
+            hmTxnVch.setTxacBrid(deptCode);
+            hmTxnVch.setOpr1No(operCode);
+            hmTxnVch.setOpr2No(operCode);
             hmTxnVchMapper.insertSelective(hmTxnVch);
         }
         return endNo - startNo + 1;

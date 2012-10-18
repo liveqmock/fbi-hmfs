@@ -1,19 +1,26 @@
 package hmfs.view;
 
+import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmTxnVch;
 import hmfs.common.util.JxlsManager;
 import hmfs.service.ActInfoService;
+import hmfs.service.DepService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pub.platform.system.manage.dao.PtOperBean;
 import skyline.common.utils.MessageUtil;
+import skyline.service.PlatformService;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +42,10 @@ public class VoucherAction {
     //    private HmMsgIn hmMsgIn;
     @ManagedProperty(value = "#{actInfoService}")
     private ActInfoService actInfoService;
+    @ManagedProperty(value = "#{platformService}")
+    private PlatformService platformService;
+    @ManagedProperty(value = "#{depService}")
+    private DepService depService;
 
     private String startDate = "";
     private String endDate = "";
@@ -43,16 +54,23 @@ public class VoucherAction {
     private HmTxnVch selectedTxnVch;
     private VouchStatus vouchStatus = VouchStatus.USED;
 
-    private String msgSn;
+    private String msgSn = " ";
     private String fundActno;
     private int totalCount;
     private List<HmMsgIn> subMsgList;
     private TxnCtlSts txnCtlSts = TxnCtlSts.SUCCESS;
 
+    private String startno;
+    private String endno;
+    private String vchSendStatus;
+    private List<SelectItem> vchStsList = new ArrayList<SelectItem>();
+
     @PostConstruct
     public void init() {
 //        hmMsgIn = new HmMsgIn();
 //        hmMsgIn.setBankName(" ");
+        vchStsList.add(new SelectItem(VouchStatus.USED.getCode(), VouchStatus.USED.getTitle()));
+        vchStsList.add(new SelectItem(VouchStatus.CANCEL.getCode(), VouchStatus.CANCEL.getTitle()));
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
         startDate = date;
         endDate = date;
@@ -91,7 +109,7 @@ public class VoucherAction {
         try {
             this.subMsgList = actInfoService.selectSubMsgList(msgSn);
             this.totalCount = this.subMsgList.size();
-            if(this.totalCount <= 0) {
+            if (this.totalCount <= 0) {
                 MessageUtil.addWarn("没有查询到数据记录。");
             }
         } catch (Exception e) {
@@ -100,17 +118,86 @@ public class VoucherAction {
         return null;
     }
 
-    /* public HmMsgIn getHmMsgIn() {
-
-            return hmMsgIn;
+    // 票据发送
+    public String onSendVoucher() {
+        long lstartNo = 0;
+        long lendNo = 0;
+        endno = StringUtils.isEmpty(endno) ? startno : endno;
+        try {
+            lstartNo = Long.parseLong(startno);
+            lendNo = Long.parseLong(endno);
+        } catch (Exception e) {
+            MessageUtil.addError("票据起止号码错误。");
         }
-
-        public void setHmMsgIn(HmMsgIn hmMsgIn) {
-            this.hmMsgIn = hmMsgIn;
+        try {
+            if (lstartNo > lendNo) {
+                throw new RuntimeException("票据起止号码输入错误！");
+            }
+            onQrySubMsgin();
+            PtOperBean oper = platformService.getOperatorManager().getOperator();
+            String response = depService.process("1005610|" + this.msgSn + "|"
+                    + oper.getDeptid() + "|" + oper.getOperid() + "|" + vchSendStatus
+                    + "|" + startno + "|" + endno);
+            if (response.startsWith("0000")) { //成功
+                MessageUtil.addInfo("票据发送成功。");
+            } else {
+                MessageUtil.addError("处理失败。" + response);
+            }
+        } catch (Exception e) {
+            MessageUtil.addError(e.getMessage());
         }
-        */
+        return null;
+    }
 
     // ----------------------------------------------------------
+
+    public List<SelectItem> getVchStsList() {
+        return vchStsList;
+    }
+
+    public void setVchStsList(List<SelectItem> vchStsList) {
+        this.vchStsList = vchStsList;
+    }
+
+    public PlatformService getPlatformService() {
+        return platformService;
+    }
+
+    public void setPlatformService(PlatformService platformService) {
+        this.platformService = platformService;
+    }
+
+    public DepService getDepService() {
+        return depService;
+    }
+
+    public void setDepService(DepService depService) {
+        this.depService = depService;
+    }
+
+    public String getVchSendStatus() {
+        return vchSendStatus;
+    }
+
+    public void setVchSendStatus(String vchSendStatus) {
+        this.vchSendStatus = vchSendStatus;
+    }
+
+    public String getStartno() {
+        return startno;
+    }
+
+    public void setStartno(String startno) {
+        this.startno = startno;
+    }
+
+    public String getEndno() {
+        return endno;
+    }
+
+    public void setEndno(String endno) {
+        this.endno = endno;
+    }
 
     public TxnCtlSts getTxnCtlSts() {
         return txnCtlSts;
