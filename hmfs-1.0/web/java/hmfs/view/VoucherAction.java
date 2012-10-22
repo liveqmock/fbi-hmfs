@@ -54,7 +54,7 @@ public class VoucherAction {
     private HmTxnVch selectedTxnVch;
     private VouchStatus vouchStatus = VouchStatus.USED;
 
-    private String msgSn = " ";
+    private String msgSn;
     private String fundActno;
     private int totalCount;
     private List<HmMsgIn> subMsgList;
