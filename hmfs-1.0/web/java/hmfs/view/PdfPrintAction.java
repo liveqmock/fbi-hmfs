@@ -26,6 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 基本的票据查询 状态更新处理.
@@ -54,13 +56,14 @@ public class PdfPrintAction {
         try {
             FacesContext ctx = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) ctx.getExternalContext().getResponse();
-                Document document = new Document(PageSize.A4, 19, 48, 62, 30);
+                Document document = new Document(PageSize.A4, 19, 48, 60, 30);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             PdfWriter writer = PdfWriter.getInstance(document, bos);
             writer.setPageEvent(new PdfPageEventHelper());
             document.open();
             // 组装数据
 //            document.add(transToPdfTable(msgIn, actFund));
+            //组装数据 2012-10-19
             generateTable(document,msgIn,actFund);
             document.close();
             response.reset();
@@ -95,6 +98,8 @@ public class PdfPrintAction {
         String payPart = "";
         String accountName = actFund.getInfoName() == null ? "" : actFund.getInfoName();   //21
         String txAmt = String.format("%.2f", msgIn.getTxnAmt1());
+        Map mapNum = null;
+        mapNum = this.transToRMB(txAmt);
         String address = msgIn.getInfoAddr();    //22
         String houseArea = StringUtils.isEmpty(msgIn.getBuilderArea()) ? "" : msgIn.getBuilderArea();
         // TODO 对勾符号
@@ -121,198 +126,227 @@ public class PdfPrintAction {
 
         PdfPCell cell = null;
         //日期打印
-        float[] widths = { 185f, 28f, 28f, 192f };
+        float[] widths = { 190f, 28f, 28f, 187f };
         PdfPTable table = new PdfPTable(widths);
         table.getDefaultCell().setBorder(0);//设置表格默认为无边框
         cell = new PdfPCell(new Paragraph(strYear,headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setVerticalAlignment(Element.ALIGN_TOP);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(strMonth,headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setVerticalAlignment(Element.ALIGN_TOP);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(strDay,headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setVerticalAlignment(Element.ALIGN_TOP);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setFixedHeight(17f);
+        cell.setFixedHeight(20f);
         table.addCell(cell);
         document.add(table);
         //第一行
 
-        float[] widths1 = { 51f, 190f, 67f, 125f };
+        float[] widths1 = { 51f, 190f, 87f, 105f };
         table.deleteBodyRows();
         table.setWidths(widths1);
         table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        cell = new PdfPCell(new Paragraph("业主姓名",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));  //业主姓名
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(("").equals(accountName)?accountNo:accountName,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("住宅建筑面积",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));  //住宅建筑面积
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(houseArea,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setFixedHeight(31f);
         table.addCell(cell);
         document.add(table);
 
         //第二行
-        float[] widths2 = { 51f, 269f, 28f, 85f };
+        float[] widths2 = { 51f, 272f, 40f, 70f };
         table.deleteBodyRows();
         table.setWidths(widths2);
         table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        cell = new PdfPCell(new Paragraph("住宅地址",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));  //住宅地址
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(address,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("电话：",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));  //电话
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(phoneNo,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setFixedHeight(31f);
         table.addCell(cell);
         document.add(table);
 
         //第三行
-        float[] widths3 = { 51f, 190f, 67f, 125f };
+        float[] widths3 = { 51f, 140f, 110f, 132f };
         table.deleteBodyRows();
         table.setWidths(widths3);
         table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        cell = new PdfPCell(new Paragraph("商品住宅",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));  //商品住宅
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         cell = new PdfPCell(new Paragraph(houseType,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("已售公房",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));     //已售公房
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(houseType,headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setFixedHeight(28f);
         table.addCell(cell);
         document.add(table);
 
         //第四行
-        float[] widths4 = { 51f, 190f, 67f, 125f };
-        table.deleteBodyRows();
-        table.setWidths(widths4);
-        table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        cell = new PdfPCell(new Paragraph("住宅建筑面积",headFont2));
+        float[] widths4 = { 51f,64f,30f,96f,72f,30f,90f };
+        PdfPTable table4 = new PdfPTable(widths4);
+        table4.getDefaultCell().setBorder(0);//设置表格默认为无边框
+        cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(houseArea,headFont2));
-        cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("住宅建筑面积",headFont2));
+        table4.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
+        table4.addCell(cell);
         cell = new PdfPCell(new Paragraph(houseArea,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table4.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table4.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table4.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table4.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setFixedHeight(24f);
-        table.addCell(cell);
-        document.add(table);
+        table4.addCell(cell);
+        document.add(table4);
 
         //第五行
-        float[] widths5 = { 51f, 190f, 67f, 125f };
-        table.deleteBodyRows();
-        table.setWidths(widths5);
-        table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        cell = new PdfPCell(new Paragraph("工程造价",headFont2));
+        float[] widths5 = { 51f,43f,79f,30f,46f,55f,77f,52f };
+        PdfPTable table5 = new PdfPTable(widths5);
+        table5.getDefaultCell().setBorder(0);//设置表格默认为无边框
+        cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table5.addCell(cell);
         cell = new PdfPCell(new Paragraph(projAmt,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("工程造价",headFont2));
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(projAmt,headFont2));
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph(payPart,headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table5.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setFixedHeight(24f);
-        table.addCell(cell);
-        document.add(table);
+        table5.addCell(cell);
+        document.add(table5);
 
         //第六行
-        float[] widths6 = { 51f, 34f,34f,34f,34f,34f,34f,34f,34f,34f,34f,34f, 67f };
+        float[] widths6 = { 51f, 30f,30f,30f,30f,30f,30f,30f,30f,30f,30f,30f, 52f };
         PdfPTable table6 = new PdfPTable(widths6);
         table6.getDefaultCell().setBorder(0);
-        cell = new PdfPCell(new Paragraph("交存金额",headFont2));
+        cell = new PdfPCell(new Paragraph("",headFont2));     //交存金额
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("9").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("8").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("7").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("6").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("5").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("4").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("3").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("2").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("1").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph("壹",headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("0").toString(),headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
         table6.addCell("");
         cell = new PdfPCell(new Paragraph(txAmt,headFont2));
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         cell.setFixedHeight(37f);
         table6.addCell(cell);
@@ -320,32 +354,31 @@ public class PdfPrintAction {
 
 
         //第七行
-        float[] widths7 = { 51f, 190f, 67f, 125f };
-        table.deleteBodyRows();
-        table.setWidths(widths7);
-        table.getDefaultCell().setBorder(0);//设置表格默认为无边框
-        //第一行
-        cell = new PdfPCell(new Paragraph("业主姓名",headFont2));
+        float[] widths7 = { 72f, 99f,36f,75f,28f,123f };
+        PdfPTable table7 = new PdfPTable(widths7);
+        table7.getDefaultCell().setBorder(0);
+        cell = new PdfPCell(new Paragraph("",headFont2));      //收款单位
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(("").equals(accountName)?accountNo:accountName,headFont2));
-        cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        table7.addCell(cell);
+        cell = new PdfPCell(new Paragraph(bkDeptName,headFont2));
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph("住宅建筑面积",headFont2));
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(houseArea,headFont2));
+        table7.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));        //开票人
         cell.setBorder(0);
-        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setFixedHeight(31f);
-        table.addCell(cell);
-        document.add(table);
-
+        table7.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        table7.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));    //复核
+        cell.setBorder(0);
+        table7.addCell(cell);
+        cell = new PdfPCell(new Paragraph("",headFont2));
+        cell.setBorder(0);
+        table7.addCell(cell);
+        cell.setFixedHeight(32f);
+        table7.addCell(cell);
+        document.add(table7);
     }
 
     private PdfPTable transToPdfTable(HmMsgIn msgIn, HmActFund actFund) throws IOException, DocumentException {
@@ -473,6 +506,34 @@ public class PdfPrintAction {
             rtnStrBuilder.append(rtnBytes);
         }
         return rtnStrBuilder.toString();
+    }
+
+    private Map transToRMB(String strAmt){
+        //TODO
+        char[] digit={'零','壹','贰','叁','肆','伍','陆','柒','捌','玖'};
+        char[] unit={'0','1','2','3','4','5','6','7','8','9'};
+        Map mapNum = new HashMap();
+        double  value = Double.valueOf(strAmt);
+        //转化成整形
+        long midVal = (long)(value*100);
+        //转化成字符串
+        String valStr=String.valueOf(midVal);
+        //转化成数组
+        char[] chDig = valStr.toCharArray();
+        int lenchDig = chDig.length;
+        for(int i = 0;i<10;i++){
+            String strName = "";
+            String strValue = "";
+            strName = String.valueOf(unit[i]);
+            int j = lenchDig-i-1;
+            if (j>=0){
+                strValue = String.valueOf(digit[chDig[j]-'0']);
+            } else{
+                strValue= "";
+            }
+            mapNum.put(strName,strValue);
+        }
+        return mapNum;
     }
 
     // -------------------------------
