@@ -96,7 +96,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
             //  2012-10-17 [检查]：系统内已记录使用票据数 + 当前使用数 > 该申请单缴款户数
             int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(tia4001.body.payApplyNo);
             if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size()) {
-                throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+                throw new RuntimeException(CbsErrorCode.VOUCHER_OVER_LENGTH.getCode());
             }
         }
 

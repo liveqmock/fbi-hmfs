@@ -27,6 +27,7 @@ public enum CbsErrorCode implements EnumApp {
     VOUCHER_NUM_ERROR("4001", "票据号码输入有误"),
     VOUCHER_SEND_ERROR("4002", "票据号码发送失败"),
     VOUCHER_USED("4003", "该票据已使用"),
+    VOUCHER_OVER_LENGTH("4004", "票据数量大于核算户数量"),
 
     SYS_NOT_SIGN_ON("5001", "系统未签到"),
     SYS_NOT_SIGN_OUT("5002", "系统未签退或不处于对帐完成状态"),

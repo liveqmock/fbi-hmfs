@@ -5,7 +5,6 @@ import common.repository.hmfs.dao.HmTxnVchMapper;
 import common.repository.hmfs.model.HmTxnVch;
 import common.repository.hmfs.model.HmTxnVchExample;
 import common.service.SystemService;
-import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,10 @@ public class TxnVouchService {
     @Transactional
     public long insertVouchsByNo(String msgSn, long startNo, long endNo, String serialNo,
                                  String deptCode, String operCode, String txnApplyNo, String vouchStatus) {
-        int maxSubsn = getMaxVchSubsn(serialNo);
+
+        //根据缴款编号获取已使用票据的最大子流水号
+//        int maxSubsn = getMaxVchSubsn(tiaHeader.serialNo);
+        int maxSubsn = getMaxVchSubsn(txnApplyNo);
         for (long i = startNo; i <= endNo; i++) {
             HmTxnVch hmTxnVch = new HmTxnVch();
             hmTxnVch.setPkid(UUID.randomUUID().toString());
