@@ -31,7 +31,7 @@ public class HmbServerHandler implements IServerHandler {
     @Override
     public boolean onConnect(INonBlockingConnection nbc) throws IOException,
             BufferUnderflowException {
-        String remoteName = nbc.getRemoteAddress().getHostName();
+        String remoteName = nbc.getRemoteAddress().getHostAddress();
         logger.info("【HMB本地服务端】远程主机: " + remoteName + "与本地主机建立连接！");
         return true;
     }
