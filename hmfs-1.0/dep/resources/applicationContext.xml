@@ -10,12 +10,12 @@
              http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="locations">
-        <list>
-            <value>classpath:db.properties</value>
-            <value>classpath:depcfg.properties</value>
-        </list>
-    </property>
+        <property name="locations">
+            <list>
+                <value>classpath:db.properties</value>
+                <value>classpath:depcfg.properties</value>
+            </list>
+        </property>
     </bean>
 
     <!-- 配置数据库连接池 -->
@@ -49,16 +49,22 @@
     <bean id="hmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
         <property name="port" value="${socket_watcher_port_hmb}"/>
         <property name="serverHandler" ref="hmbServerHandler"/>
+        <property name="MIN_SIZE_WORKER_POOL" value="2"/>
+        <property name="SIZE_WORKER_POOL" value="20"/>
     </bean>
 
     <bean id="cmbSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
         <property name="port" value="${socket_watcher_port_cbs}"/>
         <property name="serverHandler" ref="cbsServerHandler"/>
+        <property name="MIN_SIZE_WORKER_POOL" value="2"/>
+        <property name="SIZE_WORKER_POOL" value="10"/>
     </bean>
 
     <bean id="webSocketServer" class="dep.gateway.xsocket.server.XSocketServer">
         <property name="port" value="${socket_watcher_port_web}"/>
         <property name="serverHandler" ref="webServerHandler"/>
+        <property name="MIN_SIZE_WORKER_POOL" value="2"/>
+        <property name="SIZE_WORKER_POOL" value="10"/>
     </bean>
 
     <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->

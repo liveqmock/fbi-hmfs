@@ -46,6 +46,7 @@ public class CbsMsgHandleService implements IMessageHandler {
         // =========================================================
 
         try {
+            logger.info("【CBS本地服务端CbsMsgHandleService】接收到交易码:" + tiaHeader.txnCode);
             CbsAbstractTxnProcessor cbsTxnProcessor = (CbsAbstractTxnProcessor) ContainerManager.getBean("cbsTxn" + tiaHeader.txnCode + "Processor");
             toa = cbsTxnProcessor.run(tiaHeader, datagramBytes);
             strBuilder.append("0000");

@@ -4,8 +4,6 @@ import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
  * Created by IntelliJ IDEA.
  * User: zhangxiaobo
@@ -20,9 +18,8 @@ public class Bootstrap {
         try {
             ContainerManager.init();
             logger.info("【当前系统状态】【"+ PropertyManager.getProperty("hmfs_sys_status_flag") + "】");
-
             logger.info("====== Dep Server 初始化结束==========");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("====== Dep Server 初始化失败==========", e);
             System.exit(1);
         }

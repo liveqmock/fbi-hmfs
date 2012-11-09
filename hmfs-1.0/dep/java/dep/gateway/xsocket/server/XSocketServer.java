@@ -7,9 +7,11 @@ import org.xsocket.connection.IServer;
 import org.xsocket.connection.Server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 /**
  * 服务端
+ *
  * @author zxb
  */
 public class XSocketServer {
@@ -19,19 +21,24 @@ public class XSocketServer {
     private int port;
     private IServer server;
     private IServerHandler serverHandler;
+    private Integer MIN_SIZE_WORKER_POOL = 2;
+    private Integer SIZE_WORKER_POOL = 10;
+
 
     public XSocketServer() {
     }
+
     private void init() throws IOException {
-        this.server = new Server(port, serverHandler);
+        this.server = new Server(port, serverHandler, MIN_SIZE_WORKER_POOL, SIZE_WORKER_POOL);
         this.server.setFlushmode(FlushMode.ASYNC);   // 异步
     }
 
     public void start() throws IOException {
+        String serverinfo = "【SocketServer】 " + InetAddress.getLocalHost().getHostAddress() + ":" + port;
+        logger.info(serverinfo + "  开始启动...");
         init();
-        logger.info("【SocketServer】 " + server.getLocalAddress() + ":" + port + "  开始启动...");
-        server.start();
-        logger.info("【SocketServer】  " + server.getLocalAddress() + ":" + port + "  启动成功...");
+        this.server.start();
+        logger.info(serverinfo + "  启动成功...");
     }
 
     public boolean stop() throws IOException {
@@ -67,5 +74,21 @@ public class XSocketServer {
 
     public void setServerHandler(IServerHandler serverHandler) {
         this.serverHandler = serverHandler;
+    }
+
+    public int getMIN_SIZE_WORKER_POOL() {
+        return MIN_SIZE_WORKER_POOL;
+    }
+
+    public void setMIN_SIZE_WORKER_POOL(int MIN_SIZE_WORKER_POOL) {
+        this.MIN_SIZE_WORKER_POOL = MIN_SIZE_WORKER_POOL;
+    }
+
+    public int getSIZE_WORKER_POOL() {
+        return SIZE_WORKER_POOL;
+    }
+
+    public void setSIZE_WORKER_POOL(int SIZE_WORKER_POOL) {
+        this.SIZE_WORKER_POOL = SIZE_WORKER_POOL;
     }
 }
