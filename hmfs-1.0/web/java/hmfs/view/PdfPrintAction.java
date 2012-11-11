@@ -103,7 +103,7 @@ public class PdfPrintAction {
         String address = msgIn.getInfoAddr();    //22
         String houseArea = StringUtils.isEmpty(msgIn.getBuilderArea()) ? "" : msgIn.getBuilderArea();
         // TODO 对勾符号
-        String houseType = "1".equals(actFund.getHouseDepType()) ? "√" : "*";
+        String houseType = "1".equals(actFund.getHouseDepType()) ? "√" : "";
         String phoneNo = actFund.getHouseCustPhone() == null ? "" : actFund.getHouseCustPhone();
         String field83 = actFund.getDepStandard2();
         if (field83 == null) {
@@ -159,7 +159,7 @@ public class PdfPrintAction {
         cell.setBorder(0);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
-        cell = new PdfPCell(new Paragraph(("").equals(accountName)?accountNo:accountName,headFont2));
+        cell = new PdfPCell(new Paragraph(accountName+accountNo,headFont2));
         cell.setBorder(0);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
@@ -224,7 +224,7 @@ public class PdfPrintAction {
         document.add(table);
 
         //第四行
-        float[] widths4 = { 51f,64f,30f,96f,72f,30f,90f };
+        float[] widths4 = { 51f,64f,60f,66f,72f,30f,90f };
         PdfPTable table4 = new PdfPTable(widths4);
         table4.getDefaultCell().setBorder(0);//设置表格默认为无边框
         cell = new PdfPCell(new Paragraph("",headFont2));
@@ -259,7 +259,7 @@ public class PdfPrintAction {
         document.add(table4);
 
         //第五行
-        float[] widths5 = { 51f,43f,79f,30f,46f,55f,77f,52f };
+        float[] widths5 = { 51f,43f,79f,50f,26f,55f,77f,52f };
         PdfPTable table5 = new PdfPTable(widths5);
         table5.getDefaultCell().setBorder(0);//设置表格默认为无边框
         cell = new PdfPCell(new Paragraph("",headFont2));
@@ -360,7 +360,8 @@ public class PdfPrintAction {
         cell = new PdfPCell(new Paragraph("",headFont2));      //收款单位
         cell.setBorder(0);
         table7.addCell(cell);
-        cell = new PdfPCell(new Paragraph(bkDeptName,headFont2));
+//        cell = new PdfPCell(new Paragraph(bkDeptName,headFont2));
+        cell = new PdfPCell(new Paragraph("中国民生银行青岛分行",headFont2));
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table7.addCell(cell);

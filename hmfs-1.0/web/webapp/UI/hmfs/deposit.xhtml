@@ -122,6 +122,7 @@
 
                                 <p:column headerText="操作" style="text-align:center;">
                                     <p:commandLink value="打印凭证" style="color:blue"
+                                                   disabled ="#{!depositAction.confirmed}"
                                                    onclick="doPopupPrintWindow(this);"/>
                                 </p:column>
                             </p:dataTable>

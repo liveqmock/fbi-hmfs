@@ -6,10 +6,6 @@ import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.service.SystemService;
 import dep.hmfs.common.HmbTxnsnGenerator;
-import dep.hmfs.online.processor.cbs.CbsAbstractTxnProcessor;
-import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
-import dep.hmfs.online.processor.cbs.domain.base.TOA;
-import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.hmb.TxnVouchService;
 import org.slf4j.Logger;
@@ -18,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -78,7 +73,7 @@ public class WebTxn1005610Processor extends WebAbstractHmbProductBizTxnProcessor
             //  2012-10-17 [检查]：系统内已记录使用票据数 + 当前使用数 > 该申请单缴款户数
             int usedVchCnt = txnVouchService.qryUsedVchCntByMsgsn(applyno);
             if ((endNo - startNo + 1) + usedVchCnt > payInfoList.size()) {
-                throw new RuntimeException(CbsErrorCode.VOUCHER_NUM_ERROR.getCode());
+                throw new RuntimeException(CbsErrorCode.VOUCHER_OVER_LENGTH.getCode());
             }
         }
 

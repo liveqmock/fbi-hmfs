@@ -99,9 +99,13 @@ public class HmbMsgHandleService implements IMessageHandler {
         rtnHmbMsgList.add(summaryMsg);
         try {
             if (processor instanceof HmbSyncSubAbstractTxnProcessor) {
-                HmbMsg hmbMsg = hmbMsgList.get(0);
+//                HmbMsg hmbMsg = hmbMsgList.get(0);
                 List<HmbMsg> rtnSubHmbMsgList = hmbMsgList.subList(1, hmbMsgList.size());
+                //添加变量i，用来复制子报文2012-11-08
+                int i=1;
                 for (HmbMsg msg : rtnSubHmbMsgList) {
+                    //返回的子报文内容等于获取的子报文内容 2012-11-08
+                    HmbMsg hmbMsg = hmbMsgList.get(i);
                     SubMsg subMsg = null;
                     logger.info("msg.msgType:" + msg.getMsgType());
                     String rtnSubMsgType = StringUtils.leftPad(String.valueOf(Integer.parseInt(msg.getMsgType().substring(2)) + 1), 3, "0");
@@ -109,6 +113,7 @@ public class HmbMsgHandleService implements IMessageHandler {
                     subMsg = (SubMsg) Class.forName(SubMsg.class.getPackage().getName() + ".Msg" + rtnSubMsgType).newInstance();
                     BeanUtils.copyProperties(subMsg, hmbMsg);
                     rtnHmbMsgList.add(subMsg);
+                    i++;
                 }
             }
         } catch (Exception e) {

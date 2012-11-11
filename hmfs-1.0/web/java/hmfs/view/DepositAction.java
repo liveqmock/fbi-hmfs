@@ -114,12 +114,14 @@ public class DepositAction implements Serializable {
             }
             if (txnAmt.compareTo(this.totalAmt) != 0) {
                 this.checkPassed = false;
+                this.subMsgList = null;
                 MessageUtil.addError("交易金额不符！此申请单明细金额合计为：" + this.totalAmt.toString());
             } else {
                 //与界面输入的金额比对
                 BigDecimal msgTxnAmt = this.summaryMsg.getTxnAmt1();
                 if (msgTxnAmt.compareTo(this.txnAmt) != 0) {
                     this.checkPassed = false;
+                    this.subMsgList = null;
                     MessageUtil.addError("交易金额不符！此申请单金额为：" + msgTxnAmt.toString());
                 } else {
                     this.checkPassed = true;
