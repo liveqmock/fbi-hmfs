@@ -225,8 +225,7 @@ public class ActBookkeepingService {
         return hmTxnFundMapper.insertSelective(hmTxnFund);
     }
 
-    @Transactional
-    public int updateHmActFund(HmActFund actfund) {
+    private int updateHmActFund(HmActFund actfund) {
         HmActFund originRecord = hmActFundMapper.selectByPrimaryKey(actfund.getPkid());
         if (!originRecord.getRecversion().equals(actfund.getRecversion())) {
             logger.info("记录更新版本号：" + actfund.getRecversion());
@@ -240,8 +239,7 @@ public class ActBookkeepingService {
         }
     }
 
-    @Transactional
-    public int updateHmActStl(HmActStl actstl) {
+    private int updateHmActStl(HmActStl actstl) {
         HmActStl originRecord = hmActStlMapper.selectByPrimaryKey(actstl.getPkid());
         if (!originRecord.getRecversion().equals(actstl.getRecversion())) {
             logger.info("记录更新版本号：" + actstl.getRecversion());
