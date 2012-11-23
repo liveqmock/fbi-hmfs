@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,7 +134,8 @@ public class ActBookkeepingService {
             }
         }
         // 更新结算户账号信息
-        return hmActStlMapper.updateByPrimaryKey(hmActStl);
+        return updateHmActStl(hmActStl);
+//        return hmActStlMapper.updateByPrimaryKey(hmActStl);
     }
 
     @Transactional
@@ -191,7 +194,8 @@ public class ActBookkeepingService {
             }*/
         }
         // 更新核算账户信息
-        return hmActFundMapper.updateByPrimaryKey(hmActFund);
+        return updateHmActFund(hmActFund);
+//        return hmActFundMapper.updateByPrimaryKey(hmActFund);
     }
 
     // 新增核算账户交易明细记录
@@ -219,5 +223,35 @@ public class ActBookkeepingService {
         hmTxnFund.setOpr2No(operCode);
 
         return hmTxnFundMapper.insertSelective(hmTxnFund);
+    }
+
+    @Transactional
+    public int updateHmActFund(HmActFund actfund) {
+        HmActFund originRecord = hmActFundMapper.selectByPrimaryKey(actfund.getPkid());
+        if (!originRecord.getRecversion().equals(actfund.getRecversion())) {
+            logger.info("记录更新版本号：" + actfund.getRecversion());
+            logger.info("记录原版本号：" + originRecord.getRecversion());
+            throw new RuntimeException("记录并发更新冲突，请重试！");
+        } else {
+            // 备注中保存更新时间
+            actfund.setRemark(new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+            actfund.setRecversion(actfund.getRecversion() + 1);
+            return hmActFundMapper.updateByPrimaryKey(actfund);
+        }
+    }
+
+    @Transactional
+    public int updateHmActStl(HmActStl actstl) {
+        HmActStl originRecord = hmActStlMapper.selectByPrimaryKey(actstl.getPkid());
+        if (!originRecord.getRecversion().equals(actstl.getRecversion())) {
+            logger.info("记录更新版本号：" + actstl.getRecversion());
+            logger.info("记录原版本号：" + originRecord.getRecversion());
+            throw new RuntimeException("记录并发更新冲突，请重试！");
+        } else {
+            // 备注中保存更新时间
+            actstl.setRemark(new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+            actstl.setRecversion(actstl.getRecversion() + 1);
+            return hmActStlMapper.updateByPrimaryKey(actstl);
+        }
     }
 }
