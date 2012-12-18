@@ -1,5 +1,6 @@
 package dep.hmfs.online.service.hmb;
 
+import common.enums.CbsErrorCode;
 import common.enums.DCFlagCode;
 import common.enums.FundActnoStatus;
 import common.repository.hmfs.dao.*;
@@ -89,6 +90,17 @@ public class HmbActinfoService {
             throw new RuntimeException("查询到多个核算户！【核算户号】：" + fundActNo);
         } else {
             return actFundList.get(0);
+        }
+    }
+
+    public HmActFund qryActfundByActNo(String fundActNo) {
+        HmActFundExample example = new HmActFundExample();
+        example.createCriteria().andFundActno1EqualTo(fundActNo).andActStsNotEqualTo(FundActnoStatus.CANCEL.getCode());
+        List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
+        if (actFundList.size() == 1) {
+            return actFundList.get(0);
+        } else {
+            throw new RuntimeException(CbsErrorCode.FUND_ACT_NOT_EXIST.getCode());
         }
     }
 
