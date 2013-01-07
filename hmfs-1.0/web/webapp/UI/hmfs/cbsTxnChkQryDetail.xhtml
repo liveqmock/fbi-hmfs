@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+    <ui:define name="head">
+        <script type="text/javascript">
+            document.onkeydown = function TabReplace() {
+                if (event.keyCode == 13) {
+                    if (event.srcElement.id != 'editForm:btnSaveAdd' &amp;&amp; event.srcElement.id != 'editForm:btnSaveEdit')
+                        event.keyCode = 9;
+                }
+            }
+            function rtnScript(rtnflag,exmsg) {
+                if (rtnflag == "true") {
+                    alert("操作成功！");
+                    window.returnValue = "1";
+                    window.close();
+                } else {
+                    alert("操作失败:" + exmsg);
+                }
+            }
+
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <div style="margin:5px">
+            <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
+                <p:tab title=" 结算账户交易明细">
+                    <h:form id='myForm'>
+                        <p:dataTable id="pdtDisplay" dynamic="true" style="width:100%;"
+                                         value="#{txnChkAction .hmTxnStlList}" var="displayFromSelectedRecord"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
+                                         paginator="true" rows="5" paginatorPosition="bottom"
+                                         rowsPerPageTemplate="100,50,30,15,5"
+                                         emptyMessage="数据记录为空...">
+                                <p:column headerText="申请单号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.txnSn}"/>
+                                </p:column>
+                                <p:column headerText="结算账号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.stlActno}"/>
+                                </p:column>
+                                <p:column headerText="会计账号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.cbsActno}"/>
+                                </p:column>
+                                <p:column headerText="主机流水号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.cbsTxnSn}"/>
+                                </p:column>
+                                <p:column headerText="交易金额">
+                                    <h:outputText value="#{displayFromSelectedRecord.txnAmt==0? '':displayFromSelectedRecord.txnAmt}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="本笔交易时间" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.txnDate} #{displayFromSelectedRecord.txnTime}"/>
+                                </p:column>
+                                <p:column headerText="交易码" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.txnCode}"/>
+                                </p:column>
+                                <p:column headerText="记帐员号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.opr1No}"/>
+                                </p:column>
+                                <p:column headerText="复核员号" style="text-align: center">
+                                    <h:outputText value="#{displayFromSelectedRecord.opr2No}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+        </div>
+    </ui:define>
+</ui:composition>
