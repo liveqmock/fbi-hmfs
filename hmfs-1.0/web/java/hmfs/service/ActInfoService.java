@@ -72,6 +72,9 @@ public class ActInfoService {
     private HmActFundMapper hmActFundMapper;
 
     @Resource
+    private HmTxnStlMapper hmTxnStlMapper;
+
+    @Resource
     private PlatformService platformService;
 
     public HmSysCtl getAppSysStatus() {
@@ -96,7 +99,6 @@ public class ActInfoService {
         List<HmActStl> actStlList = actStlMapper.selectByExample(example);
         return actStlList;
     }
-
 
     //全部核算户余额
     public List<HmActFund> selectAllFundActBalList(ActinfoQryParam param) {
@@ -321,4 +323,16 @@ public class ActInfoService {
         example.setOrderByClause(" txac_brid,opr1_no,txn_date ");
         return hmTxnVchMapper.selectByExample(example);
     }
+
+    //根据主机流水号查询申请单号(从结算账户交易明细表)
+    public List<HmTxnStl> selectHmTxnStlAccordingToMsgSn(String strMsgSn)  {
+        HmTxnStlExample example = new HmTxnStlExample();
+        example.createCriteria().andCbsTxnSnEqualTo(strMsgSn);
+        return hmTxnStlMapper.selectByExample(example);
+    }
+
+    public HmChkTxn selectHmChkTxnByPkid(String strPkid) {
+        return hmChkTxnMapper.selectByPrimaryKey(strPkid) ;
+    }
+
 }

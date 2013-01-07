@@ -2,12 +2,16 @@ package hmfs.view;
 
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
+import common.repository.hmfs.model.HmChkTxn;
 import common.repository.hmfs.model.HmSysCtl;
+import common.repository.hmfs.model.HmTxnStl;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
 import hmfs.service.DepService;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import skyline.common.utils.MessageUtil;
@@ -16,11 +20,13 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水对帐处理
@@ -45,6 +51,11 @@ public class TxnChkAction implements Serializable {
     private HmChkTxnVO selectedRecord;
     private HmChkTxnVO[] selectedRecords;
 
+    //查询到的交易明细对账结果表数据
+    private List<HmTxnStl> hmTxnStlList;
+
+    private HmChkTxn hmChkTxn ;
+
     private int totalCount;
     private int totalErrorCount;
     private int totalSuccessCount;
@@ -68,6 +79,23 @@ public class TxnChkAction implements Serializable {
         this.qryParam.setStartDate(date);
         this.qryParam.setEndDate(date);
         this.qryParam.setActnoStatus(FundActnoStatus.NORMAL.getCode());
+
+        // hanjianlong add 20130106 start
+        Map<String, String> paramsmap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        String pkid = paramsmap.get("pkid1");
+        String action = paramsmap.get("action");
+        logger.info("PKID: " + pkid + " ACTION:" + action);
+
+        if(!StringUtils.isEmpty(pkid)) {
+            //获得选择的行对象
+            hmChkTxn = actInfoService .selectHmChkTxnByPkid(pkid);
+            //获得所选行对象的[流水编号]
+            String strMsgSn = hmChkTxn.getMsgSn();
+            strMsgSn = strMsgSn == null ? "" : strMsgSn;
+            //根据流水编号查询交易明细对账结果表
+            hmTxnStlList = actInfoService.selectHmTxnStlAccordingToMsgSn(strMsgSn);
+        }
+        // hanjianlong add 20130106 end
 
         HmSysCtl hmSysCtl = appMngService.getAppSysStatus();
         this.bankId = hmSysCtl.getBankId();
@@ -129,7 +157,29 @@ public class TxnChkAction implements Serializable {
         return null;
     }
 
+    public void onRowSelect(SelectEvent event) {
+        try {
+            //获得选择的行对象
+            selectedRecord = (HmChkTxnVO) event.getObject();
+            //获得所选行对象的[流水编号]
+            String strMsgSn = selectedRecord.getMsgSn1();
+            strMsgSn = strMsgSn == null ? "" : strMsgSn;
+            //根据流水编号查询交易明细对账结果表
+            hmTxnStlList = actInfoService.selectHmTxnStlAccordingToMsgSn(strMsgSn);
+        } catch (Exception e) {
+            MessageUtil.addError("处理失败。" + e.getMessage());
+        }
+    }
+
     //=============================
+
+    public List<HmTxnStl> getHmTxnStlList() {
+        return hmTxnStlList;
+    }
+
+    public void setHmTxnStlList(List<HmTxnStl> hmTxnStlList) {
+        this.hmTxnStlList = hmTxnStlList;
+    }
 
     public String getSysDate() {
         return sysDate;

@@ -14,6 +14,18 @@
                 width: 5%;
             }
         </style>
+        <script type="text/javascript" src="#{request.contextPath}/UI/support/pub.js"/>
+        <script type="text/javascript">
+            function actSelect(obj) {
+                var pkid = obj.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].innerHTML;
+                var sfeature = "dialogwidth:1000px; dialogheight:300px;center:yes;location:no;help:no;resizable:no;scroll:yes;status:no";
+                var arg = new Object();
+                arg.doType = "select";
+                arg.pkid = pkid;
+                var rtn = window.showModalDialog("cbsTxnChkQryDetail.xhtml?doType=select&amp;pkid1="+pkid, arg, sfeature);
+            }
+
+        </script>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
@@ -62,11 +74,14 @@
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
+                                <!-- <p:ajax event="rowSelect" listener="#{txnChkAction.onRowSelect}"  update=':tabview:myForm:pdtDisplay' oncomplete="txnDialog.show()" /> -->
+                                <!--<p:ajax event="rowSelect" listener="#{txnChkAction.onRowSelect}"  update=':tabview:myForm:pdtDisplay' oncomplete="actSelect(this)" /> -->
                                 <p:columnGroup type="header">
                                     <p:row>
                                         <p:column rowspan="2" headerText="交易日期" />
                                         <p:column colspan="4" headerText="主机端数据" />
                                         <p:column colspan="4" headerText="维修资金管理平台数据" />
+                                        <p:column rowspan="2" headerText="操作" />
                                     </p:row>
                                     <p:row>
                                         <p:column headerText="帐号" />
@@ -79,6 +94,9 @@
                                         <p:column headerText="借贷别" />
                                     </p:row>
                                 </p:columnGroup>
+                                <p:column headerText="pkid" style="display:none">
+                                    <h:outputText value="#{record.pkid1}"/>
+                                </p:column>
                                 <p:column headerText="交易日期" style="text-align: center">
                                     <h:outputText value="#{txnChkAction.qryParam.startDate}"/>
                                 </p:column>
@@ -110,7 +128,52 @@
                                 <p:column headerText="借贷别" style="text-align: center">
                                     <h:outputText value="#{record.dcFlag2}"/>
                                 </p:column>
+                                <p:column headerText="操作" style="width:50px;text-align:center">
+                                    <p:commandLink style="color:blue;" value="详细" onclick="actSelect(this)">
+                                    </p:commandLink>
+                                </p:column>
                             </p:dataTable>
+
+                            <p:dialog id="dialog" header="结算账户交易明细" widgetVar="txnDialog" showEffect="explode"
+                                      hideEffect="explode"  resizable='false'>
+                                <p:dataTable id="pdtDisplay" dynamic="true" style="width:100%;"
+                                             value="#{txnChkAction .hmTxnStlList}" var="displayFromSelectedRecord"
+                                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
+                                             paginator="true" rows="5" paginatorPosition="bottom"
+                                             rowsPerPageTemplate="100,50,30,15,5"
+                                             emptyMessage="数据记录为空...">
+                                    <p:column headerText="申请单号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.txnSn}"/>
+                                    </p:column>
+                                    <p:column headerText="结算账号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.stlActno}"/>
+                                    </p:column>
+                                    <p:column headerText="会计账号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.cbsActno}"/>
+                                    </p:column>
+                                    <p:column headerText="主机流水号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.cbsTxnSn}"/>
+                                    </p:column>
+                                    <p:column headerText="交易金额">
+                                        <h:outputText value="#{displayFromSelectedRecord.txnAmt==0? '':displayFromSelectedRecord.txnAmt}" style="float: right">
+                                            <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="本笔交易时间" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.txnDate} #{displayFromSelectedRecord.txnTime}"/>
+                                    </p:column>
+                                    <p:column headerText="交易码" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.txnCode}"/>
+                                    </p:column>
+                                    <p:column headerText="记帐员号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.opr1No}"/>
+                                    </p:column>
+                                    <p:column headerText="复核员号" style="text-align: center">
+                                        <h:outputText value="#{displayFromSelectedRecord.opr2No}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:dialog>
+
                         </div>
                     </h:form>
                 </p:tab>
