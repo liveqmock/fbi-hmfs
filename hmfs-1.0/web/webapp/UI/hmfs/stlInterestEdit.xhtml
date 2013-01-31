@@ -15,11 +15,18 @@
                 width: 5%;
             }
         </style>
+        <script type="text/javascript">
+            function doPopupWindow(obj) {
+                var pkid = obj.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].innerHTML;
+                popupwindow = window.open("stlIntaccForm.xhtml?action=edit&amp;pkid=" + pkid, "popupwindow", "height=600,width=800,left=200,top=100,toolbar=no,menubar=no,scrollbars=yes,location=no");
+                popupwindow.focus;
+            }
+        </script>
     </ui:define>
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="重复交易流水信息查询">
+                <p:tab title="结算账户计息明细">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
@@ -27,19 +34,19 @@
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="结算帐号:" style="font-weight: bold"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
+                                        <p:inputText readonly="true" value="#{stlActintAction.cbsActno}"/>
                                         <h:outputLabel value="起始日期:" for="startDate" style="font-weight: bold"/>
                                         <p:inputText id="startDate" required="true"
-                                                     value="#{actInfoAction.qryParam.startDate}"
+                                                     value="#{stlActintAction.startDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
                                         <h:outputLabel value="结束日期:" for="endDate" style="font-weight: bold"/>
                                         <p:inputText id="endDate" required="true"
-                                                     value="#{actInfoAction.qryParam.endDate}"
+                                                     value="#{stlActintAction.endDate}"
                                                      onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton style="width:120px;" value="查询交易明细"
-                                                         action="#{actInfoAction.onQueryCbsDblDetl}"
+                                        <p:commandButton style="width:120px;" value="查询计息明细"
+                                                         action="#{stlActintAction.onQueryIntTxnStls}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -54,14 +61,17 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{actInfoAction.stlDetlDblList}" var="record"
+                                         value="#{stlActintAction.intTxnStlList}" var="record"
                                          rowKey="#{record.pkid}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
+                                <p:column style="display:none;" headerText="pkid">
+                                    <h:outputText value="#{record.pkid}"/>
+                                </p:column>
                                 <p:column headerText="帐号" style="text-align: center">
-                                    <h:outputText value="#{record.stlActno}"/>
+                                    <h:outputText value="#{record.cbsActno}"/>
                                 </p:column>
                                 <p:column headerText="交易流水号" style="text-align: center">
                                     <h:outputText value="#{record.txnSn}"/>
@@ -78,8 +88,18 @@
                                 <p:column headerText="交易时间" style="text-align: center">
                                     <h:outputText value="#{record.txnDate} #{record.txnTime}"/>
                                 </p:column>
+                                <p:column headerText="上日余额">
+                                    <h:outputText value="#{record.lastActBal}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
                                 <p:column headerText="备注" style="text-align: left">
                                     <h:outputText value="#{record.remark}"/>
+                                </p:column>
+                                <p:column headerText="操作" style="width:50px;text-align:center">
+                                    <p:commandLink style="color:blue;" value="修改"
+                                                   onclick="doPopupWindow(this);">
+                                    </p:commandLink>
                                 </p:column>
                             </p:dataTable>
                         </div>

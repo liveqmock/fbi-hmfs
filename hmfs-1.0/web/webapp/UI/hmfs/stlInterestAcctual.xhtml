@@ -19,27 +19,33 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="结算账户明细信息查询">
+                <p:tab title="结算帐户计息">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
-                            <p:panel style="margin-top:10px">
+                            <p:panel id="panel" style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
-                                        <h:outputLabel value="结算帐号:" style="font-weight: bold"/>
-                                        <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
-                                        <h:outputLabel value="起始日期:" for="startDate" style="font-weight: bold"/>
-                                        <p:inputText id="startDate" required="true"
-                                                     value="#{actInfoAction.qryParam.startDate}"
-                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
-                                        <h:outputLabel value="结束日期:" for="endDate" style="font-weight: bold"/>
-                                        <p:inputText id="endDate" required="true"
-                                                     value="#{actInfoAction.qryParam.endDate}"
-                                                     onclick="WdatePicker({dateFmt:'yyyyMMdd'})"/>
+                                        <h:outputLabel value="结算帐号:" style="font-weight: bold;"/>
+                                        <p:inputText required="true" value="#{stlActintAction.cbsActno}" style="width: 176px;"/>
+                                        <h:outputLabel value="计息金额:" style="font-weight: bold"/>
+                                        <p:inputText id="amt" size="25"
+                                                     autocomplete="false" required="true"
+                                                     value="#{stlActintAction.intamt}"
+                                                     requiredMessage="计息金额不能为空。"
+                                                     validatorMessage="请输入正确的金额格式。">
+                                            <f:convertNumber for="amt" maxFractionDigits="2" maxIntegerDigits="9"
+                                                             pattern="###,###,###,##0.00"/>
+                                        </p:inputText>
+                                        <h:outputLabel value="计息日期:" style="font-weight: bold"/>
+                                        <p:inputText required="true" size="25"
+                                                     requiredMessage="计息日期不能为空。"
+                                                     onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                     value="#{stlActintAction.intDate}"/>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton style="width:120px;" value="查询交易明细"
-                                                         action="#{actInfoAction.onQueryCbsDetl}"
+                                        <p:commandButton style="width:90px;" value="确认计息"
+                                                         action="#{stlActintAction.onAcctualInt}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -54,39 +60,36 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{actInfoAction.stlDetlList}" var="record"
+                                         value="#{stlActintAction.actStlList}" var="record"
                                          rowKey="#{record.pkid}"
-                                         selection="#{actInfoAction.selectedStlDetlRecord}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          paginator="true" rows="15" paginatorPosition="bottom"
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
-                                <p:column selectionMode="multiple" style="width:18px"/>
                                 <p:column headerText="帐号" style="text-align: center">
                                     <h:outputText value="#{record.cbsActno}"/>
                                 </p:column>
-                                <p:column headerText="交易流水号" style="text-align: center">
-                                    <h:outputText value="#{record.txnSn}"/>
+                                <p:column headerText="户名" style="text-align: center">
+                                    <h:outputText value="#{record.cbsActname}"/>
                                 </p:column>
-                                <p:column headerText="交易金额">
-                                    <h:outputText value="#{record.txnAmt}" style="float: right">
+                                <p:column headerText="维修资金余额">
+                                    <h:outputText value="#{record.actBal}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
-                                <p:column headerText="缴费/支取" style="text-align: center">
+                                <p:column headerText="利息总额">
+                                    <h:outputText value="#{record.intAmt}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="总余额">
+                                    <h:outputText value="#{record.actBal.add(record.intAmt)}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="帐户状态" style="text-align: center">
                                     <h:outputText
-                                            value="#{actInfoAction.dcFlagCode.valueOfAlias(record.dcFlag).title}"/>
-                                </p:column>
-                                <p:column headerText="交易时间" style="text-align: center">
-                                    <h:outputText value="#{record.txnDate} #{record.txnTime}"/>
-                                </p:column>
-                                <p:column headerText="上日余额">
-                                    <h:outputText value="#{record.lastActBal}" style="float: right">
-                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="备注" style="text-align: left">
-                                    <h:outputText value="#{record.remark}"/>
+                                            value="#{stlActintAction.fundActnoStatus.valueOfAlias(record.actSts).title}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

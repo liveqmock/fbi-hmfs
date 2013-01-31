@@ -26,16 +26,16 @@
                             <p:panel style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
-                                        <h:outputLabel value="结算帐号:"  style="font-weight: bold"/>
+                                        <h:outputLabel value="结算帐号:" style="font-weight: bold"/>
                                         <p:inputText required="true" value="#{actInfoAction.qryParam.cbsActno}"/>
-                                        <h:outputLabel value="帐号状态:"  style="font-weight: bold"/>
+                                        <h:outputLabel value="帐号状态:" style="font-weight: bold"/>
                                         <h:selectOneMenu style="width:153px;"
                                                          value="#{actInfoAction.qryParam.actnoStatus}">
                                             <f:selectItems value="#{actInfoAction.actnoStatusList}"/>
                                         </h:selectOneMenu>
                                     </h:panelGrid>
                                     <h:panelGrid>
-                                        <p:commandButton  style="width:90px;" value="查询余额"
+                                        <p:commandButton style="width:90px;" value="查询余额"
                                                          action="#{actInfoAction.onQueryCbsBal}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
@@ -65,8 +65,18 @@
                                 <p:column headerText="户名" style="text-align: center">
                                     <h:outputText value="#{record.cbsActname}"/>
                                 </p:column>
-                                <p:column headerText="余额">
+                                <p:column headerText="维修资金余额">
                                     <h:outputText value="#{record.actBal}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="利息总额">
+                                    <h:outputText value="#{record.intAmt}" style="float: right">
+                                        <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="总余额">
+                                    <h:outputText value="#{record.actBal.add(record.intAmt)}" style="float: right">
                                         <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
                                     </h:outputText>
                                 </p:column>
@@ -81,4 +91,4 @@
             </p:tabView>
         </div>
     </ui:define>
-   </ui:composition>
+</ui:composition>

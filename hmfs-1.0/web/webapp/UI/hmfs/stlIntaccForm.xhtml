@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .input-col-m {
+                width: 60px;
+            }
+
+            .input-col-l {
+                width: 80px;
+            }
+
+            .input-col-xxl {
+                width: 1%;
+                text-align: right;
+            }
+
+            .col-95 {
+                text-align: right;
+            }
+
+            .col-5 {
+                text-align: left;
+            }
+        </style>
+        <script type="text/javascript" language="javascript">
+            document.onkeydown = function TabReplace() {
+                if (event.keyCode == 13) {
+                    if (event.srcElement.tagName != 'BUTTON')
+                        event.keyCode = 9;
+                    else
+                        event.srcElement.click();
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <div style="margin:5px;">
+            <h:form id="form">
+                <p:growl id="msgs" showDetail="false"/>
+                <p:panel id="input" header="【计息金额修改】表单">
+                    <h:panelGrid columns="2" cellspacing="5">
+                        <h:outputLabel value="结算帐号:" style="font-weight: bold;"/>
+                        <p:inputText required="true" value="#{stlActintAction.cbsActno}"
+                                     style="width: 171px;"/>
+                        <h:outputLabel value="计息金额:" for="intamt" style="font-weight: bold"/>
+                        <p:inputText id="intamt" size="25"
+                                     autocomplete="false" required="true"
+                                     value="#{stlActintAction.intamt}"
+                                     requiredMessage="计息金额不能为空。"
+                                     validatorMessage="请输入正确的金额格式。">
+                            <f:convertNumber for="intamt" maxFractionDigits="2" maxIntegerDigits="9"
+                                             pattern="###,###,###,##0.00"/>
+                        </p:inputText>
+                        <h:outputLabel value="计息日期:" style="font-weight: bold"/>
+                        <p:inputText required="true" size="25"
+                                     requiredMessage="计息日期不能为空。"
+                                     onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                     value="#{stlActintAction.intDate}"/>
+
+                    </h:panelGrid>
+                    <h:panelGrid style="width: 20%" columns="2">
+                        <p:commandButton id="saveBtn" ajax="true" value="确认修改"
+                                         action="#{stlActintAction.onIntTxnEdit}"
+                                         style="margin-left:236px;width:90px"
+                                         update="msgs,pdt,input">
+                        </p:commandButton>
+                        <p:commandButton ajax="true" id="clsBtn" value="关闭" onclick="window.close();"
+                                         style="width:90px;margin-left:15px" update="msgs"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:ajaxStatus style="height:18px;text-align:center">
+                    <f:facet name="start">
+                        <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                    </f:facet>
+                    <f:facet name="complete">
+                        <h:outputText value=""/>
+                    </f:facet>
+                </p:ajaxStatus>
+                <p:dataTable id="pdt" dynamic="true" style="width:100%;"
+                             value="#{stlActintAction.actStlList}" var="record"
+                             rowKey="#{record.pkid}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             paginator="true" rows="15" paginatorPosition="bottom"
+                             rowsPerPageTemplate="100,50,30,15,5"
+                             emptyMessage="数据记录为空...">
+                    <p:column headerText="帐号" style="text-align: center">
+                        <h:outputText value="#{record.cbsActno}"/>
+                    </p:column>
+                    <p:column headerText="户名" style="text-align: center">
+                        <h:outputText value="#{record.cbsActname}"/>
+                    </p:column>
+                    <p:column headerText="维修资金余额">
+                        <h:outputText value="#{record.actBal}" style="float: right">
+                            <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="利息总额">
+                        <h:outputText value="#{record.intAmt}" style="float: right">
+                            <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="总余额">
+                        <h:outputText value="#{record.actBal.add(record.intAmt)}" style="float: right">
+                            <f:convertNumber type="number" pattern="#,###,###,###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="帐户状态" style="text-align: center">
+                        <h:outputText
+                                value="#{stlActintAction.fundActnoStatus.valueOfAlias(record.actSts).title}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

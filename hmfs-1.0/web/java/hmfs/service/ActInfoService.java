@@ -1,8 +1,6 @@
 package hmfs.service;
 
-import common.enums.FundActType;
-import common.enums.FundActnoStatus;
-import common.enums.TxnCtlSts;
+import common.enums.*;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import common.repository.hmfs.dao.hmfs.HmWebTxnMapper;
@@ -10,16 +8,23 @@ import common.repository.hmfs.model.*;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
+import common.service.SystemService;
 import hmfs.common.model.ActinfoQryParam;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pub.platform.security.OperatorManager;
 import skyline.service.PlatformService;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,6 +84,10 @@ public class ActInfoService {
 
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
+    }
+
+    public HmTxnStl selectTxnStlByPkid(String pkid) {
+        return txnStlMapper.selectByPrimaryKey(pkid);
     }
 
     public String selectStlActno() {
@@ -325,14 +334,120 @@ public class ActInfoService {
     }
 
     //根据主机流水号查询申请单号(从结算账户交易明细表)
-    public List<HmTxnStl> selectHmTxnStlAccordingToMsgSn(String strMsgSn)  {
+    public List<HmTxnStl> selectHmTxnStlAccordingToMsgSn(String strMsgSn) {
         HmTxnStlExample example = new HmTxnStlExample();
         example.createCriteria().andCbsTxnSnEqualTo(strMsgSn);
         return hmTxnStlMapper.selectByExample(example);
     }
 
     public HmChkTxn selectHmChkTxnByPkid(String strPkid) {
-        return hmChkTxnMapper.selectByPrimaryKey(strPkid) ;
+        return hmChkTxnMapper.selectByPrimaryKey(strPkid);
     }
 
+    public List<HmActStl> qryActStlsByCbsActno(String cbsActno) {
+        HmActStlExample example = new HmActStlExample();
+        example.createCriteria().andCbsActnoEqualTo(cbsActno);
+        return actStlMapper.selectByExample(example);
+    }
+
+    // 计息
+    @Transactional
+    public void intAcctual(String cbsTxnSn, String cbsActno, String intDate, BigDecimal intamt) {
+        OperatorManager om = platformService.getOperatorManager();
+        HmActStl actStl = qryActStlsByCbsActno(cbsActno).get(0);
+        // 更新计息金额
+        stlActAddInt(actStl, intDate, intamt);
+        // 计息明细
+        addTxnStl(cbsTxnSn, om.getOperator().getDeptid(), om.getOperatorId(), intDate, actStl, intamt);
+    }
+
+    private int stlActAddInt(HmActStl hmActStl, String intDate, BigDecimal intamt) {
+
+        hmActStl.setIntAmt(intamt.add(hmActStl.getIntAmt()));
+        hmActStl.setRemark("计息" + intDate);
+        return updateHmActStl(hmActStl);
+    }
+
+    // 计息明细
+    private int addTxnStl(String cbsTxnSn, String deptCode, String operCode, String intDate,
+                          HmActStl hmActStl, BigDecimal intamt) {
+        // 新增结算户账户交易明细记录
+        HmTxnStl hmTxnStl = new HmTxnStl();
+        hmTxnStl.setPkid(UUID.randomUUID().toString());
+        hmTxnStl.setCbsTxnSn(cbsTxnSn);
+        hmTxnStl.setTxnSn(hmTxnStl.getCbsTxnSn());   // TODO msgsn
+        hmTxnStl.setStlActno(hmActStl.getSettleActno1());
+        hmTxnStl.setTxnSubSn(1);
+        hmTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        hmTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
+        hmTxnStl.setTxnCode("0000");
+        hmTxnStl.setCbsActno(hmActStl.getCbsActno());
+        hmTxnStl.setOpacBrid(hmActStl.getBranchId());
+        hmTxnStl.setTxnAmt(intamt);
+        hmTxnStl.setDcFlag(DCFlagCode.DEPOSIT.getCode());
+        hmTxnStl.setReverseFlag("0");
+        hmTxnStl.setLastActBal(hmActStl.getLastActBal());
+        hmTxnStl.setRemark(intDate + "计息");
+        // 新增网点号和柜员号
+        hmTxnStl.setTxacBrid(deptCode);
+        hmTxnStl.setOpr1No(operCode);
+        hmTxnStl.setOpr2No(operCode);
+        return hmTxnStlMapper.insertSelective(hmTxnStl);
+    }
+
+    //结算户计息交易明细
+    public List<HmTxnStl> selectStlIntTxns(String cbsActno, String startDate, String endDate) {
+        HmTxnStlExample example = new HmTxnStlExample();
+        example.createCriteria()
+                .andCbsActnoEqualTo(cbsActno).andTxnCodeEqualTo("0000")
+                .andTxnDateBetween(startDate, endDate).andTxnStsIsNull();
+        example.or().andCbsActnoEqualTo(cbsActno).andTxnCodeEqualTo("0000")
+                .andTxnDateBetween(startDate, endDate).andTxnStsNotEqualTo("1");
+        example.setOrderByClause("stl_actno, txn_date, txn_time");
+        return txnStlMapper.selectByExample(example);
+    }
+
+    //  计息修改 删除旧笔明细，新增新笔计息明细
+    @Transactional
+    public int updateNewIntacc(HmTxnStl intTxnStl, BigDecimal intamt, String intDate) throws Exception {
+        // 生成新计息明细
+        /*HmTxnStl newIntTxnStl = new HmTxnStl();
+        BeanUtils.copyProperties(newIntTxnStl, intTxnStl);
+        newIntTxnStl.setCbsTxnSn(SystemService.formatTodayByPattern("yyMMddHHMMSSsss"));
+        newIntTxnStl.setPkid(UUID.randomUUID().toString());
+        newIntTxnStl.setTxnAmt(intamt);
+        newIntTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        newIntTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
+        newIntTxnStl.setRemark(intDate + "计息");*/
+       /* //  删除旧明细
+        intTxnStl.setTxnSts("1");
+        txnStlMapper.updateByPrimaryKey(intTxnStl);*/
+
+        // 更新结算户利息金额
+        HmActStl actStl = qryActStlsByCbsActno(intTxnStl.getCbsActno()).get(0);
+        actStl.setRemark("计息修改" + new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+        actStl.setIntAmt(actStl.getIntAmt().add(intamt).subtract(intTxnStl.getTxnAmt()));
+
+        intTxnStl.setTxnAmt(intamt);
+        intTxnStl.setTxnDate(SystemService.formatTodayByPattern("yyyyMMdd"));
+        intTxnStl.setTxnTime(SystemService.formatTodayByPattern("HHmmss"));
+        intTxnStl.setRemark(intDate + "修改计息");
+
+//        return txnStlMapper.insertSelective(newIntTxnStl) + txnStlMapper.updateByPrimaryKey(intTxnStl) + updateHmActStl(actStl);
+        return txnStlMapper.updateByPrimaryKey(intTxnStl) + updateHmActStl(actStl);
+    }
+
+    private int updateHmActStl(HmActStl actstl) {
+        HmActStl originRecord = actStlMapper.selectByPrimaryKey(actstl.getPkid());
+        if (!originRecord.getRecversion().equals(actstl.getRecversion())) {
+            throw new RuntimeException("记录并发更新冲突，请重试！");
+        } else {
+            // 备注中保存更新时间
+            if (StringUtils.isEmpty(actstl.getRemark())) {
+                actstl.setRemark(new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+            }
+            actstl.setRecversion(actstl.getRecversion() + 1);
+            return actStlMapper.updateByPrimaryKey(actstl);
+        }
+    }
 }
