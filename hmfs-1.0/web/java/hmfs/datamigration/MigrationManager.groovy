@@ -25,7 +25,7 @@ class MigrationManager {
 
         println("==== " + new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()) + " 开始数据移植...=======")
 
-        //初始化本地业务表和系统控制表
+        //初始化本地业务表和系统控制表高规格                                                         g
         mig.initBizDBTable()
         mig.initSystemCtrlTable()
 
@@ -85,16 +85,16 @@ class MigrationManager {
 
     def processSqlFile(){
         println "\t3.开始修改SQL文件..."
-        processSqlFile("real_acct.sql", "mig_real_acct.sql", "Insert into QDHMFMS.REAL_ACCT", "Insert into MIG_REAL_ACCT");
-        processSqlFile("acct.sql", "mig_acct.sql", "Insert into QDHMFMS.ACCT", "Insert into MIG_ACCT");
-        processSqlFile("acct_water.sql", "mig_acct_water.sql", "Insert into QDHMFMS.ACCT_WATER", "Insert into MIG_ACCT_WATER");
-        processSqlFile("base_info.sql", "mig_base_info.sql", "Insert into QDHMFMS.BASE_INFO", "Insert into MIG_BASE_INFO");
-        processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into QDHMFMS.HOU_INFO", "Insert into MIG_HOU_INFO");
-        processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into QDHMFMS.OWNER_INFO", "Insert into MIG_OWNER_INFO");
-        processSqlFile("pay_detail_all.sql", "mig_pay_detail_all.sql", "Insert into QDHMFMS.PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
-        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL.TRADE", "Insert into MIG_PAY_DETAIL");
-        processSqlFile("base_info_oper.sql", "mig_base_info_oper.sql", "Insert into QDHMFMS.BASE_INFO_OPER", "Insert into MIG_BASE_INFO_OPER");
-        processSqlFile("trade.sql", "mig_trade.sql", "Insert into QDHMFMS.TRADE", "Insert into MIG_TRADE");
+        processSqlFile("real_acct.sql", "mig_real_acct.sql", "Insert into REAL_ACCT", "Insert into MIG_REAL_ACCT");
+        processSqlFile("acct.sql", "mig_acct.sql", "Insert into ACCT", "Insert into MIG_ACCT");
+        processSqlFile("acct_water.sql", "mig_acct_water.sql", "Insert into ACCT_WATER", "Insert into MIG_ACCT_WATER");
+        processSqlFile("base_info.sql", "mig_base_info.sql", "Insert into BASE_INFO", "Insert into MIG_BASE_INFO");
+        processSqlFile("hou_info.sql", "mig_hou_info.sql", "Insert into HOU_INFO", "Insert into MIG_HOU_INFO");
+        processSqlFile("owner_info.sql", "mig_owner_info.sql", "Insert into OWNER_INFO", "Insert into MIG_OWNER_INFO");
+        processSqlFile("pay_detail_all.sql", "mig_pay_detail_all.sql", "Insert into PAY_DETAIL", "Insert into MIG_PAY_DETAIL_ALL");
+        processSqlFile("pay_detail.sql", "mig_pay_detail.sql", "Insert into PAY_DETAIL", "Insert into MIG_PAY_DETAIL");
+        processSqlFile("base_info_oper.sql", "mig_base_info_oper.sql", "Insert into BASE_INFO_OPER", "Insert into MIG_BASE_INFO_OPER");
+        processSqlFile("trade.sql", "mig_trade.sql", "Insert into TRADE", "Insert into MIG_TRADE");
         println "\t3.修改SQL文件结束。\n"
     }
 

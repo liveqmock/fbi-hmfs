@@ -87,6 +87,9 @@ public class RefundAction implements Serializable {
     //ÍË¿î²éÑ¯
     public String onQuery() {
         try {
+            if (!checkMsgsn()){
+                return null;
+            }
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
             TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
             if (!txnCtlSts.equals(TxnCtlSts.INIT)) {
@@ -152,7 +155,20 @@ public class RefundAction implements Serializable {
             }
         }
     }
-
+    //¼ì²éÉêÇëµ¥±àºÅ
+    private boolean checkMsgsn(){
+        if(msgSn.length()!=18){
+            MessageUtil.addError("ÉêÇëµ¥±àºÅÊÇ18Î»µÄ±àÂë£¬Çë¼ì²é£¡");
+            return false;
+        }else{
+            int intLength = msgSn.length();
+            if(!"5230".equals(msgSn.substring(intLength-6,intLength-2))){
+                MessageUtil.addError("ÉêÇëµ¥±àºÅ²»ÊÇÍË¿î±àÂë£¬Çë¼ì²é£¡");
+                return false;
+            }
+        }
+        return true;
+    }
     //=============================
 
     public ActinfoQryParam getQryParam() {

@@ -354,7 +354,7 @@ public class PdfPrintAction {
 
 
         //第七行
-        float[] widths7 = { 72f, 99f,36f,75f,28f,123f };
+        float[] widths7 = { 72f, 120f,15f,75f,28f,123f };
         PdfPTable table7 = new PdfPTable(widths7);
         table7.getDefaultCell().setBorder(0);
         cell = new PdfPCell(new Paragraph("",headFont2));      //收款单位
@@ -519,6 +519,7 @@ public class PdfPrintAction {
         long midVal = (long)(value*100);
         //转化成字符串
         String valStr=String.valueOf(midVal);
+        valStr = StringUtils.leftPad(valStr,10,"0");
         //转化成数组
         char[] chDig = valStr.toCharArray();
         int lenchDig = chDig.length;

@@ -9,7 +9,7 @@ public enum VouchStatus implements EnumApp {
 
     RECEIVED("1", "领用"),
     USED("2", "使用"),
-    CANCEL("3", "撤销");
+    CANCEL("3", "作废");
 
     private String code = null;
     private String title = null;

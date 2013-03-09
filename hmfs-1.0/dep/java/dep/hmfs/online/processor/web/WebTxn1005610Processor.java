@@ -41,7 +41,7 @@ public class WebTxn1005610Processor extends WebAbstractHmbProductBizTxnProcessor
             processRequest(request);
         } catch (Exception e) {
             logger.error("Æ±¾Ý·¢ËÍÊ§°Ü", e);
-            throw new RuntimeException("Æ±¾Ý·¢ËÍÊ§°Ü¡£" + CbsErrorCode.valueOf(e.getMessage()).getTitle() , e);
+            throw new RuntimeException("Æ±¾Ý·¢ËÍÊ§°Ü¡£" + CbsErrorCode.valueOfAlias(e.getMessage()).getTitle() , e);
         }
         return "0000|Æ±¾Ý·¢ËÍ³É¹¦";
     }

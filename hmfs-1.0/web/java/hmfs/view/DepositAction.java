@@ -96,6 +96,9 @@ public class DepositAction implements Serializable {
     //缴款查询
     public String onQuery() {
         try {
+            if (!checkMsgsn()){
+                return null;
+            }
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
             TxnCtlSts txnCtlSts = TxnCtlSts.valueOfAlias(this.summaryMsg.getTxnCtlSts());
             if (!txnCtlSts.equals(TxnCtlSts.INIT)) {
@@ -215,8 +218,22 @@ public class DepositAction implements Serializable {
 
 
     }
-    //=============================
 
+    //检查申请单编号
+    private boolean checkMsgsn(){
+        if(msgSn.length()!=18){
+            MessageUtil.addError("申请单编号是18位的编码，请检查！");
+            return false;
+        }else{
+            int intLength = msgSn.length();
+            if(!"5210".equals(msgSn.substring(intLength-6,intLength-2))){
+                MessageUtil.addError("申请单编号不是缴款编码，请检查！");
+                return false;
+            }
+        }
+        return true;
+    }
+    //=============================
     public ActinfoQryParam getQryParam() {
         return qryParam;
     }
