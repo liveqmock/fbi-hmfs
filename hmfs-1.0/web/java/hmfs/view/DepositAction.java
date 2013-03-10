@@ -162,6 +162,7 @@ public class DepositAction implements Serializable {
             // 如果填写业主姓名，则需先更新HM_ACT_FUND，HM_MSG_IN无需修改，保持报文原始状态
             if (this.nameIsEmpty) {
                 logger.info("核算户" + actFund.getFundActno1() + "户名由空更新为：" + actFund.getInfoName());
+                actFund.setRemark("户名由空更新为" + actFund.getInfoName() + new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
                 actInfoService.updateHmActFund(actFund);
             }
             // 用户机构号和柜员号
