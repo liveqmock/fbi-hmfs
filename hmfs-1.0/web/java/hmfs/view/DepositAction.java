@@ -7,12 +7,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 import common.enums.FundActnoStatus;
 import common.enums.SysCtlSts;
 import common.enums.TxnCtlSts;
+import common.repository.hmfs.model.HmActFund;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmSysCtl;
 import hmfs.common.model.ActinfoQryParam;
 import hmfs.service.ActInfoService;
 import hmfs.service.AppMngService;
 import hmfs.service.DepService;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,9 @@ public class DepositAction implements Serializable {
     private boolean checkPassed = false;
     private boolean confirmed = false;
 
+    private HmActFund actFund;
+    private boolean nameIsEmpty;
+
     @ManagedProperty(value = "#{appMngService}")
     private AppMngService appMngService;
     @ManagedProperty(value = "#{actInfoService}")
@@ -96,7 +101,7 @@ public class DepositAction implements Serializable {
     //缴款查询
     public String onQuery() {
         try {
-            if (!checkMsgsn()){
+            if (!checkMsgsn()) {
                 return null;
             }
             this.summaryMsg = actInfoService.selectSummaryMsg(msgSn);
@@ -129,6 +134,21 @@ public class DepositAction implements Serializable {
                 } else {
                     this.checkPassed = true;
                 }
+                // 检查业主姓名是否为空
+                // HM_MSG_IN中业主姓名为空，只需判断核算户表中的业主姓名是否为空即可。
+                actFund = actInfoService.selectActFundByno(this.subMsgList.get(0).getFundActno1());
+                if (actFund == null) {
+                    this.checkPassed = false;
+                    logger.error("本次查询核算户不存在。" + this.subMsgList.get(0).getFundActno1());
+                    MessageUtil.addError("本次查询核算户不存在，核算户账号：" + this.subMsgList.get(0).getFundActno1());
+                    return null;
+                } else if (StringUtils.isEmpty(actFund.getInfoName()) || "#".equals(actFund.getInfoName())) {
+                    this.nameIsEmpty = true;
+                    logger.error("本次查询核算户名为空。" + actFund.getFundActno1());
+                    MessageUtil.addError("该业主户名为空，请手动录入。");
+                } else {
+                    this.nameIsEmpty = false;
+                }
             }
         } catch (Exception e) {
             MessageUtil.addError("处理失败。" + e.getMessage());
@@ -139,6 +159,11 @@ public class DepositAction implements Serializable {
     //缴款处理
     public String onConfirm() {
         try {
+            // 如果填写业主姓名，则需先更新HM_ACT_FUND，HM_MSG_IN无需修改，保持报文原始状态
+            if (this.nameIsEmpty) {
+                logger.info("核算户" + actFund.getFundActno1() + "户名由空更新为：" + actFund.getInfoName());
+                actInfoService.updateHmActFund(actFund);
+            }
             // 用户机构号和柜员号
             PtOperBean oper = platformService.getOperatorManager().getOperator();
             String response = depService.process("1005210|" + this.msgSn + "|"
@@ -220,13 +245,13 @@ public class DepositAction implements Serializable {
     }
 
     //检查申请单编号
-    private boolean checkMsgsn(){
-        if(msgSn.length()!=18){
+    private boolean checkMsgsn() {
+        if (msgSn.length() != 18) {
             MessageUtil.addError("申请单编号是18位的编码，请检查！");
             return false;
-        }else{
+        } else {
             int intLength = msgSn.length();
-            if(!"5210".equals(msgSn.substring(intLength-6,intLength-2))){
+            if (!"5210".equals(msgSn.substring(intLength - 6, intLength - 2))) {
                 MessageUtil.addError("申请单编号不是缴款编码，请检查！");
                 return false;
             }
@@ -234,6 +259,24 @@ public class DepositAction implements Serializable {
         return true;
     }
     //=============================
+
+
+    public boolean isNameIsEmpty() {
+        return nameIsEmpty;
+    }
+
+    public void setNameIsEmpty(boolean nameIsEmpty) {
+        this.nameIsEmpty = nameIsEmpty;
+    }
+
+    public HmActFund getActFund() {
+        return actFund;
+    }
+
+    public void setActFund(HmActFund actFund) {
+        this.actFund = actFund;
+    }
+
     public ActinfoQryParam getQryParam() {
         return qryParam;
     }

@@ -43,7 +43,7 @@
                         <div id="qrytable">
                             <p:messages id="msgs" showDetail="false"/>
                             <p:focus for="msgsn" />
-                            <p:panel style="margin-top:10px">
+                            <p:panel id="qrypanel" style="margin-top:10px">
                                 <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                     <h:panelGrid columns="2" cellspacing="5">
                                         <h:outputLabel value="申请单编号:" style="font-weight: bold"/>
@@ -60,19 +60,24 @@
                                             <f:convertNumber for="amt" maxFractionDigits="2" maxIntegerDigits="13"
                                                              pattern="###,###,###,###,##0.00"/>
                                         </p:inputText>
+                                        <h:outputLabel value="业主户名:" style="font-weight: bold" rendered="#{depositAction.nameIsEmpty}"/>
+                                        <p:inputText required="true" size="25" rendered="#{depositAction.nameIsEmpty}"
+                                                     requiredMessage="业主户名不能为空。"
+                                                     id="actfundname" onkeydown="KeyDown()"
+                                                     value="#{depositAction.actFund.infoName}"/>
                                     </h:panelGrid>
                                     <h:panelGrid id="buttons">
                                         <p:commandButton style="width:110px;" value="查询缴款信息"
                                                          disabled="#{depositAction.checkPassed}"
                                                          rendered="#{!depositAction.confirmed}"
                                                          action="#{depositAction.onQuery}"
-                                                         update="pdt,msgs,buttons">
+                                                         update="pdt,msgs,buttons,qrypanel">
                                         </p:commandButton>
                                         <p:commandButton style="width:110px;" value="确认缴款"
                                                          rendered="#{depositAction.checkPassed}"
                                                          disabled="#{depositAction.confirmed}"
                                                          action="#{depositAction.onConfirm}"
-                                                         update="pdt,msgs,buttons">
+                                                         update="pdt,msgs,buttons,qrypanel">
                                         </p:commandButton>
                                     </h:panelGrid>
                                 </h:panelGrid>

@@ -99,7 +99,8 @@ public class ActInfoService {
     public HmActFund selectActFundByno(String fundActno) {
         HmActFundExample example = new HmActFundExample();
         example.createCriteria().andFundActno1EqualTo(fundActno).andActStsEqualTo(FundActnoStatus.NORMAL.getCode());
-        return hmActFundMapper.selectByExample(example).get(0);
+        List<HmActFund> actFundList = hmActFundMapper.selectByExample(example);
+        return actFundList.size() > 0 ? actFundList.get(0) : null;
     }
 
     public List<HmActStl> selectStlActnoRecord(String actno) {
@@ -448,6 +449,21 @@ public class ActInfoService {
             }
             actstl.setRecversion(actstl.getRecversion() + 1);
             return actStlMapper.updateByPrimaryKey(actstl);
+        }
+    }
+
+    @Transactional
+    public int updateHmActFund(HmActFund actFund) {
+        HmActFund originRecord = actFundMapper.selectByPrimaryKey(actFund.getPkid());
+        if (!originRecord.getRecversion().equals(actFund.getRecversion())) {
+            throw new RuntimeException("记录并发更新冲突，请重试！");
+        } else {
+            // 备注中保存更新时间
+            if (StringUtils.isEmpty(actFund.getRemark())) {
+                actFund.setRemark(new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+            }
+            actFund.setRecversion(actFund.getRecversion() + 1);
+            return actFundMapper.updateByPrimaryKey(actFund);
         }
     }
 }
