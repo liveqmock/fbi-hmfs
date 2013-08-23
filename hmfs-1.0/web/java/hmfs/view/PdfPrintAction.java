@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -514,11 +515,19 @@ public class PdfPrintAction {
         char[] digit={'零','壹','贰','叁','肆','伍','陆','柒','捌','玖'};
         char[] unit={'0','1','2','3','4','5','6','7','8','9'};
         Map mapNum = new HashMap();
-        double  value = Double.valueOf(strAmt);
+        /*double  value = Double.valueOf(strAmt);
         //转化成整形
         long midVal = (long)(value*100);
         //转化成字符串
         String valStr=String.valueOf(midVal);
+        */
+        // -------------- 2013-08-23 修正数据精度丢失问题 2241.45 by zxb --------------
+        String valStr = new BigDecimal(strAmt).multiply(new BigDecimal("100")).toString();
+        if (valStr.contains(".")) {
+            int index = valStr.indexOf(".");
+            valStr = (new StringBuffer(valStr).delete(index, valStr.length())).toString();
+        }
+        // --------------
         valStr = StringUtils.leftPad(valStr,10,"0");
         //转化成数组
         char[] chDig = valStr.toCharArray();
