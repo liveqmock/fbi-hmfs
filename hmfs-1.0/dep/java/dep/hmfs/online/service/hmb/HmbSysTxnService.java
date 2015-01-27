@@ -2,6 +2,7 @@ package dep.hmfs.online.service.hmb;
 
 import common.enums.FundActType;
 import common.enums.FundActnoStatus;
+import common.enums.SysCtlSts;
 import common.repository.hmfs.dao.*;
 import common.repository.hmfs.model.*;
 import dep.hmfs.online.processor.hmb.domain.HmbMsg;
@@ -283,6 +284,15 @@ public class HmbSysTxnService extends HmbBaseService {
         }
         hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
         return hmSysCtl;
+    }
+
+    //======================20150116 zhanrui 独立事务更新系统控制表信息 用于签退==========
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    public void updateSysCTlForSignout(){
+        HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
+        hmSysCtl.setSysSts(SysCtlSts.SIGNOUT.getCode());
+        hmSysCtl.setSignoutDt(new Date());
+        hmSysCtlMapper.updateByPrimaryKey(hmSysCtl);
     }
 
 }

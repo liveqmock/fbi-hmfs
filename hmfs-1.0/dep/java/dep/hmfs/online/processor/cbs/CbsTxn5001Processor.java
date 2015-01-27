@@ -8,6 +8,7 @@ import dep.hmfs.online.processor.cbs.domain.txn.TIA5001;
 import dep.hmfs.online.processor.web.WebTxn1007003Processor;
 import dep.hmfs.online.service.hmb.HmbActinfoService;
 import dep.hmfs.online.service.hmb.HmbSysTxnService;
+import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,16 +60,24 @@ public class CbsTxn5001Processor extends CbsAbstractTxnProcessor {
         HmSysCtl hmSysCtl = hmbActinfoService.getSysCtl();
         String bankId = hmSysCtl.getBankId();
 
-        clearTodayChkData(cbsActNo, txnDate, bankId);
 
-        // 发起国土局余额对账
+        //=====20150105 zr 修改建行对账流程===
         String hmbChkResponse = null;
-        try {
-            hmbChkResponse = webTxn7003Processor.process(null);
-        } catch (Exception e) {
-            hmbChkResponse = "9999|与国土局对账不平！";
-            logger.error("与国土局对帐处理异常", e);
+        if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {//建行
+            //默认与国土局的对账已成功完成
+            hmbChkResponse = "0000";
+        } else {//其它行，走原流程
+            clearTodayChkData(cbsActNo, txnDate, bankId);
+            // 发起国土局余额对账
+            try {
+                hmbChkResponse = webTxn7003Processor.process(null);
+            } catch (Exception e) {
+                hmbChkResponse = "9999|与国土局对账不平！";
+                logger.error("与国土局对帐处理异常", e);
+            }
         }
+        //===================================
+
 
         //新增本地余额对帐流水
         try {
