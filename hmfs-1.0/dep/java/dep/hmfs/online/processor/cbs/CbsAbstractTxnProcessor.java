@@ -28,7 +28,7 @@ public abstract class CbsAbstractTxnProcessor {
     public abstract TOA process(TIAHeader tiaHeader, byte[] bytes) throws Exception;
 
     @Transactional
-    public TOA run(TIAHeader tiaHeader, byte[] datagramBytes) throws Exception {
+    public TOA run(TIAHeader tiaHeader, byte[] datagramBytes) {
         HmSysCtl hmSysCtl = hmSysCtlMapper.selectByPrimaryKey("1");
         String sysSts = hmSysCtl.getSysSts();
 
@@ -45,6 +45,10 @@ public abstract class CbsAbstractTxnProcessor {
                 throw new RuntimeException(CbsErrorCode.SYS_NOT_SIGN_ON.getCode());
             }
         }
-        return process(tiaHeader, datagramBytes);
+        try {
+            return process(tiaHeader, datagramBytes);
+        } catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
     }
 }
