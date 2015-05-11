@@ -1,5 +1,6 @@
 package skyline.service;
 
+import common.repository.hmfs.dao.hmfs.HmCmnMapper;
 import skyline.repository.model.Ptenudetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,8 @@ public class ToolsService {
     @Autowired
     PlatformService platformService;
 
-
+    @Autowired
+    private HmCmnMapper hmCmnMapper;
     /**
      * 根据枚举表的内容组下拉菜单
      *
@@ -47,5 +49,26 @@ public class ToolsService {
             items.add(item);
         }
         return items;
+    }
+
+    /**
+     * 获取本机构号下所有机构清单
+     *
+     * @param branchId 本机构号
+     * @return 机构选择列表
+     */
+    public List<SelectItem> selectBranchList(String branchId) {
+        List<String> records = selectBranchLevelString(branchId);
+        List<SelectItem> selectItems = new ArrayList<SelectItem>();
+        for (String record : records) {
+            String[] recordArray = record.split("\\|");
+            SelectItem item = new SelectItem(recordArray[0], recordArray[1]);
+            selectItems.add(item);
+        }
+        return selectItems;
+    }
+    //返回 机构号|机构名称(前面加全角空格)
+    private List<String> selectBranchLevelString(String branchid){
+        return hmCmnMapper.selectBranchLevelString(branchid);
     }
 }

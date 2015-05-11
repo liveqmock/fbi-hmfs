@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * DEP通用处理.
  * User: zhanrui
@@ -170,5 +172,28 @@ public interface HmCmnMapper {
     public int verifyChkTxnResult_2(@Param("txnDate") String txnDate,
                                     @Param("sendSysId1") String sendSysId1,
                                     @Param("sendSysId2") String sendSysId2);
+
+
+    //=============zhanrui  201505=====
+    /**
+     * 获取机构层次列表
+     */
+    @Select("select deptid || '|' || LPad('　', (level - 1) * 2, '　') || deptname" +
+            "  from ptdept" +
+            " start with deptid = #{branchid}" +
+            "connect by prior deptid = parentdeptid")
+    List<String> selectBranchLevelString(@Param("branchid") String branchid);
+
+    @Select("select deptid || '|' || deptname" +
+            "  from ptdept" +
+            " start with deptid = #{branchid}" +
+            "connect by prior deptid = parentdeptid")
+    List<String> selectBranchIdAndName(@Param("branchid") String branchid);
+
+    @Select("select deptid " +
+            "  from ptdept" +
+            " start with deptid = #{branchid}" +
+            "connect by prior deptid = parentdeptid")
+    List<String> selectBranchLevelList(@Param("branchid") String branchid);
 
 }
