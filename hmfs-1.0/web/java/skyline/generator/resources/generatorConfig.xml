@@ -4,7 +4,12 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
+<<<<<<< HEAD
     <classPathEntry location="/workspace/github/fbi-hmfs/lib/ojdbc6.jar"/>
+=======
+    <!--<classPathEntry location="/svn-fbihmfs/weblib/ojdbc6.jar"/>-->
+    <classPathEntry location="/WorkSpace/git-fbihmfs/lib/ojdbc6.jar"/>
+>>>>>>> origin/master
 
     <!--信息 -->
     <context id="AllInfo" targetRuntime="MyBatis3">
@@ -84,7 +89,19 @@
                 <table schema="hmfs" tableName="hm_msg_cancel">
                     <property name="ignoreQualifiersAtRuntime" value="true" />
                 </table>
+                <table schema="hmfs" tableName="hm_vch_store">
+                    <property name="ignoreQualifiersAtRuntime" value="true" />
+                </table>
+                <table schema="hmfs" tableName="hm_vch_jrnl">
+                    <property name="ignoreQualifiersAtRuntime" value="true" />
+                </table>
         -->
+        <table schema="hmfs" tableName="hm_vch_store">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
+        <table schema="hmfs" tableName="hm_vch_jrnl">
+            <property name="ignoreQualifiersAtRuntime" value="true" />
+        </table>
 
     </context>
 </generatorConfiguration>

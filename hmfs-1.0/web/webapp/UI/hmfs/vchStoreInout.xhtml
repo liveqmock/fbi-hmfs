@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/templates/ui.xhtml">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .ui-datatable-data tr {
+                height: 30px !important;
+            }
+
+            .odd-row {
+                text-align: center;
+                background: none repeat scroll 0 0 #FFFFFF;
+                border-top: 1px solid #BBBBBB;
+            }
+
+            .even-row {
+                text-align: center;
+                background: none repeat scroll 0 0 #F9F9F9;
+                border-top: 1px solid #BBBBBB;
+            }
+        </style>
+        <script language="JavaScript" type="text/JavaScript">
+            function KeyDown() {
+                if (event.keyCode == 13) {
+                    event.keyCode = 9;
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="entry" id="top">
+            <h:form id="form">
+                <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
+                    <p:tab id="tab1" title="分行与房管中心间的票据领用及缴回">
+                        <p:messages id="msgs" showDetail="true"/>
+                        <p:ajaxStatus style="height:10px;text-align:center">
+                            <f:facet name="start">
+                                <h:graphicImage value="/images/ajaxloadingbar.gif"/>
+                            </f:facet>
+                            <f:facet name="complete">
+                                <h:outputText value=""/>
+                            </f:facet>
+                        </p:ajaxStatus>
+
+                        <p:dataTable id="pdt" style="width:100%;margin-top: 10px;margin-bottom: 10px"
+                                     value="#{voucherStoreAction.vchStoreList}" var="record"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
+                                     currentPageReportTemplate="{startRecord}-{endRecord} 共{totalRecords}笔"
+                                     paginator="true" rows="5"
+                                     paginatorPosition="bottom"
+                                     rowsPerPageTemplate="100,50,30,15,5"
+                                     emptyMessage="数据记录为空...">
+
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    机构
+                                </f:facet>
+                                <h:outputText value="#{record.branchId}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    票据数量
+                                </f:facet>
+                                <h:outputText value="#{record.vchCount}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    起号
+                                </f:facet>
+                                <h:outputText value="#{record.vchStartNo}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    止号
+                                </f:facet>
+                                <h:outputText value="#{record.vchEndNo}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    出入库日期
+                                </f:facet>
+                                <h:outputText value="#{record.oprDate}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    操作员
+                                </f:facet>
+                                <h:outputText value="#{record.oprNo}"/>
+                            </p:column>
+                            <p:column headerText="操作" style="text-align:center">
+                                <p:commandLink value="缴回"
+                                               process="@this"
+                                               update=":form:tabview:formpanel"
+                                               action="#{voucherStoreAction.startSendToHmb}"
+                                               style="color: blue; margin-right:5px">
+                                    <f:setPropertyActionListener value="#{record}"
+                                                                 target="#{voucherStoreAction.selectedStoreRecord}"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+
+
+                        <p:panel id="formpanel" style="width: 500px; margin-top: 20px">
+                            <h:panelGrid columns="1" cellspacing="5">
+                                <h:panelGrid columns="2" cellspacing="5">
+                                    <h:outputLabel value="票据起号:"/>
+                                    <p:inputText id="vchstartno"
+                                                 value="#{voucherStoreAction.selectedStoreRecord.vchStartNo}"
+                                                 style="width: 200px;"
+                                                 onkeydown="KeyDown()"
+                                                 required="true" requiredMessage="起号不能为空。"/>
+                                    <h:outputLabel value="票据止号:"/>
+                                    <p:inputText id="vchendno"
+                                                 value="#{voucherStoreAction.selectedStoreRecord.vchEndNo}"
+                                                 onkeydown="KeyDown()"
+                                                 style="width: 200px;" required="true" requiredMessage="止号不能为空。"/>
+                                    <h:outputLabel value="票据数量:"/>
+                                    <p:inputText id="vchcnt" value="#{voucherStoreAction.selectedStoreRecord.vchCount}"
+                                                 onkeydown="KeyDown()" title="数量=止号-起号，整本处理。"
+                                                 style="width: 100px;"
+                                                 required="true" requiredMessage="数量不能为空。"/>
+                                </h:panelGrid>
+                                <h:panelGrid columns="3">
+                                    <p:commandButton id="addbtn" style="width:120px;" value="自中心领用"
+                                                     rendered="#{voucherStoreAction.operation == 'input'}"
+                                                     action="#{voucherStoreAction.onRecvFromHmb}"
+                                                     update="pdt,msgs,formpanel">
+                                    </p:commandButton>
+                                    <p:commandButton id="delbtn" style="width:120px;" value="向中心缴回"
+                                                     rendered="#{voucherStoreAction.operation == 'output'}"
+                                                     action="#{voucherStoreAction.onSendToHmb}"
+                                                     update="pdt,msgs,formpanel">
+                                    </p:commandButton>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:tab>
+                </p:tabView>
+
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
