@@ -3,12 +3,14 @@ package hmfs.view;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmVchJrnl;
 import common.repository.hmfs.model.HmVchStore;
+import common.service.SystemService;
 import hmfs.service.VoucherService;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pub.platform.advance.utils.PropertyManager;
+import pub.platform.security.OperatorManager;
 import skyline.common.utils.MessageUtil;
 import skyline.service.PlatformService;
 import skyline.service.ToolsService;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分行及网点的票据库存管理.
@@ -41,8 +44,6 @@ public class VoucherStoreAction implements Serializable {
     @ManagedProperty(value = "#{voucherService}")
     private VoucherService voucherService;
 
-    //    private String startDate = "";
-//    private String endDate = "";
     private List<HmVchStore> vchStoreList = new ArrayList<HmVchStore>();
     private List<HmVchStore> vchStoreList2 = new ArrayList<HmVchStore>();
     private List<HmVchJrnl> vchJrnlList = new ArrayList<HmVchJrnl>();
@@ -59,41 +60,36 @@ public class VoucherStoreAction implements Serializable {
     private String fromBranchId;    //拨出机构
     private String toBranchId;      //拨入机构
 
-    private String txnType; //交易类别  headoffice：分行库存处理   branch：支行及网点库存处理
-
+    private String txnType; //交易类别  headoffice：分行库存处理   branch：支行及网点库存处理  qryjrnl:日志查询
+    private VouchStatus vchStatus = VouchStatus.RECEIVED;
+    private Map<String, String> operMap;
+    private Map<String, String> deptMap;
 
     @PostConstruct
     public void init() {
-/*
-        ExternalContext extContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpSession session = (HttpSession) extContext.getSession(true);
-        OperatorManager om = (OperatorManager) session.getAttribute(SystemAttributeNames.USER_INFO_NAME);
-        if (om == null) {
-            throw new RuntimeException("用户未登录！");
-        }
-*/
-
-        //String branchid = om.getOperator().getDeptid();
-        String branchid = voucherService.selectHoInstNo();
-
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 
         this.txnType = request.getParameter("type");
         if (txnType == null) {
-            MessageUtil.addError("交易模式参数错误");
+            txnType = "qryjrnl";
         }
 
-        this.branchList = toolsService.selectBranchList(branchid);
+        OperatorManager om = platformService.getOperatorManager();
+        String branchid = om.getOperator().getDeptid();
 
+        if ("headoffice".equalsIgnoreCase(this.txnType)) {
+            branchid = voucherService.selectHoInstNo();
+            initHeadOfficeDataList();
+        }
+        this.branchList = toolsService.selectBranchList(branchid);
 
         vchStsList.add(new SelectItem(VouchStatus.USED.getCode(), VouchStatus.USED.getTitle()));
         vchStsList.add(new SelectItem(VouchStatus.CANCEL.getCode(), VouchStatus.CANCEL.getTitle()));
         selectedStoreRecord = new HmVchStore();
         selectedStoreRecord.setVchCount(0);
 
-        if ("headoffice".equalsIgnoreCase(this.txnType)) {
-            initHeadOfficeDataList();
-        }
+        operMap = voucherService.selectPtoperMap();
+        deptMap = voucherService.selectPtdeptMap();
     }
 
     public void onQuery() {
@@ -196,7 +192,7 @@ public class VoucherStoreAction implements Serializable {
                 MessageUtil.addError("输入的票据数量与按照起止号计算的数量不符，请重新输入..");
                 return;
             } else {
-                voucherService.processVchTransfer(toBranchId, selectedStoreRecord);
+                voucherService.processVchTransfer(fromBranchId, toBranchId, selectedStoreRecord);
             }
             selectedStoreRecord = new HmVchStore();
             selectedStoreRecord.setVchCount(0);
@@ -207,6 +203,31 @@ public class VoucherStoreAction implements Serializable {
         }
     }
 
+    public void  onQryJrnl(){
+        try {
+            initvchJrnlList();
+        } catch (Exception e) {
+            logger.error("操作处理失败。" + e.getMessage(), e);
+            MessageUtil.addError("操作处理失败。" + e.getMessage());
+        }
+    }
+
+    private void initvchJrnlList() {
+        this.vchStoreList = voucherService.selectInstitutionVoucherStoreList(fromBranchId);
+        this.vchJrnlList = voucherService.selectVchJrnl(fromBranchId);
+    }
+
+    public String getVoucherStatusEnumTitle(String alias){
+        return VouchStatus.valueOfAlias(alias).getTitle();
+    }
+
+    public String findOperName(String operid){
+        String opername = voucherService.selectPtoperMap().get(operid);
+        if (opername == null) {
+            opername = "";
+        }
+        return opername;
+    }
     //==============================================================
     private void disableInputtext() {
         RequestContext.getCurrentInstance().execute("document.forms['form']['form:tabview:vchstartno'].disabled = true;");
@@ -347,6 +368,30 @@ public class VoucherStoreAction implements Serializable {
 
     public void setVchStoreList2(List<HmVchStore> vchStoreList2) {
         this.vchStoreList2 = vchStoreList2;
+    }
+
+    public VouchStatus getVchStatus() {
+        return vchStatus;
+    }
+
+    public void setVchStatus(VouchStatus vchStatus) {
+        this.vchStatus = vchStatus;
+    }
+
+    public Map<String, String> getOperMap() {
+        return operMap;
+    }
+
+    public void setOperMap(Map<String, String> operMap) {
+        this.operMap = operMap;
+    }
+
+    public Map<String, String> getDeptMap() {
+        return deptMap;
+    }
+
+    public void setDeptMap(Map<String, String> deptMap) {
+        this.deptMap = deptMap;
     }
 }
 

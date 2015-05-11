@@ -5,8 +5,11 @@ import common.repository.hmfs.dao.HmVchJrnlMapper;
 import common.repository.hmfs.dao.HmVchStoreMapper;
 import common.repository.hmfs.dao.hmfs.HmVoucherMapper;
 import common.repository.hmfs.model.HmVchJrnl;
+import common.repository.hmfs.model.HmVchJrnlExample;
 import common.repository.hmfs.model.HmVchStore;
+import common.repository.hmfs.model.HmVchStoreExample;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,8 +18,11 @@ import pub.platform.advance.utils.PropertyManager;
 import pub.platform.form.config.SystemAttributeNames;
 import pub.platform.security.OperatorManager;
 import skyline.repository.dao.PtdeptMapper;
+import skyline.repository.dao.PtoperMapper;
 import skyline.repository.model.Ptdept;
 import skyline.repository.model.PtdeptExample;
+import skyline.repository.model.Ptoper;
+import skyline.repository.model.PtoperExample;
 
 import javax.annotation.Resource;
 import javax.faces.context.ExternalContext;
@@ -41,13 +47,13 @@ public class VoucherService {
     @Resource
     private PtdeptMapper ptdeptMapper;
     @Resource
+    private PtoperMapper ptoperMapper;
+    @Resource
     private HmVchStoreMapper vchStoreMapper;
     @Resource
     private HmVchJrnlMapper vchJrnlMapper;
     @Resource
     private HmVoucherMapper voucherMapper;
-
-    private int voucherNoLength = 3; //TODO 配置文件  12
 
     //获取与房管中心对应的总行（或分行）机构号
     public String selectHoInstNo() {
@@ -63,13 +69,11 @@ public class VoucherService {
 
     //按机构查看库存明细
     public List<HmVchStore> selectInstitutionVoucherStoreList(String instNo) {
-/*
         HmVchStoreExample example = new HmVchStoreExample();
         example.createCriteria().andBranchIdEqualTo(instNo);
         example.setOrderByClause(" vch_start_no");
         return vchStoreMapper.selectByExample(example);
-*/
-        return voucherMapper.selectInstVoucherStoreList(instNo);
+        //return voucherMapper.selectInstVoucherStoreList(instNo);
     }
 
     //分行票据领用
@@ -96,7 +100,7 @@ public class VoucherService {
     //行内机构调拨处理
     //拨出时需按票号顺序出库,每次只处理一条库存记录，拨出的止号不可超出此条记录的止号
     @Transactional
-    public synchronized void processVchTransfer(String toInst, HmVchStore vchStoreParam) {
+    public synchronized void processVchTransfer(String fromInst, String toInst, HmVchStore vchStoreParam) {
         if (StringUtils.isEmpty(vchStoreParam.getPkid())) {
             throw new IllegalArgumentException("未选定拨出记录.");
         }
@@ -129,14 +133,14 @@ public class VoucherService {
         if (vchStoreParam.getVchEndNo().equals(vchStoreDB.getVchEndNo())) { //整个记录拨出的情况
             //拨出日志
             insertVoucherJournal(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(),
-                    vchStoreParam.getBranchId(), VouchStatus.OUTSTORE, "全部拨出");
+                    fromInst, VouchStatus.OUTSTORE, "全部拨出");
             //直接修改原纪录的机构号
             vchStoreDB.setRemark("全部拨入");
             vchStoreDB.setBranchId(toInst);
             vchStoreMapper.updateByPrimaryKey(vchStoreDB);
             //拨入日志
-            insertVoucherJournal(vchStoreDB.getVchCount(),vchStoreDB.getVchStartNo(), vchStoreDB.getVchEndNo(),
-                    vchStoreDB.getBranchId(),VouchStatus.RECEIVED, "全部拨入");
+            insertVoucherJournal(vchStoreDB.getVchCount(), vchStoreDB.getVchStartNo(), vchStoreDB.getVchEndNo(),
+                    vchStoreDB.getBranchId(), VouchStatus.RECEIVED, "全部拨入");
         } else {//记录中部分票号拨出的情况
             //日志
             insertVoucherJournal(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(),
@@ -154,8 +158,43 @@ public class VoucherService {
             insertVoucherJournal(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(),
                     toInst, VouchStatus.RECEIVED, "部分拨入");
         }
+
+        //总分核对
+        if (!verifyVchStoreAndJrnl(fromInst) || !verifyVchStoreAndJrnl(toInst)) {
+            throw new RuntimeException("库存总分不符！");
+        }
     }
 
+    //按机构查看近一年的记录
+    public List<HmVchJrnl> selectVchJrnl(String instNo) {
+        HmVchJrnlExample example = new HmVchJrnlExample();
+        DateTime dt = new DateTime();
+        dt = dt.minusYears(1);
+        example.createCriteria().andBranchIdEqualTo(instNo).andOprDateGreaterThan(dt.toString("yyyyMMdd"));
+
+        return vchJrnlMapper.selectByExample(example);
+    }
+
+    public Map<String, String> selectPtoperMap(){
+        PtoperExample example = new PtoperExample();
+        List<Ptoper> ptopers = ptoperMapper.selectByExample(example);
+        Map<String, String> operMap = new HashMap<String, String>();
+        for (Ptoper ptoper : ptopers) {
+            operMap.put(ptoper.getOperid(), ptoper.getOpername());
+        }
+        return  operMap;
+    }
+    public Map<String, String> selectPtdeptMap(){
+        PtdeptExample example = new PtdeptExample();
+        List<Ptdept> ptdepts = ptdeptMapper.selectByExample(example);
+        Map<String, String> map = new HashMap<String, String>();
+        for (Ptdept dept : ptdepts) {
+            map.put(dept.getDeptid(), dept.getDeptname());
+        }
+        return  map;
+    }
+
+    //=====================================
     private void processInstVoucherInput(int vchCnt, String startNo, String endNo, String instNo) {
         String maxEndno = voucherMapper.selectInstVchMaxEndNo(instNo);
         if (maxEndno == null) {
@@ -239,4 +278,12 @@ public class VoucherService {
         vchJrnlMapper.insert(vchJrnl);
     }
 
+    private boolean verifyVchStoreAndJrnl(String instNo) {
+        int store = voucherMapper.selectVchStoreTotalNum(instNo);
+        int jrnl = voucherMapper.selectVchJrnlTotalNum(instNo, VouchStatus.RECEIVED.getCode())
+                - voucherMapper.selectVchJrnlTotalNum(instNo, VouchStatus.OUTSTORE.getCode())
+                - voucherMapper.selectVchJrnlTotalNum(instNo, VouchStatus.USED.getCode())
+                - voucherMapper.selectVchJrnlTotalNum(instNo, VouchStatus.CANCEL.getCode());
+        return store == jrnl;
+    }
 }

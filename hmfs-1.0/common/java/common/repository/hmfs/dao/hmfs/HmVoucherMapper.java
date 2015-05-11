@@ -7,6 +7,7 @@ import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
 import common.repository.hmfs.model.hmfs.HmVchStoreSumVO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -48,4 +49,12 @@ public interface HmVoucherMapper {
 
     //出库更新 (只更新止号)
     public int updateVoucherStoreRecordEndnoByPkid(@Param("pkid") String pkid, @Param("recversion") int recversion, @Param("endNo") String endNo);
+
+    //统计vchstore表中某机构的库存  sql92
+    @Select("select (case when sum(t.vch_count) is null then 0 else sum(t.vch_count) end) from hm_vch_store t where t.branch_id=#{instNo}")
+    public int selectVchStoreTotalNum(@Param("instNo") String instNo);
+
+    //统计vchjrnl表中某机构的库存  sql92
+    @Select("select (case when sum(t.vch_count) is null then 0 else sum(t.vch_count) end) from hm_vch_jrnl t where t.branch_id=#{instNo} and t.vch_state=#{vchStatus}")
+    public int selectVchJrnlTotalNum(@Param("instNo") String instNo, @Param("vchStatus") String vchStatus);
 }

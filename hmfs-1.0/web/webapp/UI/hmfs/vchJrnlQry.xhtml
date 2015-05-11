@@ -10,7 +10,13 @@
             .ui-datatable-data tr {
                 height: 30px !important;
             }
+            .col-95 {
+                width: 95%;
+            }
 
+            .col-5 {
+                width: 5%;
+            }
         </style>
         <script language="JavaScript" type="text/JavaScript">
             function KeyDown() {
@@ -26,7 +32,7 @@
         <div class="entry" id="top">
             <h:form id="form">
                 <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                    <p:tab id="tab1" title="行内票据调拨处理">
+                    <p:tab id="tab1" title="票据库存及使用明细清单">
                         <p:messages id="msgs" showDetail="true"/>
                         <p:ajaxStatus style="height:10px;text-align:center">
                             <f:facet name="start">
@@ -36,23 +42,18 @@
                                 <h:outputText value=""/>
                             </f:facet>
                         </p:ajaxStatus>
-                        <p:panel>
+                        <p:panel style="margin-bottom: 20px">
                             <h:panelGrid columns="2" cellspacing="5" columnClasses="col-95,col-5">
                                 <h:panelGrid columns="4" cellspacing="10">
-                                    <h:outputLabel value="拨出分支机构:"/>
+                                    <h:outputLabel value="机构:"/>
                                     <h:selectOneMenu id="frombranchname" style="width:153px;"
                                                      value="#{voucherStoreAction.fromBranchId}">
                                         <f:selectItems value="#{voucherStoreAction.branchList}"/>
                                     </h:selectOneMenu>
-                                    <h:outputLabel value="拨入分支机构:"/>
-                                    <h:selectOneMenu id="tobranchname" style="width:153px;"
-                                                     value="#{voucherStoreAction.toBranchId}">
-                                        <f:selectItems value="#{voucherStoreAction.branchList}"/>
-                                    </h:selectOneMenu>
                                 </h:panelGrid>
                                 <h:panelGrid>
-                                    <p:commandButton id="qrybtn" style="width:120px;" value="查询库存明细"
-                                                     action="#{voucherStoreAction.onTransferQuery}"
+                                    <p:commandButton id="qrybtn" style="width:120px;" value="查询明细"
+                                                     action="#{voucherStoreAction.onQryJrnl}"
                                                      update="pdt,pdt2,msgs">
                                     </p:commandButton>
 
@@ -60,21 +61,16 @@
                             </h:panelGrid>
                         </p:panel>
 
-                        <p:dataTable id="pdt" style="width:100%;margin-top: 20px;margin-bottom: 10px"
+                        <h:outputText value="票据库存明细:" />
+                        <p:dataTable id="pdt" style="width:100%;margin-top: 3px;margin-bottom: 25px"
                                      value="#{voucherStoreAction.vchStoreList}" var="record"
                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
                                      currentPageReportTemplate="{startRecord}-{endRecord} 共{totalRecords}笔"
-                                     paginator="true" rows="5"
+                                     paginator="true" rows="15"
                                      paginatorPosition="bottom"
                                      rowsPerPageTemplate="100,50,30,15,5"
                                      emptyMessage="...">
 
-                            <p:column style="text-align:center">
-                                <f:facet name="header">
-                                    机构
-                                </f:facet>
-                                <h:outputText value="#{voucherStoreAction.deptMap.get(record.branchId)}"/>
-                            </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
                                     票据数量
@@ -104,91 +100,60 @@
                                     操作员
                                 </f:facet>
                                 <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
-                            </p:column>
-                            <p:column headerText="操作" style="text-align:center">
-                                <p:commandLink value="拨出"
-                                               process="@this"
-                                               update=":form:tabview:formpanel"
-                                               action="#{voucherStoreAction.startTransfer}"
-                                               style="color: blue; margin-right:5px">
-                                    <f:setPropertyActionListener value="#{record}"
-                                                                 target="#{voucherStoreAction.selectedStoreRecord}"/>
-                                </p:commandLink>
                             </p:column>
                         </p:dataTable>
 
-                        <p:panel id="formpanel" style="margin-top: 10px">
-                            <h:panelGrid columns="2" cellspacing="5">
-                                <h:panelGrid columns="2" cellspacing="10">
-                                    <h:outputLabel value="票据起号:"/>
-                                    <p:inputText id="vchstartno"
-                                                 value="#{voucherStoreAction.selectedStoreRecord.vchStartNo}"
-                                                 onkeydown="KeyDown()"
-                                            />
-                                    <h:outputLabel value="票据止号:"/>
-                                    <p:inputText id="vchendno"
-                                                 value="#{voucherStoreAction.selectedStoreRecord.vchEndNo}"
-                                                 onkeydown="KeyDown()"
-                                            />
-                                    <h:outputLabel value="票据数量:"/>
-                                    <p:inputText id="vchcnt" value="#{voucherStoreAction.selectedStoreRecord.vchCount}"
-                                                 onkeydown="KeyDown()" title="数量=止号-起号，整本处理。"
-                                                 style="width: 60px;"
-                                            />
-                                </h:panelGrid>
-                                <h:panelGrid columns="3">
-                                    <p:commandButton id="transferbtn" style="width:120px;" value="票据调拨"
-                                                     action="#{voucherStoreAction.onTransfer}"
-                                                     update="pdt,pdt2,msgs,formpanel">
-                                    </p:commandButton>
-                                </h:panelGrid>
-                            </h:panelGrid>
-                        </p:panel>
-
-                        <p:dataTable id="pdt2" style="width:100%;margin-top: 20px;margin-bottom: 10px"
-                                     value="#{voucherStoreAction.vchStoreList2}" var="record"
+                        <h:outputText value="票据调拨及使用日志:" />
+                        <p:dataTable id="pdt2" style="width:100%;margin-top:3px;margin-bottom: 10px"
+                                     value="#{voucherStoreAction.vchJrnlList}" var="jrnlrec"
                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
                                      currentPageReportTemplate="{startRecord}-{endRecord} 共{totalRecords}笔"
-                                     paginator="true" rows="5"
+                                     paginator="true" rows="15"
                                      paginatorPosition="bottom"
                                      rowsPerPageTemplate="100,50,30,15,5"
                                      emptyMessage="...">
 
                             <p:column style="text-align:center">
                                 <f:facet name="header">
-                                    机构
-                                </f:facet>
-                                <h:outputText value="#{voucherStoreAction.deptMap.get(record.branchId)}"/>
-                            </p:column>
-                            <p:column style="text-align:center">
-                                <f:facet name="header">
                                     票据数量
                                 </f:facet>
-                                <h:outputText value="#{record.vchCount}"/>
+                                <h:outputText value="#{jrnlrec.vchCount}"/>
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
                                     起号
                                 </f:facet>
-                                <h:outputText value="#{record.vchStartNo}"/>
+                                <h:outputText value="#{jrnlrec.vchStartNo}"/>
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
                                     止号
                                 </f:facet>
-                                <h:outputText value="#{record.vchEndNo}"/>
+                                <h:outputText value="#{jrnlrec.vchEndNo}"/>
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
                                     出入库日期
                                 </f:facet>
-                                <h:outputText value="#{record.oprDate}"/>
+                                <h:outputText value="#{jrnlrec.oprDate}"/>
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
                                     操作员
                                 </f:facet>
-                                <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
+                                <h:outputText value="#{voucherStoreAction.operMap.get(jrnlrec.oprNo)}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    备注
+                                </f:facet>
+                                <h:outputText value="#{jrnlrec.remark}"/>
+                            </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    票据状态
+                                </f:facet>
+                                <h:outputText style="color: blue;" value="#{voucherStoreAction.vchStatus.valueOfAlias(jrnlrec.vchState).title}"/>
                             </p:column>
                         </p:dataTable>
 

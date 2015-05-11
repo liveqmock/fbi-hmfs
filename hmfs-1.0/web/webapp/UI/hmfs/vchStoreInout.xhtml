@@ -61,7 +61,7 @@
                                 <f:facet name="header">
                                     机构
                                 </f:facet>
-                                <h:outputText value="#{record.branchId}"/>
+                                <h:outputText value="#{voucherStoreAction.deptMap.get(record.branchId)}"/>
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
@@ -91,7 +91,7 @@
                                 <f:facet name="header">
                                     操作员
                                 </f:facet>
-                                <h:outputText value="#{record.oprNo}"/>
+                                <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
                             </p:column>
                             <p:column headerText="操作" style="text-align:center">
                                 <p:commandLink value="缴回"

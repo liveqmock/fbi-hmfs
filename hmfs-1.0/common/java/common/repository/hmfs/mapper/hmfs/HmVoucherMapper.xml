@@ -87,4 +87,10 @@
     </update>
 
 
+
+    <select id="selectVchJrnl">
+        select *
+        from hm_vch_jrnl t
+        where t.branch_id = #{instNo}
+    </select>
 </mapper>
