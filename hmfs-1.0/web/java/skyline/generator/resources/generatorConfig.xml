@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry location="/svn-fbihmfs/weblib/ojdbc6.jar"/>
+    <classPathEntry location="/workspace/github/fbi-hmfs/lib/ojdbc6.jar"/>
 
     <!--信息 -->
     <context id="AllInfo" targetRuntime="MyBatis3">
