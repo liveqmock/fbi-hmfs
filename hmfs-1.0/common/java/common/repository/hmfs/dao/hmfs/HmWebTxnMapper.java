@@ -1,6 +1,7 @@
 package common.repository.hmfs.dao.hmfs;
 
 import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmTxnStl;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
@@ -22,6 +23,8 @@ public interface HmWebTxnMapper {
     //缴款交易：查询子报文信息
     public List<HmMsgIn> selectSubMsgListByMsgSn(@Param("msgSn") String msgSn);
 
+    //缴款交易：查询子报文及账户姓名信息　20140109 linyong
+    public List<HmMsgIn> selectSubMsgActFundListByMsgSn(@Param("msgSn") String msgSn);
     //主机余额对帐结果查询
     public List<HmChkActVO> selectCbsChkActFailResult(@Param("sendSysId") String sendSysId, @Param("txnDate") String txnDate);
 
@@ -37,4 +40,10 @@ public interface HmWebTxnMapper {
     //20120724 zhanrui
     //分户账务交易明细日报
     public List<HmFundTxnVO> selectIndiviFundTxnDetail(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    //2015-05-08 linyong 根据日期查询机构是否存在未进行票据维护的缴款书
+    public List<HmTxnStl> checkVoucherIsHandlerByDept(@Param("prevDate") String prevDate,@Param("deptCode") String deptCode);
+
+    //2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书
+    public List<HmTxnStl> checkVoucherIsHandlerByOper(@Param("currentDate") String currentDate,@Param("operCode") String operCode);
 }

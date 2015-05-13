@@ -1,6 +1,7 @@
 package hmfs.common.util;
 
 import common.repository.hmfs.model.HmTxnVch;
+import common.repository.hmfs.model.HmVchJrnl;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
 import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -84,5 +85,36 @@ public class JxlsManager {
             }
         }
     }
+    public String exportVchRecvList(String filename, List<HmVchJrnl> records,String vchNo) {
+        try {
+            Map beansMap = new HashMap();
+            beansMap.put("records", records);
+            beansMap.put("vchNo", vchNo);
 
+            String reportPath = PropertyManager.getProperty("prj_root_dir");
+            String templateFileName = reportPath + "/report/vchRecvList.xls";
+
+            outputExcel(beansMap, templateFileName, filename);
+        } catch (Exception e) {
+            logger.error("报表处理错误！", e);
+            throw new RuntimeException("报表处理错误！", e);
+        }
+        return null;
+    }
+
+    public String exportVchInList(String filename, List<HmVchJrnl> records) {
+        try {
+            Map beansMap = new HashMap();
+            beansMap.put("records", records);
+
+            String reportPath = PropertyManager.getProperty("prj_root_dir");
+            String templateFileName = reportPath + "/report/vchInList.xls";
+
+            outputExcel(beansMap, templateFileName, filename);
+        } catch (Exception e) {
+            logger.error("报表处理错误！", e);
+            throw new RuntimeException("报表处理错误！", e);
+        }
+        return null;
+    }
 }

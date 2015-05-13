@@ -19,6 +19,27 @@
          where a.fund_actno1 = b.fund_actno1
     </select>
 
+    <!--查询子Msg记录  linyong -->
+    <select id="selectSubMsgActFundListByMsgSn" parameterType="java.lang.String"
+            resultMap="common.repository.hmfs.dao.HmMsgInMapper.BaseResultMap">
+        select a.pkid,
+               a.msg_Sn,
+               a.msg_Sub_Sn,
+               b.info_name,
+               a.txn_amt1,
+               a.fund_actno1,
+               a.info_addr,
+               a.builder_area,
+               a.txn_Ctl_Sts,
+               b.dep_standard2,
+               b.house_dep_type,
+               b.house_cust_phone
+            from
+               (select * from hm_msg_in  where msg_sn = #{msgSn} and msg_type like '01%') a,
+                hm_act_fund b
+         where a.fund_actno1 = b.fund_actno1
+    </select>
+
     <!--主机余额对帐结果 不平数据-->
     <select id="selectCbsChkActFailResult" parameterType="java.lang.String"
             resultType="common.repository.hmfs.model.hmfs.HmChkActVO">
@@ -279,5 +300,23 @@
              where txn.fund_acttype = '570'
                and txn.txn_date between #{startDate} and #{endDate}
              order by txndate, txntime, actno
-     </select>
+    </select>
+    <!--2015-05-08 linyong 根据日期查询机构是否存在未进行票据维护的缴款书-->
+    <select id="checkVoucherIsHandlerByDept" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.HmTxnStl">
+        select a.*
+        from hm_txn_stl a
+        where a.txn_date = #{prevDate} and a.txac_brid = #{deptCode}
+        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b where b.txn_date=#{prevDate}
+        and b.txac_brid = #{deptCode})
+    </select>
+    <!--//2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书-->
+    <select id="checkVoucherIsHandlerByOper" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.HmTxnStl">
+        select a.*
+        from hm_txn_stl a
+        where a.txn_date = #{currentDate} and a.opr1_no = #{operCode}
+        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b where b.txn_date=#{currentDate}
+        and b.opr1_no = #{operCode})
+    </select>
 </mapper>

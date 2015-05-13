@@ -4,6 +4,7 @@ import common.enums.CbsErrorCode;
 import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
+import common.repository.hmfs.model.HmVchStore;
 import dep.hmfs.common.HmbTxnsnGenerator;
 import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -120,6 +122,7 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
 
                 //20150511 zhanrui
                 if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                    txnVouchService.processVchUseOrCancel(tiaHeader.deptCode, VouchStatus.valueOfAlias(tia4001.body.billStatus), String.valueOf(startNo), String.valueOf(endNo),tiaHeader.operCode);
                 }
             }
         } catch (Exception e) {

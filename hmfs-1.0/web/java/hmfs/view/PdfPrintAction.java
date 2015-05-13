@@ -98,6 +98,8 @@ public class PdfPrintAction {
         String projAmt = "";
         String payPart = "";
         String accountName = actFund.getInfoName() == null ? "" : actFund.getInfoName();   //21
+        //从账户表中取金额
+//        String txAmt = String.format("%.2f",  actFund.getActBal());
         String txAmt = String.format("%.2f", msgIn.getTxnAmt1());
         Map mapNum = null;
         mapNum = this.transToRMB(txAmt);
@@ -299,52 +301,56 @@ public class PdfPrintAction {
         document.add(table5);
 
         //第六行
-        float[] widths6 = { 51f, 30f,30f,30f,30f,30f,30f,30f,30f,30f,30f,30f, 52f };
+        float[] widths6 = { 120f, 200f,20f, 52f };
+//        float[] widths6 = { 51f, 30f,30f,30f,30f,30f,30f,30f,30f,30f,30f,30f, 52f };
         PdfPTable table6 = new PdfPTable(widths6);
         table6.getDefaultCell().setBorder(0);
         cell = new PdfPCell(new Paragraph("",headFont2));     //交存金额
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("9").toString(),headFont2));
+        cell = new PdfPCell(new Paragraph(mapNum.get("9").toString()+"仟"+mapNum.get("8").toString()+"佰"+
+                mapNum.get("7").toString()+"拾"+mapNum.get("6").toString()+"万"+mapNum.get("5").toString()+"仟"+
+                mapNum.get("4").toString()+"佰"+mapNum.get("3").toString()+"拾"+mapNum.get("2").toString()+"元"+
+                mapNum.get("1").toString()+"角"+mapNum.get("0").toString()+"分",headFont2));
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(0);
         table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("8").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("7").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("6").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("5").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("4").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("3").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("2").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("1").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
-        cell = new PdfPCell(new Paragraph(mapNum.get("0").toString(),headFont2));
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setBorder(0);
-        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("8").toString()+"佰",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("7").toString()+"拾",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("6").toString()+"万",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("5").toString()+"仟",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("4").toString()+"佰",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("3").toString()+"拾",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("2").toString()+"元",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("1").toString()+"角",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
+//        cell = new PdfPCell(new Paragraph(mapNum.get("0").toString()+"分",headFont2));
+//        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//        cell.setBorder(0);
+//        table6.addCell(cell);
         table6.addCell("");
         cell = new PdfPCell(new Paragraph(txAmt,headFont2));
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);

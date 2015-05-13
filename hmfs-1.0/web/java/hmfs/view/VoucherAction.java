@@ -5,12 +5,14 @@ import common.enums.TxnCtlSts;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmTxnVch;
+import common.repository.hmfs.model.HmVchJrnl;
 import hmfs.common.util.JxlsManager;
 import hmfs.service.ActInfoService;
 import hmfs.service.DepService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pub.platform.advance.utils.PropertyManager;
 import pub.platform.system.manage.dao.PtOperBean;
 import skyline.common.utils.MessageUtil;
 import skyline.service.PlatformService;
@@ -65,6 +67,14 @@ public class VoucherAction {
     private String vchSendStatus;
     private List<SelectItem> vchStsList = new ArrayList<SelectItem>();
 
+    //20150508 linyong 票据领用查询
+    private String vchNo;
+    private List<HmVchJrnl> vchRecvList = new ArrayList<HmVchJrnl>();
+    //票据流水查询
+    private List<HmTxnVch> vchTxnList = new ArrayList<HmTxnVch>();
+    //票据入库查询
+    private List<HmVchJrnl> vchInList = new ArrayList<HmVchJrnl>();
+
     @PostConstruct
     public void init() {
 //        hmMsgIn = new HmMsgIn();
@@ -107,7 +117,8 @@ public class VoucherAction {
 
     public String onQrySubMsgin() {
         try {
-            this.subMsgList = actInfoService.selectSubMsgList(msgSn);
+//            this.subMsgList = actInfoService.selectSubMsgList(msgSn);
+            this.subMsgList = actInfoService.selectSubMsgActFundListByMsgSn(msgSn); //linyong
             this.totalCount = this.subMsgList.size();
             if (this.totalCount <= 0) {
                 MessageUtil.addWarn("没有查询到数据记录。");
@@ -147,6 +158,99 @@ public class VoucherAction {
             MessageUtil.addError(e.getMessage());
         }
         return null;
+    }
+
+    //20150508 linyong 票据领用查询
+    public void onReceiveQry(){
+        try {
+            int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
+            if (vchNo.length() != vchnoLen) {
+                MessageUtil.addError("票号长度错误。");
+                return;
+            }
+            this.vchRecvList = actInfoService.qryVchByStsAndVchNo(vchNo, "1");
+            if (vchRecvList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            logger.error("操作处理失败。" + e.getMessage(), e);
+            MessageUtil.addError("操作处理失败。" + e.getMessage());
+        }
+    }
+
+    //20150508 linyong 票据领用excel导出
+    public void onReceiveForExcel() {
+        onReceiveQry();
+        if (this.vchRecvList.size() == 0) {
+            MessageUtil.addWarn("记录为空...");
+            return;
+        } else {
+            String excelFilename = "维修资金票据领用清单-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xls";
+            JxlsManager jxls = new JxlsManager();
+            jxls.exportVchRecvList(excelFilename, this.vchRecvList,vchNo);
+        }
+    }
+
+    //20150508 linyong 票据流水查询
+    public void onTxnQuery(){
+        try {
+            int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
+            if (startno.length() != vchnoLen || endno.length() != vchnoLen) {
+                MessageUtil.addError("票号长度错误。");
+                return;
+            }
+            this.vchTxnList = actInfoService.qryVchByVchNo(startno, endno);
+            if (vchTxnList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            logger.error("操作处理失败。" + e.getMessage(), e);
+            MessageUtil.addError("操作处理失败。" + e.getMessage());
+        }
+    }
+
+    //20150508 linyong 票据流水excel导出
+    public void onTxnQueryForExcel() {
+        onTxnQuery();
+        if (this.vchTxnList.size() == 0) {
+            MessageUtil.addWarn("记录为空...");
+            return;
+        } else {
+            String excelFilename = "维修资金票据流水清单-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xls";
+            JxlsManager jxls = new JxlsManager();
+            jxls.exportTxnvchList(excelFilename, this.vchTxnList);
+        }
+    }
+
+    //20150508 linyong 票据入库查询
+    public void onInQuery(){
+        try {
+            int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
+            if (startno.length() != vchnoLen || endno.length() != vchnoLen) {
+                MessageUtil.addError("票号长度错误。");
+                return;
+            }
+            this.vchInList = actInfoService.qryInVchByStsAndVchNo(startno, endno,"1");
+            if (vchInList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            logger.error("操作处理失败。" + e.getMessage(), e);
+            MessageUtil.addError("操作处理失败。" + e.getMessage());
+        }
+    }
+
+    //20150508 linyong 票据入库excel导出
+    public void onInQueryForExcel() {
+        onInQuery();
+        if (this.vchInList.size() == 0) {
+            MessageUtil.addWarn("记录为空...");
+            return;
+        } else {
+            String excelFilename = "维修资金票据流水清单-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xls";
+            JxlsManager jxls = new JxlsManager();
+            jxls.exportVchInList(excelFilename, this.vchInList);
+        }
     }
 
     // ----------------------------------------------------------
@@ -293,5 +397,37 @@ public class VoucherAction {
 
     public void setActInfoService(ActInfoService actInfoService) {
         this.actInfoService = actInfoService;
+    }
+
+    public List<HmVchJrnl> getVchRecvList() {
+        return vchRecvList;
+    }
+
+    public void setVchRecvList(List<HmVchJrnl> vchRecvList) {
+        this.vchRecvList = vchRecvList;
+    }
+
+    public String getVchNo() {
+        return vchNo;
+    }
+
+    public void setVchNo(String vchNo) {
+        this.vchNo = vchNo;
+    }
+
+    public List<HmTxnVch> getVchTxnList() {
+        return vchTxnList;
+    }
+
+    public void setVchTxnList(List<HmTxnVch> vchTxnList) {
+        this.vchTxnList = vchTxnList;
+    }
+
+    public List<HmVchJrnl> getVchInList() {
+        return vchInList;
+    }
+
+    public void setVchInList(List<HmVchJrnl> vchInList) {
+        this.vchInList = vchInList;
     }
 }

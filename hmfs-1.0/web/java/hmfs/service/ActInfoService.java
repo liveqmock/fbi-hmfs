@@ -82,6 +82,9 @@ public class ActInfoService {
     @Resource
     private PlatformService platformService;
 
+    @Resource
+    private HmVchJrnlMapper hmVchJrnlMapper;
+
     public HmSysCtl getAppSysStatus() {
         return hmSysCtlMapper.selectByPrimaryKey("1");
     }
@@ -465,5 +468,37 @@ public class ActInfoService {
             actFund.setRecversion(actFund.getRecversion() + 1);
             return actFundMapper.updateByPrimaryKey(actFund);
         }
+    }
+
+    //缴款交易：查询子报文信息 linyong
+    public List<HmMsgIn> selectSubMsgActFundListByMsgSn(String msgSn) {
+        return hmWebTxnMapper.selectSubMsgActFundListByMsgSn(msgSn);
+    }
+
+    //20150508 linyong 票据领用查询
+    public List<HmVchJrnl> qryVchByStsAndVchNo(String vchNo, String vouchStatus) {
+        HmVchJrnlExample example = new HmVchJrnlExample();
+        example.createCriteria().andVchStateEqualTo(vouchStatus).andVchStartNoLessThanOrEqualTo(vchNo).andVchEndNoGreaterThanOrEqualTo(vchNo);
+        example.setOrderByClause(" opr_date desc,pkid desc ");
+        List<HmVchJrnl> vchJrnlList = hmVchJrnlMapper.selectByExample(example);
+        return hmVchJrnlMapper.selectByExample(example);
+    }
+
+    //20150508 linyong 票据业务发生流水查询
+    public List<HmTxnVch> qryVchByVchNo(String startNo, String endNo) {
+        HmTxnVchExample example = new HmTxnVchExample();
+        example.createCriteria().andVchNumBetween(startNo,endNo);
+        example.setOrderByClause(" txac_brid,opr1_no,txn_date ");
+        return hmTxnVchMapper.selectByExample(example);
+    }
+
+    //20150508 linyong 票据入库查询
+    public List<HmVchJrnl> qryInVchByStsAndVchNo(String startNo,String endNo, String vouchStatus) {
+        HmVchJrnlExample example = new HmVchJrnlExample();
+        example.createCriteria().andVchStateEqualTo(vouchStatus).andVchStartNoLessThanOrEqualTo(startNo);
+        example.or().andVchStateEqualTo(vouchStatus).andVchEndNoLessThanOrEqualTo(endNo);
+        example.setOrderByClause(" branch_id,opr_date desc,pkid desc ");
+        List<HmVchJrnl> vchJrnlList = hmVchJrnlMapper.selectByExample(example);
+        return hmVchJrnlMapper.selectByExample(example);
     }
 }

@@ -22,6 +22,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +195,9 @@ public class VoucherStoreAction implements Serializable {
                 return;
             }
             long cnt = this.selectedStoreRecord.getVchCount();
-            if (cnt != Integer.parseInt(endNo) - Integer.parseInt(startNo) + 1) {
+            BigDecimal start = new BigDecimal(startNo);
+            BigDecimal end = new BigDecimal(endNo);
+            if (cnt != end.subtract(start).intValue() + 1) {
                 MessageUtil.addError("输入的票据数量与按照起止号计算的数量不符，请重新输入..");
                 return;
             } else {
