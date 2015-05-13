@@ -10,6 +10,7 @@ import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.processor.cbs.domain.txn.TIA4001;
 import dep.hmfs.online.service.hmb.HmbClientReqService;
 import dep.hmfs.online.service.hmb.TxnVouchService;
+import dep.util.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +117,10 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
                 txnVouchService.insertVouchsByNo(msgSn, startNo, endNo, tiaHeader.serialNo,
                         tiaHeader.deptCode, tiaHeader.operCode, tia4001.body.payApplyNo,
                         tia4001.body.billStatus);
+
+                //20150511 zhanrui
+                if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
+                }
             }
         } catch (Exception e) {
             logger.error("发送报文至国土局时出现异常。" + e.getMessage(), e);

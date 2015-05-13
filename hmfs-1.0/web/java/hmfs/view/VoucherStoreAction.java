@@ -3,7 +3,6 @@ package hmfs.view;
 import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmVchJrnl;
 import common.repository.hmfs.model.HmVchStore;
-import common.service.SystemService;
 import hmfs.service.VoucherService;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -59,8 +58,8 @@ public class VoucherStoreAction implements Serializable {
     private List<SelectItem> branchList;
     private String fromBranchId;    //拨出机构
     private String toBranchId;      //拨入机构
+    private String branchId;      //登录柜员机构
 
-    private String txnType; //交易类别  headoffice：分行库存处理   branch：支行及网点库存处理  qryjrnl:日志查询
     private VouchStatus vchStatus = VouchStatus.RECEIVED;
     private Map<String, String> operMap;
     private Map<String, String> deptMap;
@@ -69,24 +68,24 @@ public class VoucherStoreAction implements Serializable {
     public void init() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 
-        this.txnType = request.getParameter("type");
+        String txnType = request.getParameter("type");
         if (txnType == null) {
             txnType = "qryjrnl";
         }
 
         OperatorManager om = platformService.getOperatorManager();
-        String branchid = om.getOperator().getDeptid();
+        branchId = om.getOperator().getDeptid();
 
-        if ("headoffice".equalsIgnoreCase(this.txnType)) {
-            branchid = voucherService.selectHoInstNo();
+        if ("headoffice".equalsIgnoreCase(txnType)) {
+            branchId = voucherService.selectHoInstNo();
             initHeadOfficeDataList();
         }
-        this.branchList = toolsService.selectBranchList(branchid);
+        this.branchList = toolsService.selectBranchList(branchId);
 
         vchStsList.add(new SelectItem(VouchStatus.USED.getCode(), VouchStatus.USED.getTitle()));
         vchStsList.add(new SelectItem(VouchStatus.CANCEL.getCode(), VouchStatus.CANCEL.getTitle()));
         selectedStoreRecord = new HmVchStore();
-        selectedStoreRecord.setVchCount(0);
+        selectedStoreRecord.setVchCount(0L);
 
         operMap = voucherService.selectPtoperMap();
         deptMap = voucherService.selectPtdeptMap();
@@ -111,7 +110,7 @@ public class VoucherStoreAction implements Serializable {
                 MessageUtil.addError("票号长度错误。");
                 return;
             }
-            int cnt = this.selectedStoreRecord.getVchCount();
+            long cnt = this.selectedStoreRecord.getVchCount();
             if (cnt != Long.parseLong(endNo) - Long.parseLong(startNo) + 1) {
                 MessageUtil.addError("输入的票据数量与按照起止号计算的数量不符，请重新输入..");
                 return;
@@ -120,7 +119,7 @@ public class VoucherStoreAction implements Serializable {
             }
 
             selectedStoreRecord = new HmVchStore();
-            selectedStoreRecord.setVchCount(0);
+            selectedStoreRecord.setVchCount(0L);
             initHeadOfficeDataList();
             RequestContext.getCurrentInstance().execute("document.forms['form']['form:tabview:vchstartno'].focus;");
         } catch (Exception e) {
@@ -149,6 +148,13 @@ public class VoucherStoreAction implements Serializable {
         }
         return null;
     }
+
+    public void onTestVoucher(){
+
+        voucherService.processVchUseOrCancel(branchId, VouchStatus.USED, "011", "020");
+
+    }
+
 
     //==============================================================
     public void startTransfer() {
@@ -187,7 +193,7 @@ public class VoucherStoreAction implements Serializable {
                 MessageUtil.addError("票号长度错误。");
                 return;
             }
-            int cnt = this.selectedStoreRecord.getVchCount();
+            long cnt = this.selectedStoreRecord.getVchCount();
             if (cnt != Integer.parseInt(endNo) - Integer.parseInt(startNo) + 1) {
                 MessageUtil.addError("输入的票据数量与按照起止号计算的数量不符，请重新输入..");
                 return;
@@ -195,7 +201,7 @@ public class VoucherStoreAction implements Serializable {
                 voucherService.processVchTransfer(fromBranchId, toBranchId, selectedStoreRecord);
             }
             selectedStoreRecord = new HmVchStore();
-            selectedStoreRecord.setVchCount(0);
+            selectedStoreRecord.setVchCount(0L);
             initTransferdataList();
         } catch (Exception e) {
             logger.error("操作处理失败。" + e.getMessage(), e);
@@ -215,10 +221,6 @@ public class VoucherStoreAction implements Serializable {
     private void initvchJrnlList() {
         this.vchStoreList = voucherService.selectInstitutionVoucherStoreList(fromBranchId);
         this.vchJrnlList = voucherService.selectVchJrnl(fromBranchId);
-    }
-
-    public String getVoucherStatusEnumTitle(String alias){
-        return VouchStatus.valueOfAlias(alias).getTitle();
     }
 
     public String findOperName(String operid){

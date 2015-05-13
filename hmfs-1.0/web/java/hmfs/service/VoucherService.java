@@ -78,10 +78,10 @@ public class VoucherService {
 
     //分行票据领用
     @Transactional
-    public void processHoInstVchInput(int vchCnt, String startNo, String endNo) {
+    public void processHoInstVchInput(long vchCnt, String startNo, String endNo) {
         //获取分行库存情况
         String instNo = selectHoInstNo();
-        processInstVoucherInput(vchCnt, startNo, endNo, instNo);
+        processInstVoucherInput(vchCnt, startNo, endNo, instNo, "自中心领用");
         insertVoucherJournal(vchCnt, startNo, endNo, instNo, VouchStatus.RECEIVED, "自中心领用");
     }
 
@@ -114,13 +114,8 @@ public class VoucherService {
             throw new RuntimeException("拨出的止号超出范围.");
         }
 
-        Long nTransInStartNo = Long.parseLong(vchStoreParam.getVchEndNo()) + 1;
-        String sTransInStartNo = nTransInStartNo.toString();
-
-        int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
-        if (sTransInStartNo.length() != vchnoLen) { //长度不足 左补零
-            sTransInStartNo = StringUtils.leftPad(sTransInStartNo, vchnoLen, "0");
-        }
+        long nTransInStartNo = Long.parseLong(vchStoreParam.getVchEndNo()) + 1;
+        String sTransInStartNo = getStandLengthForVoucherString(nTransInStartNo);
 
         if (vchStoreParam.getRecversion().compareTo(vchStoreDB.getRecversion()) != 0) {
             throw new RuntimeException("并发冲突，记录已被修改。");
@@ -149,11 +144,11 @@ public class VoucherService {
             //修改原纪录的起号
             vchStoreDB.setRemark("部分拨出");
             vchStoreDB.setVchStartNo(sTransInStartNo);
-            vchStoreDB.setVchCount(Integer.parseInt(vchStoreDB.getVchEndNo()) - Integer.parseInt(vchStoreDB.getVchStartNo()) + 1);
+            vchStoreDB.setVchCount(Long.parseLong(vchStoreDB.getVchEndNo()) - Long.parseLong(vchStoreDB.getVchStartNo()) + 1);
             vchStoreMapper.updateByPrimaryKey(vchStoreDB);
 
             //增加新记录
-            processInstVoucherInput(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(), toInst);
+            processInstVoucherInput(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(), toInst, "部分拨入");
             //日志
             insertVoucherJournal(vchStoreParam.getVchCount(), vchStoreParam.getVchStartNo(), vchStoreParam.getVchEndNo(),
                     toInst, VouchStatus.RECEIVED, "部分拨入");
@@ -165,6 +160,93 @@ public class VoucherService {
         }
     }
 
+
+    //票据使用和作废
+    @Transactional
+    public void processVchUseOrCancel(final String instNo, final VouchStatus status, final String startNo, final String endNo) {
+        //TODO 检查 中间不能有空号（库存中不存在的中间号码）
+
+        List<HmVchStore> storeParamList = new ArrayList<HmVchStore>();
+        doVchUseOrCancel(instNo, startNo, endNo, storeParamList);
+
+        String remark = "";
+        if (status == VouchStatus.USED) {
+            remark = "票据使用";
+        } else if (status == VouchStatus.CANCEL) {
+            remark = "票据作废";
+        } else {
+            throw new IllegalArgumentException("参数错误.");
+        }
+
+        for (final HmVchStore storeParam : storeParamList) {
+            HmVchStore storeDb = selectVchStoreByStartNo(instNo, storeParam.getVchStartNo());
+            long startNoDb = Long.parseLong(storeDb.getVchStartNo());
+            long endNoDb = Long.parseLong(storeDb.getVchEndNo());
+            long startNoParam = Long.parseLong(storeParam.getVchStartNo());
+            long endNoParam = Long.parseLong(storeParam.getVchEndNo());
+
+            vchStoreMapper.deleteByPrimaryKey(storeDb.getPkid());
+            if (startNoDb != startNoParam || endNoDb != endNoParam) {//处理整个记录
+                if (startNoParam != startNoDb) {
+                    insertVoucherStore(startNoParam - startNoDb, storeDb.getVchStartNo(),
+                            getStandLengthForVoucherString(startNoParam - 1), instNo, remark);
+                }
+                if (endNoParam != endNoDb) {
+                    insertVoucherStore(endNoDb - endNoParam, getStandLengthForVoucherString(endNoParam + 1),
+                            storeDb.getVchEndNo(), instNo, remark);
+                }
+            }
+        }
+
+        insertVoucherJournal(Long.parseLong(endNo) - Long.parseLong(startNo) + 1, startNo, endNo, instNo, status, remark);
+        //总分核对
+        if (!verifyVchStoreAndJrnl(instNo)) {
+            throw new RuntimeException("库存总分不符！");
+        }
+    }
+
+    private void doVchUseOrCancel(String instNo, String startNo, String endNo, List<HmVchStore> storeParamList) {
+        HmVchStore storeDb = selectVchStoreByStartNo(instNo, startNo);
+        HmVchStore storeParam = new HmVchStore();
+        storeParam.setPkid(storeDb.getPkid());
+        storeParam.setVchStartNo(startNo);
+        if (storeDb.getVchEndNo().compareTo(endNo) < 0) {
+            storeParam.setVchEndNo(storeDb.getVchEndNo());
+            storeParam.setVchCount(Long.parseLong(storeDb.getVchEndNo()) - Long.parseLong(startNo) + 1);
+            storeParamList.add(storeParam);
+            String vchNo = getStandLengthForVoucherString(Long.parseLong(storeDb.getVchEndNo()) + 1);
+            doVchUseOrCancel(instNo, vchNo, endNo, storeParamList);
+        } else {
+            storeParam.setVchEndNo(endNo);
+            storeParam.setVchCount(Long.parseLong(endNo) - Long.parseLong(startNo) + 1);
+            storeParamList.add(storeParam);
+        }
+    }
+
+    //根据起号查找数据库中含有此号码的库存记录
+    private HmVchStore selectVchStoreByStartNo(String instNo, String startNo) {
+        HmVchStoreExample storeExample = new HmVchStoreExample();
+        storeExample.createCriteria().andBranchIdEqualTo(instNo)
+                .andVchStartNoLessThanOrEqualTo(startNo)
+                .andVchEndNoGreaterThanOrEqualTo(startNo);
+        List<HmVchStore> storesTmp = vchStoreMapper.selectByExample(storeExample);
+        if (storesTmp.size() != 1) {
+            throw new RuntimeException("未找到库存记录。");
+        }
+        return storesTmp.get(0);
+    }
+
+    //补票据号长度
+    private String getStandLengthForVoucherString(long vchno) {
+        String vchNo = "" + vchno;
+        int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
+        if (vchNo.length() != vchnoLen) { //长度不足 左补零
+            vchNo = StringUtils.leftPad(vchNo, vchnoLen, "0");
+        }
+        return vchNo;
+    }
+
+
     //按机构查看近一年的记录
     public List<HmVchJrnl> selectVchJrnl(String instNo) {
         HmVchJrnlExample example = new HmVchJrnlExample();
@@ -175,34 +257,35 @@ public class VoucherService {
         return vchJrnlMapper.selectByExample(example);
     }
 
-    public Map<String, String> selectPtoperMap(){
+    public Map<String, String> selectPtoperMap() {
         PtoperExample example = new PtoperExample();
         List<Ptoper> ptopers = ptoperMapper.selectByExample(example);
         Map<String, String> operMap = new HashMap<String, String>();
         for (Ptoper ptoper : ptopers) {
             operMap.put(ptoper.getOperid(), ptoper.getOpername());
         }
-        return  operMap;
+        return operMap;
     }
-    public Map<String, String> selectPtdeptMap(){
+
+    public Map<String, String> selectPtdeptMap() {
         PtdeptExample example = new PtdeptExample();
         List<Ptdept> ptdepts = ptdeptMapper.selectByExample(example);
         Map<String, String> map = new HashMap<String, String>();
         for (Ptdept dept : ptdepts) {
             map.put(dept.getDeptid(), dept.getDeptname());
         }
-        return  map;
+        return map;
     }
 
     //=====================================
-    private void processInstVoucherInput(int vchCnt, String startNo, String endNo, String instNo) {
+    private void processInstVoucherInput(long vchCnt, String startNo, String endNo, String instNo, String remark) {
         String maxEndno = voucherMapper.selectInstVchMaxEndNo(instNo);
         if (maxEndno == null) {
             maxEndno = "0";
         }
 
         if (startNo.compareTo(maxEndno) > 0) {//入库记录的起号比库存中的都大
-            insertVoucherStore(vchCnt, startNo, endNo, instNo);
+            insertVoucherStore(vchCnt, startNo, endNo, instNo, remark);
         } else {
             //检查是否存在入库记录的起号与止号之间的记录
             int recordNum = voucherMapper.selectStoreRecordnumBetweenStartnoAndEndno(startNo, endNo);
@@ -215,11 +298,11 @@ public class VoucherService {
             } else {
                 String maxNearbyEndno = voucherMapper.selectStoreEndno_LessThanVchno(startNo);
                 if (maxNearbyEndno == null) {//有库存，但每条记录的起号都比入库记录的止号大
-                    insertVoucherStore(vchCnt, startNo, endNo, instNo);
+                    insertVoucherStore(vchCnt, startNo, endNo, instNo, remark);
                 } else {
                     int dbVchCnt = Integer.parseInt(minNearbyStartno) - Integer.parseInt(maxNearbyEndno) - 1;
                     if (vchCnt <= dbVchCnt) {
-                        insertVoucherStore(vchCnt, startNo, endNo, instNo);
+                        insertVoucherStore(vchCnt, startNo, endNo, instNo, remark);
                     } else {
                         throw new RuntimeException("票号冲突。");
                     }
@@ -241,7 +324,7 @@ public class VoucherService {
     }
 
 
-    private void insertVoucherStore(int vchCnt, String startNo, String endNo, String instNo) {
+    private void insertVoucherStore(long vchCnt, String startNo, String endNo, String instNo, String remark) {
         HmVchStore vchStore = new HmVchStore();
         vchStore.setVchCount(vchCnt);
         vchStore.setVchStartNo(startNo);
@@ -251,14 +334,14 @@ public class VoucherService {
         vchStore.setOprDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
         vchStore.setOprNo(getOperatorManager().getOperatorId());
         vchStore.setRecversion(0);
-        vchStore.setRemark("入库处理");
+        vchStore.setRemark(remark);
 
         String random = StringUtils.leftPad("" + (new SecureRandom().nextInt(99999) + 1), 5, "0");
         vchStore.setPkid(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "-" + random + "-" + "001");
         vchStoreMapper.insert(vchStore);
     }
 
-    private void insertVoucherJournal(int vchCnt, String startNo, String endNo, String instNo,
+    private void insertVoucherJournal(long vchCnt, String startNo, String endNo, String instNo,
                                       VouchStatus status, String remark) {
         HmVchJrnl vchJrnl = new HmVchJrnl();
         vchJrnl.setVchCount(vchCnt);

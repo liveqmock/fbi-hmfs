@@ -101,6 +101,12 @@
                                 </f:facet>
                                 <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
                             </p:column>
+                            <p:column style="text-align:center">
+                                <f:facet name="header">
+                                    备注
+                                </f:facet>
+                                <h:outputText value="#{record.remark}"/>
+                            </p:column>
                         </p:dataTable>
 
                         <h:outputText value="票据调拨及使用日志:" />
