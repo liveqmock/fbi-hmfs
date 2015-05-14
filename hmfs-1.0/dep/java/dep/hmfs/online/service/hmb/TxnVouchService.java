@@ -104,8 +104,8 @@ public class TxnVouchService {
         return hmTxnVchMapper.countByExample(example) > 0;
     }
     //2015-05-08 linyong 根据日期查询机构是否存在未进行票据维护的缴款书
-    public List<HmTxnStl> checkVoucherIsHandlerByDept(String prevDate,String deptCode){
-        return hmWebTxnMapper.checkVoucherIsHandlerByDept(prevDate,deptCode);
+    public List<HmTxnStl> checkVoucherIsHandlerByDept(String prevDate,String currentDate,String deptCode){
+        return hmWebTxnMapper.checkVoucherIsHandlerByDept(prevDate,currentDate,deptCode);
     }
     //2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书
     public List<HmTxnStl> checkVoucherIsHandlerByOper(String currentDate,String operCode){

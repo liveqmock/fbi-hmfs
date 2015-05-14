@@ -105,8 +105,11 @@ public class CbsTxn4001Processor extends CbsAbstractTxnProcessor {
 
         // 检查票据是否已使用
         for (long i = startNo; i <= endNo; i++) {
-            if (txnVouchService.isUsedVchNo(String.valueOf(i))) {
-                throw new RuntimeException(CbsErrorCode.VOUCHER_USED.getCode());
+            //如果票据状态为作废，不用做检查
+            if(!VouchStatus.CANCEL.getCode().equals(tia4001.body.billStatus)){
+                if (txnVouchService.isUsedVchNo(String.valueOf(i))) {
+                    throw new RuntimeException(CbsErrorCode.VOUCHER_USED.getCode());
+                }
             }
         }
 

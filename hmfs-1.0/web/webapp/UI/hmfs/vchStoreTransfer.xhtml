@@ -101,9 +101,10 @@
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
-                                    操作员
+                                    柜员号
                                 </f:facet>
-                                <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
+                                <!--<h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>-->
+                                <h:outputText value="#{record.oprNo}"/>
                             </p:column>
                             <p:column headerText="操作" style="text-align:center">
                                 <p:commandLink value="拨出"
@@ -186,9 +187,9 @@
                             </p:column>
                             <p:column style="text-align:center">
                                 <f:facet name="header">
-                                    操作员
+                                    柜员号
                                 </f:facet>
-                                <h:outputText value="#{voucherStoreAction.operMap.get(record.oprNo)}"/>
+                                <h:outputText value="#{record.oprNo}"/>
                             </p:column>
                         </p:dataTable>
 

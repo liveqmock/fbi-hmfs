@@ -112,8 +112,9 @@ public class CbsTxn1001Processor extends CbsAbstractTxnProcessor {
         calendar.add(Calendar.DATE, -1);
         Date date = calendar.getTime();
         String prevDate = new SimpleDateFormat("yyyyMMdd").format(date);
+        String currentDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String deptCode = tiaHeader.deptCode;
-        List<HmTxnStl> listTxn = txnVouchService.checkVoucherIsHandlerByDept(prevDate,deptCode);
+        List<HmTxnStl> listTxn = txnVouchService.checkVoucherIsHandlerByDept(prevDate,currentDate,deptCode);
         if (listTxn.size()>0){
             return true;
         }else {

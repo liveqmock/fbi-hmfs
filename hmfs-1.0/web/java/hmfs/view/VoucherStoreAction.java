@@ -195,6 +195,7 @@ public class VoucherStoreAction implements Serializable {
                 return;
             }
             long cnt = this.selectedStoreRecord.getVchCount();
+            //20150514 linyong 由于票据号长度大于12位，无法转换成Integer类型。
             BigDecimal start = new BigDecimal(startNo);
             BigDecimal end = new BigDecimal(endNo);
             if (cnt != end.subtract(start).intValue() + 1) {

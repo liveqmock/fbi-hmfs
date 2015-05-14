@@ -42,7 +42,7 @@ public interface HmWebTxnMapper {
     public List<HmFundTxnVO> selectIndiviFundTxnDetail(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
     //2015-05-08 linyong 根据日期查询机构是否存在未进行票据维护的缴款书
-    public List<HmTxnStl> checkVoucherIsHandlerByDept(@Param("prevDate") String prevDate,@Param("deptCode") String deptCode);
+    public List<HmTxnStl> checkVoucherIsHandlerByDept(@Param("prevDate") String prevDate,@Param("currentDate") String currentDate,@Param("deptCode") String deptCode);
 
     //2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书
     public List<HmTxnStl> checkVoucherIsHandlerByOper(@Param("currentDate") String currentDate,@Param("operCode") String operCode);

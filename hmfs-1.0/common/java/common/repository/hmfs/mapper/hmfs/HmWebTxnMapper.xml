@@ -306,8 +306,9 @@
             resultType="common.repository.hmfs.model.HmTxnStl">
         select a.*
         from hm_txn_stl a
-        where a.txn_date = #{prevDate} and a.txac_brid = #{deptCode}
-        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b where b.txn_date=#{prevDate}
+        where a.dc_flag='D' and a.txn_date = #{prevDate} and a.txac_brid = #{deptCode}
+        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b
+        where and b.txn_date between #{prevDate} and #{currentDate}
         and b.txac_brid = #{deptCode})
     </select>
     <!--//2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书-->
@@ -315,7 +316,7 @@
             resultType="common.repository.hmfs.model.HmTxnStl">
         select a.*
         from hm_txn_stl a
-        where a.txn_date = #{currentDate} and a.opr1_no = #{operCode}
+        where a.dc_flag='D' and a.txn_date = #{currentDate} and a.opr1_no = #{operCode}
         and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b where b.txn_date=#{currentDate}
         and b.opr1_no = #{operCode})
     </select>
