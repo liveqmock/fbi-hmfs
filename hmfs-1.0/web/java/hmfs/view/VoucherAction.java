@@ -6,6 +6,7 @@ import common.enums.VouchStatus;
 import common.repository.hmfs.model.HmMsgIn;
 import common.repository.hmfs.model.HmTxnVch;
 import common.repository.hmfs.model.HmVchJrnl;
+import common.repository.hmfs.model.hmfs.HmVchTxnVO;
 import hmfs.common.util.JxlsManager;
 import hmfs.service.ActInfoService;
 import hmfs.service.DepService;
@@ -74,6 +75,8 @@ public class VoucherAction {
     private List<HmTxnVch> vchTxnList = new ArrayList<HmTxnVch>();
     //票据入库查询
     private List<HmVchJrnl> vchInList = new ArrayList<HmVchJrnl>();
+    //票据流水查询,包含账号信息
+    private List<HmVchTxnVO> vchTxnAcctList = new ArrayList<HmVchTxnVO>();
 
     @PostConstruct
     public void init() {
@@ -253,6 +256,37 @@ public class VoucherAction {
         }
     }
 
+    //20150508 linyong 票据流水查询，包含账号等信息
+    public void onTxnAccountQuery(){
+        try {
+            int vchnoLen = PropertyManager.getIntProperty("voucher_no_length");
+            if (startno.length() != vchnoLen || endno.length() != vchnoLen) {
+                MessageUtil.addError("票号长度错误。");
+                return;
+            }
+            this.vchTxnAcctList = actInfoService.selectVchAccountTxn(startno, endno);
+            if (vchTxnAcctList.isEmpty()) {
+                MessageUtil.addWarn("数据不存在...");
+            }
+        } catch (Exception e) {
+            logger.error("操作处理失败。" + e.getMessage(), e);
+            MessageUtil.addError("操作处理失败。" + e.getMessage());
+        }
+    }
+
+    //20150508 linyong 票据流水excel导出
+    public void onTxnAccountQueryForExcel() {
+        onTxnAccountQuery();
+        if (this.vchTxnAcctList.size() == 0) {
+            MessageUtil.addWarn("记录为空...");
+            return;
+        } else {
+            String excelFilename = "维修资金票据流水清单-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xls";
+            JxlsManager jxls = new JxlsManager();
+            jxls.exportTxnvchAcctList(excelFilename, this.vchTxnAcctList);
+        }
+    }
+
     // ----------------------------------------------------------
 
     public List<SelectItem> getVchStsList() {
@@ -429,5 +463,13 @@ public class VoucherAction {
 
     public void setVchInList(List<HmVchJrnl> vchInList) {
         this.vchInList = vchInList;
+    }
+
+    public List<HmVchTxnVO> getVchTxnAcctList() {
+        return vchTxnAcctList;
+    }
+
+    public void setVchTxnAcctList(List<HmVchTxnVO> vchTxnAcctList) {
+        this.vchTxnAcctList = vchTxnAcctList;
     }
 }

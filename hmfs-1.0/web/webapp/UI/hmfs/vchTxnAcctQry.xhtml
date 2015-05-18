@@ -26,7 +26,7 @@
     <ui:define name="content">
         <div style="margin:5px">
             <p:tabView id="tabview" dynamic="true" cache="false" style="font-weight:normal;font-style:normal">
-                <p:tab title="维修资金票据入库总账查询">
+                <p:tab title="维修资金票据流水查询">
                     <h:form>
                         <div id="qrytable">
                             <p:growl id="msgs" showDetail="false"/>
@@ -42,11 +42,11 @@
                                     </h:panelGrid>
                                     <h:panelGrid>
                                         <p:commandButton style="width:100px;" value="查询明细"
-                                                         action="#{voucherAction.onInQuery}"
+                                                         action="#{voucherAction.onTxnAccountQuery}"
                                                          update="pdt,msgs">
                                         </p:commandButton>
                                         <p:commandButton style="width:100px;" value="导出EXCEL"
-                                                         action="#{voucherAction.onInQueryForExcel}"
+                                                         action="#{voucherAction.onTxnAccountQueryForExcel}"
                                                          ajax="false">
                                         </p:commandButton>
                                     </h:panelGrid>
@@ -61,7 +61,7 @@
                                 </f:facet>
                             </p:ajaxStatus>
                             <p:dataTable id="pdt" dynamic="true" style="width:100%;"
-                                         value="#{voucherAction.vchInList}" var="record"
+                                         value="#{voucherAction.vchTxnAcctList}" var="record"
                                          rowKey="#{record.pkid}"
                                          selection="#{voucherAction.selectedTxnVch}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -69,24 +69,37 @@
                                          rowsPerPageTemplate="100,50,30,15,5"
                                          emptyMessage="数据记录为空...">
                                 <p:column selectionMode="single" style="width:18px"/>
-                                <p:column headerText="领用日期" style="text-align: center">
-                                    <h:outputText value="#{record.oprDate}"/>
+                                <p:column headerText="交易日期" style="text-align: center">
+                                    <h:outputText value="#{record.txndate}"/>
                                 </p:column>
-                                <p:column headerText="机构代码" style="text-align: center">
-                                    <h:outputText value="#{record.branchId}"/>
+                                <p:column headerText="申请单号" style="text-align: center">
+                                    <h:outputText value="#{record.fundtxnsn}"/>
                                 </p:column>
-                                <p:column headerText="票据数量" style="text-align: center">
-                                    <h:outputText value="#{record.vchCount}"/>
+                                <p:column headerText="主机流水号">
+                                    <h:outputText value="#{record.cbstxnsn}" style="text-align: center"/>
                                 </p:column>
-                                <p:column headerText="起始号码" style="text-align: center">
-                                    <h:outputText value="#{record.vchStartNo}"/>
-                                </p:column>
-                                <p:column headerText="截止号码" style="text-align: center">
-                                    <h:outputText value="#{record.vchEndNo}"/>
+
+                                <p:column headerText="票据号" style="text-align: center">
+                                    <h:outputText value="#{record.vchnum}"/>
                                 </p:column>
                                 <p:column headerText="票据状态" style="text-align: center">
                                     <h:outputText
-                                            value="#{voucherAction.vouchStatus.valueOfAlias(record.vchState).title}"/>
+                                            value="#{voucherAction.vouchStatus.valueOfAlias(record.vchsts).title}"/>
+                                </p:column>
+                                <p:column headerText="银行网点号" style="text-align: center">
+                                    <h:outputText value="#{record.txacbrid}"/>
+                                </p:column>
+                                <p:column headerText="记账柜员" style="text-align: center">
+                                    <h:outputText value="#{record.opr1no}"/>
+                                </p:column>
+                                <p:column headerText="账号" style="text-align: center">
+                                    <h:outputText value="#{record.fundactno}"/>
+                                </p:column>
+                                <p:column headerText="金额" style="text-align: center">
+                                    <h:outputText value="#{record.actbal}"/>
+                                </p:column>
+                                <p:column headerText="地址" style="text-align: center">
+                                    <h:outputText value="#{record.infoaddr}"/>
                                 </p:column>
                             </p:dataTable>
                         </div>

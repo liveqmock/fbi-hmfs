@@ -65,8 +65,10 @@ public class CbsTxn1001Processor extends CbsAbstractTxnProcessor {
             //  建行 1001 交易返回报文
             if ("05".equals(PropertyManager.getProperty("SEND_SYS_ID"))) {
                 if (checkVoucherIsHandlerByDept(tiaHeader)||checkVoucherIsHandlerByOper(tiaHeader)){
-                    throw new RuntimeException(CbsErrorCode.VOUCHER_NOT_HANDLER.getCode());
-                }else{
+                    logger.info("票据未维护");
+                    //throw new RuntimeException(CbsErrorCode.VOUCHER_NOT_HANDLER.getCode());
+                }
+                //}else{
                     String[] payMsgTypes = {"01035", "01045"};
                     List<HmMsgIn> payInfoList = hmbBaseService.qrySubMsgsByMsgSnAndTypes(tia1001.body.payApplyNo, payMsgTypes);
                     logger.info("查询交款交易子报文。查询到笔数：" + payInfoList.size());
@@ -98,7 +100,7 @@ public class CbsTxn1001Processor extends CbsAbstractTxnProcessor {
                             toa1001.body.recordList.add(record);
                         }
                     }
-                }
+//                }
             }
         } else {
             throw new RuntimeException(CbsErrorCode.QRY_NO_RECORDS.getCode());

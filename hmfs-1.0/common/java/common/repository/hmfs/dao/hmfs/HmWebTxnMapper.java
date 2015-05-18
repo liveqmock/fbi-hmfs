@@ -5,6 +5,7 @@ import common.repository.hmfs.model.HmTxnStl;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
+import common.repository.hmfs.model.hmfs.HmVchTxnVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -46,4 +47,7 @@ public interface HmWebTxnMapper {
 
     //2015-05-08 linyong 根据日期查询柜员是否存在未进行票据维护的缴款书
     public List<HmTxnStl> checkVoucherIsHandlerByOper(@Param("currentDate") String currentDate,@Param("operCode") String operCode);
+
+    //2015-05-08 linyong 根据票据起止号码查询票据流水
+    public List<HmVchTxnVO> selectVchAccountTxn(@Param("startNo") String startNo,@Param("endNo") String endNo);
 }

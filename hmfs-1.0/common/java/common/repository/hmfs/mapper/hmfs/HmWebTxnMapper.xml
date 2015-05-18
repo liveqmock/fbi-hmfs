@@ -299,7 +299,7 @@
                and vch.vch_sts='2'
              where txn.fund_acttype = '570'
                and txn.txn_date between #{startDate} and #{endDate}
-             order by txndate, txntime, actno
+             order by txndate,vchnum,actno
     </select>
     <!--2015-05-08 linyong 根据日期查询机构是否存在未进行票据维护的缴款书-->
     <select id="checkVoucherIsHandlerByDept" parameterType="java.lang.String"
@@ -307,7 +307,7 @@
         select a.*
         from hm_txn_stl a
         where a.dc_flag='D' and a.txn_date = #{prevDate} and a.txac_brid = #{deptCode}
-        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b
+        and a.txn_sn not in (select distinct fund_txn_sn from hm_txn_vch b
         where and b.txn_date between #{prevDate} and #{currentDate}
         and b.txac_brid = #{deptCode})
     </select>
@@ -317,7 +317,36 @@
         select a.*
         from hm_txn_stl a
         where a.dc_flag='D' and a.txn_date = #{currentDate} and a.opr1_no = #{operCode}
-        and a.txn_sn not in (select fund_txn_sn from hm_txn_vch b where b.txn_date=#{currentDate}
+        and a.txn_sn not in (select distinct fund_txn_sn from hm_txn_vch b where b.txn_date=#{currentDate}
         and b.opr1_no = #{operCode})
+    </select>
+
+    <!--//2015-05-08 linyong 票据流水查询包含账号等信息-->
+    <select id="selectVchAccountTxn" parameterType="java.lang.String"
+            resultType="common.repository.hmfs.model.hmfs.HmVchTxnVO">
+        select a.pkid,
+        a.txn_sub_sn as txnsubsn,
+        a.txn_date as txndate,
+        a.vch_sts as vchsts,
+        a.vch_num as vchnum,
+        a.opr1_no as opr1no,
+        a.opr2_no as opr2no,
+        a.fund_txn_sn as fundtxnsn,
+        a.txac_brid as txacbrid,
+        a.cbs_txn_sn as cbstxnsn,
+        c.info_addr as infoaddr,
+        c.act_bal as actbal,
+        c.fund_actno1 as fundactno,
+        c.info_name  as infoname,
+        c.builder_area as builderarea
+        from HM_TXN_VCH a
+        left outer join hm_txn_fund b on a.fund_txn_sn = b.txn_sn and b.fund_acttype='570'
+        left outer join hm_act_fund c on b.fund_actno = c.fund_actno1 and c.fund_acttype1='570'
+        where
+        b.txn_sub_sn = a.txn_sub_sn + 1
+        and b.txn_sn in (
+        select distinct fund_txn_sn from
+        HM_TXN_VCH where vch_num between #{startNo} and #{endNo})
+        order by a.vch_num
     </select>
 </mapper>

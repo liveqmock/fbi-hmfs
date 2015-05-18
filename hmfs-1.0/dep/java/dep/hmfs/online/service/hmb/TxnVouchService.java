@@ -112,7 +112,7 @@ public class TxnVouchService {
         return hmWebTxnMapper.checkVoucherIsHandlerByOper(currentDate, operCode);
     }
 
-    //票据使用和作废
+    //票据使用和作废 20150511 linyong
     @Transactional
     public void processVchUseOrCancel(final String instNo, final VouchStatus status, final String startNo, final String endNo,final String operCode) {
         //TODO 检查 中间不能有空号（库存中不存在的中间号码）

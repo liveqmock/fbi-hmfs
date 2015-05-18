@@ -8,6 +8,7 @@ import common.repository.hmfs.model.*;
 import common.repository.hmfs.model.hmfs.HmChkActVO;
 import common.repository.hmfs.model.hmfs.HmChkTxnVO;
 import common.repository.hmfs.model.hmfs.HmFundTxnVO;
+import common.repository.hmfs.model.hmfs.HmVchTxnVO;
 import common.service.SystemService;
 import hmfs.common.model.ActinfoQryParam;
 import org.apache.commons.beanutils.BeanUtils;
@@ -500,5 +501,10 @@ public class ActInfoService {
         example.setOrderByClause(" branch_id,opr_date desc,pkid desc ");
         List<HmVchJrnl> vchJrnlList = hmVchJrnlMapper.selectByExample(example);
         return hmVchJrnlMapper.selectByExample(example);
+    }
+
+    //20150508 linyong 票据业务发生流水查询，包括账号等信息
+    public List<HmVchTxnVO> selectVchAccountTxn(String startNo, String endNo) {
+        return hmWebTxnMapper.selectVchAccountTxn(startNo,endNo);
     }
 }

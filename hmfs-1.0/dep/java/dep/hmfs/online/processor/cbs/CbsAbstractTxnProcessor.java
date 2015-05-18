@@ -7,6 +7,8 @@ import common.repository.hmfs.model.HmSysCtl;
 import dep.hmfs.online.processor.cbs.domain.base.TIAHeader;
 import dep.hmfs.online.processor.cbs.domain.base.TOA;
 import dep.hmfs.online.service.hmb.HmbBaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -19,6 +21,7 @@ import javax.annotation.Resource;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class CbsAbstractTxnProcessor {
+    private static Logger logger = LoggerFactory.getLogger(CbsAbstractTxnProcessor.class);
 
     @Resource
     protected HmbBaseService hmbBaseService;
@@ -48,7 +51,8 @@ public abstract class CbsAbstractTxnProcessor {
         try {
             return process(tiaHeader, datagramBytes);
         } catch (Exception e) {
-            throw  new RuntimeException(e);
+            logger.info("["+tiaHeader.txnCode +"]:", e);
+            throw  new RuntimeException(e.getMessage());
         }
     }
 }
